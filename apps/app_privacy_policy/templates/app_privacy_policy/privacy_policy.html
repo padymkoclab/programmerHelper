@@ -1,0 +1,61 @@
+
+{% extends template_extend %}
+
+{% load static from staticfiles %}
+{% load i18n %}
+
+{% block block_css %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static 'app_privacy_policy/css/app_privacy_policy.css' %}">
+{% endblock block_css %}
+
+{% block block_content %}
+
+    {% trans "Personal information of user" as personal_information_of_user %}
+    {% trans "Usage personal information of user" as usage_personal_information_of_user %}
+    {% trans "Keeping personal data of user" as keeping_personal_data_of_user %}
+    {% trans "State privacy policy" as state_privacy_policy %}
+
+    <div class="row">
+        <div class="col-xs-10 col-xs-offset-1 col-md-8 col-md-offset-2" id="container_privacy_policy">
+            <div class="col-md-12">
+                <h1 class="text-center" id="label_Privacy_policy">{% trans "Privacy policy" %}</h1>
+            </div>
+            <div class="col-xs-12" id="container_for_tabs">
+                <ul class="nav nav-pills nav-stacked" id="tabs_privacy_policy">
+                    <li class="active"><a href="#personal_user_information">{{ personal_information_of_user }}</a></li>
+                    <li><a href="#usage_personal_user_information">{{ usage_personal_information_of_user }}</a></li>
+                    <li><a href="#keeping_personal_user_information">{{ keeping_personal_data_of_user }}</a></li>
+                    <li><a href="#state_privacy_policy">{{ state_privacy_policy }}</a></li>
+                </ul>
+            </div>
+            <div class="col-xs-12">
+                <h3 id="personal_user_information">{{ personal_information_of_user }}</h3>
+                <div class="wrapper_for_content_by_theme_of_privacy_policy">
+                    {% trans "Our web site collects the following personally identifiable information: email, name, last name, gender, date of birth. Action privacy policy comes into force from the date of registration of the user on the Web site." %}
+                </div>
+                <h3 id="keeping_personal_user_information">{{ usage_personal_information_of_user }}</h3>
+                <div class="wrapper_for_content_by_theme_of_privacy_policy">
+                    <h4><em>{% trans "Using cookies" %}</em></h4>
+                        {% trans "Cookies it is small piece of data stored in the user's device. Our website uses cookies to improve your experience. We'll assume you're ok with this, and inform you what, we using cookies for only saving your prefence about language. It is made, for handy every user, visited this website." %}
+                    <h4><em>{% trans "Using database" %}</em></h4>
+                        {% trans "We use the database as a key tool to store your personal information. For this we use a database of modern object-relational database management system (ORDBMS) - Postgresql. Access to this database is only the administration of the site." %}
+                </div>
+                <p>
+                <h3 id="usage_personal_user_information">{{ keeping_personal_data_of_user }}</h3>
+                <div class="wrapper_for_content_by_theme_of_privacy_policy">
+                    {% trans "Use of your personal information is based only on the need to provide you with the desired features of the site. For example in order to be able to participate in surveys or to get access to your personal cabinet. Also, your personal information is used in case of need to contact you." %}
+                </div>
+                <h3 id="state_privacy_policy">{{ state_privacy_policy }}</h3>
+                <div class="wrapper_for_content_by_theme_of_privacy_policy">
+                    {% trans "Privacy Policy on your site from time to time change this view it is advised to all users of the site to keep abreast of changes." %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock block_content %}
+
+{% block block_js %}
+    {{ block.super }}
+    <script src="{% static 'app_privacy_policy/js/app_privacy_policy.js' %}" type="text/javascript" charset="utf-8"></script>
+{% endblock block_js %}

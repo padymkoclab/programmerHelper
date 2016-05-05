@@ -1,0 +1,61 @@
+
+
+#container_privacy_policy
+{
+    margin-bottom: 30px;
+    padding: 30px 10px;
+
+    border-radius: 5px;
+    background: #f9f9ef;
+    box-shadow: 3px 3px 5px grey;
+}
+
+#personal_user_information,
+#keeping_personal_user_information,
+#usage_personal_user_information,
+#state_privacy_policy
+{
+    font-family: Georgia;
+    font-style: italic;
+
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.wrapper_for_content_by_theme_of_privacy_policy
+{
+    margin-top: 20px;
+    margin-left: 50px;
+    padding: 20px;
+
+    border: 5px solid #eee;
+    border-radius: 10px;
+    box-shadow: 1px 1px 20px;
+}
+
+
+body
+{
+    padding-top: 0;
+}
+
+#tabs_privacy_policy
+{
+    padding: 10px;
+
+    border: 3px solid #337ab7;
+    border-bottom-right-radius: 10px;
+    border-bottom-left-radius: 10px;
+}
+
+
+#label_Privacy_policy
+{
+    margin: 0;
+    padding: 5px;
+
+    color: #fff;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    background: #337ab7;
+    text-shadow: 2px 2px 40px;
+}

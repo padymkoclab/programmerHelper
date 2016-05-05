@@ -1,0 +1,49 @@
+
+
+# Project
+
+assets/
+media/
+
+# Python
+__pycache__/
+migrations/
+
+# Environment
+bin/
+include
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+share/
+selenium/
+var/
+*.egg-info/
+*.egg
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+pip-selfcheck.json
+
+# Unit test / coverage reports
+htmlcov/
+.coverage
+.cache
+
+# Translations
+*.mo
+*.pot
+
+# # Django stuff:
+*.log
+
+# Sphinx documentation
