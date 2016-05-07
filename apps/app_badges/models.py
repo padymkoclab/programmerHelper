@@ -41,7 +41,7 @@ class Badge(models.Model):
 
 class GettingBadge(models.Model):
 
-    user = models.ForeignKey(
+    account = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         verbose_name=_('User'),
         on_delete=models.CASCADE,
@@ -56,7 +56,7 @@ class GettingBadge(models.Model):
         verbose_name_plural = "Getting badges"
         ordering = ['date_getting']
         get_latest_by = 'date_getting'
-        unique_together = ['user', 'badge']
+        unique_together = ['account', 'badge']
 
     def __str__(self):
-        return 'Badge "{0.badge}" of user {0.user}'.format(self)
+        return 'Badge "{0.badge}" of user {0.account}'.format(self)

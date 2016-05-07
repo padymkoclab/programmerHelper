@@ -29,9 +29,15 @@ class Factory_ProgrammingUtility(factory.DjangoModelFactory):
         model = ProgrammingUtility
 
     description = factory.Faker('text', locale='ru')
-    url_in_web = factory.Faker('url', locale='ru')
+    picture = factory.Faker('url', locale='ru')
     category = fuzzy.FuzzyChoice(ProgrammingCategory.objects.all())
 
     @factory.lazy_attribute
     def name(self):
         return factory.Faker('text', locale='ru').generate([])[:40]
+
+ProgrammingCategory.objects.filter().delete()
+for i in range(10):
+    category = Factory_ProgrammingCategory()
+    for i in range(random.randrange(10)):
+        Factory_ProgrammingUtility(category=category)

@@ -1,6 +1,7 @@
 
 import uuid
 
+from django.template.defaultfilters import truncatewords
 from django.core.validators import MinLengthValidator, RegexValidator, MinValueValidator
 from django.utils import timezone
 from django.core.urlresolvers import reverse
@@ -109,7 +110,7 @@ class OpinionAboutBook(OpinionUserModel):
     objects = models.Manager()
 
     def __str__(self):
-        return 'Opinion os user {0.user} about book "{0.book}"'.format(self)
+        return 'Opinion of user "{0.user}" about book "{0.book}"'.format(self)
 
 
 class BookComment(TimeStampedModel):
@@ -149,7 +150,7 @@ class Writter(models.Model):
     """
 
     """
-A
+
     id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
     name = models.CharField(
         _('Name'), max_length=200, validators=[MinLengthValidator(settings.MIN_LENGTH_FOR_NAME_OR_TITLE_OBJECT)]
@@ -170,3 +171,6 @@ A
 
     def get_absolute_url(self):
         return reverse('app_books:writter', kwargs={'slug': self.slug})
+
+    def short_about(self):
+        return truncatewords(self.about, 10)

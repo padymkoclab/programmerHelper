@@ -50,9 +50,9 @@ class GettingBadgeAdmin(admin.ModelAdmin):
     Admin View for GettingBadge
     '''
 
-    list_display = ('badge', 'user', 'date_getting')
+    list_display = ('badge', 'account', 'date_getting')
     list_filter = (
-        ('user', admin.RelatedFieldListFilter),
+        ('account', admin.RelatedFieldListFilter),
         ('badge', admin.RelatedFieldListFilter),
         'date_getting',
     )

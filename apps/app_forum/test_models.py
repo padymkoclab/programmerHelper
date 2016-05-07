@@ -9,13 +9,13 @@ from factory import fuzzy
 from .models import *
 
 
-User_model = get_user_model()
+USER_MODEL = get_user_model()
 
 
-class Factory_TopicCategory(factory.DjangoModelFactory):
+class Factory_ForumTheme(factory.DjangoModelFactory):
 
     class Meta:
-        model = TopicCategory
+        model = ForumTheme
 
     description = factory.Faker('text', locale='ru')
 
@@ -24,14 +24,13 @@ class Factory_TopicCategory(factory.DjangoModelFactory):
         return factory.Faker('text', locale='ru').generate([])[:50]
 
 
-class Factory_Topic(factory.DjangoModelFactory):
+class Factory_ForumTopic(factory.DjangoModelFactory):
 
     class Meta:
-        model = Topic
+        model = ForumTopic
 
     description = factory.Faker('text', locale='ru')
-    author = fuzzy.FuzzyChoice(User_model.objects.filter(is_superuser=True, is_active=True))
-    category = fuzzy.FuzzyChoice(TopicCategory.objects.all())
+    author = fuzzy.FuzzyChoice(USER_MODEL.objects.all())
 
     @factory.lazy_attribute
     def name(self):
@@ -39,14 +38,23 @@ class Factory_Topic(factory.DjangoModelFactory):
 
     @factory.lazy_attribute
     def status(self):
-        return random.choice(Topic.STATUS_CHOICES)[0]
+        return random.choice(tuple(ForumTopic.CHOICES_STATUS._db_values))
 
 
-class Factory_Post(factory.DjangoModelFactory):
+class Factory_ForumPost(factory.DjangoModelFactory):
 
     class Meta:
-        model = Post
+        model = ForumPost
 
     content = factory.Faker('text', locale='ru')
-    author = fuzzy.FuzzyChoice(User_model.objects.all())
-    topic = fuzzy.FuzzyChoice(Topic.objects.all())
+    author = fuzzy.FuzzyChoice(USER_MODEL.objects.all())
+    topic = fuzzy.FuzzyChoice(ForumTopic.objects.all())
+
+
+ForumTheme.objects.filter().delete()
+for i in range(10):
+    theme = Factory_ForumTheme()
+    for j in range(random.randrange(20)):
+        topic = Factory_ForumTopic(theme=theme)
+        for e in range(random.randrange(1, 10)):
+            Factory_ForumPost(topic=topic)

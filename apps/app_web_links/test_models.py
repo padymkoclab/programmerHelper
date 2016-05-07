@@ -22,5 +22,5 @@ class Factory_WebLink(factory.DjangoModelFactory):
         return '{0} {1}'.format(name_en, name_ru)
 
 
-for i in range(500):
+for i in range(300):
     Factory_WebLink()

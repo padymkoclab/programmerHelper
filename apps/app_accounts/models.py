@@ -81,7 +81,7 @@ class Account(AbstractBaseUser, PermissionsMixin):
         related_name='users',
         verbose_name=_('Badges'),
         through=GettingBadge,
-        through_fields=('user', 'badge'),
+        through_fields=('account', 'badge'),
     )
     # private fields
     gender = models.CharField(_('Gender'), max_length=50, choices=CHOICES_GENDER, default=CHOICES_GENDER.vague)

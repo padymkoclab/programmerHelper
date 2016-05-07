@@ -36,7 +36,7 @@ class ForumThemeAdmin(admin.ModelAdmin):
     list_display = (
         'name',
         'get_count_topic',
-        'get_count_total_messages',
+        'get_count_total_posts',
         'is_new',
         'date_modified',
         'date_added',
@@ -54,7 +54,7 @@ class ForumThemeAdmin(admin.ModelAdmin):
         qs = super(ForumThemeAdmin, self).get_queryset(request)
         qs = qs.annotate(
             count_topics=Count('topics', distinct=True),
-            count_messages=Count('topics__messages', distinct=True),
+            count_posts=Count('topics__posts', distinct=True),
         )
         return qs
 
@@ -63,10 +63,10 @@ class ForumThemeAdmin(admin.ModelAdmin):
     get_count_topic.admin_order_field = 'count_topics'
     get_count_topic.short_description = _('Count topics')
 
-    def get_count_total_messages(self, obj):
-        return obj.count_messages
-    get_count_total_messages.admin_order_field = 'count_messages'
-    get_count_total_messages.short_description = _('Count total messages')
+    def get_count_total_posts(self, obj):
+        return obj.count_posts
+    get_count_total_posts.admin_order_field = 'count_posts'
+    get_count_total_posts.short_description = _('Count total posts')
 
 
 class ForumTopicAdmin(admin.ModelAdmin):
@@ -78,7 +78,7 @@ class ForumTopicAdmin(admin.ModelAdmin):
         'name',
         'theme',
         'author',
-        'get_count_messages',
+        'get_count_posts',
         'status',
         'status_changed',
         'is_new',
@@ -100,14 +100,14 @@ class ForumTopicAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
         qs = super(ForumTopicAdmin, self).get_queryset(request)
         qs = qs.annotate(
-            count_messages=Count('messages', distinct=True),
+            count_posts=Count('posts', distinct=True),
         )
         return qs
 
-    def get_count_messages(self, obj):
-        return obj.count_messages
-    get_count_messages.admin_order_field = 'count_messages'
-    get_count_messages.short_description = _('Count messages')
+    def get_count_posts(self, obj):
+        return obj.count_posts
+    get_count_posts.admin_order_field = 'count_posts'
+    get_count_posts.short_description = _('Count posts')
 
 
 class ForumPostAdmin(admin.ModelAdmin):

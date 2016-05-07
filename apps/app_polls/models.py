@@ -20,6 +20,9 @@ class Poll(TimeStampedModel):
 
     """
 
+    MIN_COUNT_CHOICES_IN_POLL = 2
+    MAX_COUNT_CHOICES_IN_POLL = 10
+
     CHOICES_STATUS = Choices(
         ('draft', _('Draft')),
         ('open', _('Open')),
@@ -36,13 +39,6 @@ class Poll(TimeStampedModel):
         _('Title'), max_length=200, unique=True, validators=[MinLengthValidator(settings.MIN_LENGTH_FOR_NAME_OR_TITLE_OBJECT)]
     )
     slug = AutoSlugField(_('Slug'), populate_from='title', always_update=True, unique=True, allow_unicode=True, db_index=True)
-    author = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        related_name='polls',
-        on_delete=models.PROTECT,
-        limit_choices_to={'is_superuser': True},
-        verbose_name=_('Author'),
-    )
     accessability = models.CharField(
         _('accessability'),
         max_length=20,
@@ -51,7 +47,7 @@ class Poll(TimeStampedModel):
     )
     status = StatusField(verbose_name=_('status'), choices_name='CHOICES_STATUS', default=CHOICES_STATUS.draft)
     status_changed = MonitorField(_('Status changed'), monitor='status')
-    voted_users = models.ManyToManyField(
+    votes = models.ManyToManyField(
         settings.AUTH_USER_MODEL,
         related_name='votes_in_polls',
         through='VoteInPoll',
@@ -88,17 +84,20 @@ class Choice(models.Model):
         on_delete=models.CASCADE,
         related_name='choices',
     )
-    content = models.TextField(_('content'))
-    count_votes = models.IntegerField(_('Count votes'), default=0)
+    text_choice = models.TextField(_('Text choice'))
 
     class Meta:
         db_table = 'choices'
         verbose_name = _("Choice")
         verbose_name_plural = _("Choices")
-        # unique_together = ['poll', 'title']
+        ordering = ['poll']
+        unique_together = ['poll', 'text_choice']
 
     def __str__(self):
-        return '{0.title}'.format(self)
+        return _('{0.text_choice}').format(self)
+
+    def count_votes(self):
+        pass
 
 
 class VoteInPoll(models.Model):
@@ -112,6 +111,11 @@ class VoteInPoll(models.Model):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         verbose_name=_('User'),
+        on_delete=models.CASCADE,
+    )
+    choice = models.ForeignKey(
+        'Choice',
+        verbose_name=_('Choice'),
         on_delete=models.CASCADE,
     )
     date_voting = models.DateTimeField(_('Date voting'), auto_now=True)

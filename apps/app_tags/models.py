@@ -13,6 +13,9 @@ class Tag(TimeStampedModel):
     Model tags for another models
     """
 
+    MIN_COUNT_TAGS_ON_OBJECT = 1
+    MAX_COUNT_TAGS_ON_OBJECT = 5
+
     name = models.CharField(_('Name'), max_length=30, unique=True)
     slug = AutoSlugField(_('Slug'), populate_from='name', unique=True, always_update=True, allow_unicode=True)
 

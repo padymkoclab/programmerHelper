@@ -1,9 +1,7 @@
 
-from django.db.models import Count
+from django.db.models import Count, When, Case, BooleanField
 from django.utils.translation import ugettext_lazy as _
 from django.contrib import admin
-
-from mylabour.models import OpinionUserModel
 
 from .models import *
 from .forms import SnippetForm
@@ -50,11 +48,11 @@ class SnippetAdmin(admin.ModelAdmin):
         'author',
         'lexer',
         'get_count_good_opinions',
-        'get_count_bad_opinions',
-        'get_count_opinions',
-        'get_count_favorites',
-        'get_count_comments',
-        'get_count_tags',
+        # 'get_count_bad_opinions',
+        # 'get_count_opinions',
+        # 'get_count_favorites',
+        # 'get_count_comments',
+        # 'get_count_tags',
         'is_new',
         'date_modified',
         'date_added',
@@ -81,9 +79,17 @@ class SnippetAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
         qs = super(SnippetAdmin, self).get_queryset(request)
         qs = qs.annotate(
-            count_comments=Count('comments', distinct=True),
-            count_opinions=Count('opinions', distinct=True),
-            count_tags=Count('tags', distinct=True),
+            # count_tags=Count('tags', distinct=True),
+            # count_comments=Count('comments', distinct=True),
+            # count_opinions=Count('opinions', distinct=True),
+            count_good_opinions=Count(
+                Case(
+                    When(opinionaboutsnippet__is_useful=True, then=True),
+                    default=None,
+                    ouput_field=BooleanField(),
+                ),
+                # distinct=True
+            )
         )
         return qs
 
@@ -93,17 +99,17 @@ class SnippetAdmin(admin.ModelAdmin):
     get_count_comments.short_description = _('Count comments')
 
     def get_count_good_opinions(self, obj):
-        return OpinionAboutSnippet.objects.filter(snippet=obj, is_useful=True).count()
-    # get_count_good_opinions.admin_order_field = ''
+        return obj.count_good_opinions
+    get_count_good_opinions.admin_order_field = 'count_good_opinions'
     get_count_good_opinions.short_description = _('Count good opinions')
 
     def get_count_bad_opinions(self, obj):
-        return OpinionAboutSnippet.objects.filter(snippet=obj, is_useful=False).count()
+        return 1
     # get_count_bad_opinions.admin_order_field = ''
     get_count_bad_opinions.short_description = _('Count bad opinions')
 
     def get_count_favorites(self, obj):
-        return OpinionAboutSnippet.objects.filter(snippet=obj, is_favorite=OpinionUserModel.YES).count()
+        return 1
     # get_count_favorites.admin_order_field = ''
     get_count_favorites.short_description = _('Count favorites')
 

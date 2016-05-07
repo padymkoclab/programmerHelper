@@ -71,7 +71,7 @@ class ForumTopic(TimeStampedModel):
         verbose_name = _('Topic')
         verbose_name_plural = _('Topics')
         order_with_respect_to = 'theme'
-        unique_together = ['slug', 'theme']
+        unique_together = ['name', 'theme']
         get_latest_by = 'date_modified'
 
     def __str__(self):

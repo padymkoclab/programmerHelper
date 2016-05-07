@@ -10,10 +10,10 @@ from .models import *
 Accounts = Account.objects.all()
 
 
-class Factory_CategorySolution(factory.DjangoModelFactory):
+class Factory_SolutionCategory(factory.DjangoModelFactory):
 
     class Meta:
-        model = CategorySolution
+        model = SolutionCategory
 
     @factory.lazy_attribute
     def name(self):
@@ -33,7 +33,8 @@ class Factory_Solution(factory.DjangoModelFactory):
     class Meta:
         model = Solution
 
-    category = fuzzy.FuzzyChoice(CategorySolution.objects.all())
+    category = fuzzy.FuzzyChoice(SolutionCategory.objects.all())
+    author = fuzzy.FuzzyChoice(Account.objects.all())
 
     @factory.lazy_attribute
     def title(self):
@@ -47,18 +48,18 @@ class Factory_Solution(factory.DjangoModelFactory):
         return text_body
 
 
-class Factory_OpinionUserAboutSolution(factory.DjangoModelFactory):
+class Factory_OpinionAboutSolution(factory.DjangoModelFactory):
 
     class Meta:
-        model = OpinionUserAboutSolution
+        model = OpinionAboutSolution
 
     is_useful = fuzzy.FuzzyChoice([True, False, None])
 
     @factory.lazy_attribute
     def is_favorite(self):
         if self.is_useful is None:
-            return OpinionUserModel.YES
-        return random.choice(OpinionUserModel.CHOICES_FAVORITE)[0]
+            return OpinionUserModel.CHOICES_FAVORITE.yes
+        return random.choice(tuple(OpinionUserModel.CHOICES_FAVORITE._db_values))
 
 
 class Factory_SolutionComment(factory.DjangoModelFactory):
@@ -93,18 +94,18 @@ class Factory_Question(factory.DjangoModelFactory):
                 return Question.OPEN_QUESTION
 
 
-class Factory_OpinionUserAboutQuestion(factory.DjangoModelFactory):
+class Factory_OpinionAboutQuestion(factory.DjangoModelFactory):
 
     class Meta:
-        model = OpinionUserAboutQuestion
+        model = OpinionAboutQuestion
 
     is_useful = fuzzy.FuzzyChoice([True, False, None])
 
     @factory.lazy_attribute
     def is_favorite(self):
         if self.is_useful is None:
-            return OpinionUserModel.YES
-        return random.choice(OpinionUserModel.CHOICES_FAVORITE)[0]
+            return OpinionUserModel.CHOICES_FAVORITE.yes
+        return random.choice(tuple(OpinionUserModel.CHOICES_FAVORITE._db_values))
 
 
 class Factory_Answer(factory.DjangoModelFactory):
@@ -123,14 +124,14 @@ class Factory_Answer(factory.DjangoModelFactory):
         return random.choice([True, False])
 
 
-class Factory_OpinionUserAboutAnswer(factory.DjangoModelFactory):
+class Factory_OpinionAboutAnswer(factory.DjangoModelFactory):
 
     class Meta:
-        model = OpinionUserAboutAnswer
+        model = OpinionAboutAnswer
 
     user = fuzzy.FuzzyChoice(Accounts)
     answer = fuzzy.FuzzyChoice(Answer.objects.all())
-    liked_this_answer = fuzzy.FuzzyChoice([True, False])
+    liked_it = fuzzy.FuzzyChoice([True, False])
 
 
 class Factory_AnswerComment(factory.DjangoModelFactory):
@@ -143,12 +144,12 @@ class Factory_AnswerComment(factory.DjangoModelFactory):
     text_comment = factory.Faker('text', locale='ru')
 
 
-CategorySolution.objects.filter().delete()
-for i in range(20):
-    category = Factory_CategorySolution()
+SolutionCategory.objects.filter().delete()
+for i in range(10):
+    category = Factory_SolutionCategory()
     # import ipdb
     # ipdb.set_trace()
-    random_count_solutions = random.choice([1, 10])
+    random_count_solutions = random.randrange(8)
     for j in range(random_count_solutions):
         solution = Factory_Solution(category=category)
         # generate random
@@ -169,12 +170,12 @@ for i in range(20):
         solution.useful_links.set(web_links)
         solution.tags.set(tags)
         for user in users:
-            Factory_OpinionUserAboutSolution(user=user, solution=solution)
+            Factory_OpinionAboutSolution(user=user, solution=solution)
         for e in range(random_count_comments):
             Factory_SolutionComment(solution=solution)
 
 Question.objects.filter().delete()
-for i in range(100):
+for i in range(30):
     question = Factory_Question()
     # generate random
     random_count_tags = random.randrange(Tag.MIN_COUNT_TAGS_ON_OBJECT, Tag.MAX_COUNT_TAGS_ON_OBJECT)
@@ -189,13 +190,13 @@ for i in range(100):
     # setting objects
     question.tags.set(tags)
     for user in users:
-        Factory_OpinionUserAboutQuestion(user=user, question=question)
+        Factory_OpinionAboutQuestion(user=user, question=question)
     for j in range(random_count_answers):
         answer = Factory_Answer(question=question)
         # generate random
         random_count_opinions = random.randrange(0, 50)
         random_count_comments = random.randrange(0, 5)
         for e in range(random_count_opinions):
-            Factory_OpinionUserAboutAnswer(answer=answer)
+            Factory_OpinionAboutAnswer(answer=answer)
         for k in range(random_count_comments):
             Factory_AnswerComment(answer=answer)

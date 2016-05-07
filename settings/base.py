@@ -41,6 +41,7 @@ MY_APPS = [
     'apps.app_newsletters.apps.AppNewslettersConfig',
     'apps.app_cources.apps.AppCourcesConfig',
     'apps.app_polls.apps.AppPollsConfig',
+    'apps.app_generic_models.apps.AppGenericModelsConfig',
 ]
 
 THIRD_PARTY_APPS = [

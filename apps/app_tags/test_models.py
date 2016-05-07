@@ -17,5 +17,5 @@ class Factory_Tag(factory.DjangoModelFactory):
 
 
 Tag.objects.filter().delete()
-for i in range(500):
+for i in range(300):
     Factory_Tag()

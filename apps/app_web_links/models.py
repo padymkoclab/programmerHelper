@@ -12,6 +12,8 @@ class WebLink(models.Model):
     Model tags for another models
     """
 
+    MAX_COUNT_WEBLINKS_ON_OBJECT = 10
+
     id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
     title = models.CharField(
         _('Title'), max_length=200, unique=True, validators=[MinLengthValidator(settings.MIN_LENGTH_FOR_NAME_OR_TITLE_OBJECT)]

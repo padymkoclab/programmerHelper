@@ -71,7 +71,7 @@ class Factory_ArticleComment(factory.DjangoModelFactory):
 
 
 Article.objects.filter().delete()
-for i in range(50):
+for i in range(20):
     article = Factory_Article()
     accounts = USER_MODEL.objects.all()
     # random

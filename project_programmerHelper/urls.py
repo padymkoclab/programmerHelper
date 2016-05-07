@@ -26,6 +26,7 @@ urlpatterns = [
     url(r'^tags/', include('apps.app_tags.urls')),
     url(r'^snippets/', include('apps.app_snippets.urls')),
     url(r'^news/', include('apps.app_newsletters.urls')),
+    url(r'^polls/', include('apps.app_polls.urls')),
     url(r'^programming_tester/', include('apps.app_programming_tester.urls')),
     url(r'^programming_utilities/', include('apps.app_programming_utilities.urls')),
 ]

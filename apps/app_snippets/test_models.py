@@ -32,18 +32,18 @@ class Factory_Snippet(factory.DjangoModelFactory):
         return random.choice(CHOICES_LEXERS)[0]
 
 
-class Factory_OpinionUserAboutSnippet(factory.DjangoModelFactory):
+class Factory_OpinionAboutSnippet(factory.DjangoModelFactory):
 
     class Meta:
-        model = OpinionUserAboutSnippet
+        model = OpinionAboutSnippet
 
     is_useful = fuzzy.FuzzyChoice([True, False, None])
 
     @factory.lazy_attribute
     def is_favorite(self):
         if self.is_useful is None:
-            return OpinionUserModel.UNKNOWN
-        return random.choice(OpinionUserModel.CHOICES_FAVORITE)[0]
+            return OpinionUserModel.CHOICES_FAVORITE.unknown
+        return random.choice(tuple(OpinionUserModel.CHOICES_FAVORITE._db_values))
 
 
 class Factory_SnippetComment(factory.DjangoModelFactory):
@@ -57,7 +57,7 @@ class Factory_SnippetComment(factory.DjangoModelFactory):
 
 
 Snippet.objects.filter().delete()
-for i in range(100):
+for i in range(50):
     snippet = Factory_Snippet()
     random_count_comments = random.randrange(0, 5)
     random_count_users = random.randrange(0, len(Accounts))
@@ -68,6 +68,6 @@ for i in range(100):
     tags = random.sample(tuple(Tag.objects.all()), random_count_tags)
     snippet.tags.set(tags)
     for user in users:
-        Factory_OpinionUserAboutSnippet(user=user, snippet=snippet)
+        Factory_OpinionAboutSnippet(user=user, snippet=snippet)
     for i in range(random_count_comments):
         Factory_SnippetComment(snippet=snippet)
