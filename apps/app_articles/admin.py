@@ -3,20 +3,10 @@ from django.db.models import Count
 from django.utils.translation import ugettext_lazy as _
 from django.contrib import admin
 
+from apps.app_generic_models.admin import OpinionGenericInline, CommentGenericInline
+
 from .forms import ArticleForm
-from .models import Article, ArticleSubsection, ArticleComment
-
-
-class OpinionAboutArticleInline(admin.TabularInline):
-    '''
-        Tabular Inline View for Tag
-    '''
-
-    model = Article.opinions.through
-    extra = 1
-    fields = ['user', 'is_useful', 'is_favorite']
-    # verbose_name = _('Opinion')
-    # verbose_name_plural = _('Voted users')
+from .models import Article, ArticleSubsection
 
 
 class ArticleSubsectionInline(admin.StackedInline):
@@ -30,18 +20,6 @@ class ArticleSubsectionInline(admin.StackedInline):
     fk_name = 'article'
     fields = ['title', 'content']
     extra = 1
-
-
-class ArticleCommentInline(admin.StackedInline):
-    '''
-    Tabular Inline View for Tag
-    '''
-
-    model = ArticleComment
-    fk_name = 'article'
-    fields = ['article', 'author', 'text_comment']
-    extra = 1
-    verbose_name = _('Comment')
 
 
 class ArticleAdmin(admin.ModelAdmin):
@@ -70,9 +48,9 @@ class ArticleAdmin(admin.ModelAdmin):
     )
     search_fields = ('title', 'web_url')
     inlines = [
+        OpinionGenericInline,
         ArticleSubsectionInline,
-        OpinionAboutArticleInline,
-        ArticleCommentInline,
+        CommentGenericInline,
     ]
     fieldsets = [
         (_('Basic'), {
@@ -132,23 +110,6 @@ class ArticleAdmin(admin.ModelAdmin):
     get_count_comments.short_description = _('Count comments')
 
 
-class OpinionAboutArticleAdmin(admin.ModelAdmin):
-    '''
-        Admin View for OpinionAboutArticle
-    '''
-
-    list_display = ('user', 'article', 'is_useful', 'display_is_favorite_as_boolean', 'date_modified')
-    list_filter = (
-        ('user', admin.RelatedOnlyFieldListFilter),
-        ('article', admin.RelatedOnlyFieldListFilter),
-        ('is_useful', admin.BooleanFieldListFilter),
-        'is_favorite',
-        'date_modified',
-    )
-    date_hierarchy = 'date_modified'
-    fields = ['article', 'user', 'is_useful', 'is_favorite']
-
-
 class ArticleSubsectionAdmin(admin.ModelAdmin):
     '''
         Admin View for ArticleSubsection
@@ -163,18 +124,3 @@ class ArticleSubsectionAdmin(admin.ModelAdmin):
     search_fields = ('title', 'article__title')
     date_hierarchy = 'date_modified'
     fields = ['article', 'title', 'content']
-
-
-class ArticleCommentAdmin(admin.ModelAdmin):
-    '''
-        Admin View for ArticleComment
-    '''
-    list_display = ('article', 'author', 'is_new', 'date_modified', 'date_added')
-    list_filter = (
-        ('article', admin.RelatedOnlyFieldListFilter),
-        ('author', admin.RelatedOnlyFieldListFilter),
-        'date_modified',
-        'date_added',
-    )
-    date_hierarchy = 'date_modified'
-    fields = ['article', 'author', 'text_comment']

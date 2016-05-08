@@ -1,6 +1,7 @@
 
 import uuid
 
+from django.contrib.contenttypes.fields import GenericRelation
 from django.template.defaultfilters import truncatewords
 from django.core.validators import MinLengthValidator, RegexValidator, MinValueValidator
 from django.utils import timezone
@@ -11,7 +12,7 @@ from django.conf import settings
 
 from autoslug import AutoSlugField
 
-from mylabour.models import TimeStampedModel, OpinionUserModel
+from apps.app_generic_models.models import UserComment_Generic, UserOpinion_Generic
 from apps.app_tags.models import Tag
 from apps.app_web_links.models import WebLink
 
@@ -40,7 +41,10 @@ class Book(models.Model):
         _('ISBN'),
         max_length=30,
         help_text=_('ISBN code of book'),
-        validators=[RegexValidator(regex='\d+-\d+-\d+-\d+-\d+')])
+        validators=[RegexValidator(regex='\d+-\d+-\d+-\d+-\d+')],
+        blank=True,
+        default='',
+    )
     date_published = models.DateField(_('Date published'))
     tags = models.ManyToManyField(
         Tag,
@@ -52,13 +56,8 @@ class Book(models.Model):
         related_name='books',
         verbose_name=_('Where downloads')
     )
-    opinions = models.ManyToManyField(
-        settings.AUTH_USER_MODEL,
-        related_name='opinions_about_books',
-        through='OpinionAboutBook',
-        through_fields=['book', 'user'],
-        verbose_name=_('Opinions'),
-    )
+    comments = GenericRelation(UserComment_Generic)
+    opinions = GenericRelation(UserOpinion_Generic)
 
     class Meta:
         db_table = 'books'
@@ -81,69 +80,6 @@ class Book(models.Model):
         This book pusblished about one year ago.
         """
         return timezone.now() >= self.date_published - timezone.timedelta(weeks=52)
-
-
-class OpinionAboutBook(OpinionUserModel):
-    """
-
-    """
-
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        limit_choices_to={'is_active': True},
-        verbose_name=_('User'),
-        on_delete=models.CASCADE,
-    )
-    book = models.ForeignKey(
-        'Book',
-        verbose_name=_('Book'),
-        on_delete=models.CASCADE,
-    )
-
-    class Meta(OpinionUserModel.Meta):
-        db_table = 'opinions_about_books'
-        verbose_name = _('Opinion')
-        verbose_name_plural = _('Opinions')
-        ordering = ['book', 'user']
-        unique_together = ['user', 'book']
-
-    objects = models.Manager()
-
-    def __str__(self):
-        return 'Opinion of user "{0.user}" about book "{0.book}"'.format(self)
-
-
-class BookComment(TimeStampedModel):
-    """
-
-    """
-
-    author = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        limit_choices_to={'is_active': True},
-        on_delete=models.DO_NOTHING,
-        related_name='comments_books',
-        verbose_name=_('Author'),
-    )
-    book = models.ForeignKey(
-        'Book',
-        on_delete=models.CASCADE,
-        related_name='comments',
-        verbose_name=_('Book'),
-    )
-    content = models.TextField(_('Content'))
-
-    class Meta:
-        db_table = 'books_comments'
-        verbose_name = _('Comment')
-        verbose_name_plural = _('Comments')
-        get_latest_by = 'date_'
-        ordering = ['book', 'author']
-
-    objects = models.Manager()
-
-    def __str__(self):
-        return 'Comment from author "{0.author}" on book "{0.book}"'.format(self)
 
 
 class Writter(models.Model):

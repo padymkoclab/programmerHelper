@@ -1,4 +1,5 @@
 
+from django.contrib.contenttypes.fields import GenericRelation
 from django.core.urlresolvers import reverse
 from django.core.validators import MinLengthValidator
 from django.utils.translation import ugettext_lazy as _
@@ -7,8 +8,9 @@ from django.conf import settings
 
 from autoslug import AutoSlugField
 
+from apps.app_generic_models.models import UserComment_Generic, UserOpinion_Generic
 from apps.app_tags.models import Tag
-from mylabour.models import TimeStampedModel, OpinionUserModel
+from mylabour.models import TimeStampedModel
 from mylabour.utils import CHOICES_LEXERS
 
 
@@ -37,13 +39,8 @@ class Snippet(TimeStampedModel):
         on_delete=models.DO_NOTHING,
         limit_choices_to={'is_active': True},
     )
-    opinions = models.ManyToManyField(
-        settings.AUTH_USER_MODEL,
-        verbose_name=_('Opinions'),
-        related_name='opinions_about_snippets',
-        through='OpinionAboutSnippet',
-        through_fields=('snippet', 'user'),
-    )
+    opinions = GenericRelation(UserOpinion_Generic)
+    comments = GenericRelation(UserComment_Generic)
 
     class Meta:
         db_table = 'snippets'
@@ -60,46 +57,3 @@ class Snippet(TimeStampedModel):
 
     def get_scope(self):
         pass
-
-
-class OpinionAboutSnippet(OpinionUserModel):
-
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-        verbose_name='User',
-        limit_choices_to={'is_active': True},
-    )
-    snippet = models.ForeignKey('Snippet', on_delete=models.CASCADE, verbose_name='Snippet')
-
-    class Meta(OpinionUserModel.Meta):
-        db_table = 'Opinions_about_snippets'
-        verbose_name = _('Opinion about snippet')
-        verbose_name_plural = _('Opinions about snippet')
-        ordering = ['snippet', 'user']
-        unique_together = ['user', 'snippet']
-
-    def __str__(self):
-        return _('Opinion of user "{0.user}" about snippet "{0.snippet}"').format(self)
-
-
-class SnippetComment(TimeStampedModel):
-
-    text_comment = models.TextField(_('Text comment'))
-    snippet = models.ForeignKey('Snippet', related_name='comments', verbose_name=_('Snippet'), on_delete=models.CASCADE)
-    author = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        related_name='comments_snippet',
-        verbose_name=_('Author'),
-        on_delete=models.DO_NOTHING,
-    )
-
-    class Meta:
-        db_table = 'snippets_comments'
-        verbose_name = _("Comment of snippet")
-        verbose_name_plural = _("Comments of snippet")
-        get_latest_by = 'date_added'
-        ordering = ['snippet', 'date_added']
-
-    def __str__(self):
-        return _('Comment from "{0.author}" on snippet "{0.snippet}"').format(self)

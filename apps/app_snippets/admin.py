@@ -3,38 +3,10 @@ from django.db.models import Count, When, Case, BooleanField
 from django.utils.translation import ugettext_lazy as _
 from django.contrib import admin
 
+from apps.app_generic_models.admin import OpinionGenericInline, CommentGenericInline
+
 from .models import *
 from .forms import SnippetForm
-
-
-class SnippetCommentInline(admin.StackedInline):
-    '''
-    Stacked Inline View for SnippetComment
-    '''
-
-    model = SnippetComment
-    fieldsets = (
-        (None, {
-            'fields': ['author', 'text_comment']
-        }),
-    )
-    extra = 1
-    fk_name = 'snippet'
-    verbose_name = _('Comment')
-
-
-class OpinionAboutSnippetInline(admin.TabularInline):
-    '''
-    Stacked Inline View for OpinionAboutSnippet
-    '''
-
-    model = OpinionAboutSnippet
-    extra = 1
-    fieldsets = (
-        (None, {
-            'fields': ['user', 'is_useful', 'is_favorite']
-        }),
-    )
 
 
 class SnippetAdmin(admin.ModelAdmin):
@@ -64,8 +36,8 @@ class SnippetAdmin(admin.ModelAdmin):
         'date_added',
     )
     inlines = [
-        SnippetCommentInline,
-        OpinionAboutSnippetInline,
+        OpinionGenericInline,
+        CommentGenericInline,
     ]
     search_fields = ('title',)
     filter_horizontal = ['tags']
@@ -122,40 +94,3 @@ class SnippetAdmin(admin.ModelAdmin):
         return obj.count_tags
     get_count_tags.admin_order_field = 'count_tags'
     get_count_tags.short_description = _('Count tags')
-
-
-class OpinionAboutSnippetAdmin(admin.ModelAdmin):
-    '''
-    Admin View for OpinionAboutSnippet
-    '''
-    list_display = ('snippet', 'user', 'is_useful', 'is_favorite', 'date_modified')
-    list_filter = (
-        ('user', admin.RelatedOnlyFieldListFilter),
-        ('snippet', admin.RelatedOnlyFieldListFilter),
-        'is_useful',
-        'is_favorite',
-        'date_modified',
-    )
-    fieldsets = [
-        [None, {
-            'fields': ['snippet', 'user', 'is_useful', 'is_favorite']
-        }]
-    ]
-
-
-class SnippetCommentAdmin(admin.ModelAdmin):
-    '''
-        Admin View for SnippetComment
-    '''
-    list_display = ('snippet', 'author', 'is_new', 'date_modified', 'date_added')
-    list_filter = (
-        ('author', admin.RelatedOnlyFieldListFilter),
-        ('snippet', admin.RelatedOnlyFieldListFilter),
-        'date_modified',
-        'date_added',
-    )
-    fieldsets = [
-        [None, {
-            'fields': ['snippet', 'author', 'text_comment']
-        }]
-    ]

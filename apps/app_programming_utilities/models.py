@@ -1,4 +1,5 @@
 
+from django.contrib.contenttypes.fields import GenericRelation
 from django.core.urlresolvers import reverse
 from django.core.validators import MinLengthValidator
 from django.utils.translation import ugettext_lazy as _
@@ -7,7 +8,8 @@ from django.conf import settings
 
 from autoslug import AutoSlugField
 
-from mylabour.models import TimeStampedModel, LikeUserModel
+from apps.app_generic_models.models import UserOpinion_Generic, UserComment_Generic
+from mylabour.models import TimeStampedModel
 
 
 # Are you agree?
@@ -58,20 +60,8 @@ class ProgrammingUtility(TimeStampedModel):
         on_delete=models.CASCADE,
     )
     web_link = models.URLField(_('Web link'))
-    opinions = models.ManyToManyField(
-        settings.AUTH_USER_MODEL,
-        related_name='opinions_about_utilities',
-        verbose_name=_('Opinions'),
-        through='OpinionAboutProgrammingUtility',
-        through_fields=['utility', 'user']
-    )
-    comments = models.ManyToManyField(
-        settings.AUTH_USER_MODEL,
-        related_name='comments_about_utilities',
-        verbose_name=_('Comments'),
-        through='ProgrammingUtilityComment',
-        through_fields=['utility', 'author']
-    )
+    opinions = GenericRelation(UserOpinion_Generic)
+    comments = GenericRelation(UserComment_Generic)
 
     class Meta:
         db_table = 'programming_utilities'
@@ -82,46 +72,3 @@ class ProgrammingUtility(TimeStampedModel):
 
     def __str__(self):
         return '{0.name}'.format(self)
-
-
-class ProgrammingUtilityComment(TimeStampedModel):
-    """
-
-    """
-
-    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.DO_NOTHING, verbose_name=_('Author'))
-    utility = models.ForeignKey('ProgrammingUtility', on_delete=models.CASCADE, verbose_name=_('Utility'))
-
-    class Meta:
-        db_table = 'programming_utilities_comments'
-        verbose_name = _('Comment')
-        verbose_name_plural = _('Comments')
-        ordering = ['utility', 'date_modified']
-
-    objects = models.Manager()
-
-    def __str__(self):
-        return 'Commen from "{0.user}" on utility "{0.utility}"'.format(self)
-
-
-class OpinionAboutProgrammingUtility(LikeUserModel):
-    """
-
-    """
-
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.DO_NOTHING, verbose_name=_('User'))
-    utility = models.ForeignKey('ProgrammingUtility', on_delete=models.CASCADE, verbose_name=_('Utility'))
-
-    class Meta(LikeUserModel.Meta):
-        db_table = 'programming_utilities_opinions'
-        verbose_name = _('Opinion')
-        verbose_name_plural = _('Opinions')
-        unique_together = ['user', 'utility']
-
-    objects = models.Manager()
-
-    def __str__(self):
-        return 'Opnion of user "{0.user}" on utility "{0.utility}"'.format(self)
-
-    def save(self, *args, **kwargs):
-        super(OpinionAboutProgrammingUtility, self).save(*args, **kwargs)

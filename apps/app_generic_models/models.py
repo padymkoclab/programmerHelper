@@ -14,7 +14,7 @@ from model_utils import Choices
 class BaseGeneric(models.Model):
 
     id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
-    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, verbose_name=_('Type object'))
     object_id = models.UUIDField()
     content_object = GenericForeignKey('content_type', 'object_id')
     date_modified = models.DateTimeField(_('Date modified'), auto_now=True)

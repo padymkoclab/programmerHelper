@@ -3,25 +3,7 @@ from django.db.models import Count
 from django.utils.translation import ugettext_lazy as _
 from django.contrib import admin
 
-from .models import BookComment, OpinionAboutBook
-
-
-class BookCommentInline(admin.StackedInline):
-    '''
-        Stacked Inline View for BookComment
-    '''
-    model = BookComment
-    extra = 1
-    fk_name = 'book'
-    fields = ['book', 'author', 'content']
-
-
-class OpinionAboutBookInline(admin.TabularInline):
-    '''
-    Tabular Inline View for OpinionAboutBook
-    '''
-    model = OpinionAboutBook
-    extra = 1
+from apps.app_generic_models.admin import OpinionGenericInline, CommentGenericInline
 
 
 class BookAdmin(admin.ModelAdmin):
@@ -43,8 +25,8 @@ class BookAdmin(admin.ModelAdmin):
     )
     list_filter = ('date_published',)
     inlines = [
-        BookCommentInline,
-        OpinionAboutBookInline,
+        OpinionGenericInline,
+        CommentGenericInline,
     ]
     search_fields = ('name', 'publishers')
     date_hierarchy = 'date_published'
@@ -92,24 +74,6 @@ class BookAdmin(admin.ModelAdmin):
         return obj.count_links_where_download
     get_count_links_where_download.admin_order_field = 'count_links_where_download'
     get_count_links_where_download.short_description = _('Count links where download')
-
-
-class BookCommentAdmin(admin.ModelAdmin):
-    '''
-        Admin View for BookComment
-    '''
-    list_display = ('author', 'book', 'date_modified')
-    list_filter = ('author', 'book', 'date_modified')
-    fields = ['book', 'author', 'content']
-
-
-class OpinionAboutBookAdmin(admin.ModelAdmin):
-    '''
-        Admin View for OpinionAboutBook
-    '''
-    list_display = ('user', 'book', 'is_useful', 'display_is_favorite_as_boolean', 'date_modified')
-    list_filter = ('user', 'book', 'is_useful', 'is_favorite', 'date_modified')
-    fields = ['book', 'user', 'is_useful', 'is_favorite']
 
 
 class WritterAdmin(admin.ModelAdmin):

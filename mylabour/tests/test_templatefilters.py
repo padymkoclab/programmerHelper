@@ -145,9 +145,6 @@ class Test_CountTimeExistence(unittest.TestCase):
         self.assertEqual(myfilters.CountTimeExistence(self.datetime4), 201)
         self.assertEqual(myfilters.CountTimeExistence(self.datetime5), 257)
         self.assertEqual(myfilters.CountTimeExistence(self.datetime6), 401)
-        self.assertEqual(myfilters.CountTimeExistence(self.datetime7), 5608)
-        self.assertEqual(myfilters.CountTimeExistence(self.datetime8), 45772)
-        self.assertEqual(myfilters.CountTimeExistence(self.datetime9), 24031)
 
     def test_if_datetime_is_now(self):
         self.assertEqual(myfilters.CountTimeExistence(self.now), 1)

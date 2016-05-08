@@ -1,4 +1,5 @@
 
+from django.contrib.contenttypes.fields import GenericRelation
 from django.core.urlresolvers import reverse
 from django.core.validators import MinLengthValidator
 from django.utils.translation import ugettext_lazy as _
@@ -9,7 +10,8 @@ from model_utils.fields import StatusField, MonitorField
 from model_utils import Choices
 from autoslug import AutoSlugField
 
-from mylabour.models import TimeStampedModel, OpinionUserModel
+from apps.app_generic_models.models import UserComment_Generic, UserOpinion_Generic
+from mylabour.models import TimeStampedModel
 from apps.app_tags.models import Tag
 from apps.app_web_links.models import WebLink
 
@@ -54,14 +56,8 @@ class Article(TimeStampedModel):
         related_name='articles',
         verbose_name=_('Useful links'),
     )
-    opinions = models.ManyToManyField(
-        settings.AUTH_USER_MODEL,
-        through='OpinionAboutArticle',
-        through_fields=('article', 'user'),
-        related_name='opinions_about_articles',
-        verbose_name=_('Opinions'),
-        limit_choices_to={'is_active': True},
-    )
+    comments = GenericRelation(UserComment_Generic)
+    opinions = GenericRelation(UserOpinion_Generic)
 
     class Meta:
         db_table = 'articles'
@@ -76,32 +72,6 @@ class Article(TimeStampedModel):
 
     def get_absolute_url(self):
         return reverse('app_articles:article', kwargs={'slug': self.slug})
-
-
-class OpinionAboutArticle(OpinionUserModel):
-
-    article = models.ForeignKey(
-        'Article',
-        verbose_name=_('Article'),
-        on_delete=models.CASCADE,
-        limit_choices_to={'status': Article.STATUS_ARTICLE.published},
-    )
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        verbose_name=_('User'),
-        on_delete=models.CASCADE,
-        limit_choices_to={'is_active': True},
-    )
-
-    class Meta(OpinionUserModel.Meta):
-        db_table = 'opinions_about_articles'
-        verbose_name = _("Opinion about article")
-        verbose_name_plural = _("Opinions about article")
-        ordering = ['article', 'user']
-        unique_together = ['article', 'user']
-
-    def __str__(self):
-        return 'Opinion of user "{0.user}" about article "{0.article}"'.format(self)
 
 
 class ArticleSubsection(TimeStampedModel):
@@ -127,26 +97,3 @@ class ArticleSubsection(TimeStampedModel):
 
     def __str__(self):
         return 'Subsection "{0.title}"'.format(self)
-
-
-class ArticleComment(TimeStampedModel):
-
-    text_comment = models.TextField(_('Text comment'))
-    article = models.ForeignKey('Article', verbose_name=_('Article'), on_delete=models.CASCADE, related_name='comments')
-    author = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        verbose_name=_('Author'),
-        related_name='comments_articles',
-        limit_choices_to={'is_active': True},
-        on_delete=models.DO_NOTHING,
-    )
-
-    class Meta:
-        db_table = 'articles_comments'
-        verbose_name = _("Comment of article")
-        verbose_name_plural = _("Comments of article")
-        get_latest_by = 'date_modified'
-        ordering = ['date_modified']
-
-    def __str__(self):
-        return 'Comment "{0.author}" on article "{0.article}"'.format(self)
