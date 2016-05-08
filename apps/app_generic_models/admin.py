@@ -1,7 +1,10 @@
 
-from django.db.models import Count
-from django.utils.translation import ugettext_lazy as _
+from django.contrib.contenttypes.admin import GenericStackedInline, GenericTabularInline
+# from django.db.models import Count
+# from django.utils.translation import ugettext_lazy as _
 from django.contrib import admin
+
+from .models import UserComment_Generic, UserLike_Generic, UserOpinion_Generic
 
 
 class UserComment_GenericAdmin(admin.ModelAdmin):
@@ -69,3 +72,21 @@ class UserLike_GenericAdmin(admin.ModelAdmin):
     date_hierarchy = 'date_modified'
     fields = ['content_type', 'object_id', 'user', 'liked_it']
     search_fields = ('content_object',)
+
+
+class OpinionGenericInline(GenericTabularInline):
+    model = UserOpinion_Generic
+    extra = 1
+    fields = ['user', 'is_useful', 'is_favorite']
+
+
+class CommentGenericInline(GenericStackedInline):
+    model = UserComment_Generic
+    extra = 1
+    fields = ['author', 'text_comment']
+
+
+class LikeGenericInline(GenericTabularInline):
+    model = UserLike_Generic
+    extra = 1
+    fields = ['user', 'liked_it']

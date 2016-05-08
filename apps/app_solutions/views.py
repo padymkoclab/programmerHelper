@@ -1,7 +1,7 @@
 
 from django.views.generic import DetailView
 
-from .models import SolutionCategory, Solution, Question
+from .models import SolutionCategory, Solution
 
 
 class SolutionCategoryDetailView(DetailView):
@@ -11,9 +11,4 @@ class SolutionCategoryDetailView(DetailView):
 
 class SolutionDetailView(DetailView):
     model = Solution
-    template_name = "TEMPLATE_NAME"
-
-
-class QuestionDetailView(DetailView):
-    model = Question
     template_name = "TEMPLATE_NAME"

@@ -30,8 +30,10 @@ from apps.app_forum.models import ForumTopic, ForumTheme, ForumPost
 from apps.app_forum.admin import ForumThemeAdmin, ForumTopicAdmin, ForumPostAdmin
 from apps.app_articles.models import Article, OpinionAboutArticle, ArticleSubsection, ArticleComment
 from apps.app_articles.admin import ArticleAdmin, OpinionAboutArticleAdmin, ArticleSubsectionAdmin, ArticleCommentAdmin
-from apps.app_solutions.models import SolutionCategory, Solution, Question, Answer
-from apps.app_solutions.admin import SolutionCategoryAdmin, SolutionAdmin, QuestionAdmin, AnswerAdmin
+from apps.app_questions.models import Question, Answer
+from apps.app_questions.admin import QuestionAdmin, AnswerAdmin
+from apps.app_solutions.models import SolutionCategory, Solution
+from apps.app_solutions.admin import SolutionCategoryAdmin, SolutionAdmin
 from apps.app_newsletters.models import Newsletter
 from apps.app_newsletters.admin import NewsletterAdmin
 
