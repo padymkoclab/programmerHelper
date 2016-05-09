@@ -4,7 +4,7 @@ from django.contrib import admin
 
 # auth
 from apps.app_accounts.models import Account
-from apps.app_accounts.admin import AccountAdmin  # , AccountAdminArticles
+from apps.app_accounts.admin import AccountAdmin
 from django.contrib.auth.models import Group
 #
 from apps.app_articles.admin import ArticleAdmin, ArticleSubsectionAdmin
@@ -13,7 +13,8 @@ from apps.app_badges.admin import BadgeAdmin, GettingBadgeAdmin
 from apps.app_badges.models import Badge, GettingBadge
 from apps.app_books.admin import BookAdmin, WritterAdmin
 from apps.app_books.models import Book, Writter
-from apps.app_cources.models import Course, Lesson, Sublesson
+from apps.app_courses.admin import CourseAdmin, LessonAdmin, SublessonAdmin
+from apps.app_courses.models import Course, Lesson, Sublesson
 from apps.app_forum.admin import ForumThemeAdmin, ForumTopicAdmin, ForumPostAdmin
 from apps.app_forum.models import ForumTopic, ForumTheme, ForumPost
 from apps.app_generic_models.admin import UserComment_GenericAdmin, UserOpinion_GenericAdmin, UserLike_GenericAdmin
@@ -65,12 +66,9 @@ ProgrammerHelper_AdminSite.register(Variant, VariantAdmin)
 # app_solution
 ProgrammerHelper_AdminSite.register(SolutionCategory, SolutionCategoryAdmin)
 ProgrammerHelper_AdminSite.register(Solution, SolutionAdmin)
-# ProgrammerHelper_AdminSite.register(OpinionAboutSolution, OpinionAboutSolutionAdmin)
-# ProgrammerHelper_AdminSite.register(SolutionComment, SolutionCommentAdmin)
+# app_question
 ProgrammerHelper_AdminSite.register(Question, QuestionAdmin)
-# ProgrammerHelper_AdminSite.register(OpinionAboutQuestion, OpinionAboutQuestionAdmin)
 ProgrammerHelper_AdminSite.register(Answer, AnswerAdmin)
-# ProgrammerHelper_AdminSite.register(AnswerComment, AnswerCommentAdmin)
 # app_articles
 ProgrammerHelper_AdminSite.register(Article, ArticleAdmin)
 ProgrammerHelper_AdminSite.register(ArticleSubsection, ArticleSubsectionAdmin)
@@ -88,9 +86,9 @@ ProgrammerHelper_AdminSite.register(Newsletter, NewsletterAdmin)
 ProgrammerHelper_AdminSite.register(Book, BookAdmin)
 ProgrammerHelper_AdminSite.register(Writter, WritterAdmin)
 # app_cources
-ProgrammerHelper_AdminSite.register(Course,)
-ProgrammerHelper_AdminSite.register(Lesson,)
-ProgrammerHelper_AdminSite.register(Sublesson,)
+ProgrammerHelper_AdminSite.register(Course, CourseAdmin)
+ProgrammerHelper_AdminSite.register(Lesson, LessonAdmin)
+ProgrammerHelper_AdminSite.register(Sublesson, SublessonAdmin)
 # app_polls
 ProgrammerHelper_AdminSite.register(Poll, PollAdmin)
 ProgrammerHelper_AdminSite.register(Choice, ChoiceAdmin)

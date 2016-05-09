@@ -39,7 +39,7 @@ MY_APPS = [
     'apps.app_forum.apps.AppForumConfig',
     'apps.app_snippets.apps.AppSnippetsConfig',
     'apps.app_newsletters.apps.AppNewslettersConfig',
-    'apps.app_cources.apps.AppCourcesConfig',
+    'apps.app_courses.apps.AppCoursesConfig',
     'apps.app_polls.apps.AppPollsConfig',
     'apps.app_questions.apps.AppQuestionsConfig',
     'apps.app_generic_models.apps.AppGenericModelsConfig',

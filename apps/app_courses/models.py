@@ -1,4 +1,6 @@
 
+import functools
+
 from django.contrib.contenttypes.fields import GenericRelation
 from django.core.validators import MinValueValidator, MinLengthValidator
 from django.core.urlresolvers import reverse
@@ -12,7 +14,7 @@ from apps.app_generic_models.models import UserComment_Generic, UserOpinion_Gene
 from mylabour.models import TimeStampedModel
 from mylabour.utils import CHOICES_LEXERS
 
-# отзывы о cource
+# отзывы о course
 
 
 class Course(TimeStampedModel):
@@ -20,8 +22,11 @@ class Course(TimeStampedModel):
 
     """
 
+    MIN_COUNT_LESSONS = 3
+    MAX_COUNT_LESSONS = 12
+
     name = models.CharField(
-        _('Name of cource'),
+        _('Name'),
         max_length=200,
         unique=True,
         validators=[MinLengthValidator(settings.MIN_LENGTH_FOR_NAME_OR_TITLE_OBJECT)],
@@ -34,11 +39,11 @@ class Course(TimeStampedModel):
         settings.AUTH_USER_MODEL,
         verbose_name=_('Authorship'),
         limit_choices_to={'is_superuser': True},
-        related_name='cources',
+        related_name='courses',
     )
 
     class Meta:
-        db_table = 'cources'
+        db_table = 'courses'
         verbose_name = _('Course')
         verbose_name_plural = _('Courses')
         get_latest_by = 'date_added'
@@ -53,13 +58,20 @@ class Course(TimeStampedModel):
         super(Course, self).save(*args, **kwargs)
 
     def get_absolute_url(self):
-        return reverse('app_cources:cource', kwargs={'slug': self.slug})
+        return reverse('app_courses:course_detail', kwargs={'slug': self.slug})
+
+    def get_generalized_scope(self):
+        return functools.reduce(lambda a, b: a + b, (lesson.get_scope() for lesson in self.lessons.iterator()))
+    get_generalized_scope.short_description = _('Scope')
 
 
 class Lesson(TimeStampedModel):
     """
 
     """
+
+    MIN_COUNT_SUBLESSONS = 5
+    MAX_COUNT_SUBLESSONS = 12
 
     name = models.CharField(
         _('Name'), max_length=200, validators=[MinLengthValidator(settings.MIN_LENGTH_FOR_NAME_OR_TITLE_OBJECT)]
@@ -68,11 +80,11 @@ class Lesson(TimeStampedModel):
         _('Slug'),
         populate_from='name',
         always_update=True,
-        unique_with=['cource', 'name'],
+        unique_with=['course', 'name'],
         allow_unicode=True,
         db_index=True,
     )
-    cource = models.ForeignKey('Course', verbose_name=_('Course'), on_delete=models.CASCADE, related_name='lessons')
+    course = models.ForeignKey('Course', verbose_name=_('Course'), on_delete=models.CASCADE, related_name='lessons')
     number = models.PositiveSmallIntegerField(_('Number of lesson'), validators=[MinValueValidator(1)])
     is_completed = models.BooleanField(_('Lesson is completed?'), default=False)
     header = models.TextField(_('Header'))
@@ -86,8 +98,8 @@ class Lesson(TimeStampedModel):
         verbose_name = _('Lesson')
         verbose_name_plural = _('Lessons')
         get_latest_by = 'date_modified'
-        ordering = ['cource', 'number']
-        unique_together = ['name', 'cource', 'number']
+        ordering = ['course', 'number']
+        unique_together = ['name', 'course', 'number']
 
     objects = models.Manager()
 
@@ -98,7 +110,12 @@ class Lesson(TimeStampedModel):
         super(Lesson, self).save(*args, **kwargs)
 
     def get_absolute_url(self):
-        return reverse('app_cources:lesson', kwargs={'number': self.number, 'slug': self.slug})
+        return reverse('app_courses:lesson_detail', kwargs={'number': self.number, 'slug': self.slug})
+
+    def get_scope(self):
+        count_good_opinions = self.opinions.filter(is_useful=True).count()
+        count_bad_opinions = self.opinions.filter(is_useful=False).count()
+        return count_good_opinions - count_bad_opinions
 
 
 class Sublesson(TimeStampedModel):

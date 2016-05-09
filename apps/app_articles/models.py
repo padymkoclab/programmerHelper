@@ -93,8 +93,8 @@ class ArticleSubsection(TimeStampedModel):
 
     class Meta:
         db_table = 'articles_subsections'
-        verbose_name = _("Subsection article")
-        verbose_name_plural = _("Subsections article")
+        verbose_name = _("Subsection")
+        verbose_name_plural = _("Subsections")
         ordering = ['article', 'date_modified']
         unique_together = ['article', 'title']
 

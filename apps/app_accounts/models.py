@@ -115,7 +115,7 @@ class Account(AbstractBaseUser, PermissionsMixin):
         super(Account, self).save(*args, **kwargs)
 
     def get_absolute_url(self):
-        return reverse('app_accounts:account_detail', kwargs={'account_email': self.email})
+        return reverse('app_accounts:detail', kwargs={'account_email': self.email})
 
     def get_full_name(self):
         return '{0.username} ({0.email})'.format(self)
