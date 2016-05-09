@@ -17,7 +17,8 @@ DATABASES = {
         'TEST': {
             'NAME': 'test_programmerhelper_db',
             'CHARSET': 'UTF-8',
-        }
+        },
+        'ATOMIC_REQUESTS': True,
     }
 }
 

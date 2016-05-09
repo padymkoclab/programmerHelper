@@ -1,5 +1,7 @@
 
+from django.utils.html import format_html_join
 from django.db.models import Count
+from django.template.defaultfilters import truncatewords
 from django.utils.translation import ugettext_lazy as _
 from django.contrib import admin
 
@@ -13,6 +15,8 @@ class BookAdmin(admin.ModelAdmin):
 
     list_display = (
         'name',
+        'writters',
+        'get_scope',
         'pages',
         'views',
         'publishers',
@@ -21,6 +25,7 @@ class BookAdmin(admin.ModelAdmin):
         'get_count_tags',
         'get_count_opinions',
         'get_count_comments',
+        'is_new',
         'date_published',
     )
     list_filter = ('date_published',)
@@ -28,7 +33,7 @@ class BookAdmin(admin.ModelAdmin):
         OpinionGenericInline,
         CommentGenericInline,
     ]
-    search_fields = ('name', 'publishers')
+    search_fields = ('name', 'publishers', 'authorship__name')
     date_hierarchy = 'date_published'
     filter_horizontal = ['tags', 'authorship']
     filter_vertical = ['where_download']
@@ -80,6 +85,27 @@ class WritterAdmin(admin.ModelAdmin):
     '''
         Admin View for Writter
     '''
-    list_display = ('name', 'short_about')
+    list_display = ('name', 'books_in_html', 'get_count_books', 'short_about')
     search_fields = ['name', 'about']
     fields = ['name', 'about']
+
+    def get_queryset(self, request):
+        qs = super(WritterAdmin, self).get_queryset(request)
+        qs = qs.annotate(
+            count_books=Count('books', distinct=True),
+        )
+        return qs
+
+    def get_count_books(self, obj):
+        return obj.count_books
+    get_count_books.admin_order_field = 'count_books'
+    get_count_books.short_description = _('Count books')
+
+    def books_in_html(self, obj):
+        return format_html_join(', ', '"{0}"', ((book, ) for book in obj.books.all()))
+    books_in_html.admin_order_field = 'count_books'
+    books_in_html.short_description = _('Books')
+
+    def short_about(self, obj):
+        return truncatewords(obj.about, 10)
+    short_about.short_description = _('Short about writter')

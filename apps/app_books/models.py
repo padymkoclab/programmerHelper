@@ -1,8 +1,9 @@
 
+import statistics
 import uuid
 
+from django.utils.html import format_html_join
 from django.contrib.contenttypes.fields import GenericRelation
-from django.template.defaultfilters import truncatewords
 from django.core.validators import MinLengthValidator, RegexValidator, MinValueValidator
 from django.utils import timezone
 from django.core.urlresolvers import reverse
@@ -73,18 +74,29 @@ class Book(models.Model):
         return reverse('app_books:book', kwargs={'slug': self.slug})
 
     def get_scope(self):
-        pass
+        # no sorted in admin
+        goods = UserOpinion_Generic.objects.filter(object_id=self.pk, is_useful=True).count()
+        bads = UserOpinion_Generic.objects.filter(object_id=self.pk, is_useful=False).count()
+        return statistics.mean([goods, bads])
+    # get_scope.admin_order_field = 'date_published'
+    get_scope.short_description = _('Scope')
 
     def is_new(self):
-        """
-        This book pusblished about one year ago.
-        """
-        return timezone.now() >= self.date_published - timezone.timedelta(weeks=52)
+        """This book pusblished about one year ago."""
+        return timezone.now().date() >= self.date_published - timezone.timedelta(weeks=52)
+    is_new.admin_order_field = 'date_published'
+    is_new.short_description = _('Is new')
+    is_new.boolean = True
+
+    def writters(self):
+        """Listing writters separated throgh commas"""
+        return format_html_join(', ', '{0}', ((writter, ) for writter in self.authorship.all()))
+    writters.short_description = _('Writters')
 
 
 class Writter(models.Model):
     """
-
+    Model for writters of books
     """
 
     id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
@@ -107,6 +119,3 @@ class Writter(models.Model):
 
     def get_absolute_url(self):
         return reverse('app_books:writter', kwargs={'slug': self.slug})
-
-    def short_about(self):
-        return truncatewords(self.about, 10)

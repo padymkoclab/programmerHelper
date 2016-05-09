@@ -28,7 +28,7 @@ class Course(TimeStampedModel):
     )
     slug = AutoSlugField(_('Slug'), populate_from='name', always_update=True, unique=True, allow_unicode=True, db_index=True)
     picture = models.URLField(_('Picture'))
-    decription = models.TextField(_('Description'))
+    description = models.TextField(_('Description'))
     lexer = models.CharField(_('Lexer'), max_length=30, choices=CHOICES_LEXERS)
     authorship = models.ManyToManyField(
         settings.AUTH_USER_MODEL,

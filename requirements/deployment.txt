@@ -1,0 +1,6 @@
+
+- r base.txt
+
+whitenoise==3.0
+dj-database-url==0.4.1
+gunicorn==19.4.5

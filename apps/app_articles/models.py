@@ -73,6 +73,9 @@ class Article(TimeStampedModel):
     def get_absolute_url(self):
         return reverse('app_articles:article', kwargs={'slug': self.slug})
 
+    def get_scope(self):
+        pass
+
 
 class ArticleSubsection(TimeStampedModel):
 

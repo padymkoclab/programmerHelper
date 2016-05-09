@@ -71,7 +71,7 @@ Factory_Badges(name='Clear head', short_description='Added own snippet')
 Factory_Badges(name='Closer questions', short_description='Closed questions')
 Factory_Badges(name='Deleter questions', short_description='Deleted questions')
 Factory_Badges(name='Dispatcher', short_description='Used links in own articles or solutions')
-Factory_Badges(name='Sage', short_description='Participate in creating courses')
+Factory_Badges(name='Sage', short_description='Participating in creating courses')
 Factory_Badges(name='Have opinion', short_description='Voted in polls')
 
 
