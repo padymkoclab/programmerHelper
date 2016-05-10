@@ -1,4 +1,7 @@
 
+import random
+import string
+
 from django import setup
 from django.apps import apps
 import pathlib
@@ -143,54 +146,59 @@ def startapp(list_apps_names_separeted_commas):
 @task
 def recreate_db():
     """
-    Recreating PostreSql database with applying migrations.
+    Recreating PostreSql database with recreating and applying migrations, and also create default superuser.
     """
 
-    run('invoke rm_migrations_files')
-    print('Clear migrations files')
-    # disable all connects for databases
-    run('sudo service postgresql stop')
-    run('sudo service postgresql start')
-    # getting attributes database
-    user_password = settings.DATABASES['default']['PASSWORD']
-    db_user = settings.DATABASES['default']['USER']
-    db_name = settings.DATABASES['default']['NAME']
-    # recreate database and role
-    connect = 'sudo -u postgres psql -c '
-    all_commands = """
-    DROP DATABASE {db_name};
-    DROP ROLE {db_user};
-    CREATE ROLE {db_user} LOGIN PASSWORD '{user_password}' CREATEDB;
-    CREATE DATABASE {db_name} WITH OWNER = {db_user}
-        ENCODING = 'UTF8'
-        TABLESPACE = pg_default
-        LC_COLLATE = 'en_US.UTF-8'
-        LC_CTYPE = 'en_US.UTF-8'
-        CONNECTION LIMIT = -1;
-    GRANT CONNECT, TEMPORARY ON DATABASE {db_name} TO public;
-    GRANT ALL ON DATABASE {db_name} TO {db_user};
-    """.format(user_password=user_password, db_user=db_user, db_name=db_name)
-    for line in all_commands.split(';'):
-        command = line.strip() + ';'
-        try:
-            full_command = '{0} "{1}"'.format(connect, command)
-            run(full_command)
-        except:
-            pass
-    # executing migrations
-    run('./manage.py makemigrations')
-    run('./manage.py migrate')
-    # load apps in registry if not ready
-    if not apps.ready:
-        setup()
-    # create main superuser
-    USER_MODEL = get_user_model()
-    USER_MODEL.objects.create_superuser(
-        email='setivolkylany@gmail.com',
-        username='setivolkylany',
-        password='lv210493',
-        date_birthday='2000-12-12',
+    random_symbol = random.choice(string.ascii_uppercase)
+    answer_from_user = input(
+        'Are you sure, what yoy feel like recreate database? If yes, please type "{0}": '.format(random_symbol)
     )
-    print('-'*50)
-    print('Succesful added superuser!')
-    print('-'*50)
+    if answer_from_user == random_symbol:
+        run('invoke rm_migrations_files')
+        print('Clear migrations files')
+        # disable all connects for databases
+        run('sudo service postgresql stop')
+        run('sudo service postgresql start')
+        # getting attributes database
+        user_password = settings.DATABASES['default']['PASSWORD']
+        db_user = settings.DATABASES['default']['USER']
+        db_name = settings.DATABASES['default']['NAME']
+        # recreate database and role
+        connect = 'sudo -u postgres psql -c '
+        all_commands = """
+        DROP DATABASE {db_name};
+        DROP ROLE {db_user};
+        CREATE ROLE {db_user} LOGIN PASSWORD '{user_password}' CREATEDB;
+        CREATE DATABASE {db_name} WITH OWNER = {db_user}
+            ENCODING = 'UTF8'
+            TABLESPACE = pg_default
+            LC_COLLATE = 'en_US.UTF-8'
+            LC_CTYPE = 'en_US.UTF-8'
+            CONNECTION LIMIT = -1;
+        GRANT CONNECT, TEMPORARY ON DATABASE {db_name} TO public;
+        GRANT ALL ON DATABASE {db_name} TO {db_user};
+        """.format(user_password=user_password, db_user=db_user, db_name=db_name)
+        for line in all_commands.split(';'):
+            command = line.strip() + ';'
+            try:
+                full_command = '{0} "{1}"'.format(connect, command)
+                run(full_command)
+            except:
+                pass
+        # executing migrations
+        run('./manage.py makemigrations')
+        run('./manage.py migrate')
+        # load apps in registry if not ready
+        if not apps.ready:
+            setup()
+        # create main superuser
+        USER_MODEL = get_user_model()
+        USER_MODEL.objects.create_superuser(
+            email='setivolkylany@gmail.com',
+            username='setivolkylany',
+            password='lv210493',
+            date_birthday='2000-12-12',
+        )
+        print('-'*50)
+        print('Succesful added superuser!')
+        print('-'*50)

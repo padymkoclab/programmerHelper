@@ -10,7 +10,7 @@ from django.conf import settings
 
 from autoslug import AutoSlugField
 
-from apps.app_generic_models.models import UserComment_Generic, UserOpinion_Generic
+from apps.app_generic_models.models import CommentGeneric, OpinionGeneric
 from mylabour.models import TimeStampedModel
 from mylabour.utils import CHOICES_LEXERS
 
@@ -38,7 +38,7 @@ class Course(TimeStampedModel):
     authorship = models.ManyToManyField(
         settings.AUTH_USER_MODEL,
         verbose_name=_('Authorship'),
-        limit_choices_to={'is_superuser': True},
+        limit_choices_to={'is_active': True},
         related_name='courses',
     )
 
@@ -80,7 +80,7 @@ class Lesson(TimeStampedModel):
         _('Slug'),
         populate_from='name',
         always_update=True,
-        unique_with=['course', 'name'],
+        unique_with=['course', 'number'],
         allow_unicode=True,
         db_index=True,
     )
@@ -90,8 +90,8 @@ class Lesson(TimeStampedModel):
     header = models.TextField(_('Header'))
     conclusion = models.TextField(_('Conclusion'))
     views = models.IntegerField(_('Count views'), default=0, editable=False)
-    comments = GenericRelation(UserComment_Generic)
-    opinions = GenericRelation(UserOpinion_Generic)
+    comments = GenericRelation(CommentGeneric)
+    opinions = GenericRelation(OpinionGeneric)
 
     class Meta:
         db_table = 'Lessons'
@@ -99,7 +99,7 @@ class Lesson(TimeStampedModel):
         verbose_name_plural = _('Lessons')
         get_latest_by = 'date_modified'
         ordering = ['course', 'number']
-        unique_together = ['name', 'course', 'number']
+        unique_together = ['course', 'number']
 
     objects = models.Manager()
 
@@ -116,6 +116,7 @@ class Lesson(TimeStampedModel):
         count_good_opinions = self.opinions.filter(is_useful=True).count()
         count_bad_opinions = self.opinions.filter(is_useful=False).count()
         return count_good_opinions - count_bad_opinions
+    get_scope.short_description = _('Scope')
 
 
 class Sublesson(TimeStampedModel):
@@ -144,7 +145,7 @@ class Sublesson(TimeStampedModel):
         verbose_name = _('Sublesson')
         verbose_name_plural = _('Sublessons')
         get_latest_by = 'date_modified'
-        ordering = ['number']
+        ordering = ['lesson', 'number']
         unique_together = ['lesson', 'number']
 
     objects = models.Manager()

@@ -8,7 +8,7 @@ from django.conf import settings
 import factory
 from factory import fuzzy
 
-from apps.app_generic_models.factories import Factory_UserComment_Generic, Factory_UserOpinion_Generic
+from apps.app_generic_models.factories import Factory_CommentGeneric, Factory_ScopeGeneric
 
 from .models import *
 
@@ -77,6 +77,6 @@ for i in range(30):
     if len(Accounts) < min_high_limiter:
         min_high_limiter = len(Accounts)
     for i in range(random.randint(0, min_high_limiter)):
-        Factory_UserOpinion_Generic(content_object=book)
+        Factory_ScopeGeneric(content_object=book)
     for i in range(random.randint(0, min_high_limiter)):
-        Factory_UserComment_Generic(content_object=book)
+        Factory_CommentGeneric(content_object=book)

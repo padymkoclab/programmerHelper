@@ -10,7 +10,7 @@ from .models import Course, Lesson, Sublesson
 
 class LessonInline(admin.StackedInline):
     '''
-        Stacked Inline View for Lesson
+    Stacked Inline View for Lesson
     '''
 
     model = Lesson
@@ -21,8 +21,9 @@ class LessonInline(admin.StackedInline):
 
 class CourseAdmin(admin.ModelAdmin):
     '''
-        Admin View for Course
+    Admin View for Course
     '''
+
     list_display = (
         'name',
         'picture',
@@ -63,6 +64,7 @@ class SublessonInline(admin.StackedInline):
     '''
     Stacked Inline View for Sublesson
     '''
+
     model = Sublesson
     min_num = Lesson.MIN_COUNT_SUBLESSONS
     max_num = Lesson.MAX_COUNT_SUBLESSONS
@@ -71,9 +73,22 @@ class SublessonInline(admin.StackedInline):
 
 class LessonAdmin(admin.ModelAdmin):
     '''
-        Admin View for Course
+    Admin View for Lesson
     '''
-    list_display = ('name', 'course', 'number', 'is_completed', 'get_scope', 'views', 'get_count_sublessons', 'date_modified', 'date_added')
+
+    list_display = (
+        'name',
+        'course',
+        'number',
+        'is_completed',
+        'get_count_opinions',
+        'get_count_comments',
+        'get_scope',
+        'views',
+        'get_count_sublessons',
+        'date_modified',
+        'date_added',
+    )
     list_filter = ('date_modified',)
     inlines = [
         OpinionGenericInline,
@@ -86,6 +101,8 @@ class LessonAdmin(admin.ModelAdmin):
         qs = super(LessonAdmin, self).get_queryset(request)
         qs = qs.annotate(
             count_sublessons=Count('sublessons', distinct=True),
+            count_comments=Count('comments', distinct=True),
+            count_opinions=Count('opinions', distinct=True),
         )
         return qs
 
@@ -94,11 +111,24 @@ class LessonAdmin(admin.ModelAdmin):
     get_count_sublessons.admin_order_field = 'count_sublessons'
     get_count_sublessons.short_description = _('Count sublessons')
 
+    def get_count_opinions(self, obj):
+        return obj.count_opinions
+    get_count_opinions.admin_order_field = 'count_opinions'
+    get_count_opinions.short_description = _('Count opinions')
+
+    def get_count_comments(self, obj):
+        return obj.count_comments
+    get_count_comments.admin_order_field = 'count_comments'
+    get_count_comments.short_description = _('Count comments')
+
 
 class SublessonAdmin(admin.ModelAdmin):
     '''
-        Admin View for Sublesson
+    Admin View for Sublesson
     '''
-    list_display = ('title',)
-    list_filter = ('lesson',)
+
+    list_display = ('title', 'lesson', 'number', 'is_new', 'date_modified', 'date_added')
+    list_filter = ('lesson', 'date_modified', 'date_added')
     search_fields = ('title', 'lesson__name')
+    date_hierarchy = 'date_modified'
+    fields = ('title', 'lesson', 'number', 'text', 'code')

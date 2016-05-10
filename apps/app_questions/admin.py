@@ -15,9 +15,9 @@ class AnswerInline(admin.StackedInline):
     '''
 
     model = Answer
-    extra = 1
+    extra = 0
     fk_name = 'question'
-    fields = ['author', 'is_acceptable', 'text_answer']
+    fields = ['author', 'is_acceptabled', 'text_answer']
 
 
 class QuestionAdmin(admin.ModelAdmin):
@@ -29,11 +29,8 @@ class QuestionAdmin(admin.ModelAdmin):
         'title',
         'author',
         'status',
-        # 'count_good_opinions',
         'get_count_answers',
-        # 'get_count_good_opinions',
-        # 'get_count_bad_opinions',
-        # 'get_count_favorites',
+        'get_rating',
         'get_count_opinions',
         'get_count_tags',
         'is_dublicated',
@@ -80,18 +77,6 @@ class QuestionAdmin(admin.ModelAdmin):
     get_count_opinions.admin_order_field = 'count_opinions'
     get_count_opinions.short_description = _('Count opinions')
 
-    # def get_count_good_opinions(self, obj):
-    #     return obj.opinions.through.objects.filter(question=obj, is_useful=True).count()
-    # get_count_good_opinions.short_description = _('Count good opinions')
-
-    # def get_count_bad_opinions(self, obj):
-    #     return obj.opinions.through.objects.filter(question=obj, is_useful=False).count()
-    # get_count_bad_opinions.short_description = _('Count bad opinions')
-
-    # def get_count_favorites(self, obj):
-    #     return obj.opinions.through.objects.filter(question=obj, is_favorite=obj.opinions.through.CHOICES_FAVORITE.yes).count()
-    # get_count_favorites.short_description = _('Count favorites')
-
 
 class AnswerAdmin(admin.ModelAdmin):
     '''
@@ -101,11 +86,10 @@ class AnswerAdmin(admin.ModelAdmin):
     list_display = (
         'question',
         'author',
-        'is_acceptable',
+        'is_acceptabled',
         'get_count_comments',
-        # 'get_count_positive_votes',
-        # 'get_count_negative_votes',
         'get_count_likes',
+        'get_rating',
         'is_new',
         'date_modified',
         'date_added',
@@ -113,7 +97,7 @@ class AnswerAdmin(admin.ModelAdmin):
     list_filter = (
         ('author', admin.RelatedFieldListFilter),
         ('question', admin.RelatedFieldListFilter),
-        # 'opinions',
+        'is_acceptabled',
         'date_modified',
         'date_added',
     )
@@ -122,7 +106,7 @@ class AnswerAdmin(admin.ModelAdmin):
         LikeGenericInline,
         CommentGenericInline,
     ]
-    fields = ['question', 'author', 'text_answer', 'is_acceptable']
+    fields = ['question', 'author', 'text_answer', 'is_acceptabled']
 
     def get_queryset(self, request):
         qs = super(AnswerAdmin, self).get_queryset(request)
@@ -141,14 +125,3 @@ class AnswerAdmin(admin.ModelAdmin):
         return obj.count_comments
     get_count_comments.admin_order_field = 'count_comments'
     get_count_comments.short_description = _('Count comments')
-
-    # def get_count_positive_votes(self, obj):
-    #     return OpinionAboutAnswer.objects.filter(answer=obj, liked_it=True).count()
-        # return obj.count_opinions
-    # get_count_opinions.admin_order_field = 'count_opinions'
-    # get_count_positive_votes.short_description = _('Count positive votes')
-
-    # def get_count_negative_votes(self, obj):
-    #     return OpinionAboutAnswer.objects.filter(answer=obj, liked_it=False).count()
-    # get_count_opinions.admin_order_field = 'count_opinions'
-    # get_count_negative_votes.short_description = _('Count negative votes')

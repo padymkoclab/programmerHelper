@@ -6,7 +6,7 @@ from django.contrib.auth import get_user_model
 import factory
 from factory import fuzzy
 
-from apps.app_generic_models.factories import Factory_UserComment_Generic, Factory_UserOpinion_Generic
+from apps.app_generic_models.factories import Factory_CommentGeneric, Factory_ScopeGeneric
 
 from .models import *
 
@@ -63,7 +63,7 @@ for i in range(20):
         Factory_ArticleSubsection(article=article)
     # create opinions
     for j in range(random.randrange(0, 10)):
-        Factory_UserOpinion_Generic(content_object=article)
+        Factory_ScopeGeneric(content_object=article)
     # create comments
     for j in range(random.randrange(0, 10)):
-        Factory_UserComment_Generic(content_object=article)
+        Factory_CommentGeneric(content_object=article)

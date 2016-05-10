@@ -29,6 +29,6 @@ urlpatterns = [
     url(r'^polls/', include('apps.app_polls.urls')),
     url(r'^courses/', include('apps.app_courses.urls')),
     url(r'^questions/', include('apps.app_questions.urls')),
-    url(r'^programming_tester/', include('apps.app_programming_tester.urls')),
-    url(r'^programming_utilities/', include('apps.app_programming_utilities.urls')),
+    url(r'^testing/', include('apps.app_testing.urls')),
+    url(r'^utilities/', include('apps.app_utilities.urls')),
 ]

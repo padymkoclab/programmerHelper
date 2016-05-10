@@ -6,7 +6,7 @@ from django.contrib.auth import get_user_model
 import factory
 from factory import fuzzy
 
-from apps.app_generic_models.factories import Factory_UserComment_Generic, Factory_UserOpinion_Generic
+from apps.app_generic_models.factories import Factory_CommentGeneric, Factory_OpinionGeneric
 
 from .models import *
 
@@ -43,7 +43,6 @@ class Factory_Lesson(factory.DjangoModelFactory):
 
     header = factory.Faker('text', locale='ru')
     conclusion = factory.Faker('text', locale='ru')
-    number = factory.Sequence(lambda n: n)
 
     @factory.lazy_attribute
     def name(self):
@@ -63,7 +62,6 @@ class Factory_Sublesson(factory.DjangoModelFactory):
 
     text = factory.Faker('text', locale='ru')
     code = factory.Faker('text', locale='ru')
-    number = factory.Sequence(lambda n: n)
 
     @factory.lazy_attribute
     def title(self):
@@ -76,14 +74,14 @@ for i in range(10):
     course = Factory_Cource()
     random_count_authors = random.randint(1, 3)
     accounts = random.sample(tuple(Accounts), random_count_authors)
-    course.authorship.set = accounts
+    course.authorship.set(accounts)
     # create lessons
-    for j in range(random.randint(Course.MIN_COUNT_LESSONS, Course.MAX_COUNT_LESSONS)):
-        lesson = Factory_Lesson(course=course)
+    for number_lesson, j in enumerate(range(random.randint(Course.MIN_COUNT_LESSONS, Course.MAX_COUNT_LESSONS))):
+        lesson = Factory_Lesson(course=course, number=number_lesson + 1)
         for e in range(random.randint(0, 10)):
-            Factory_UserComment_Generic(content_object=lesson)
+            Factory_CommentGeneric(content_object=lesson)
         for k in range(random.randint(0, 10)):
-            Factory_UserOpinion_Generic(content_object=lesson)
+            Factory_OpinionGeneric(content_object=lesson)
         # create sublessons
-        for q in range(random.randint(Lesson.MIN_COUNT_SUBLESSONS, Lesson.MAX_COUNT_SUBLESSONS)):
-            Factory_Sublesson(lesson=lesson)
+        for number_sublesson, q in enumerate(range(random.randint(Lesson.MIN_COUNT_SUBLESSONS, Lesson.MAX_COUNT_SUBLESSONS))):
+            Factory_Sublesson(lesson=lesson, number=number_sublesson + 1)

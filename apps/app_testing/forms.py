@@ -5,7 +5,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.forms import BaseInlineFormSet, ValidationError
 
 
-class VariantInlineFormSet(BaseInlineFormSet):
+class TestingVariantInlineFormSet(BaseInlineFormSet):
     """
     Special inline form for relationship between TestQuestion and Varian models.
     """
@@ -15,7 +15,7 @@ class VariantInlineFormSet(BaseInlineFormSet):
         Validation what one variant is true.
         """
 
-        super(VariantInlineFormSet, self).clean()
+        super(TestingVariantInlineFormSet, self).clean()
         lst = list()
         for form in self.forms:
             v = form.cleaned_data.get('is_right_variant', None)

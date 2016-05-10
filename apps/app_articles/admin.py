@@ -1,9 +1,9 @@
 
-from django.db.models import Count
+from django.db.models import Count, Avg
 from django.utils.translation import ugettext_lazy as _
 from django.contrib import admin
 
-from apps.app_generic_models.admin import OpinionGenericInline, CommentGenericInline
+from apps.app_generic_models.admin import ScopeGenericInline, CommentGenericInline
 
 from .forms import ArticleForm
 from .models import Article, ArticleSubsection
@@ -19,7 +19,7 @@ class ArticleSubsectionInline(admin.StackedInline):
     max_num = Article.MAX_COUNT_SUBSECTIONS
     fk_name = 'article'
     fields = ['title', 'content']
-    extra = 1
+    extra = 0
 
 
 class ArticleAdmin(admin.ModelAdmin):
@@ -35,7 +35,8 @@ class ArticleAdmin(admin.ModelAdmin):
         'get_count_subsections',
         'get_count_useful_links',
         'get_count_tags',
-        'get_count_opinions',
+        'get_rating',
+        'get_rating_admin',
         'get_count_comments',
         'is_new',
         'date_modified',
@@ -48,7 +49,7 @@ class ArticleAdmin(admin.ModelAdmin):
     )
     search_fields = ('title', 'web_url')
     inlines = [
-        OpinionGenericInline,
+        ScopeGenericInline,
         ArticleSubsectionInline,
         CommentGenericInline,
     ]
@@ -77,7 +78,6 @@ class ArticleAdmin(admin.ModelAdmin):
         qs = super(ArticleAdmin, self).get_queryset(request)
         qs = qs.annotate(
             count_tags=Count('tags', distinct=True),
-            count_opinions=Count('opinions', distinct=True),
             count_useful_links=Count('useful_links', distinct=True),
             count_subsections=Count('subsections', distinct=True),
             count_comments=Count('comments', distinct=True),
@@ -94,11 +94,6 @@ class ArticleAdmin(admin.ModelAdmin):
     get_count_tags.admin_order_field = 'count_tags'
     get_count_tags.short_description = _('Count tags')
 
-    def get_count_opinions(self, obj):
-        return obj.count_opinions
-    get_count_opinions.admin_order_field = 'count_opinions'
-    get_count_opinions.short_description = _('Count opinions')
-
     def get_count_subsections(self, obj):
         return obj.count_subsections
     get_count_subsections.admin_order_field = 'count_subsections'
@@ -108,6 +103,13 @@ class ArticleAdmin(admin.ModelAdmin):
         return obj.count_comments
     get_count_comments.admin_order_field = 'count_comments'
     get_count_comments.short_description = _('Count comments')
+
+    def get_rating_admin(self, obj):
+        avg_scope = obj.scopes.aggregate(rating=Avg('scope'))['rating'] or float(0)
+        return float('{0:.3}'.format(avg_scope))
+        # return obj.get_rating()
+    get_rating_admin.short_description = _('Rating')
+    get_rating_admin.admin_order_field = 'scopes__rating'
 
 
 class ArticleSubsectionAdmin(admin.ModelAdmin):

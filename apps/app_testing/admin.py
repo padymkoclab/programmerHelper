@@ -3,24 +3,34 @@ from django.utils.translation import ugettext_lazy as _
 from django.db.models import Count
 from django.contrib import admin
 
-from .models import TestQuestion, Variant
-from .forms import VariantInlineFormSet
+from .models import TestingSuit, TestingQuestion, TestingVariant
+from .forms import TestingVariantInlineFormSet
 
 
-class QuestionInline(admin.StackedInline):
+class TestingQuestionInline(admin.StackedInline):
     """
     Stacked Inline View for Question
     """
 
-    model = TestQuestion
+    model = TestingQuestion
     max_num = 20
-    extra = 3
+    min_num = 3
+    extra = 0
     fk_name = 'test_suit'
 
 
-class TestSuitAdmin(admin.ModelAdmin):
+class TestingPassageInline(admin.TabularInline):
     """
-    Admin View for TestSuit
+    Stacked Inline View for Question
+    """
+
+    model = TestingSuit.passages.through
+    extra = 0
+
+
+class TestingSuitAdmin(admin.ModelAdmin):
+    """
+    Admin View for TestingSuit
     """
 
     search_fields = ('name',)
@@ -43,11 +53,12 @@ class TestSuitAdmin(admin.ModelAdmin):
         ('author', admin.RelatedOnlyFieldListFilter),
     )
     inlines = [
-        QuestionInline,
+        TestingQuestionInline,
+        TestingPassageInline,
     ]
 
     def get_queryset(self, request):
-        qs = super(TestSuitAdmin, self).get_queryset(request)
+        qs = super(TestingSuitAdmin, self).get_queryset(request)
         qs = qs.annotate(count_questions=Count('questions', distinct=True))
         return qs
 
@@ -57,22 +68,22 @@ class TestSuitAdmin(admin.ModelAdmin):
     get_count_questions.short_description = _('Count questions')
 
 
-class VariantInline(admin.TabularInline):
+class TestingVariantInline(admin.TabularInline):
     """
-    Tabular Inline View for Variant
+    Tabular Inline View for TestingVariant
     """
 
-    model = Variant
+    model = TestingVariant
     min_num = 3
     max_num = 6
     extra = 1
     fk_name = 'question'
-    formset = VariantInlineFormSet
+    formset = TestingVariantInlineFormSet
 
 
-class TestQuestionAdmin(admin.ModelAdmin):
+class TestingQuestionAdmin(admin.ModelAdmin):
     """
-    Admin View for TestQuestion
+    Admin View for TestingQuestion
     """
 
     search_fields = ('name',)
@@ -83,11 +94,11 @@ class TestQuestionAdmin(admin.ModelAdmin):
         ('test_suit', admin.RelatedOnlyFieldListFilter),
     )
     inlines = [
-        VariantInline,
+        TestingVariantInline,
     ]
 
     def get_queryset(self, request):
-        qs = super(TestQuestionAdmin, self).get_queryset(request)
+        qs = super(TestingQuestionAdmin, self).get_queryset(request)
         qs = qs.annotate(count_variants=Count('variants', distinct=True))
         return qs
 
@@ -97,9 +108,9 @@ class TestQuestionAdmin(admin.ModelAdmin):
     get_count_variants.short_description = _('Count variants')
 
 
-class VariantAdmin(admin.ModelAdmin):
+class TestingVariantAdmin(admin.ModelAdmin):
     '''
-        Admin View for Variant
+        Admin View for TestingVariant
     '''
     list_display = ('question', 'is_right_variant')
     list_filter = (

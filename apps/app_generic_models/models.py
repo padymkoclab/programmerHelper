@@ -1,6 +1,7 @@
 
 import uuid
 
+from django.core.validators import MaxValueValidator
 from django.utils import timezone
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
@@ -31,7 +32,7 @@ class BaseGeneric(models.Model):
     is_new.boolean = True
 
 
-class UserComment_Generic(BaseGeneric):
+class CommentGeneric(BaseGeneric):
 
     text_comment = models.TextField(_('Text comment'))
     author = models.ForeignKey(
@@ -48,12 +49,7 @@ class UserComment_Generic(BaseGeneric):
         verbose_name_plural = _('Comments')
 
 
-class UserOpinion_Generic(BaseGeneric):
-
-    CHOICES_FAVORITE = Choices(
-        ('yes', _('Yes')),
-        ('unknown', _('Unknown')),
-    )
+class OpinionGeneric(BaseGeneric):
 
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -61,13 +57,8 @@ class UserOpinion_Generic(BaseGeneric):
         related_name='opinions',
         verbose_name=_('User'),
     )
-    is_useful = models.NullBooleanField(_('Is was useful for you?'))
-    is_favorite = models.CharField(
-        _('Is your favorite theme?'),
-        max_length=30,
-        choices=CHOICES_FAVORITE,
-        default=CHOICES_FAVORITE.unknown,
-    )
+    is_useful = models.NullBooleanField(_('Is was useful for you?'), default=None)
+    is_favorite = models.NullBooleanField(_('Is your favorite theme?'), default=None)
 
     class Meta(BaseGeneric.Meta):
         db_table = 'opinions'
@@ -85,7 +76,7 @@ class UserOpinion_Generic(BaseGeneric):
     display_is_favorite_as_boolean.short_description = _('Is favorite')
 
 
-class UserLike_Generic(BaseGeneric):
+class LikeGeneric(BaseGeneric):
     """
 
     """
@@ -103,3 +94,26 @@ class UserLike_Generic(BaseGeneric):
         verbose_name = _('"Like"')
         verbose_name_plural = _('"Likes"')
         permissions = (('can_view_likes', _('Can view likes')),)
+
+
+class ScopeGeneric(BaseGeneric):
+    """
+
+    """
+
+    MIN_SCOPE = 0
+    MAX_SCOPE = 5
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.DO_NOTHING,
+        related_name='scopes',
+        verbose_name=_('User'),
+    )
+    scope = models.PositiveSmallIntegerField(_('Scope'), default=MIN_SCOPE, validators=[MaxValueValidator(MAX_SCOPE)])
+
+    class Meta(BaseGeneric.Meta):
+        db_table = 'scopes'
+        verbose_name = _('Scope')
+        verbose_name_plural = _('Scopes')
+        permissions = (('can_view_scopes', _('Can view scopes')),)

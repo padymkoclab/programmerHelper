@@ -1,7 +1,7 @@
 
-import statistics
 import uuid
 
+from django.db.models import Avg
 from django.utils.html import format_html_join
 from django.contrib.contenttypes.fields import GenericRelation
 from django.core.validators import MinLengthValidator, RegexValidator, MinValueValidator
@@ -13,7 +13,7 @@ from django.conf import settings
 
 from autoslug import AutoSlugField
 
-from apps.app_generic_models.models import UserComment_Generic, UserOpinion_Generic
+from apps.app_generic_models.models import CommentGeneric, ScopeGeneric
 from apps.app_tags.models import Tag
 from apps.app_web_links.models import WebLink
 
@@ -57,8 +57,8 @@ class Book(models.Model):
         related_name='books',
         verbose_name=_('Where downloads')
     )
-    comments = GenericRelation(UserComment_Generic)
-    opinions = GenericRelation(UserOpinion_Generic)
+    comments = GenericRelation(CommentGeneric)
+    scopes = GenericRelation(ScopeGeneric)
 
     class Meta:
         db_table = 'books'
@@ -73,13 +73,11 @@ class Book(models.Model):
     def get_absolute_url(self):
         return reverse('app_books:book', kwargs={'slug': self.slug})
 
-    def get_scope(self):
-        # no sorted in admin
-        goods = UserOpinion_Generic.objects.filter(object_id=self.pk, is_useful=True).count()
-        bads = UserOpinion_Generic.objects.filter(object_id=self.pk, is_useful=False).count()
-        return statistics.mean([goods, bads])
+    def get_rating(self):
+        avg_scope = self.scopes.aggregate(rating=Avg('scope'))['rating'] or float(0)
+        return float('{0:.3}'.format(avg_scope))
     # get_scope.admin_order_field = 'date_published'
-    get_scope.short_description = _('Scope')
+    get_rating.short_description = _('Rating')
 
     def is_new(self):
         """This book pusblished about one year ago."""

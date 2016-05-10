@@ -8,7 +8,7 @@ from django.conf import settings
 
 from autoslug import AutoSlugField
 
-from apps.app_generic_models.models import UserComment_Generic, UserOpinion_Generic
+from apps.app_generic_models.models import CommentGeneric, OpinionGeneric
 from apps.app_tags.models import Tag
 from mylabour.models import TimeStampedModel
 from mylabour.utils import CHOICES_LEXERS
@@ -39,8 +39,8 @@ class Snippet(TimeStampedModel):
         on_delete=models.DO_NOTHING,
         limit_choices_to={'is_active': True},
     )
-    opinions = GenericRelation(UserOpinion_Generic)
-    comments = GenericRelation(UserComment_Generic)
+    opinions = GenericRelation(OpinionGeneric)
+    comments = GenericRelation(CommentGeneric)
 
     class Meta:
         db_table = 'snippets'

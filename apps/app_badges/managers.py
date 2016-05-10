@@ -10,17 +10,14 @@ class BadgeManager(models.Manager):
     Model manager for working with badges of account
     """
 
-    # def users_with_badge_FavoriteQuestion(self):
-
-
     def validate_badges(self, account_natural_key):
-        badges = list()
-        # if accounts is None:
         account = get_user_model().objects.get_by_natural_key(account_natural_key)
-        print(account.questions.all())
-        for j in account.questions.all():
-            print(j.count_good_opinions())
-            print(j.count_bad_opinions())
+        self.check_badge_Favorite_Question(account)
+        # return account
+
+    def check_badge_Favorite_Question(self, account):
+        pass
+
         # Favorite question
         # Stellar question
         # Nice Question

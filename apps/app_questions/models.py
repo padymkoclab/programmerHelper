@@ -1,14 +1,20 @@
 
+import collections
+
+from django.core.exceptions import ValidationError
 from django.contrib.contenttypes.fields import GenericRelation
 from django.core.validators import MinLengthValidator
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext
 from django.db import models
 from django.conf import settings
 
 from autoslug import AutoSlugField
+from model_utils import Choices
+from model_utils.managers import QueryManager
 
-from apps.app_generic_models.models import UserComment_Generic, UserOpinion_Generic, UserLike_Generic
+from apps.app_generic_models.models import CommentGeneric, OpinionGeneric, LikeGeneric
 from apps.app_tags.models import Tag
 from mylabour.models import TimeStampedModel
 
@@ -20,12 +26,9 @@ class Question(TimeStampedModel):
 
     """
 
-    OPEN_QUESTION = 'open'
-    CLOSED_QUESTION = 'closed'
-
-    CHOICES_STATUS = (
-        (OPEN_QUESTION, _('Open question')),
-        (CLOSED_QUESTION, _('Closed question')),
+    CHOICES_STATUS = Choices(
+        ('open', _('Open')),
+        ('closed', _('Closed')),
     )
 
     title = models.CharField(
@@ -33,7 +36,7 @@ class Question(TimeStampedModel):
     )
     slug = AutoSlugField(_('Slug'), populate_from='title', unique=True, always_update=True, allow_unicode=True)
     text_question = models.TextField(_('Text question'))
-    status = models.CharField(_('Status'), max_length=50, choices=CHOICES_STATUS, default=OPEN_QUESTION)
+    status = models.CharField(_('Status'), max_length=50, choices=CHOICES_STATUS, default=CHOICES_STATUS.open)
     author = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         verbose_name=_('Author'),
@@ -48,10 +51,15 @@ class Question(TimeStampedModel):
     )
     views = models.IntegerField(_('Count views'), default=0, editable=False)
     is_dublicated = models.BooleanField(_('Is dublicated question?'), default=False)
-    opinions = GenericRelation(UserOpinion_Generic)
+    opinions = GenericRelation(OpinionGeneric)
 
+    # managers
     objects = models.Manager()
-    aaa = QuestionManager()
+    questions = QuestionManager()
+
+    # simple managers
+    open_questions = QueryManager(status=CHOICES_STATUS.open)
+    closed_questions = QueryManager(status=CHOICES_STATUS.closed)
 
     class Meta:
         db_table = 'questions'
@@ -66,17 +74,22 @@ class Question(TimeStampedModel):
     def get_absolute_url(self):
         return reverse('app_questions:question', kwargs={'slug': self.slug})
 
-    def has_acceptable_answer(self):
-        return any(self.answers.values_list('is_acceptable', flat=True))
+    def has_acceptabled_answer(self):
+        list_all_values_field_is_acceptabled_of_answers = self.answers.values_list('is_acceptabled', flat=True)
+        count_acceptabled_answers = collections.Counter(list_all_values_field_is_acceptabled_of_answers)[True]
+        if count_acceptabled_answers == 0:
+            return False
+        elif count_acceptabled_answers == 1:
+            return True
+        else:
+            error_message = ugettext('Question "{0}" have more than a single acceptabled answer!'.format(self.title))
+            raise ValidationError(error_message)
 
-    # def count_good_opinions(self):
-    #     return OpinionAboutQuestion.objects.filter(question=self, is_useful=True).count()
-
-    # def count_bad_opinions(self):
-    #     return OpinionAboutQuestion.objects.filter(question=self, is_useful=False).count()
-
-    # def count_favorites(self):
-    #     return OpinionAboutQuestion.objects.filter(question=self, is_favorite=OpinionUserModel.CHOICES_FAVORITE.yes).count()
+    def get_rating(self):
+        good_opinions = self.opinions.filter(is_useful=True).count()
+        bad_opinions = self.opinions.filter(is_useful=False).count()
+        return good_opinions - bad_opinions
+    get_rating.short_description = _('Rating')
 
 
 class Answer(TimeStampedModel):
@@ -92,7 +105,7 @@ class Answer(TimeStampedModel):
         verbose_name=_('Question'),
         on_delete=models.CASCADE,
         related_name='answers',
-        limit_choices_to={'status': Question.OPEN_QUESTION}
+        limit_choices_to={'status': Question.CHOICES_STATUS.open}
     )
     author = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -101,9 +114,9 @@ class Answer(TimeStampedModel):
         related_name='answers',
         limit_choices_to={'is_active': True},
     )
-    is_acceptable = models.BooleanField(_('Is acceptable answer?'), default=False)
-    comments = GenericRelation(UserComment_Generic)
-    likes = GenericRelation(UserLike_Generic)
+    is_acceptabled = models.BooleanField(_('Is acceptabled answer?'), default=False)
+    comments = GenericRelation(CommentGeneric)
+    likes = GenericRelation(LikeGeneric)
 
     class Meta:
         db_table = 'answers'
@@ -115,9 +128,8 @@ class Answer(TimeStampedModel):
     def __str__(self):
         return _('Answer on question "{0.question}" from user "{0.author}"').format(self)
 
-
-# dynamic rating by field "voted_users"
-# acceptend this answer only author
-# top question and top answer by week
-# top snippet by week
-# are you have unread inbox messages
+    def get_rating(self):
+        count_likes = self.likes.filter(liked_it=True).count()
+        count_dislikes = self.likes.filter(liked_it=False).count()
+        return count_likes - count_dislikes
+    get_rating.short_description = _('Rating')

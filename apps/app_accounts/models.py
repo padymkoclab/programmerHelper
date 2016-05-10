@@ -14,6 +14,7 @@ from model_utils import Choices
 from model_utils.managers import QueryManager
 
 from apps.app_badges.models import Badge, GettingBadge
+from apps.app_badges.managers import BadgeManager
 from .managers import AccountManager
 
 
@@ -74,7 +75,6 @@ class Account(AbstractBaseUser, PermissionsMixin):
     presents_on_github = models.URLField(_('Presents on github'), blank=True)
     presents_on_stackoverflow = models.URLField(_('Presents on stackoverflow'), blank=True)
     personal_website = models.URLField(_('Personal website'), blank=True)
-    # choices badges in related of reputation user
     # badges
     badges = models.ManyToManyField(
         Badge,
@@ -94,6 +94,8 @@ class Account(AbstractBaseUser, PermissionsMixin):
     # managers
     objects = models.Manager()
     objects = AccountManager()
+    badges_checker = BadgeManager()
+    # simple managers
     active_accounts = QueryManager(is_active=True)
     superuser_accounts = QueryManager(is_superuser=True)
 
@@ -157,4 +159,7 @@ class Account(AbstractBaseUser, PermissionsMixin):
     """
 
     def get_reputation(self):
+        pass
+
+    def get_badges(self):
         pass

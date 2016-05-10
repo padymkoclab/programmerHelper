@@ -1,4 +1,5 @@
 
+from django.db.models import Avg
 from django.contrib.contenttypes.fields import GenericRelation
 from django.core.urlresolvers import reverse
 from django.core.validators import MinLengthValidator
@@ -10,7 +11,7 @@ from model_utils.fields import StatusField, MonitorField
 from model_utils import Choices
 from autoslug import AutoSlugField
 
-from apps.app_generic_models.models import UserComment_Generic, UserOpinion_Generic
+from apps.app_generic_models.models import CommentGeneric, ScopeGeneric
 from mylabour.models import TimeStampedModel
 from apps.app_tags.models import Tag
 from apps.app_web_links.models import WebLink
@@ -56,8 +57,8 @@ class Article(TimeStampedModel):
         related_name='articles',
         verbose_name=_('Useful links'),
     )
-    comments = GenericRelation(UserComment_Generic)
-    opinions = GenericRelation(UserOpinion_Generic)
+    comments = GenericRelation(CommentGeneric)
+    scopes = GenericRelation(ScopeGeneric)
 
     class Meta:
         db_table = 'articles'
@@ -73,8 +74,11 @@ class Article(TimeStampedModel):
     def get_absolute_url(self):
         return reverse('app_articles:article', kwargs={'slug': self.slug})
 
-    def get_scope(self):
-        pass
+    def get_rating(self):
+        avg_scope = self.scopes.aggregate(rating=Avg('scope'))['rating'] or float(0)
+        return float('{0:.3}'.format(avg_scope))
+    # get_scope.admin_order_field = 'date_published'
+    get_rating.short_description = _('Rating')
 
 
 class ArticleSubsection(TimeStampedModel):

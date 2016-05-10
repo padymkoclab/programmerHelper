@@ -5,7 +5,7 @@ from django.template.defaultfilters import truncatewords
 from django.utils.translation import ugettext_lazy as _
 from django.contrib import admin
 
-from apps.app_generic_models.admin import OpinionGenericInline, CommentGenericInline
+from apps.app_generic_models.admin import ScopeGenericInline, CommentGenericInline
 
 
 class BookAdmin(admin.ModelAdmin):
@@ -16,21 +16,20 @@ class BookAdmin(admin.ModelAdmin):
     list_display = (
         'name',
         'writters',
-        'get_scope',
         'pages',
         'views',
         'publishers',
         'isbn',
         'get_count_links_where_download',
         'get_count_tags',
-        'get_count_opinions',
+        'get_rating',
         'get_count_comments',
         'is_new',
         'date_published',
     )
     list_filter = ('date_published',)
     inlines = [
-        OpinionGenericInline,
+        ScopeGenericInline,
         CommentGenericInline,
     ]
     search_fields = ('name', 'publishers', 'authorship__name')
@@ -56,7 +55,7 @@ class BookAdmin(admin.ModelAdmin):
             count_comments=Count('comments', distinct=True),
             count_tags=Count('tags', distinct=True),
             count_links_where_download=Count('where_download', distinct=True),
-            count_opinions=Count('opinions', distinct=True),
+            # count_opinions=Count('opinions', distinct=True),
         )
         return qs
 
@@ -64,11 +63,6 @@ class BookAdmin(admin.ModelAdmin):
         return obj.count_tags
     get_count_tags.admin_order_field = 'count_tags'
     get_count_tags.short_description = _('Count tags')
-
-    def get_count_opinions(self, obj):
-        return obj.count_opinions
-    get_count_opinions.admin_order_field = 'count_opinions'
-    get_count_opinions.short_description = _('Count opinions')
 
     def get_count_comments(self, obj):
         return obj.count_comments

@@ -7,14 +7,14 @@ from factory import fuzzy
 from .models import *
 
 
-class Factory_TestSuit(factory.DjangoModelFactory):
+class Factory_TestingSuit(factory.DjangoModelFactory):
 
     class Meta:
-        model = TestSuit
+        model = TestingSuit
 
     description = factory.Faker('text', locale='ru')
     author = fuzzy.FuzzyChoice(Account.objects.all())
-    complexity = fuzzy.FuzzyChoice(tuple(TestSuit.CHOICES_COMPLEXITY._db_values))
+    complexity = fuzzy.FuzzyChoice(tuple(TestingSuit.CHOICES_COMPLEXITY._db_values))
 
     @factory.lazy_attribute
     def name(self):
@@ -32,23 +32,23 @@ class Factory_TestSuit(factory.DjangoModelFactory):
         return '00' + duration[2:]
 
 
-class Factory_TestPassageUser(factory.django.DjangoModelFactory):
+class Factory_TestingPassage(factory.django.DjangoModelFactory):
 
     class Meta:
-        model = TestPassageUser
+        model = TestingPassage
 
     user = fuzzy.FuzzyChoice(Account.objects.all())
-    test_suit = fuzzy.FuzzyChoice(Account.objects.all())
-    status = fuzzy.FuzzyChoice(TestPassageUser.CHOICES_STATUS._db_values)
-    scope = fuzzy.FuzzyInteger(TestPassageUser.MIN_SCOPE, TestPassageUser.MAX_SCOPE)
+    test_suit = fuzzy.FuzzyChoice(TestingSuit.objects.all())
+    status = fuzzy.FuzzyChoice(TestingPassage.CHOICES_STATUS._db_values)
+    scope = fuzzy.FuzzyInteger(TestingPassage.MIN_SCOPE, TestingPassage.MAX_SCOPE)
 
 
-class Factory_TestQuestion(factory.DjangoModelFactory):
+class Factory_TestingQuestion(factory.DjangoModelFactory):
 
     class Meta:
-        model = TestQuestion
+        model = TestingQuestion
 
-    test_suit = fuzzy.FuzzyChoice(TestSuit.objects.all())
+    test_suit = fuzzy.FuzzyChoice(TestingSuit.objects.all())
     text_question = factory.Faker('text', locale='ru')
 
     @factory.lazy_attribute
@@ -56,12 +56,12 @@ class Factory_TestQuestion(factory.DjangoModelFactory):
         return factory.Faker('text', locale='ru').generate([])[:40]
 
 
-class Factory_Variant(factory.DjangoModelFactory):
+class Factory_TestingVariant(factory.DjangoModelFactory):
 
     class Meta:
-        model = Variant
+        model = TestingVariant
 
-    question = fuzzy.FuzzyChoice(TestQuestion.objects.all())
+    question = fuzzy.FuzzyChoice(TestingQuestion.objects.all())
     text_variant = factory.Faker('text', locale='ru')
 
     @factory.lazy_attribute
@@ -72,13 +72,12 @@ class Factory_Variant(factory.DjangoModelFactory):
         return is_right_variant
 
 
-TestSuit.objects.filter().delete()
+TestingSuit.objects.filter().delete()
 for i in range(10):
-    test_suit = Factory_TestSuit()
-    for k in range(20):
-        user = random.choice(tuple(Account.objects.all()))
-        Factory_TestPassageUser(user=user, test_suit=test_suit)
-    for j in range(TestSuit.MIN_COUNT_QUESTIONS, TestSuit.MAX_COUNT_QUESTIONS):
-        question = Factory_TestQuestion(test_suit=test_suit)
-        for e in range(TestQuestion.MIN_COUNT_VARIANTS, TestQuestion.MAX_COUNT_VARIANTS):
-            Factory_Variant(question=question)
+    test_suit = Factory_TestingSuit()
+    for j in range(random.randrange(30)):
+        Factory_TestingPassage(test_suit=test_suit)
+    for h in range(TestingSuit.MIN_COUNT_QUESTIONS, TestingSuit.MAX_COUNT_QUESTIONS):
+        question = Factory_TestingQuestion(test_suit=test_suit)
+        for g in range(TestingQuestion.MIN_COUNT_VARIANTS, TestingQuestion.MAX_COUNT_VARIANTS):
+            Factory_TestingVariant(question=question)

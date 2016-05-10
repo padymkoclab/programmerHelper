@@ -4,12 +4,12 @@ from django.contrib.contenttypes.admin import GenericStackedInline, GenericTabul
 # from django.utils.translation import ugettext_lazy as _
 from django.contrib import admin
 
-from .models import UserComment_Generic, UserLike_Generic, UserOpinion_Generic
+from .models import *
 
 
-class UserComment_GenericAdmin(admin.ModelAdmin):
+class CommentGenericAdmin(admin.ModelAdmin):
     '''
-        Admin View for UserComment_Generic
+        Admin View for CommentGeneric
     '''
 
     list_display = ('content_object', 'content_type', 'author', 'is_new', 'date_modified', 'date_added')
@@ -24,9 +24,9 @@ class UserComment_GenericAdmin(admin.ModelAdmin):
     search_fields = ('content_object',)
 
 
-class UserOpinion_GenericAdmin(admin.ModelAdmin):
+class OpinionGenericAdmin(admin.ModelAdmin):
     '''
-        Admin View for UserOpinion_Generic
+        Admin View for OpinionGeneric
     '''
 
     list_display = (
@@ -50,9 +50,9 @@ class UserOpinion_GenericAdmin(admin.ModelAdmin):
     search_fields = ('content_object',)
 
 
-class UserLike_GenericAdmin(admin.ModelAdmin):
+class LikeGenericAdmin(admin.ModelAdmin):
     '''
-        Admin View for UserLike_Generic
+        Admin View for LikeGeneric
     '''
 
     list_display = (
@@ -74,19 +74,49 @@ class UserLike_GenericAdmin(admin.ModelAdmin):
     search_fields = ('content_object',)
 
 
+class ScopeGenericAdmin(admin.ModelAdmin):
+    '''
+        Admin View for LikeGeneric
+    '''
+
+    list_display = (
+        'content_object',
+        'content_type',
+        'user',
+        'scope',
+        'is_new',
+        'date_modified',
+    )
+    list_filter = (
+        ('content_type', admin.RelatedOnlyFieldListFilter),
+        ('user', admin.RelatedOnlyFieldListFilter),
+        'scope',
+        'date_modified',
+    )
+    date_hierarchy = 'date_modified'
+    fields = ['content_type', 'object_id', 'user', 'scope']
+    search_fields = ('content_object',)
+
+
 class OpinionGenericInline(GenericTabularInline):
-    model = UserOpinion_Generic
-    extra = 1
+    model = OpinionGeneric
+    extra = 0
     fields = ['user', 'is_useful', 'is_favorite']
 
 
 class CommentGenericInline(GenericStackedInline):
-    model = UserComment_Generic
-    extra = 1
+    model = CommentGeneric
+    extra = 0
     fields = ['author', 'text_comment']
 
 
 class LikeGenericInline(GenericTabularInline):
-    model = UserLike_Generic
-    extra = 1
+    model = LikeGeneric
+    extra = 0
     fields = ['user', 'liked_it']
+
+
+class ScopeGenericInline(GenericTabularInline):
+    model = ScopeGeneric
+    extra = 0
+    fields = ['user', 'scope']

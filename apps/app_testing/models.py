@@ -15,7 +15,7 @@ from model_utils.fields import StatusField
 from mylabour.models import TimeStampedModel
 
 
-class TestSuit(TimeStampedModel):
+class TestingSuit(TimeStampedModel):
     """
     Model for suit of questions in test
     """
@@ -33,7 +33,7 @@ class TestSuit(TimeStampedModel):
     name = models.CharField(
         _('Name'), max_length=200, validators=[MinLengthValidator(settings.MIN_LENGTH_FOR_NAME_OR_TITLE_OBJECT)]
     )
-    slug = AutoSlugField(_('Slug'), populate_from='name', unique=True, always_update=True, allow_unicode=True, db_index=True)
+    slug = AutoSlugField(_('Slug'), populate_from='name', unique_with=['author'], always_update=True, allow_unicode=True, db_index=True)
     description = models.TextField(_('Description'))
     picture = models.URLField(_('Picture'), max_length=1000)
     duration = models.DurationField(_('Duration'), default=timedelta(minutes=1))
@@ -47,13 +47,13 @@ class TestSuit(TimeStampedModel):
     passages = models.ManyToManyField(
         settings.AUTH_USER_MODEL,
         verbose_name=_('Passages'),
-        related_name='passages_tests',
-        through='TestPassageUser',
+        related_name='passages',
+        through='TestingPassage',
         through_fields=['test_suit', 'user'],
     )
 
     class Meta:
-        db_table = 'test_suits'
+        db_table = 'testing_suits'
         verbose_name = _("Suit of tests")
         verbose_name_plural = _("Suits of tests")
         ordering = ['date_added']
@@ -64,7 +64,7 @@ class TestSuit(TimeStampedModel):
         return '{0.name}'.format(self)
 
     def get_absolute_url(self):
-        return reverse('app_programming_tester:test_suit', kwargs={'slug': self.slug})
+        return reverse('app_testing:suit', kwargs={'slug': self.slug})
 
     def count_attempts_passing(self):
         pass
@@ -73,7 +73,7 @@ class TestSuit(TimeStampedModel):
         pass
 
 
-class TestPassageUser(models.Model):
+class TestingPassage(models.Model):
 
     MIN_SCOPE = 0
     MAX_SCOPE = 12
@@ -89,7 +89,7 @@ class TestPassageUser(models.Model):
         verbose_name=_('User'),
     )
     test_suit = models.ForeignKey(
-        'TestSuit',
+        'TestingSuit',
         on_delete=models.CASCADE,
         verbose_name=_('User'),
     )
@@ -97,8 +97,15 @@ class TestPassageUser(models.Model):
     scope = models.SmallIntegerField(_('Scope'), default=0, editable=False)
     date_passage = models.DateTimeField(_('Date passage'), auto_now_add=True)
 
+    class Meta:
+        db_table = 'testing_passages'
+        verbose_name = _("Testing passage")
+        verbose_name_plural = _("Testing passages")
+        get_latest_by = 'date_passage'
+        order_with_respect_to = 'date_passage'
 
-class TestQuestion(TimeStampedModel):
+
+class TestingQuestion(TimeStampedModel):
     """
 
     """
@@ -109,11 +116,11 @@ class TestQuestion(TimeStampedModel):
     name = models.CharField(
         _('Name'), max_length=200, validators=[MinLengthValidator(settings.MIN_LENGTH_FOR_NAME_OR_TITLE_OBJECT)]
     )
-    test_suit = models.ForeignKey('TestSuit', verbose_name=_('Test suit'), related_name='questions', on_delete=models.CASCADE)
+    test_suit = models.ForeignKey('TestingSuit', verbose_name=_('Test suit'), related_name='questions', on_delete=models.CASCADE)
     text_question = models.TextField(_('Text question'))
 
     class Meta:
-        db_table = 'test_suits_questions'
+        db_table = 'testing_questions'
         verbose_name = _("Testing question")
         verbose_name_plural = _("Testing questions")
         unique_together = ['name', 'test_suit']
@@ -130,20 +137,20 @@ class TestQuestion(TimeStampedModel):
         return False
 
 
-class Variant(models.Model):
+class TestingVariant(models.Model):
     """
 
     """
 
     id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
-    question = models.ForeignKey('TestQuestion', related_name='variants', verbose_name=_('Question'), on_delete=models.CASCADE)
+    question = models.ForeignKey('TestingQuestion', related_name='variants', verbose_name=_('Question'), on_delete=models.CASCADE)
     text_variant = models.CharField(_('Text variant'), max_length=300)
     is_right_variant = models.BooleanField(_('It is right variant of answer?'), default=False)
 
     class Meta:
-        db_table = 'test_suits_questions_variants'
-        verbose_name = _("Variant answer on question")
-        verbose_name_plural = _("Variants answer on question")
+        db_table = 'testing_variants'
+        verbose_name = _("Variant")
+        verbose_name_plural = _("Variants")
         unique_together = ['question', 'text_variant']
         order_with_respect_to = 'question'
 

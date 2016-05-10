@@ -8,7 +8,7 @@ from django.conf import settings
 
 from autoslug import AutoSlugField
 
-from apps.app_generic_models.models import UserComment_Generic, UserOpinion_Generic
+from apps.app_generic_models.models import CommentGeneric, OpinionGeneric
 from apps.app_web_links.models import WebLink
 from apps.app_tags.models import Tag
 from mylabour.models import TimeStampedModel
@@ -76,8 +76,8 @@ class Solution(TimeStampedModel):
         related_name='solutions',
         verbose_name=_('Useful links'),
     )
-    comments = GenericRelation(UserComment_Generic)
-    opinions = GenericRelation(UserOpinion_Generic)
+    comments = GenericRelation(CommentGeneric)
+    opinions = GenericRelation(OpinionGeneric)
 
     # run code JSBin
     # testing with online run code

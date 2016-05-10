@@ -12,34 +12,47 @@ from .models import *
 Accounts = get_user_model().objects.all()
 
 
-class Factory_UserComment_Generic(factory.DjangoModelFactory):
+class Factory_CommentGeneric(factory.DjangoModelFactory):
 
     class Meta:
-        model = UserComment_Generic
+        model = CommentGeneric
 
     author = fuzzy.FuzzyChoice(tuple(Accounts))
     text_comment = factory.Faker('text', locale='ru')
 
 
-class Factory_UserOpinion_Generic(factory.DjangoModelFactory):
+class Factory_OpinionGeneric(factory.DjangoModelFactory):
 
     class Meta:
-        model = UserOpinion_Generic
+        model = OpinionGeneric
 
     user = fuzzy.FuzzyChoice(tuple(Accounts))
     is_useful = fuzzy.FuzzyChoice([None, True, False])
 
     @factory.lazy_attribute
     def is_favorite(self):
+        choices = [True, False, None]
         if self.is_useful is None:
-            return UserOpinion_Generic.CHOICES_FAVORITE.yes
-        return fuzzy.FuzzyChoice(tuple(UserOpinion_Generic.CHOICES_FAVORITE._db_values)).fuzz()
+            choices = [True, False]
+        return random.choice(choices)
 
 
-class Factory_UserLike_Generic(factory.DjangoModelFactory):
+class Factory_LikeGeneric(factory.DjangoModelFactory):
 
     class Meta:
-        model = UserLike_Generic
+        model = LikeGeneric
 
     user = fuzzy.FuzzyChoice(tuple(Accounts))
     liked_it = fuzzy.FuzzyChoice([True, False])
+
+
+class Factory_ScopeGeneric(factory.DjangoModelFactory):
+
+    class Meta:
+        model = ScopeGeneric
+
+    user = fuzzy.FuzzyChoice(tuple(Accounts))
+
+    @factory.lazy_attribute
+    def scope(self):
+        return random.randint(ScopeGeneric.MIN_SCOPE, ScopeGeneric.MAX_SCOPE)

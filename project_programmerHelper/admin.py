@@ -17,16 +17,16 @@ from apps.app_courses.admin import CourseAdmin, LessonAdmin, SublessonAdmin
 from apps.app_courses.models import Course, Lesson, Sublesson
 from apps.app_forum.admin import ForumThemeAdmin, ForumTopicAdmin, ForumPostAdmin
 from apps.app_forum.models import ForumTopic, ForumTheme, ForumPost
-from apps.app_generic_models.admin import UserComment_GenericAdmin, UserOpinion_GenericAdmin, UserLike_GenericAdmin
-from apps.app_generic_models.models import UserComment_Generic, UserOpinion_Generic, UserLike_Generic
+from apps.app_generic_models.admin import CommentGenericAdmin, OpinionGenericAdmin, LikeGenericAdmin, ScopeGenericAdmin
+from apps.app_generic_models.models import CommentGeneric, OpinionGeneric, LikeGeneric, ScopeGeneric
 from apps.app_newsletters.admin import NewsletterAdmin
 from apps.app_newsletters.models import Newsletter
 from apps.app_polls.admin import PollAdmin, VoteInPollAdmin, ChoiceAdmin
 from apps.app_polls.models import Poll, Choice, VoteInPoll
-from apps.app_programming_tester.admin import TestSuitAdmin, TestQuestionAdmin, VariantAdmin
-from apps.app_programming_tester.models import TestSuit, TestQuestion, Variant
-from apps.app_programming_utilities.admin import ProgrammingCategoryAdmin, ProgrammingUtilityAdmin
-from apps.app_programming_utilities.models import ProgrammingCategory, ProgrammingUtility
+from apps.app_testing.admin import TestingSuitAdmin, TestingQuestionAdmin, TestingVariantAdmin
+from apps.app_testing.models import TestingSuit, TestingQuestion, TestingVariant
+from apps.app_utilities.admin import UtilityCategoryAdmin, UtilityAdmin
+from apps.app_utilities.models import UtilityCategory, Utility
 from apps.app_questions.admin import QuestionAdmin, AnswerAdmin
 from apps.app_questions.models import Question, Answer
 from apps.app_snippets.admin import SnippetAdmin
@@ -55,14 +55,14 @@ ProgrammerHelper_AdminSite.register(Account, AccountAdmin)
 ProgrammerHelper_AdminSite.register(Badge, BadgeAdmin)
 ProgrammerHelper_AdminSite.register(GettingBadge, GettingBadgeAdmin)
 # app_programming_utilities
-ProgrammerHelper_AdminSite.register(ProgrammingCategory, ProgrammingCategoryAdmin)
-ProgrammerHelper_AdminSite.register(ProgrammingUtility, ProgrammingUtilityAdmin)
+ProgrammerHelper_AdminSite.register(UtilityCategory, UtilityCategoryAdmin)
+ProgrammerHelper_AdminSite.register(Utility, UtilityAdmin)
 # app_web_links
 ProgrammerHelper_AdminSite.register(WebLink, WebLinkAdmin)
 # app_programming_tester
-ProgrammerHelper_AdminSite.register(TestSuit, TestSuitAdmin)
-ProgrammerHelper_AdminSite.register(TestQuestion, TestQuestionAdmin)
-ProgrammerHelper_AdminSite.register(Variant, VariantAdmin)
+ProgrammerHelper_AdminSite.register(TestingSuit, TestingSuitAdmin)
+ProgrammerHelper_AdminSite.register(TestingQuestion, TestingQuestionAdmin)
+ProgrammerHelper_AdminSite.register(TestingVariant, TestingVariantAdmin)
 # app_solution
 ProgrammerHelper_AdminSite.register(SolutionCategory, SolutionCategoryAdmin)
 ProgrammerHelper_AdminSite.register(Solution, SolutionAdmin)
@@ -94,6 +94,7 @@ ProgrammerHelper_AdminSite.register(Poll, PollAdmin)
 ProgrammerHelper_AdminSite.register(Choice, ChoiceAdmin)
 ProgrammerHelper_AdminSite.register(VoteInPoll, VoteInPollAdmin)
 # app_generic_models
-ProgrammerHelper_AdminSite.register(UserComment_Generic, UserComment_GenericAdmin)
-ProgrammerHelper_AdminSite.register(UserOpinion_Generic, UserOpinion_GenericAdmin)
-ProgrammerHelper_AdminSite.register(UserLike_Generic, UserLike_GenericAdmin)
+ProgrammerHelper_AdminSite.register(CommentGeneric, CommentGenericAdmin)
+ProgrammerHelper_AdminSite.register(OpinionGeneric, OpinionGenericAdmin)
+ProgrammerHelper_AdminSite.register(LikeGeneric, LikeGenericAdmin)
+ProgrammerHelper_AdminSite.register(ScopeGeneric, ScopeGenericAdmin)
