@@ -12,7 +12,7 @@ from autoslug import AutoSlugField
 from mylabour.models import TimeStampedModel
 
 
-class ForumTheme(TimeStampedModel):
+class ForumSection(TimeStampedModel):
     """
 
     """
@@ -25,8 +25,8 @@ class ForumTheme(TimeStampedModel):
 
     class Meta:
         db_table = 'forum_themes'
-        verbose_name = ("Theme")
-        verbose_name_plural = _("Themes")
+        verbose_name = ("Section")
+        verbose_name_plural = _("Sections")
         ordering = ['name']
         get_latest_by = 'date_modified'
 
@@ -36,7 +36,23 @@ class ForumTheme(TimeStampedModel):
     def get_absolute_url(self):
         return reverse('app_forum:theme', kwargs={'slug': self.slug})
 
-    # last activity
+    def last_activity(self):
+        return self.topics.latest().date_modified
+    last_activity.short_description = _('Last activity')
+
+    def get_count_posts(self):
+        result = self.topics.annotate(count_posts=models.Count('posts')).aggregate(total_count_posts=models.Sum('count_posts'))
+        return result['total_count_posts']
+    get_count_posts.admin_order_field = 'count_topics'  # annotate in admin.py file
+    get_count_posts.short_description = _('Count posts')
+
+    def count_active_users(self):
+        """Count users posted in topic of theme"""
+        result = set()
+        for topic in self.topics.iterator():
+            result.update(topic.get_active_users())
+        return len(result)
+    count_active_users.short_description = _('Active users')
 
 
 class ForumTopic(TimeStampedModel):
@@ -52,8 +68,8 @@ class ForumTopic(TimeStampedModel):
     name = models.CharField(
         _('Name'), max_length=200, validators=[MinLengthValidator(settings.MIN_LENGTH_FOR_NAME_OR_TITLE_OBJECT)]
     )
-    slug = AutoSlugField(_('Slug'), populate_from='name', unique=True, always_update=True, db_index=True, allow_unicode=True)
-    theme = models.ForeignKey('ForumTheme', verbose_name=_('Theme'), related_name='topics', on_delete=models.CASCADE)
+    slug = AutoSlugField(_('Slug'), populate_from='name', unique_with=['theme'], always_update=True, db_index=True, allow_unicode=True)
+    theme = models.ForeignKey('ForumSection', verbose_name=_('Theme'), related_name='topics', on_delete=models.CASCADE)
     author = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         verbose_name=_('Author'),
@@ -70,7 +86,7 @@ class ForumTopic(TimeStampedModel):
         db_table = 'forum_topics'
         verbose_name = _('Topic')
         verbose_name_plural = _('Topics')
-        order_with_respect_to = 'theme'
+        ordering = ['theme', 'date_added']
         unique_together = ['name', 'theme']
         get_latest_by = 'date_modified'
 
@@ -80,7 +96,19 @@ class ForumTopic(TimeStampedModel):
     def get_absolute_url(self):
         return reverse('app_forum:topic', kwargs={'slug': self.slug})
 
-    # date_last_activity
+    def last_activity(self):
+        return self.posts.latest().date_modified
+    last_activity.short_description = _('Last activity')
+
+    def get_active_users(self):
+        """Return set users posted in this topic"""
+        return frozenset(self.posts.values_list('author', flat=True))
+
+    def count_active_users(self):
+        """Count users posted in topic"""
+        active_users = self.get_active_users()
+        return len(active_users)
+    count_active_users.short_description = _('Active users')
 
 
 class ForumPost(TimeStampedModel):

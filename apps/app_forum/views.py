@@ -1,7 +1,7 @@
 
 from django.views.generic import DetailView
 
-from .models import ForumTheme, ForumTopic
+from .models import ForumSection, ForumTopic
 
 
 class TopicDetailView(DetailView):
@@ -9,6 +9,6 @@ class TopicDetailView(DetailView):
     template_name = "app_programming_tester/test_suit_detail.html"
 
 
-class ThemeDetailView(DetailView):
-    model = ForumTheme
+class SectionDetailView(DetailView):
+    model = ForumSection
     template_name = "TEMPLATE_NAME"

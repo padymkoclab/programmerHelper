@@ -22,7 +22,7 @@ class Snippet(TimeStampedModel):
     title = models.CharField(
         _('Title'), max_length=200, unique=True, validators=[MinLengthValidator(settings.MIN_LENGTH_FOR_NAME_OR_TITLE_OBJECT)]
     )
-    slug = AutoSlugField(_('Slug'), populate_from='title', always_update=True, unique=True, allow_unicode=True)
+    slug = AutoSlugField(_('Slug'), populate_from='title', always_update=True, unique=True, allow_unicode=True, db_index=True)
     lexer = models.CharField(_('Lexer of code'), max_length=50, choices=CHOICES_LEXERS)
     description = models.TextField(_('Decription'))
     code = models.TextField(_('Code'))
@@ -56,4 +56,7 @@ class Snippet(TimeStampedModel):
         return reverse('app_snippets:snippet', kwargs={'slug': self.slug})
 
     def get_scope(self):
-        pass
+        count_good_opinions = self.opinions.filter(is_useful=True).count()
+        count_bad_opinions = self.opinions.filter(is_useful=False).count()
+        return count_good_opinions - count_bad_opinions
+    get_scope.short_description = _('Scope')

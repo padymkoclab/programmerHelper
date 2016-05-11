@@ -52,7 +52,7 @@ class Factory_TestingQuestion(factory.DjangoModelFactory):
     text_question = factory.Faker('text', locale='ru')
 
     @factory.lazy_attribute
-    def name(self):
+    def title(self):
         return factory.Faker('text', locale='ru').generate([])[:40]
 
 
@@ -66,10 +66,9 @@ class Factory_TestingVariant(factory.DjangoModelFactory):
 
     @factory.lazy_attribute
     def is_right_variant(self):
-        is_right_variant = True
         if self.question.have_one_right_variant():
             return False
-        return is_right_variant
+        return random.choice([True, False])
 
 
 TestingSuit.objects.filter().delete()
@@ -77,7 +76,7 @@ for i in range(10):
     test_suit = Factory_TestingSuit()
     for j in range(random.randrange(30)):
         Factory_TestingPassage(test_suit=test_suit)
-    for h in range(TestingSuit.MIN_COUNT_QUESTIONS, TestingSuit.MAX_COUNT_QUESTIONS):
+    for h in range(random.randint(TestingSuit.MIN_COUNT_QUESTIONS, TestingSuit.MAX_COUNT_QUESTIONS)):
         question = Factory_TestingQuestion(test_suit=test_suit)
-        for g in range(TestingQuestion.MIN_COUNT_VARIANTS, TestingQuestion.MAX_COUNT_VARIANTS):
+        for g in range(random.randint(TestingQuestion.MIN_COUNT_VARIANTS, TestingQuestion.MAX_COUNT_VARIANTS)):
             Factory_TestingVariant(question=question)

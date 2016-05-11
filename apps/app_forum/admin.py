@@ -3,7 +3,7 @@ from django.db.models import Count
 from django.utils.translation import ugettext_lazy as _
 from django.contrib import admin
 
-from .models import ForumTopic, ForumPost
+from .models import ForumSection, ForumTopic, ForumPost
 
 
 class ForumTopicInline(admin.StackedInline):
@@ -12,31 +12,21 @@ class ForumTopicInline(admin.StackedInline):
     '''
 
     model = ForumTopic
-    min_num = 0
-    extra = 1
+    min_num = 1
+    extra = 0
     fk_name = 'theme'
 
 
-class ForumPostInline(admin.StackedInline):
+class ForumSectionAdmin(admin.ModelAdmin):
     '''
-        Tabular Inline View for ForumPost
-    '''
-
-    model = ForumPost
-    min_num = 0
-    extra = 1
-    fk_name = 'topic'
-
-
-class ForumThemeAdmin(admin.ModelAdmin):
-    '''
-    Admin View for ForumTheme
+    Admin View for ForumSection
     '''
 
     list_display = (
         'name',
-        'get_count_topic',
-        'get_count_total_posts',
+        'get_count_topics',
+        'get_count_posts',
+        'count_active_users',
         'is_new',
         'date_modified',
         'date_added',
@@ -49,24 +39,37 @@ class ForumThemeAdmin(admin.ModelAdmin):
     inlines = [
         ForumTopicInline,
     ]
+    fieldsets = [
+        [
+            ForumSection._meta.verbose_name, {
+                'fields': ['name', 'description']
+            }
+        ]
+    ]
 
     def get_queryset(self, request):
-        qs = super(ForumThemeAdmin, self).get_queryset(request)
+        qs = super(ForumSectionAdmin, self).get_queryset(request)
         qs = qs.annotate(
             count_topics=Count('topics', distinct=True),
             count_posts=Count('topics__posts', distinct=True),
         )
         return qs
 
-    def get_count_topic(self, obj):
-        return obj.count_topics
-    get_count_topic.admin_order_field = 'count_topics'
-    get_count_topic.short_description = _('Count topics')
+    def get_count_topics(self, obj):
+        return obj.topics.count()
+    get_count_topics.admin_order_field = 'count_topics'
+    get_count_topics.short_description = _('Count topics')
 
-    def get_count_total_posts(self, obj):
-        return obj.count_posts
-    get_count_total_posts.admin_order_field = 'count_posts'
-    get_count_total_posts.short_description = _('Count total posts')
+
+class ForumPostInline(admin.StackedInline):
+    '''
+        Tabular Inline View for ForumPost
+    '''
+
+    model = ForumPost
+    min_num = 1
+    extra = 0
+    fk_name = 'topic'
 
 
 class ForumTopicAdmin(admin.ModelAdmin):
@@ -79,6 +82,7 @@ class ForumTopicAdmin(admin.ModelAdmin):
         'theme',
         'author',
         'get_count_posts',
+        'count_active_users',
         'status',
         'status_changed',
         'is_new',
@@ -96,6 +100,14 @@ class ForumTopicAdmin(admin.ModelAdmin):
     inlines = [
         ForumPostInline,
     ]
+    fieldsets = [
+        [
+            ForumTopic._meta.verbose_name, {
+                'fields': ['name', 'theme', 'author', 'status', 'description']
+            }
+        ]
+    ]
+    search_fields = ['name']
 
     def get_queryset(self, request):
         qs = super(ForumTopicAdmin, self).get_queryset(request)
@@ -122,3 +134,12 @@ class ForumPostAdmin(admin.ModelAdmin):
         'date_modified',
         'date_added',
     )
+    date_hierarchy = 'date_added'
+    search_fields = ['content']
+    fieldsets = [
+        [
+            ForumPost._meta.verbose_name, {
+                'fields': ['topic', 'author', 'content']
+            }
+        ]
+    ]

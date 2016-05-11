@@ -1,6 +1,7 @@
 
 import uuid
 
+from django.template.defaultfilters import truncatewords
 from django.core.urlresolvers import reverse
 from django.core.validators import MinLengthValidator
 from django.utils.translation import ugettext_lazy as _
@@ -30,7 +31,6 @@ class Poll(TimeStampedModel):
     )
 
     CHOICES_ACCESSABILITY = Choices(
-        ('private', _('Private')),
         ('protect', _('Protect')),
         ('public', _('Public')),
     )
@@ -49,7 +49,7 @@ class Poll(TimeStampedModel):
     status_changed = MonitorField(_('Status changed'), monitor='status')
     votes = models.ManyToManyField(
         settings.AUTH_USER_MODEL,
-        related_name='votes_in_polls',
+        related_name='+',
         through='VoteInPoll',
         through_fields=['poll', 'user'],
         verbose_name=_('Voted users'),
@@ -94,10 +94,7 @@ class Choice(models.Model):
         unique_together = ['poll', 'text_choice']
 
     def __str__(self):
-        return _('{0.text_choice}').format(self)
-
-    def count_votes(self):
-        pass
+        return truncatewords('{0.text_choice}'.format(self), 8)
 
 
 class VoteInPoll(models.Model):
@@ -112,11 +109,13 @@ class VoteInPoll(models.Model):
         settings.AUTH_USER_MODEL,
         verbose_name=_('User'),
         on_delete=models.CASCADE,
+        related_name='votes_in_polls'
     )
     choice = models.ForeignKey(
         'Choice',
         verbose_name=_('Choice'),
         on_delete=models.CASCADE,
+        related_name='votes',
     )
     date_voting = models.DateTimeField(_('Date voting'), auto_now=True)
 

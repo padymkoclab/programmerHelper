@@ -3,7 +3,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.db.models import Count
 from django.contrib import admin
 
-from .models import TestingSuit, TestingQuestion, TestingVariant
+from .models import TestingSuit, TestingQuestion, TestingVariant, TestingPassage
 from .forms import TestingVariantInlineFormSet
 
 
@@ -17,6 +17,7 @@ class TestingQuestionInline(admin.StackedInline):
     min_num = 3
     extra = 0
     fk_name = 'test_suit'
+    fields = ['title', 'text_question']
 
 
 class TestingPassageInline(admin.TabularInline):
@@ -26,6 +27,7 @@ class TestingPassageInline(admin.TabularInline):
 
     model = TestingSuit.passages.through
     extra = 0
+    fields = ['user', 'status', 'scope']
 
 
 class TestingSuitAdmin(admin.ModelAdmin):
@@ -41,6 +43,7 @@ class TestingSuitAdmin(admin.ModelAdmin):
         'complexity',
         'count_attempts_passing',
         'count_completed_passing',
+        'get_avg_scope_by_completed_passing',
         'get_count_questions',
         'is_new',
         'date_modified',
@@ -56,6 +59,14 @@ class TestingSuitAdmin(admin.ModelAdmin):
         TestingQuestionInline,
         TestingPassageInline,
     ]
+    date_hierarchy = 'date_added'
+    fieldsets = [
+        [
+            TestingSuit._meta.verbose_name, {
+                'fields': ['name', 'author', 'picture', 'duration', 'complexity', 'description'],
+            }
+        ]
+    ]
 
     def get_queryset(self, request):
         qs = super(TestingSuitAdmin, self).get_queryset(request)
@@ -66,6 +77,29 @@ class TestingSuitAdmin(admin.ModelAdmin):
         return obj.count_questions
     get_count_questions.admin_order_field = 'count_questions'
     get_count_questions.short_description = _('Count questions')
+
+
+class TestingPassageAdmin(admin.ModelAdmin):
+    """
+
+    """
+
+    list_display = ['test_suit', 'user', 'status', 'scope', 'date_passage']
+    date_hierarchy = 'date_passage'
+    list_filter = [
+        ('test_suit', admin.RelatedOnlyFieldListFilter),
+        ('user', admin.RelatedOnlyFieldListFilter),
+        'status',
+        'date_passage',
+    ]
+    fieldsets = [
+        [
+            TestingPassage._meta.verbose_name, {
+                'fields': ['test_suit', 'user', 'status', 'scope'],
+            }
+        ]
+    ]
+    readonly_fields = ['test_suit', 'user', 'status', 'scope']
 
 
 class TestingVariantInline(admin.TabularInline):
@@ -86,8 +120,8 @@ class TestingQuestionAdmin(admin.ModelAdmin):
     Admin View for TestingQuestion
     """
 
-    search_fields = ('name',)
-    list_display = ('name', 'test_suit', 'is_new', 'get_count_variants', 'date_modified', 'date_added')
+    search_fields = ('title',)
+    list_display = ('cropped_title', 'test_suit', 'is_new', 'get_count_variants', 'date_modified', 'date_added')
     list_filter = (
         'date_modified',
         'date_added',
@@ -95,6 +129,14 @@ class TestingQuestionAdmin(admin.ModelAdmin):
     )
     inlines = [
         TestingVariantInline,
+    ]
+    date_hierarchy = 'date_added'
+    fieldsets = [
+        [
+            TestingQuestion._meta.verbose_name, {
+                'fields': ['title', 'test_suit', 'text_question'],
+            }
+        ]
     ]
 
     def get_queryset(self, request):
@@ -112,9 +154,16 @@ class TestingVariantAdmin(admin.ModelAdmin):
     '''
         Admin View for TestingVariant
     '''
-    list_display = ('question', 'is_right_variant')
+    list_display = ('cropped_text_variant', 'question', 'is_right_variant')
     list_filter = (
         ('question', admin.RelatedOnlyFieldListFilter),
         ('is_right_variant', admin.BooleanFieldListFilter),
     )
     search_fields = ('question__title',)
+    fieldsets = [
+        [
+            TestingVariant._meta.verbose_name, {
+                'fields': ['question', 'text_variant', 'is_right_variant'],
+            }
+        ]
+    ]

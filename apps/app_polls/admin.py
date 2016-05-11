@@ -14,7 +14,7 @@ class ChoiceInline(admin.StackedInline):
     model = Choice
     min_num = Poll.MIN_COUNT_CHOICES_IN_POLL
     max_num = Poll.MAX_COUNT_CHOICES_IN_POLL
-    extra = 1
+    extra = 0
 
 
 class VoteInPollInline(admin.TabularInline):
@@ -23,7 +23,8 @@ class VoteInPollInline(admin.TabularInline):
     '''
 
     model = VoteInPoll
-    extra = 1
+    extra = 0
+    fields = ['choice', 'user']
 
 
 class PollAdmin(admin.ModelAdmin):
@@ -38,6 +39,13 @@ class PollAdmin(admin.ModelAdmin):
         VoteInPollInline,
     ]
     search_fields = ('title',)
+    fieldsets = [
+        [
+            Poll._meta.verbose_name, {
+                'fields': ['title', 'accessability', 'status', 'status_changed']
+            }
+        ]
+    ]
 
     def get_queryset(self, request):
         qs = super(PollAdmin, self).get_queryset(request)
@@ -62,13 +70,30 @@ class ChoiceAdmin(admin.ModelAdmin):
     '''
     Admin View for Choice
     '''
-    list_display = ('poll', 'text_choice')
+    list_display = ('__str__', 'poll', 'get_count_votes')
     list_filter = (
-        ('poll', admin.RelatedFieldListFilter),
+        ('poll', admin.RelatedOnlyFieldListFilter),
     )
     search_fields = ('text_choice',)
+    fieldsets = [
+        [
+            Choice._meta.verbose_name, {
+                'fields': ['poll', 'text_choice']
+            }
+        ]
+    ]
 
-admin.site.register(Choice, ChoiceAdmin)
+    def get_queryset(self, request):
+        qs = super(ChoiceAdmin, self).get_queryset(request)
+        qs = qs.annotate(
+            count_votes=Count('votes')
+        )
+        return qs
+
+    def get_count_votes(self, obj):
+        return obj.count_votes
+    get_count_votes.short_description = _('Count votes')
+    get_count_votes.admin_order_field = 'count_votes'
 
 
 class VoteInPollAdmin(admin.ModelAdmin):
@@ -77,8 +102,16 @@ class VoteInPollAdmin(admin.ModelAdmin):
     '''
     list_display = ('poll', 'user', 'choice', 'date_voting')
     list_filter = (
-        ('poll', admin.RelatedFieldListFilter),
-        ('user', admin.RelatedFieldListFilter),
+        ('poll', admin.RelatedOnlyFieldListFilter),
+        ('user', admin.RelatedOnlyFieldListFilter),
         'choice',
         'date_voting',
     )
+    readonly_fields = ['poll', 'user', 'choice']
+    fieldsets = [
+        [
+            VoteInPoll._meta.verbose_name, {
+                'fields': ['poll', 'user', 'choice']
+            }
+        ]
+    ]

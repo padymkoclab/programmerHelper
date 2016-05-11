@@ -12,10 +12,10 @@ from .models import *
 Accounts = get_user_model().objects.all()
 
 
-class Factory_ForumTheme(factory.DjangoModelFactory):
+class Factory_ForumSection(factory.DjangoModelFactory):
 
     class Meta:
-        model = ForumTheme
+        model = ForumSection
 
     description = factory.Faker('text', locale='ru')
 
@@ -31,6 +31,7 @@ class Factory_ForumTopic(factory.DjangoModelFactory):
 
     description = factory.Faker('text', locale='ru')
     author = fuzzy.FuzzyChoice(Accounts)
+    views = fuzzy.FuzzyInteger(1000)
 
     @factory.lazy_attribute
     def name(self):
@@ -48,13 +49,12 @@ class Factory_ForumPost(factory.DjangoModelFactory):
 
     content = factory.Faker('text', locale='ru')
     author = fuzzy.FuzzyChoice(Accounts)
-    topic = fuzzy.FuzzyChoice(ForumTopic.objects.all())
 
 
-ForumTheme.objects.filter().delete()
+ForumSection.objects.filter().delete()
 for i in range(10):
-    theme = Factory_ForumTheme()
-    for j in range(random.randrange(20)):
+    theme = Factory_ForumSection()
+    for j in range(random.randrange(1, 20)):
         topic = Factory_ForumTopic(theme=theme)
         for e in range(random.randrange(1, 10)):
             Factory_ForumPost(topic=topic)

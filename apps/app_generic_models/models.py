@@ -9,8 +9,6 @@ from django.utils.translation import ugettext_lazy as _
 from django.db import models
 from django.conf import settings
 
-from model_utils import Choices
-
 
 class BaseGeneric(models.Model):
 
@@ -57,23 +55,14 @@ class OpinionGeneric(BaseGeneric):
         related_name='opinions',
         verbose_name=_('User'),
     )
-    is_useful = models.NullBooleanField(_('Is was useful for you?'), default=None)
-    is_favorite = models.NullBooleanField(_('Is your favorite theme?'), default=None)
+    is_useful = models.NullBooleanField(_('Is useful?'), default=None)
+    is_favorite = models.NullBooleanField(_('Is favorite?'), default=None)
 
     class Meta(BaseGeneric.Meta):
         db_table = 'opinions'
         verbose_name = _('Opinion')
         verbose_name_plural = _('Opinions')
         permissions = (('can_view_opinions', _('Can view opinions')),)
-
-    def display_is_favorite_as_boolean(self):
-        if self.is_favorite == self.CHOICES_FAVORITE.yes:
-            return True
-        if self.is_favorite == self.CHOICES_FAVORITE.unknown:
-            return None
-    display_is_favorite_as_boolean.boolean = True
-    display_is_favorite_as_boolean.admin_order_field = 'is_favorite'
-    display_is_favorite_as_boolean.short_description = _('Is favorite')
 
 
 class LikeGeneric(BaseGeneric):

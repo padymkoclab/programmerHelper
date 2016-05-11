@@ -6,6 +6,7 @@ from django.contrib import admin
 from apps.app_generic_models.admin import OpinionGenericInline, CommentGenericInline
 
 from .models import Course, Lesson, Sublesson
+from .forms import CourseForm, LessonInlineFormSet, SublessonInlineFormSet
 
 
 class LessonInline(admin.StackedInline):
@@ -17,6 +18,7 @@ class LessonInline(admin.StackedInline):
     min_num = Course.MIN_COUNT_LESSONS
     max_num = Course.MAX_COUNT_LESSONS
     extra = 0
+    formset = LessonInlineFormSet
 
 
 class CourseAdmin(admin.ModelAdmin):
@@ -24,11 +26,13 @@ class CourseAdmin(admin.ModelAdmin):
     Admin View for Course
     '''
 
+    form = CourseForm
     list_display = (
         'name',
         'picture',
         'lexer',
-        'get_generalized_scope',
+        'authorship_inline',
+        'get_total_scope',
         'get_count_lessons',
         'is_new',
         'date_modified',
@@ -43,7 +47,13 @@ class CourseAdmin(admin.ModelAdmin):
         LessonInline,
     ]
     search_fields = ('name',)
-    fields = ['name', 'picture', 'description', 'lexer', 'authorship']
+    fieldsets = [
+        [
+            Course._meta.verbose_name, {
+                'fields': ['name', 'lexer', 'picture', 'description', 'authorship'],
+            }
+        ]
+    ]
     date_hierarchy = 'date_added'
     filter_horizontal = ['authorship']
 
@@ -69,6 +79,7 @@ class SublessonInline(admin.StackedInline):
     min_num = Lesson.MIN_COUNT_SUBLESSONS
     max_num = Lesson.MAX_COUNT_SUBLESSONS
     extra = 0
+    formset = SublessonInlineFormSet
 
 
 class LessonAdmin(admin.ModelAdmin):
@@ -96,6 +107,13 @@ class LessonAdmin(admin.ModelAdmin):
         CommentGenericInline,
     ]
     search_fields = ('name',)
+    fieldsets = [
+        [
+            Lesson._meta.verbose_name, {
+                'fields': ['name', 'course', 'number', 'is_completed', 'header', 'conclusion'],
+            }
+        ]
+    ]
 
     def get_queryset(self, request):
         qs = super(LessonAdmin, self).get_queryset(request)
@@ -131,4 +149,10 @@ class SublessonAdmin(admin.ModelAdmin):
     list_filter = ('lesson', 'date_modified', 'date_added')
     search_fields = ('title', 'lesson__name')
     date_hierarchy = 'date_modified'
-    fields = ('title', 'lesson', 'number', 'text', 'code')
+    fieldsets = [
+        [
+            Sublesson._meta.verbose_name, {
+                'fields': ('title', 'lesson', 'number', 'text', 'code'),
+            }
+        ]
+    ]

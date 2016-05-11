@@ -26,6 +26,7 @@ class Factory_Book(factory.django.DjangoModelFactory):
         start_date=datetime.date(2000, 1, 1),
         end_date=datetime.datetime.now().date() - datetime.timedelta(days=365),
     )
+    views = fuzzy.FuzzyInteger(1000)
 
     @factory.lazy_attribute
     def name(self):
@@ -48,6 +49,34 @@ class Factory_Book(factory.django.DjangoModelFactory):
             result.append(str(random.randint(10000, 11111)))
         return '-'.join(result)
 
+    @factory.post_generation
+    def comments(self, created, extracted, **kwargs):
+        for i in range(random.randint(0, 10)):
+            Factory_CommentGeneric(content_object=self)
+
+    @factory.post_generation
+    def tags(self, created, extracted, **kwargs):
+        count_tags = random.randrange(settings.MIN_COUNT_TAGS_ON_OBJECT, settings.MAX_COUNT_TAGS_ON_OBJECT)
+        tags = random.sample(tuple(Tag.objects.all()), count_tags)
+        self.tags.set(tags)
+
+    @factory.post_generation
+    def where_download(self, created, extracted, **kwargs):
+        count_links = random.randrange(0, settings.MAX_COUNT_WEBLINKS_ON_OBJECT)
+        weblinks = random.sample(tuple(WebLink.objects.all()), count_links)
+        self.where_download.set(weblinks)
+
+    @factory.post_generation
+    def scopes(self, created, extracted, **kwargs):
+        for i in range(random.randint(0, 10)):
+            Factory_ScopeGeneric(content_object=self)
+
+    @factory.post_generation
+    def authorship(self, created, extracted, **kwargs):
+        count_authors = random.randint(1, 4)
+        authors = random.sample(tuple(Writter.objects.all()), count_authors)
+        self.authorship.set(authors)
+
 
 class Factory_Writter(factory.django.DjangoModelFactory):
 
@@ -63,20 +92,4 @@ for i in range(20):
     Factory_Writter()
 Book.objects.filter().delete()
 for i in range(30):
-    book = Factory_Book()
-    count_authors = random.randint(1, 4)
-    authors = random.sample(tuple(Writter.objects.all()), count_authors)
-    book.authorship.set(authors)
-    count_tags = random.randrange(settings.MIN_COUNT_TAGS_ON_OBJECT, settings.MAX_COUNT_TAGS_ON_OBJECT)
-    tags = random.sample(tuple(Tag.objects.all()), count_tags)
-    book.tags.set(tags)
-    count_links = random.randrange(0, settings.MAX_COUNT_WEBLINKS_ON_OBJECT)
-    weblinks = random.sample(tuple(WebLink.objects.all()), count_links)
-    book.where_download.set(weblinks)
-    min_high_limiter = 10
-    if len(Accounts) < min_high_limiter:
-        min_high_limiter = len(Accounts)
-    for i in range(random.randint(0, min_high_limiter)):
-        Factory_ScopeGeneric(content_object=book)
-    for i in range(random.randint(0, min_high_limiter)):
-        Factory_CommentGeneric(content_object=book)
+    Factory_Book()

@@ -36,6 +36,7 @@ class Factory_Utility(factory.DjangoModelFactory):
     description = factory.Faker('text', locale='ru')
     picture = factory.Faker('url', locale='ru')
     category = fuzzy.FuzzyChoice(UtilityCategory.objects.all())
+    web_link = factory.Faker('url', locale='en')
 
     @factory.lazy_attribute
     def name(self):

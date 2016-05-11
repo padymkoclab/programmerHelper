@@ -71,6 +71,13 @@ class TagAdmin(admin.ModelAdmin):
     # )
     # range count ListFilter
     search_fields = ('name',)
+    fieldsets = [
+        [
+            Tag._meta.verbose_name, {
+                'fields': ['name']
+            }
+        ]
+    ]
     inlines = [
         SolutionInline,
         SnippetInline,

@@ -4,7 +4,7 @@ from django.views.generic import DetailView
 from .models import SolutionCategory, Solution
 
 
-class SolutionCategoryDetailView(DetailView):
+class CategoryDetailView(DetailView):
     model = SolutionCategory
     template_name = "TEMPLATE_NAME"
 

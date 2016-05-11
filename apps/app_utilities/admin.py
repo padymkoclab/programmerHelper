@@ -5,7 +5,7 @@ from django.contrib import admin
 
 from apps.app_generic_models.admin import OpinionGenericInline, CommentGenericInline
 
-from .models import Utility
+from .models import UtilityCategory, Utility
 
 
 class UtilityInline(admin.StackedInline):
@@ -27,8 +27,8 @@ class UtilityCategoryAdmin(admin.ModelAdmin):
         'name',
         'picture',
         'views',
-        'get_count_programming_utilities',
-        'get_total_rating',
+        'get_count_utilities',
+        'get_total_scope',
         'get_total_opinions',
         'get_total_comments',
         'is_new',
@@ -39,6 +39,13 @@ class UtilityCategoryAdmin(admin.ModelAdmin):
         UtilityInline,
     ]
     search_fields = ('name',)
+    fieldsets = [
+        [
+            UtilityCategory._meta.verbose_name, {
+                'fields': ['name', 'description', 'picture']
+            }
+        ]
+    ]
 
     def get_queryset(self, request):
         qs = super(UtilityCategoryAdmin, self).get_queryset(request)
@@ -47,10 +54,10 @@ class UtilityCategoryAdmin(admin.ModelAdmin):
         )
         return qs
 
-    def get_count_programming_utilities(self, obj):
+    def get_count_utilities(self, obj):
         return obj.count_utilities
-    get_count_programming_utilities.admin_order_field = 'count_utilities'
-    get_count_programming_utilities.short_description = _('Count utilities')
+    get_count_utilities.admin_order_field = 'count_utilities'
+    get_count_utilities.short_description = _('Count utilities')
 
 
 class UtilityAdmin(admin.ModelAdmin):
@@ -61,7 +68,7 @@ class UtilityAdmin(admin.ModelAdmin):
     list_display = (
         'name',
         'category',
-        'get_rating',
+        'get_scope',
         'get_count_opinions',
         'get_count_comments',
         'is_new',
@@ -76,6 +83,13 @@ class UtilityAdmin(admin.ModelAdmin):
     inlines = [
         OpinionGenericInline,
         CommentGenericInline,
+    ]
+    fieldsets = [
+        [
+            Utility._meta.verbose_name, {
+                'fields': ['name', 'category', 'web_link', 'picture', 'description']
+            }
+        ]
     ]
 
     def get_queryset(self, request):

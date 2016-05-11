@@ -38,9 +38,15 @@ class SolutionCategory(TimeStampedModel):
         return '{0.name}'.format(self)
 
     def get_absolute_url(self):
-        return reverse('app_solutions:solution_category', kwargs={'slug': self.slug})
+        return reverse('app_solutions:category', kwargs={'slug': self.slug})
 
-    # latest changed
+    def get_total_scope(self):
+        return sum(solution.get_scope() for solution in self.solutions.iterator())
+    get_total_scope.short_description = _('Scope')
+
+    def last_activity(self):
+        return self.solutions.latest().date_modified
+    last_activity.short_description = _('Last activity')
 
 
 class Solution(TimeStampedModel):
@@ -88,22 +94,16 @@ class Solution(TimeStampedModel):
         verbose_name_plural = _("Solutions")
         ordering = ['category', 'title']
         unique_together = ['title', 'category']
-        get_latest_by = 'date_added'
+        get_latest_by = 'date_modified'
 
     def __str__(self):
-        return _('Solution "{0.title}"').format(self)
+        return _('{0.title}').format(self)
 
     def get_absolute_url(self):
         return reverse('app_solutions:solution', kwargs={'slug': self.slug})
 
-    # def count_votes_as_good_solution(self):
-    #     return self.voted_users.through.objects.filter(solution=self, is_helped=True).count()
-
-    # def count_votes_as_bad_solution(self):
-    #     return self.voted_users.through.objects.filter(solution=self, is_helped=False).count()
-
-    # def all_count_votes(self):
-    #     return self.count_votes_as_good_solution() + self.count_votes_as_bad_solution()
-
-    def get_scope_solution(self):
-        pass
+    def get_scope(self):
+        count_good_opinions = self.opinions.filter(is_useful=True).count()
+        count_bad_opinions = self.opinions.filter(is_useful=False).count()
+        return count_good_opinions - count_bad_opinions
+    get_scope.short_description = _('Scope')

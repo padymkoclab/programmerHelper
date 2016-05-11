@@ -4,12 +4,12 @@ from django.contrib.contenttypes.admin import GenericStackedInline, GenericTabul
 # from django.utils.translation import ugettext_lazy as _
 from django.contrib import admin
 
-from .models import *
+from .models import CommentGeneric, OpinionGeneric, LikeGeneric, ScopeGeneric
 
 
 class CommentGenericAdmin(admin.ModelAdmin):
     '''
-        Admin View for CommentGeneric
+    Admin View for CommentGeneric
     '''
 
     list_display = ('content_object', 'content_type', 'author', 'is_new', 'date_modified', 'date_added')
@@ -20,13 +20,20 @@ class CommentGenericAdmin(admin.ModelAdmin):
         'date_added',
     )
     date_hierarchy = 'date_modified'
-    fields = ['author', 'content_type', 'text_comment', 'object_id']
     search_fields = ('content_object',)
+    fieldsets = [
+        [
+            CommentGeneric._meta.verbose_name, {
+                'fields': ['content_type', 'object_id', 'author', 'text_comment'],
+            }
+        ]
+    ]
+    readonly_fields = ['author', 'content_type', 'text_comment', 'object_id']
 
 
 class OpinionGenericAdmin(admin.ModelAdmin):
     '''
-        Admin View for OpinionGeneric
+    Admin View for OpinionGeneric
     '''
 
     list_display = (
@@ -34,7 +41,7 @@ class OpinionGenericAdmin(admin.ModelAdmin):
         'content_type',
         'user',
         'is_useful',
-        'display_is_favorite_as_boolean',
+        'is_favorite',
         'is_new',
         'date_modified',
     )
@@ -46,13 +53,20 @@ class OpinionGenericAdmin(admin.ModelAdmin):
         'date_modified',
     )
     date_hierarchy = 'date_modified'
-    fields = ['content_type', 'object_id', 'user', 'is_useful', 'is_favorite']
     search_fields = ('content_object',)
+    fieldsets = [
+        [
+            OpinionGeneric._meta.verbose_name, {
+                'fields': ['content_type', 'object_id', 'user', 'is_useful', 'is_favorite'],
+            }
+        ]
+    ]
+    readonly_fields = ['content_type', 'object_id', 'user', 'is_useful', 'is_favorite']
 
 
 class LikeGenericAdmin(admin.ModelAdmin):
     '''
-        Admin View for LikeGeneric
+    Admin View for LikeGeneric
     '''
 
     list_display = (
@@ -70,13 +84,20 @@ class LikeGenericAdmin(admin.ModelAdmin):
         'date_modified',
     )
     date_hierarchy = 'date_modified'
-    fields = ['content_type', 'object_id', 'user', 'liked_it']
     search_fields = ('content_object',)
+    fieldsets = [
+        [
+            LikeGeneric._meta.verbose_name, {
+                'fields': ['content_type', 'object_id', 'user', 'liked_it'],
+            }
+        ]
+    ]
+    readonly_fields = ['content_type', 'object_id', 'user', 'liked_it']
 
 
 class ScopeGenericAdmin(admin.ModelAdmin):
     '''
-        Admin View for LikeGeneric
+    Admin View for LikeGeneric
     '''
 
     list_display = (
@@ -86,6 +107,7 @@ class ScopeGenericAdmin(admin.ModelAdmin):
         'scope',
         'is_new',
         'date_modified',
+        'object_id',
     )
     list_filter = (
         ('content_type', admin.RelatedOnlyFieldListFilter),
@@ -94,8 +116,15 @@ class ScopeGenericAdmin(admin.ModelAdmin):
         'date_modified',
     )
     date_hierarchy = 'date_modified'
-    fields = ['content_type', 'object_id', 'user', 'scope']
     search_fields = ('content_object',)
+    fieldsets = [
+        [
+            ScopeGeneric._meta.verbose_name, {
+                'fields': ['content_type', 'object_id', 'user', 'scope'],
+            }
+        ]
+    ]
+    readonly_fields = ['content_type', 'object_id', 'user', 'scope']
 
 
 class OpinionGenericInline(GenericTabularInline):

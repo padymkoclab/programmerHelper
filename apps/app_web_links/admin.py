@@ -42,7 +42,13 @@ class WebLinkAdmin(admin.ModelAdmin):
         SolutionInline,
         ArticleInline,
     ]
-    fields = ['title', 'web_url']
+    fieldsets = [
+        [
+            WebLink._meta.verbose_name, {
+                'fields': ['title', 'web_url']
+            }
+        ]
+    ]
 
     def get_queryset(self, request):
         qs = super(WebLinkAdmin, self).get_queryset(request)

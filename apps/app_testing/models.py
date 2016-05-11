@@ -2,6 +2,7 @@
 from datetime import timedelta
 import uuid
 
+from django.template.defaultfilters import truncatewords
 from django.core.urlresolvers import reverse
 from django.core.validators import MinLengthValidator
 from django.db import models
@@ -13,6 +14,8 @@ from model_utils import Choices
 from model_utils.fields import StatusField
 
 from mylabour.models import TimeStampedModel
+
+from .managers import TestingQuestionManager
 
 
 class TestingSuit(TimeStampedModel):
@@ -67,10 +70,22 @@ class TestingSuit(TimeStampedModel):
         return reverse('app_testing:suit', kwargs={'slug': self.slug})
 
     def count_attempts_passing(self):
-        pass
+        return self.passages.filter(passages_testing__status=TestingPassage.CHOICES_STATUS.attempt).count()
+    count_attempts_passing.short_description = _('Count attempts passing')
 
     def count_completed_passing(self):
-        pass
+        return self.passages.filter(passages_testing__status=TestingPassage.CHOICES_STATUS.passed).count()
+    count_completed_passing.short_description = _('Count completed passing')
+
+    def get_avg_scope_by_completed_passing(self):
+        """ Average value by scopes on passed testing"""
+        # selected only passed
+        result = self.passages.filter(passages_testing__status=TestingPassage.CHOICES_STATUS.passed)
+        # aggregation for getting average scope
+        result = result.aggregate(avg_scope=models.Avg('passages_testing__scope')) or float(0)
+        result = '{0:.3}'.format(result['avg_scope'])
+        return float(result)
+    get_avg_scope_by_completed_passing.short_description = _('Average scope')
 
 
 class TestingPassage(models.Model):
@@ -80,21 +95,22 @@ class TestingPassage(models.Model):
 
     CHOICES_STATUS = Choices(
         ('passed', _('Passed')),
-        ('attemps', _('Attemps')),
+        ('attempt', _('Attempt')),
     )
 
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
+        related_name='passages_testing',
         on_delete=models.CASCADE,
         verbose_name=_('User'),
     )
     test_suit = models.ForeignKey(
         'TestingSuit',
         on_delete=models.CASCADE,
-        verbose_name=_('User'),
+        verbose_name=_('Testing suit'),
     )
     status = StatusField(_('Status'), choices_name='CHOICES_STATUS')
-    scope = models.SmallIntegerField(_('Scope'), default=0, editable=False)
+    scope = models.SmallIntegerField(_('Scope'), default=0)
     date_passage = models.DateTimeField(_('Date passage'), auto_now_add=True)
 
     class Meta:
@@ -102,7 +118,7 @@ class TestingPassage(models.Model):
         verbose_name = _("Testing passage")
         verbose_name_plural = _("Testing passages")
         get_latest_by = 'date_passage'
-        order_with_respect_to = 'date_passage'
+        ordering = ['date_passage']
 
 
 class TestingQuestion(TimeStampedModel):
@@ -113,8 +129,8 @@ class TestingQuestion(TimeStampedModel):
     MIN_COUNT_VARIANTS = 3
     MAX_COUNT_VARIANTS = 8
 
-    name = models.CharField(
-        _('Name'), max_length=200, validators=[MinLengthValidator(settings.MIN_LENGTH_FOR_NAME_OR_TITLE_OBJECT)]
+    title = models.CharField(
+        _('Title'), max_length=200, validators=[MinLengthValidator(settings.MIN_LENGTH_FOR_NAME_OR_TITLE_OBJECT)]
     )
     test_suit = models.ForeignKey('TestingSuit', verbose_name=_('Test suit'), related_name='questions', on_delete=models.CASCADE)
     text_question = models.TextField(_('Text question'))
@@ -123,18 +139,25 @@ class TestingQuestion(TimeStampedModel):
         db_table = 'testing_questions'
         verbose_name = _("Testing question")
         verbose_name_plural = _("Testing questions")
-        unique_together = ['name', 'test_suit']
+        unique_together = ['title', 'test_suit']
         get_latest_by = 'date_modified'
-        order_with_respect_to = 'test_suit'
+        ordering = ['test_suit', 'title']
+
+    objects = models.Manager()
+    objects = TestingQuestionManager()
 
     def __str__(self):
-        return '{0.name}'.format(self)
+        return '{0.title}'.format(self)
 
     def have_one_right_variant(self):
-        for variant in self.variants.all():
-            if variant.is_right_variant:
-                return True
-        return False
+        if self.variants.filter(is_right_variant=True).count() != 1:
+            return False
+        return True
+
+    def cropped_title(self):
+        return truncatewords(self.title, 8)
+    cropped_title.short_description = _('Title')
+    cropped_title.admin_order_field = 'title'
 
 
 class TestingVariant(models.Model):
@@ -152,7 +175,12 @@ class TestingVariant(models.Model):
         verbose_name = _("Variant")
         verbose_name_plural = _("Variants")
         unique_together = ['question', 'text_variant']
-        order_with_respect_to = 'question'
+        ordering = ['question']
 
     def __str__(self):
         return '{0.text_variant}'.format(self)
+
+    def cropped_text_variant(self):
+        return truncatewords(self.text_variant, 5)
+    cropped_text_variant.short_description = _('Variant')
+    cropped_text_variant.admin_order_field = 'text_variant'

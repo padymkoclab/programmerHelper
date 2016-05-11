@@ -43,6 +43,7 @@ class Factory_Lesson(factory.DjangoModelFactory):
 
     header = factory.Faker('text', locale='ru')
     conclusion = factory.Faker('text', locale='ru')
+    views = fuzzy.FuzzyInteger(1000)
 
     @factory.lazy_attribute
     def name(self):
@@ -72,7 +73,7 @@ Course.objects.filter().delete()
 # create courses
 for i in range(10):
     course = Factory_Cource()
-    random_count_authors = random.randint(1, 3)
+    random_count_authors = random.randint(1, Course.MAX_COUNT_AUTHORS)
     accounts = random.sample(tuple(Accounts), random_count_authors)
     course.authorship.set(accounts)
     # create lessons

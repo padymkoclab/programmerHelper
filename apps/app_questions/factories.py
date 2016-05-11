@@ -66,7 +66,7 @@ class Factory_Answer(factory.DjangoModelFactory):
 
     @factory.lazy_attribute
     def is_acceptabled(self):
-        if self.question.has_acceptable_answer():
+        if self.question.has_acceptabled_answer():
             return False
         return random.choice([True, False])
 

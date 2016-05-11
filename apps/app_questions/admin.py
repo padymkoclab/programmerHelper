@@ -30,11 +30,12 @@ class QuestionAdmin(admin.ModelAdmin):
         'author',
         'status',
         'get_count_answers',
-        'get_rating',
+        'get_scope',
         'get_count_opinions',
         'get_count_tags',
         'is_dublicated',
         'is_new',
+        'last_activity',
         'date_modified',
         'date_added')
     list_filter = (
@@ -48,7 +49,11 @@ class QuestionAdmin(admin.ModelAdmin):
         OpinionGenericInline,
         AnswerInline,
     ]
-    fields = ['title', 'author', 'status', 'text_question', 'is_dublicated', 'tags']
+    fieldsets = [
+        (_('Question'), {
+            'fields': ['title', 'author', 'status', 'text_question', 'is_dublicated', 'tags'],
+        }),
+    ]
     filter_horizontal = ['tags']
     form = QuestionForm
     search_fields = ['title']
@@ -89,7 +94,7 @@ class AnswerAdmin(admin.ModelAdmin):
         'is_acceptabled',
         'get_count_comments',
         'get_count_likes',
-        'get_rating',
+        'get_scope',
         'is_new',
         'date_modified',
         'date_added',

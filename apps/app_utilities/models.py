@@ -40,9 +40,9 @@ class UtilityCategory(TimeStampedModel):
     def get_absolute_url(self):
         return reverse('app_utilities:category', kwargs={'slug': self.slug})
 
-    def get_total_rating(self):
-        return sum(utility.get_rating() for utility in self.utilities.iterator())
-    get_total_rating.short_description = _('Rating')
+    def get_total_scope(self):
+        return sum(utility.get_scope() for utility in self.utilities.iterator())
+    get_total_scope.short_description = _('Rating')
 
     def get_total_opinions(self):
         # create new field count_opinions
@@ -91,8 +91,8 @@ class Utility(TimeStampedModel):
     def __str__(self):
         return '{0.name}'.format(self)
 
-    def get_rating(self):
+    def get_scope(self):
         good_opinions = self.opinions.filter(is_useful=True).count()
         bad_opinions = self.opinions.filter(is_useful=False).count()
         return good_opinions - bad_opinions
-    get_rating.short_description = _('Rating')
+    get_scope.short_description = _('Scope')

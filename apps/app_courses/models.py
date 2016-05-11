@@ -24,6 +24,7 @@ class Course(TimeStampedModel):
 
     MIN_COUNT_LESSONS = 3
     MAX_COUNT_LESSONS = 12
+    MAX_COUNT_AUTHORS = 5
 
     name = models.CharField(
         _('Name'),
@@ -60,9 +61,12 @@ class Course(TimeStampedModel):
     def get_absolute_url(self):
         return reverse('app_courses:course_detail', kwargs={'slug': self.slug})
 
-    def get_generalized_scope(self):
+    def get_total_scope(self):
         return functools.reduce(lambda a, b: a + b, (lesson.get_scope() for lesson in self.lessons.iterator()))
-    get_generalized_scope.short_description = _('Scope')
+    get_total_scope.short_description = _('Scope')
+
+    def authorship_inline(self):
+        return ', '.join(i.__str__() for i in self.authorship.iterator())
 
 
 class Lesson(TimeStampedModel):

@@ -69,7 +69,7 @@ class Question(TimeStampedModel):
         get_latest_by = 'date_added'
 
     def __str__(self):
-        return _('Question "{0.title}"').format(self)
+        return _('{0.title}').format(self)
 
     def get_absolute_url(self):
         return reverse('app_questions:question', kwargs={'slug': self.slug})
@@ -85,11 +85,15 @@ class Question(TimeStampedModel):
             error_message = ugettext('Question "{0}" have more than a single acceptabled answer!'.format(self.title))
             raise ValidationError(error_message)
 
-    def get_rating(self):
+    def get_scope(self):
         good_opinions = self.opinions.filter(is_useful=True).count()
         bad_opinions = self.opinions.filter(is_useful=False).count()
         return good_opinions - bad_opinions
-    get_rating.short_description = _('Rating')
+    get_scope.short_description = _('Scope')
+
+    def last_activity(self):
+        return self.answers.latest().date_modified
+    last_activity.short_description = _('Last activity')
 
 
 class Answer(TimeStampedModel):
@@ -128,8 +132,8 @@ class Answer(TimeStampedModel):
     def __str__(self):
         return _('Answer on question "{0.question}" from user "{0.author}"').format(self)
 
-    def get_rating(self):
+    def get_scope(self):
         count_likes = self.likes.filter(liked_it=True).count()
         count_dislikes = self.likes.filter(liked_it=False).count()
         return count_likes - count_dislikes
-    get_rating.short_description = _('Rating')
+    get_scope.short_description = _('Scope')

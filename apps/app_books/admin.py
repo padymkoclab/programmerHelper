@@ -7,6 +7,8 @@ from django.contrib import admin
 
 from apps.app_generic_models.admin import ScopeGenericInline, CommentGenericInline
 
+from .models import Book, Writter
+
 
 class BookAdmin(admin.ModelAdmin):
     '''
@@ -36,17 +38,23 @@ class BookAdmin(admin.ModelAdmin):
     date_hierarchy = 'date_published'
     filter_horizontal = ['tags', 'authorship']
     filter_vertical = ['where_download']
-    fields = [
-        'name',
-        'description',
-        'picture',
-        'pages',
-        'date_published',
-        'isbn',
-        'publishers',
-        'authorship',
-        'where_download',
-        'tags',
+    fieldsets = [
+        [
+            Book._meta.verbose_name, {
+                'fields': [
+                    'name',
+                    'description',
+                    'picture',
+                    'pages',
+                    'date_published',
+                    'isbn',
+                    'publishers',
+                    'authorship',
+                    'where_download',
+                    'tags',
+                ]
+            }
+        ]
     ]
 
     def get_queryset(self, request):
@@ -81,7 +89,13 @@ class WritterAdmin(admin.ModelAdmin):
     '''
     list_display = ('name', 'books_in_html', 'get_count_books', 'short_about')
     search_fields = ['name', 'about']
-    fields = ['name', 'about']
+    fieldsets = [
+        [
+            Writter._meta.verbose_name, {
+                'fields': ['name', 'about'],
+            }
+        ]
+    ]
 
     def get_queryset(self, request):
         qs = super(WritterAdmin, self).get_queryset(request)
