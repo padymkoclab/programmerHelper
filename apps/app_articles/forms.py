@@ -1,8 +1,8 @@
 
-from django.utils.translation import ungettext_lazy
+from django.utils.translation import ugettext_lazy as _
 from django import forms
 
-from .models import Article, Tag
+from .models import Article, settings
 
 
 class ArticleForm(forms.ModelForm):
@@ -11,24 +11,18 @@ class ArticleForm(forms.ModelForm):
         fields = ('title', 'author')
 
     def clean(self):
-        count_tags = len(self.cleaned_data.get('tags', '0'))
-        if count_tags < Tag.MIN_COUNT_TAGS_ON_OBJECT:
-            raise forms.ValidationError({
-                'tags': ungettext_lazy(
-                    'Article must be have at least %(number)d tag',
-                    'Article must be have at least %(number)d tags',
-                    'number',
-                ) % {
-                    'number': Tag.MIN_COUNT_TAGS_ON_OBJECT,
-                }
-            })
-        if count_tags > Tag.MAX_COUNT_TAGS_ON_OBJECT:
-            raise forms.ValidationError({
-                'tags': ungettext_lazy(
-                    'Article must be have no more %(number)d tag',
-                    'Article must be have no more %(number)d tags',
-                    'number',
-                ) % {
-                    'number': Tag.MAX_COUNT_TAGS_ON_OBJECT,
-                }
-            })
+                # validation restrict count tags
+        tags = self.cleaned_data.get('tags', tuple())
+        if not settings.MIN_COUNT_TAGS_ON_OBJECT <= len(tags) <= settings.MAX_COUNT_TAGS_ON_OBJECT:
+            self.add_error('tags', _('Count tags must be from {0} to {1}').format(
+                settings.MIN_COUNT_TAGS_ON_OBJECT,
+                settings.MAX_COUNT_TAGS_ON_OBJECT,
+                )
+            )
+        # validation restrict count weblinks where downloads
+        links = self.cleaned_data.get('links', tuple())
+        if len(links) > settings.MAX_COUNT_WEBLINKS_ON_OBJECT:
+            self.add_error('links', _('Count links must be not more than {0}'.format(
+                settings.MAX_COUNT_WEBLINKS_ON_OBJECT
+                )
+            ))

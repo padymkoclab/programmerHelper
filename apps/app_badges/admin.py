@@ -6,12 +6,12 @@ from django.contrib import admin
 from .models import *
 
 
-class UserInline(admin.TabularInline):
-    '''
-        Tabular Inline View for Account
-    '''
-    model = Badge.users.through
-    extra = 1
+# class UserInline(admin.TabularInline):
+#     '''
+#         Tabular Inline View for Account
+#     '''
+#     model = Badge.users.through
+#     extra = 1
 
 
 class BadgeAdmin(admin.ModelAdmin):
@@ -24,14 +24,15 @@ class BadgeAdmin(admin.ModelAdmin):
     search_fields = ('name', 'short_description')
     fieldsets = (
         (
-            None, {
-                'fields': ['name', 'short_description'],
+            Badge._meta.verbose_name, {
+                'fields': ['name', 'short_description', 'users'],
             }
         ),
     )
-    inlines = [
-        UserInline,
-    ]
+    # inlines = [
+    #     UserInline,
+    # ]
+    readonly_fields = ['users']
     date_hierarchy = 'date_created'
 
     def get_queryset(self, request):
@@ -50,10 +51,18 @@ class GettingBadgeAdmin(admin.ModelAdmin):
     Admin View for GettingBadge
     '''
 
-    list_display = ('badge', 'account', 'date_getting')
+    list_display = ('badge', 'user', 'date_getting')
     list_filter = (
-        ('account', admin.RelatedFieldListFilter),
-        ('badge', admin.RelatedFieldListFilter),
+        ('user', admin.RelatedOnlyFieldListFilter),
+        ('badge', admin.RelatedOnlyFieldListFilter),
         'date_getting',
     )
     date_hierarchy = 'date_getting'
+    readonly_fields = ('badge', 'user')
+    fieldsets = [
+        [
+            GettingBadge._meta.verbose_name, {
+                'fields': ('badge', 'user'),
+            }
+        ]
+    ]

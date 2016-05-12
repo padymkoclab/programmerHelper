@@ -33,7 +33,7 @@ class Article(TimeStampedModel):
     title = models.CharField(
         _('Title'), max_length=200, validators=[MinLengthValidator(settings.MIN_LENGTH_FOR_NAME_OR_TITLE_OBJECT)]
     )
-    slug = AutoSlugField(populate_from='title', unique=True, always_update=True, allow_unicode=True, db_index=True)
+    slug = AutoSlugField(_('Slug'), populate_from='title', unique_with=['author'], always_update=True, allow_unicode=True, db_index=True)
     quotation = models.CharField(_('Quotation'), max_length=200)
     picture = models.URLField(_('Picture'), max_length=1000)
     header = models.TextField(_('Header'))
@@ -52,10 +52,11 @@ class Article(TimeStampedModel):
         related_name='articles',
         verbose_name=_('Tags'),
     )
-    useful_links = models.ManyToManyField(
+    links = models.ManyToManyField(
         WebLink,
         related_name='articles',
-        verbose_name=_('Useful links'),
+        verbose_name=_('Links'),
+        help_text=_('Useful weblinks')
     )
     comments = GenericRelation(CommentGeneric)
     scopes = GenericRelation(ScopeGeneric)
@@ -75,9 +76,11 @@ class Article(TimeStampedModel):
         return reverse('app_articles:article', kwargs={'slug': self.slug})
 
     def get_rating(self):
-        avg_scope = self.scopes.aggregate(rating=Avg('scope'))['rating'] or float(0)
-        return float('{0:.3}'.format(avg_scope))
-    # get_scope.admin_order_field = 'date_published'
+        rating = self.scopes.aggregate(rating=Avg('scope'))['rating']
+        if rating is not None:
+            return float('{0:.3}'.format(rating))
+        return None
+    get_rating.admin_order_field = 'rating'  # annotation in admin.py
     get_rating.short_description = _('Rating')
 
 
@@ -92,7 +95,7 @@ class ArticleSubsection(TimeStampedModel):
     title = models.CharField(
         _('Title'), max_length=200, validators=[MinLengthValidator(settings.MIN_LENGTH_FOR_NAME_OR_TITLE_OBJECT)]
     )
-    slug = AutoSlugField(populate_from='title', unique=True, always_update=True, allow_unicode=True, db_index=True)
+    slug = AutoSlugField(_('Slug'), populate_from='title', unique_with=['article'], always_update=True, allow_unicode=True, db_index=True)
     content = models.TextField(_('Content'))
 
     class Meta:
@@ -103,4 +106,4 @@ class ArticleSubsection(TimeStampedModel):
         unique_together = ['article', 'title']
 
     def __str__(self):
-        return 'Subsection "{0.title}"'.format(self)
+        return '{0.title}'.format(self)

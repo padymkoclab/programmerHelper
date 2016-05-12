@@ -79,9 +79,9 @@ for i in range(10):
     # create lessons
     for number_lesson, j in enumerate(range(random.randint(Course.MIN_COUNT_LESSONS, Course.MAX_COUNT_LESSONS))):
         lesson = Factory_Lesson(course=course, number=number_lesson + 1)
-        for e in range(random.randint(0, 10)):
+        for e in range(random.randint(0, 5)):
             Factory_CommentGeneric(content_object=lesson)
-        for k in range(random.randint(0, 10)):
+        for k in range(random.randint(0, 5)):
             Factory_OpinionGeneric(content_object=lesson)
         # create sublessons
         for number_sublesson, q in enumerate(range(random.randint(Lesson.MIN_COUNT_SUBLESSONS, Lesson.MAX_COUNT_SUBLESSONS))):

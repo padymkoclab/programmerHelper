@@ -25,8 +25,4 @@ def IndexView(request):
     # response = HttpResponse(content_type="image/png")
     # im.save(response, "PNG")
     # return response
-    a = 1
-    b = 0
-    import pdb; pdb.set_trace()
-    c = a / b
     return HttpResponse(c, content_type="text/plain")

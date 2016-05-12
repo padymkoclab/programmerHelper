@@ -1,10 +1,9 @@
 
 from django.contrib.contenttypes.admin import GenericStackedInline, GenericTabularInline
-# from django.db.models import Count
-# from django.utils.translation import ugettext_lazy as _
 from django.contrib import admin
 
 from .models import CommentGeneric, OpinionGeneric, LikeGeneric, ScopeGeneric
+from .forms import ScopeGenericInlineFormSet
 
 
 class CommentGenericAdmin(admin.ModelAdmin):
@@ -149,3 +148,4 @@ class ScopeGenericInline(GenericTabularInline):
     model = ScopeGeneric
     extra = 0
     fields = ['user', 'scope']
+    # formset = ScopeGenericInlineFormSet

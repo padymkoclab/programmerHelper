@@ -151,7 +151,7 @@ def recreate_db():
 
     random_symbol = random.choice(string.ascii_uppercase)
     answer_from_user = input(
-        'Are you sure, what yoy feel like recreate database? If yes, please type "{0}": '.format(random_symbol)
+        'Are you sure, what you feel like recreate database? If yes, please type "{0}": '.format(random_symbol)
     )
     if answer_from_user == random_symbol:
         run('invoke rm_migrations_files')
@@ -188,17 +188,23 @@ def recreate_db():
         # executing migrations
         run('./manage.py makemigrations')
         run('./manage.py migrate')
-        # load apps in registry if not ready
-        if not apps.ready:
-            setup()
         # create main superuser
-        USER_MODEL = get_user_model()
-        USER_MODEL.objects.create_superuser(
-            email='setivolkylany@gmail.com',
-            username='setivolkylany',
-            password='lv210493',
-            date_birthday='2000-12-12',
-        )
-        print('-'*50)
-        print('Succesful added superuser!')
-        print('-'*50)
+        # create_default_superuser()
+
+
+@task
+def create_default_superuser():
+    # load apps in registry if not ready
+    if not apps.ready:
+        setup()
+    # get user_model
+    USER_MODEL = get_user_model()
+    USER_MODEL.objects.create_superuser(
+        email='setivolkylany@gmail.com',
+        username='setivolkylany',
+        password='lv210493',
+        date_birthday='2000-12-12',
+    )
+    print('-'*50)
+    print('Succesful added superuser!')
+    print('-'*50)

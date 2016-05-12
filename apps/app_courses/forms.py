@@ -46,7 +46,6 @@ class LessonInlineFormSet(forms.BaseInlineFormSet):
             number = form.cleaned_data.get('number', None)
             if number in t:
                 form.add_error('number', _('Please don`t repeat your number.'))
-        # import pdb; pdb.set_trace()
 
 
 class SublessonInlineFormSet(forms.BaseInlineFormSet):

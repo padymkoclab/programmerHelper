@@ -2,8 +2,6 @@
 from django.contrib.auth import get_user_model
 from django.db import models
 
-from .models import *
-
 
 class BadgeManager(models.Manager):
     """
@@ -15,8 +13,20 @@ class BadgeManager(models.Manager):
         self.check_badge_Favorite_Question(account)
         # return account
 
+    # def has_badge(self, account, badge):
+    #     try:
+    #         GettingBadge.objects.get(account=account, badge=badge)
+    #     except GettingBadge.DoesNotExist:
+    #         return False
+    #     else:
+    #         return True
+
+    # def last_got_badges(self, count=10):
+    #     return GettingBadge.objects.order_by('-date_getting')[:count]
+
     def check_badge_Favorite_Question(self, account):
-        pass
+        for account in self.iterator():
+            pass
 
         # Favorite question
         # Stellar question
@@ -78,26 +88,3 @@ class BadgeManager(models.Manager):
         # Dispatcher
         # Sage
         # Have opinion
-
-
-    def has_badge(self, account, badge):
-        try:
-            GettingBadge.objects.get(account=account, badge=badge)
-        except DoesNotExist:
-            return False
-        else:
-            return True
-
-    def last_got_badges(self, count=10):
-        return GettingBadge.objects.order_by('-date_getting')[:count]
-
-
-# GettingBadge.objects.filter().delete()
-# for i in Account.objects.all():
-#     r = random.randrange(Badge.objects.count())
-#     badges = random.sample(tuple(Badge.objects.all()), r)
-#     for j in badges:
-#         GettingBadge.objects.create(user=i, badge=j)
-
-
-

@@ -1,5 +1,5 @@
 
-from django.db.models import Count, Avg
+from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.contrib import admin
 
@@ -32,11 +32,10 @@ class ArticleAdmin(admin.ModelAdmin):
         'title',
         'picture',
         'author',
-        'get_count_subsections',
-        'get_count_useful_links',
-        'get_count_tags',
         'get_rating',
-        'get_rating_admin',
+        'get_count_subsections',
+        'get_count_links',
+        'get_count_tags',
         'get_count_comments',
         'is_new',
         'date_modified',
@@ -63,31 +62,29 @@ class ArticleAdmin(admin.ModelAdmin):
         (_('Header'), {
             'fields': ['quotation', 'header']
         }),
-        # (_('Content'), {
-        #     'fields': ['quotation', 'header', 'conclusion']
-        # }),
         (_('Footer'), {
-            'fields': ['conclusion', 'useful_links', 'tags']
+            'fields': ['conclusion', 'links', 'tags']
         }),
     ]
     filter_horizontal = ['tags']
-    filter_vertical = ['useful_links']
+    filter_vertical = ['links']
     date_hierarchy = 'date_added'
 
     def get_queryset(self, request):
         qs = super(ArticleAdmin, self).get_queryset(request)
         qs = qs.annotate(
-            count_tags=Count('tags', distinct=True),
-            count_useful_links=Count('useful_links', distinct=True),
-            count_subsections=Count('subsections', distinct=True),
-            count_comments=Count('comments', distinct=True),
+            count_tags=models.Count('tags', distinct=True),
+            count_links=models.Count('links', distinct=True),
+            count_subsections=models.Count('subsections', distinct=True),
+            count_comments=models.Count('comments', distinct=True),
+            rating=models.Avg('scopes__scope', distinct=True),
         )
         return qs
 
-    def get_count_useful_links(self, obj):
-        return obj.count_useful_links
-    get_count_useful_links.admin_order_field = 'count_useful_links'
-    get_count_useful_links.short_description = _('Count useful links')
+    def get_count_links(self, obj):
+        return obj.count_links
+    get_count_links.admin_order_field = 'count_links'
+    get_count_links.short_description = _('Count useful links')
 
     def get_count_tags(self, obj):
         return obj.count_tags
@@ -104,13 +101,6 @@ class ArticleAdmin(admin.ModelAdmin):
     get_count_comments.admin_order_field = 'count_comments'
     get_count_comments.short_description = _('Count comments')
 
-    def get_rating_admin(self, obj):
-        avg_scope = obj.scopes.aggregate(rating=Avg('scope'))['rating'] or float(0)
-        return float('{0:.3}'.format(avg_scope))
-        # return obj.get_rating()
-    get_rating_admin.short_description = _('Rating')
-    get_rating_admin.admin_order_field = 'scopes__rating'
-
 
 class ArticleSubsectionAdmin(admin.ModelAdmin):
     '''
@@ -123,6 +113,12 @@ class ArticleSubsectionAdmin(admin.ModelAdmin):
         'date_modified',
         'date_added',
     )
-    search_fields = ('title', 'article__title')
+    search_fields = ('title', )
     date_hierarchy = 'date_modified'
-    fields = ['article', 'title', 'content']
+    fieldsets = [
+        [
+            ArticleSubsection._meta.verbose_name, {
+                'fields': ['article', 'title', 'content'],
+            }
+        ]
+    ]

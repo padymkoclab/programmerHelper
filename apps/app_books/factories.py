@@ -51,7 +51,7 @@ class Factory_Book(factory.django.DjangoModelFactory):
 
     @factory.post_generation
     def comments(self, created, extracted, **kwargs):
-        for i in range(random.randint(0, 10)):
+        for i in range(random.randint(0, 5)):
             Factory_CommentGeneric(content_object=self)
 
     @factory.post_generation
@@ -61,10 +61,10 @@ class Factory_Book(factory.django.DjangoModelFactory):
         self.tags.set(tags)
 
     @factory.post_generation
-    def where_download(self, created, extracted, **kwargs):
+    def links(self, created, extracted, **kwargs):
         count_links = random.randrange(0, settings.MAX_COUNT_WEBLINKS_ON_OBJECT)
         weblinks = random.sample(tuple(WebLink.objects.all()), count_links)
-        self.where_download.set(weblinks)
+        self.links.set(weblinks)
 
     @factory.post_generation
     def scopes(self, created, extracted, **kwargs):

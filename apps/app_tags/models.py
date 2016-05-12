@@ -3,8 +3,6 @@ from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext_lazy as _
 from django.db import models
 
-from autoslug import AutoSlugField
-
 from mylabour.models import TimeStampedModel
 
 
@@ -16,8 +14,7 @@ class Tag(TimeStampedModel):
     MIN_COUNT_TAGS_ON_OBJECT = 1
     MAX_COUNT_TAGS_ON_OBJECT = 5
 
-    name = models.CharField(_('Name'), max_length=30, unique=True)
-    slug = AutoSlugField(_('Slug'), populate_from='name', unique=True, always_update=True, allow_unicode=True)
+    name = models.SlugField(_('Name'), max_length=30, unique=True)
 
     class Meta:
         db_table = 'tags'
@@ -30,4 +27,4 @@ class Tag(TimeStampedModel):
         return '{0.name}'.format(self)
 
     def get_absolute_url(self):
-        return reverse('app_tags:tag', kwargs={'slug': self.slug})
+        return reverse('app_tags:tag', kwargs={'slug': self.name})

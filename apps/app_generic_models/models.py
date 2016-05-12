@@ -45,6 +45,7 @@ class CommentGeneric(BaseGeneric):
         db_table = 'comments'
         verbose_name = _('Comment')
         verbose_name_plural = _('Comments')
+        unique_together = ['author', 'object_id']
 
 
 class OpinionGeneric(BaseGeneric):
@@ -63,6 +64,7 @@ class OpinionGeneric(BaseGeneric):
         verbose_name = _('Opinion')
         verbose_name_plural = _('Opinions')
         permissions = (('can_view_opinions', _('Can view opinions')),)
+        unique_together = ['user', 'object_id']
 
 
 class LikeGeneric(BaseGeneric):
@@ -83,6 +85,7 @@ class LikeGeneric(BaseGeneric):
         verbose_name = _('"Like"')
         verbose_name_plural = _('"Likes"')
         permissions = (('can_view_likes', _('Can view likes')),)
+        unique_together = ['user', 'object_id']
 
 
 class ScopeGeneric(BaseGeneric):
@@ -106,3 +109,4 @@ class ScopeGeneric(BaseGeneric):
         verbose_name = _('Scope')
         verbose_name_plural = _('Scopes')
         permissions = (('can_view_scopes', _('Can view scopes')),)
+        unique_together = ['user', 'object_id']

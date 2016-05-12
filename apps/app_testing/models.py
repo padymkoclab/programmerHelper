@@ -50,7 +50,7 @@ class TestingSuit(TimeStampedModel):
     passages = models.ManyToManyField(
         settings.AUTH_USER_MODEL,
         verbose_name=_('Passages'),
-        related_name='passages',
+        related_name='+',
         through='TestingPassage',
         through_fields=['test_suit', 'user'],
     )
@@ -100,7 +100,7 @@ class TestingPassage(models.Model):
 
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        related_name='passages_testing',
+        related_name='passages',
         on_delete=models.CASCADE,
         verbose_name=_('User'),
     )

@@ -1,6 +1,6 @@
 
 from django.utils.html import format_html_join
-from django.db.models import Count
+from django.db import models
 from django.template.defaultfilters import truncatewords
 from django.utils.translation import ugettext_lazy as _
 from django.contrib import admin
@@ -8,6 +8,7 @@ from django.contrib import admin
 from apps.app_generic_models.admin import ScopeGenericInline, CommentGenericInline
 
 from .models import Book, Writter
+from .forms import BookForm
 
 
 class BookAdmin(admin.ModelAdmin):
@@ -15,6 +16,7 @@ class BookAdmin(admin.ModelAdmin):
     Admin View for Book
     '''
 
+    form = BookForm
     list_display = (
         'name',
         'writters',
@@ -22,7 +24,7 @@ class BookAdmin(admin.ModelAdmin):
         'views',
         'publishers',
         'isbn',
-        'get_count_links_where_download',
+        'get_count_links',
         'get_count_tags',
         'get_rating',
         'get_count_comments',
@@ -37,7 +39,7 @@ class BookAdmin(admin.ModelAdmin):
     search_fields = ('name', 'publishers', 'authorship__name')
     date_hierarchy = 'date_published'
     filter_horizontal = ['tags', 'authorship']
-    filter_vertical = ['where_download']
+    filter_vertical = ['links']
     fieldsets = [
         [
             Book._meta.verbose_name, {
@@ -50,7 +52,7 @@ class BookAdmin(admin.ModelAdmin):
                     'isbn',
                     'publishers',
                     'authorship',
-                    'where_download',
+                    'links',
                     'tags',
                 ]
             }
@@ -60,10 +62,10 @@ class BookAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
         qs = super(BookAdmin, self).get_queryset(request)
         qs = qs.annotate(
-            count_comments=Count('comments', distinct=True),
-            count_tags=Count('tags', distinct=True),
-            count_links_where_download=Count('where_download', distinct=True),
-            # count_opinions=Count('opinions', distinct=True),
+            count_comments=models.Count('comments', distinct=True),
+            count_tags=models.Count('tags', distinct=True),
+            count_links=models.Count('links', distinct=True),
+            rating=models.Avg('scopes__scope', distinct=True),
         )
         return qs
 
@@ -77,10 +79,10 @@ class BookAdmin(admin.ModelAdmin):
     get_count_comments.admin_order_field = 'count_comments'
     get_count_comments.short_description = _('Count comments')
 
-    def get_count_links_where_download(self, obj):
-        return obj.count_links_where_download
-    get_count_links_where_download.admin_order_field = 'count_links_where_download'
-    get_count_links_where_download.short_description = _('Count links where download')
+    def get_count_links(self, obj):
+        return obj.count_links
+    get_count_links.admin_order_field = 'count_links'
+    get_count_links.short_description = _('Count links where download')
 
 
 class WritterAdmin(admin.ModelAdmin):
@@ -100,7 +102,7 @@ class WritterAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
         qs = super(WritterAdmin, self).get_queryset(request)
         qs = qs.annotate(
-            count_books=Count('books', distinct=True),
+            count_books=models.Count('books', distinct=True),
         )
         return qs
 

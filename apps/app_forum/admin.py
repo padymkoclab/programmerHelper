@@ -127,7 +127,7 @@ class ForumPostAdmin(admin.ModelAdmin):
     Admin View for ForumPost
     '''
 
-    list_display = ('author', 'topic', 'is_new', 'date_modified', 'date_added')
+    list_display = ('topic', 'author', 'is_new', 'date_modified', 'date_added')
     list_filter = (
         ('author', admin.RelatedOnlyFieldListFilter),
         ('topic', admin.RelatedOnlyFieldListFilter),

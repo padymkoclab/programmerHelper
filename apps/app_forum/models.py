@@ -74,7 +74,7 @@ class ForumTopic(TimeStampedModel):
         settings.AUTH_USER_MODEL,
         verbose_name=_('Author'),
         related_name='topics',
-        on_delete=models.PROTECT,
+        on_delete=models.CASCADE,
         limit_choices_to={'is_superuser': True, 'is_active': True},
     )
     description = models.TextField(_('Description'))
@@ -127,18 +127,18 @@ class ForumPost(TimeStampedModel):
         settings.AUTH_USER_MODEL,
         verbose_name=_('Author'),
         related_name='posts',
-        on_delete=models.DO_NOTHING,
+        on_delete=models.CASCADE,
         limit_choices_to={'is_active': True},
     )
     content = models.TextField(_('Content'))
-    # is_published
-    # is_hidden
+#     # is_published
+#     # is_hidden
 
     class Meta:
         db_table = 'forum_posts'
         verbose_name = _("Post")
         verbose_name_plural = _("Posts")
-        order_with_respect_to = 'topic'
+        ordering = ['topic', 'date_modified']
         get_latest_by = 'date_modified'
 
     def __str__(self):

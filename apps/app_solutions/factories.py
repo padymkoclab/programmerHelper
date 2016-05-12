@@ -64,12 +64,12 @@ class Factory_Solution(factory.DjangoModelFactory):
 
     @factory.post_generation
     def comments(self, created, extracted, **kwargs):
-        for i in range(random.randint(0, 10)):
+        for i in range(random.randint(0, 5)):
             Factory_CommentGeneric(content_object=self)
 
     @factory.post_generation
     def opinions(self, created, extracted, **kwargs):
-        for i in range(random.randint(0, 10)):
+        for i in range(random.randint(0, 5)):
             Factory_OpinionGeneric(content_object=self)
 
 

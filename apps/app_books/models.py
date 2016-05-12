@@ -1,7 +1,6 @@
 
 import uuid
 
-from django.db.models import Avg
 from django.utils.html import format_html_join
 from django.contrib.contenttypes.fields import GenericRelation
 from django.core.validators import MinLengthValidator, RegexValidator, MinValueValidator
@@ -25,7 +24,7 @@ class Book(models.Model):
 
     id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
     name = models.CharField(
-        _('Name'), max_length=200, validators=[MinLengthValidator(settings.MIN_LENGTH_FOR_NAME_OR_TITLE_OBJECT)]
+        _('Name'), max_length=200, validators=[MinLengthValidator(settings.MIN_LENGTH_FOR_NAME_OR_TITLE_OBJECT)], unique=True,
     )
     slug = AutoSlugField(_('Slug'), populate_from='name', unique=True, always_update=True, allow_unicode=True, db_index=True)
     description = models.TextField(_('Description'))
@@ -52,10 +51,11 @@ class Book(models.Model):
         verbose_name=_('Tags'),
         related_name='books',
     )
-    where_download = models.ManyToManyField(
+    links = models.ManyToManyField(
         WebLink,
         related_name='books',
-        verbose_name=_('Where downloads')
+        verbose_name=_('Where downloads'),
+        help_text=_('Weblinks where can download this book.')
     )
     comments = GenericRelation(CommentGeneric)
     scopes = GenericRelation(ScopeGeneric)
@@ -74,9 +74,11 @@ class Book(models.Model):
         return reverse('app_books:book', kwargs={'slug': self.slug})
 
     def get_rating(self):
-        avg_scope = self.scopes.aggregate(rating=Avg('scope'))['rating'] or float(0)
-        return float('{0:.3}'.format(avg_scope))
-    # get_scope.admin_order_field = 'date_published'
+        rating = self.scopes.aggregate(rating=models.Avg('scope'))['rating']
+        if rating is not None:
+            return float('{0:.3}'.format(rating))
+        return None
+    get_rating.admin_order_field = 'rating'  # annotation in admin.py
     get_rating.short_description = _('Rating')
 
     def is_new(self):
@@ -99,7 +101,7 @@ class Writter(models.Model):
 
     id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
     name = models.CharField(
-        _('Name'), max_length=200, validators=[MinLengthValidator(settings.MIN_LENGTH_FOR_NAME_OR_TITLE_OBJECT)]
+        _('Name'), max_length=200, validators=[MinLengthValidator(settings.MIN_LENGTH_FOR_NAME_OR_TITLE_OBJECT)], unique=True,
     )
     slug = AutoSlugField(_('Slug'), populate_from='name', unique=True, always_update=True, allow_unicode=True, db_index=True)
     about = models.TextField(_('About writter'))

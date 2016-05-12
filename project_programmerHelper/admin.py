@@ -3,10 +3,10 @@ from django.utils.translation import ugettext_lazy as _
 from django.contrib import admin
 
 # auth
-from apps.app_accounts.models import Account
-from apps.app_accounts.admin import AccountAdmin
+from apps.app_accounts.admin import AccountAdmin, AccountLevelAdmin
+from apps.app_accounts.models import Account, AccountLevel
 from django.contrib.auth.models import Group
-#
+# apps
 from apps.app_articles.admin import ArticleAdmin, ArticleSubsectionAdmin
 from apps.app_articles.models import Article, ArticleSubsection
 from apps.app_badges.admin import BadgeAdmin, GettingBadgeAdmin
@@ -23,10 +23,6 @@ from apps.app_newsletters.admin import NewsletterAdmin
 from apps.app_newsletters.models import Newsletter
 from apps.app_polls.admin import PollAdmin, VoteInPollAdmin, ChoiceAdmin
 from apps.app_polls.models import Poll, Choice, VoteInPoll
-from apps.app_testing.admin import TestingSuitAdmin, TestingPassageAdmin, TestingQuestionAdmin, TestingVariantAdmin
-from apps.app_testing.models import TestingSuit, TestingPassage, TestingQuestion, TestingVariant
-from apps.app_utilities.admin import UtilityCategoryAdmin, UtilityAdmin
-from apps.app_utilities.models import UtilityCategory, Utility
 from apps.app_questions.admin import QuestionAdmin, AnswerAdmin
 from apps.app_questions.models import Question, Answer
 from apps.app_snippets.admin import SnippetAdmin
@@ -35,6 +31,10 @@ from apps.app_solutions.admin import SolutionCategoryAdmin, SolutionAdmin
 from apps.app_solutions.models import SolutionCategory, Solution
 from apps.app_tags.admin import TagAdmin
 from apps.app_tags.models import Tag
+from apps.app_testing.admin import TestingSuitAdmin, TestingPassageAdmin, TestingQuestionAdmin, TestingVariantAdmin
+from apps.app_testing.models import TestingSuit, TestingPassage, TestingQuestion, TestingVariant
+from apps.app_utilities.admin import UtilityCategoryAdmin, UtilityAdmin
+from apps.app_utilities.models import UtilityCategory, Utility
 from apps.app_web_links.admin import WebLinkAdmin
 from apps.app_web_links.models import WebLink
 
@@ -50,7 +50,7 @@ ProgrammerHelper_AdminSite = ProgrammerHelperSite(name='ProgrammerHelper')
 ProgrammerHelper_AdminSite.register(Group)
 # app_accounts
 ProgrammerHelper_AdminSite.register(Account, AccountAdmin)
-# ProgrammerHelper_AdminSite.register(Account, AccountAdminArticles)
+ProgrammerHelper_AdminSite.register(AccountLevel, AccountLevelAdmin)
 # app_badges
 ProgrammerHelper_AdminSite.register(Badge, BadgeAdmin)
 ProgrammerHelper_AdminSite.register(GettingBadge, GettingBadgeAdmin)

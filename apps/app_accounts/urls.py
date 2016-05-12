@@ -11,4 +11,5 @@ urlpatterns = [
     url(r'create/$', AccountDetailView.as_view(), {}, 'create'),
     url(r'update/$', AccountDetailView.as_view(), {}, 'update'),
     url(r'delete/$', AccountDetailView.as_view(), {}, 'delete'),
+    url(r'level/(?P<slug>[-_\w]+)/$', AccountDetailView.as_view(), {}, 'level'),
 ]
