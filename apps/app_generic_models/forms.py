@@ -10,12 +10,11 @@ class ScopeGenericInlineFormSet(forms.BaseInlineFormSet):
     Special inline form for relationship between TestQuestion and Varian models.
     """
 
-    fk = 'content_object'
-
     def clean(self):
-        """Validation what must unique numbers of lessons in formset."""
+        """Custom validation"""
         super(ScopeGenericInlineFormSet, self).clean()
-        raise Exception('Oooops')
+        pass
+        # raise Exception('Oooops')
         # all_numbers_of_lessons = list()
         # for form in self.forms:
         #     number = form.cleaned_data.get('number', None)

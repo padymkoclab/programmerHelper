@@ -58,11 +58,11 @@ class GettingBadgeAdmin(admin.ModelAdmin):
         'date_getting',
     )
     date_hierarchy = 'date_getting'
-    readonly_fields = ('badge', 'user')
+    readonly_fields = ('badge', 'user', 'conditions')
     fieldsets = [
         [
             GettingBadge._meta.verbose_name, {
-                'fields': ('badge', 'user'),
+                'fields': ('badge', 'user', 'conditions'),
             }
         ]
     ]

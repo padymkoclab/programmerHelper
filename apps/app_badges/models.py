@@ -7,7 +7,7 @@ from django.conf import settings
 
 from autoslug import AutoSlugField
 
-from .managers import BadgeManager
+# from .managers import BadgeManager
 
 
 class Badge(models.Model):
@@ -33,7 +33,7 @@ class Badge(models.Model):
     )
 
     objects = models.Manager()
-    objects = BadgeManager()
+    # objects = BadgeManager()
 
     class Meta:
         db_table = 'badges'
@@ -55,15 +55,22 @@ class GettingBadge(models.Model):
         related_name='badges',
     )
     badge = models.ForeignKey('Badge', verbose_name=_('Badge'), on_delete=models.CASCADE, related_name='+')
+    conditions = models.TextField(_('Pleasurable conditions'))
     date_getting = models.DateTimeField(_('Date getting'), auto_now_add=True)
 
     class Meta:
         db_table = 'getting_badges'
         verbose_name = "Getting badge"
         verbose_name_plural = "Getting badges"
-        ordering = ['date_getting']
+        ordering = ['-date_getting']
         get_latest_by = 'date_getting'
         unique_together = ['user', 'badge']
 
     def __str__(self):
         return 'Badge "{0.badge}" of user {0.user}'.format(self)
+
+    @staticmethod
+    def normalize_conditions(list_conditions):
+        # if not isinstance(list_conditions, (tuple, list)):
+        #     raise TypeError('Please transfer sequence.')
+        return ', '.join(i.__str__() for i in list_conditions)

@@ -13,18 +13,18 @@ class Factory_Badges(factory.DjangoModelFactory):
         model = Badge
 
 
-Factory_Badges(name='Favorite question', short_description='Question favorited by 25 users')
-Factory_Badges(name='Stellar question', short_description='Question favorited by 100 users')
-Factory_Badges(name='Nice Question', short_description='Question score of 10 or more')
-Factory_Badges(name='Good Question', short_description='Question score of 25 or more')
-Factory_Badges(name='Great Question', short_description='Question score of 100 or more')
-Factory_Badges(name='Popular Question', short_description='Question with 1,000 views')
-Factory_Badges(name='Notable Question', short_description='Question with 2,500 views')
-Factory_Badges(name='Famous Question', short_description='Question with 10,000 views')
+Factory_Badges(name='Favorite question', short_description='Question favorited by 5 users')
+Factory_Badges(name='Stellar question', short_description='Question favorited by 10 users')
+Factory_Badges(name='Nice Question', short_description='Question score of 5 or more')
+Factory_Badges(name='Good Question', short_description='Question score of 10 or more')
+Factory_Badges(name='Great Question', short_description='Question score of 20 or more')
+Factory_Badges(name='Popular Question', short_description='Question with 100 views')
+Factory_Badges(name='Notable Question', short_description='Question with 500 views')
+Factory_Badges(name='Famous Question', short_description='Question with 1000 views')
 Factory_Badges(name='Schoolar', short_description='Ask a question and accept an answer')
-Factory_Badges(name='Student', short_description='First question with score of 1 or more')
-Factory_Badges(name='Tumbleweed', short_description='Asked a question with zero score, no answers, no comments')
-Factory_Badges(name='Enlightened', short_description='First to answer and accepted with score of 10 or more')
+Factory_Badges(name='Student', short_description='Accept an answer on 5 questions')
+Factory_Badges(name='Tumbleweed', short_description='Asked a question with zero score or less, no answers.')
+Factory_Badges(name='Enlightened', short_description='Have accepted answer with score of 10 or more')
 Factory_Badges(name='Explainer', short_description='Answer on 1 question with scope > 0 within 12 hours')
 Factory_Badges(name='Refiner', short_description='Answer on 50 questions with scope > 0 within 12 hours')
 Factory_Badges(name='Illuminator', short_description='Answer on 500 question with scope > 0 within 12 hours')
@@ -75,10 +75,10 @@ Factory_Badges(name='Sage', short_description='Participating in creating courses
 Factory_Badges(name='Have opinion', short_description='Voted in polls')
 
 
-class Factory_GettingBadgeUser(factory.DjangoModelFactory):
+# class Factory_GettingBadgeUser(factory.DjangoModelFactory):
 
-    class Meta:
-        model = GettingBadgeUser
+#     class Meta:
+#         model = GettingBadgeUser
 
-    user = fuzzy.FuzzyChoice(get_user_model().objects.all())
-    badge = fuzzy.FuzzyChoice(Badge.objects.all())
+#     user = fuzzy.FuzzyChoice(get_user_model().objects.all())
+#     badge = fuzzy.FuzzyChoice(Badge.objects.all())

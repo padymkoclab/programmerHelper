@@ -1,6 +1,4 @@
 
-import collections
-
 from django.core.exceptions import ValidationError
 from django.contrib.contenttypes.fields import GenericRelation
 from django.core.validators import MinLengthValidator
@@ -18,7 +16,7 @@ from apps.app_generic_models.models import CommentGeneric, OpinionGeneric, LikeG
 from apps.app_tags.models import Tag
 from mylabour.models import TimeStampedModel
 
-from .managers import QuestionManager
+from .managers import QuestionManager, AnswerManager
 
 
 class Question(TimeStampedModel):
@@ -55,11 +53,12 @@ class Question(TimeStampedModel):
 
     # managers
     objects = models.Manager()
-    questions = QuestionManager()
+    objects = QuestionManager()
 
     # simple managers
     open_questions = QueryManager(status=CHOICES_STATUS.open)
     closed_questions = QueryManager(status=CHOICES_STATUS.closed)
+    questions_with_acceptabled_answer = QueryManager(answers__is_acceptabled=True)
 
     class Meta:
         db_table = 'questions'
@@ -75,8 +74,7 @@ class Question(TimeStampedModel):
         return reverse('app_questions:question', kwargs={'slug': self.slug})
 
     def has_acceptabled_answer(self):
-        list_all_values_field_is_acceptabled_of_answers = self.answers.values_list('is_acceptabled', flat=True)
-        count_acceptabled_answers = collections.Counter(list_all_values_field_is_acceptabled_of_answers)[True]
+        count_acceptabled_answers = self.answers.filter(is_acceptabled=True).count()
         if count_acceptabled_answers == 0:
             return False
         elif count_acceptabled_answers == 1:
@@ -84,6 +82,7 @@ class Question(TimeStampedModel):
         else:
             error_message = ugettext('Question "{0}" have more than a single acceptabled answer!'.format(self.title))
             raise ValidationError(error_message)
+    has_acceptabled_answer.boolean = True
 
     def get_scope(self):
         good_opinions = self.opinions.filter(is_useful=True).count()
@@ -94,6 +93,14 @@ class Question(TimeStampedModel):
     def last_activity(self):
         return self.answers.latest().date_modified
     last_activity.short_description = _('Last activity')
+
+    def get_count_favorites(self):
+        return self.opinions.filter(is_favorite=True).count()
+    get_count_favorites.short_description = _('Count favorites')
+
+    def get_count_unfavorites(self):
+        return self.opinions.filter(is_favorite=False).count()
+    get_count_unfavorites.short_description = _('Count unfavorites')
 
 
 class Answer(TimeStampedModel):
@@ -121,6 +128,12 @@ class Answer(TimeStampedModel):
     is_acceptabled = models.BooleanField(_('Is acceptabled answer?'), default=False)
     comments = GenericRelation(CommentGeneric)
     likes = GenericRelation(LikeGeneric)
+
+    objects = models.Manager()
+    objects = AnswerManager()
+
+    # simple managers
+    acceptabled_answers = QueryManager(is_acceptabled=True)
 
     class Meta:
         db_table = 'answers'

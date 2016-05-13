@@ -148,4 +148,4 @@ class ScopeGenericInline(GenericTabularInline):
     model = ScopeGeneric
     extra = 0
     fields = ['user', 'scope']
-    # formset = ScopeGenericInlineFormSet
+    formset = ScopeGenericInlineFormSet

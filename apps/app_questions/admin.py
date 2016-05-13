@@ -30,7 +30,10 @@ class QuestionAdmin(admin.ModelAdmin):
         'author',
         'status',
         'get_count_answers',
+        'has_acceptabled_answer',
         'get_scope',
+        'get_count_favorites',
+        'get_count_unfavorites',
         'get_count_opinions',
         'get_count_tags',
         'is_dublicated',
@@ -39,7 +42,7 @@ class QuestionAdmin(admin.ModelAdmin):
         'date_modified',
         'date_added')
     list_filter = (
-        ('author', admin.RelatedFieldListFilter),
+        ('author', admin.RelatedOnlyFieldListFilter),
         'status',
         'date_modified',
         'date_added',
@@ -100,8 +103,8 @@ class AnswerAdmin(admin.ModelAdmin):
         'date_added',
     )
     list_filter = (
-        ('author', admin.RelatedFieldListFilter),
-        ('question', admin.RelatedFieldListFilter),
+        ('author', admin.RelatedOnlyFieldListFilter),
+        ('question', admin.RelatedOnlyFieldListFilter),
         'is_acceptabled',
         'date_modified',
         'date_added',
@@ -124,7 +127,7 @@ class AnswerAdmin(admin.ModelAdmin):
     def get_count_likes(self, obj):
         return obj.count_likes
     get_count_likes.admin_order_field = 'count_likes'
-    get_count_likes.short_description = _('Count voted opinions')
+    get_count_likes.short_description = _('Count likes')
 
     def get_count_comments(self, obj):
         return obj.count_comments

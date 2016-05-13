@@ -1,5 +1,5 @@
 
-from django.db.models import Count
+from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.contrib import admin
 
@@ -21,6 +21,7 @@ class SnippetAdmin(admin.ModelAdmin):
         'lexer',
         'views',
         'get_scope',
+        'get_good_opinions',
         'get_count_comments',
         'get_count_opinions',
         'get_count_tags',
@@ -52,17 +53,17 @@ class SnippetAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
         qs = super(SnippetAdmin, self).get_queryset(request)
         qs = qs.annotate(
-            count_tags=Count('tags', distinct=True),
-            count_comments=Count('comments', distinct=True),
-            count_opinions=Count('opinions', distinct=True),
-            # count_good_opinions=Count(
-            #     Case(
-            #         When(opinionaboutsnippet__is_useful=True, then=True),
-            #         default=None,
-            #         ouput_field=BooleanField(),
-            #     ),
-            # distinct=True
-            # )
+            count_tags=models.Count('tags', distinct=True),
+            count_comments=models.Count('comments', distinct=True),
+            count_opinions=models.Count('opinions', distinct=True),
+            count_good_opinions=models.Count(
+                models.Case(
+                    models.When(opinions__is_useful=True, then=True),
+                    default=None,
+                    ouput_field=models.BooleanField(),
+                ),
+                distinct=True,
+            )
         )
         return qs
 
@@ -80,3 +81,8 @@ class SnippetAdmin(admin.ModelAdmin):
         return obj.count_tags
     get_count_tags.admin_order_field = 'count_tags'
     get_count_tags.short_description = _('Count tags')
+
+    def get_good_opinions(self, obj):
+        return obj.count_good_opinions
+    get_good_opinions.admin_order_field = 'count_good_opinions'
+    get_good_opinions.short_description = _('Count good opinions')

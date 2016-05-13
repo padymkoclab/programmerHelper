@@ -128,7 +128,7 @@ class Account(AbstractBaseUser, PermissionsMixin):
     # managers
     objects = models.Manager()
     objects = AccountManager()
-    badges_checker = BadgeManager()
+    badges_manager = BadgeManager()
 
     # simple managers
     actives = QueryManager(is_active=True)
@@ -173,33 +173,34 @@ class Account(AbstractBaseUser, PermissionsMixin):
     def has_module_perms(self, app_label):
         return True
 
-    # Member for 56 days
-
-    # visited 42 days, 5 consecutive
-
-    # Last seen 11 mins ago
-
-    # last activity
-
-    """
-    activity
-    account_detail
-    account change
-
-    user feed
-    location GeoDjango
-
-    questions sorted by votes, activity, newest
-    answers sorted by votes, activity, newest
-
-    3 profile views
-
-    """
-
     def get_reputation(self):
         pass
 
     def get_badges(self):
+        pass
+
+    def get_scopes_questions_of_account(self):
+        """Return dictionary scopes all questions of account as {question: scope}."""
+        result = dict()
+        for question in self.questions.iterator():
+            result[question] = question.get_scope()
+        return result
+
+    def get_questions_of_account_with_count_favorites_this_questions(self):
+        """Return dictionary with question and count his favories of account as {question: count favotires}."""
+        result = dict()
+        for question in self.questions.iterator():
+            result[question] = question.get_count_favorites()
+        return result
+
+    def last_seen(self):
+        # Last seen 11 mins ago
+        pass
+
+    def last_activity(self):
+        pass
+
+    def get_activity(self):
         pass
 
 
