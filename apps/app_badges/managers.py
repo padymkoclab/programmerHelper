@@ -1,4 +1,5 @@
 
+import collections
 import functools
 
 from django.db import models
@@ -24,22 +25,26 @@ class BadgeManager(models.Manager):
         # account = get_user_model().objects.get_by_natural_key(account_natural_key)
         GettingBadge.objects.filter().delete()
         # print('[', end='')
-        self.check_badge_Favorite_Question(account=None)
-        self.check_badge_Stellar_Question(account=None)
-        self.check_badge_Nice_Question(account=None)
-        self.check_badge_Good_Question(account=None)
-        self.check_badge_Great_Question(account=None)
-        self.check_badge_Popular_Question(account=None)
-        self.check_badge_Notable_Question(account=None)
-        self.check_badge_Famous_Question(account=None)
-        self.check_badge_Schoolar(account=None)
-        self.check_badge_Student(account=None)
-        self.check_badge_Tumbleweed(account=None)
-        self.check_badge_Enlightened(account=None)
+        self.check_badge_Favorite_Question()
+        self.check_badge_Stellar_Question()
+        self.check_badge_Nice_Question()
+        self.check_badge_Good_Question()
+        self.check_badge_Great_Question()
+        self.check_badge_Popular_Question()
+        self.check_badge_Notable_Question()
+        self.check_badge_Famous_Question()
+        self.check_badge_Schoolar()
+        self.check_badge_Student()
+        self.check_badge_Tumbleweed()
+        self.check_badge_Enlightened()
+        self.check_badge_Explainer()
+        self.check_badge_Refiner()
+        self.check_badge_Illuminator()
+        self.check_badge_Guru()
         # print(']', end='')
 
     def has_badge(self, account, badge):
-        """Checkup presence badges in account"""
+        """Checkup presence badge in account."""
         try:
             GettingBadge.objects.get(account=account, badge=badge)
         except GettingBadge.DoesNotExist:
@@ -47,168 +52,444 @@ class BadgeManager(models.Manager):
         else:
             return True
 
-    def last_got_badges(self, count=10):
-        return GettingBadge.objects.order_by('-date_getting')[:count]
+    def get_badges(self, account):
+        """Getting all badges certain account."""
+        pass
 
-    def added_badge_to_account(self, account, badge_name):
-        badge = Badge.objects.get(name__icontains=badge_name)
-        GettingBadge.objects.update_or_create(user=account, badge=badge)
+    def last_got_badges(self, count_last_getting=10):
+        """Getting listing last getting badges of accounts."""
+        return GettingBadge.objects.order_by('-date_getting')[:count_last_getting]
+
+    def added_badge_to_accounts(self, account_pks, badge_name):
+        """Add badge to accounts listing in account_pks as their primary keys."""
+        if account_pks and badge_name:
+            # get badge
+            badge = Badge.objects.get(name__icontains=badge_name)
+            # iteration on primary keys of accounts and adding badge
+            for account_pk in account_pks:
+                account = self.get(pk=account_pk)
+                GettingBadge.objects.update_or_create(user=account, badge=badge)
 
     @point_execution_in_terminal
-    def check_badge_Favorite_Question(self, account):
+    def check_badge_Favorite_Question(self):
         """Question if favorited at least 5 users."""
         QUESTION_AS_FAVORITE = 5
-        for account in self.iterator():
-            scopes_questions = account.get_questions_of_account_with_count_favorites_this_questions()
-            result = tuple(filter(lambda item: item[1] >= QUESTION_AS_FAVORITE, scopes_questions.items()))
-            if result:
-                self.added_badge_to_account(account=account, badge_name='favorite question')
+        all_questions_with_certain_favorites = Question.objects.questions_by_min_count_favorits(
+            min_count_favorits=QUESTION_AS_FAVORITE,
+        )
+        account_pks = all_questions_with_certain_favorites.values_list('author', flat=True).distinct()
+        self.added_badge_to_accounts(account_pks=account_pks, badge_name='favorite question')
 
     @point_execution_in_terminal
-    def check_badge_Stellar_Question(self, account):
+    def check_badge_Stellar_Question(self):
         """Question if favorited at least 10 users."""
         QUESTION_AS_STELLAR = 10
-        for account in self.iterator():
-            scopes_questions = account.get_questions_of_account_with_count_favorites_this_questions()
-            result = tuple(filter(lambda item: item[1] >= QUESTION_AS_STELLAR, scopes_questions.items()))
-            if result:
-                self.added_badge_to_account(account=account, badge_name='stellar question')
+        all_questions_with_certain_favorites = Question.objects.questions_by_min_count_favorits(
+            min_count_favorits=QUESTION_AS_STELLAR,
+        )
+        account_pks = all_questions_with_certain_favorites.values_list('author', flat=True).distinct()
+        self.added_badge_to_accounts(account_pks=account_pks, badge_name='stellar question')
 
     @point_execution_in_terminal
-    def check_badge_Nice_Question(self, account):
+    def check_badge_Nice_Question(self):
         """Scope of question must be 5 and more."""
-        SCOPES_QUESTION_AS_NICE = 5
-        for account in self.iterator():
-            scopes_questions = account.get_scopes_questions_of_account()
-            result = tuple(filter(lambda item: item[1] >= SCOPES_QUESTION_AS_NICE, scopes_questions.items()))
-            if result:
-                self.added_badge_to_account(account=account, badge_name='nice question')
+        SCOPE_QUESTION_AS_NICE = 5
+        nices_questions = Question.objects.questions_by_min_scope(min_scope=SCOPE_QUESTION_AS_NICE)
+        account_pks = nices_questions.values_list('author', flat=True)
+        self.added_badge_to_accounts(account_pks=account_pks, badge_name='nice question')
 
     @point_execution_in_terminal
-    def check_badge_Good_Question(self, account):
+    def check_badge_Good_Question(self):
         """Scope of question must be 10 and more."""
-        SCOPES_QUESTION_AS_GOOD = 10
-        for account in self.iterator():
-            scopes_questions = account.get_scopes_questions_of_account()
-            result = tuple(filter(lambda item: item[1] >= SCOPES_QUESTION_AS_GOOD, scopes_questions.items()))
-            if result:
-                self.added_badge_to_account(account=account, badge_name='good question')
+        SCOPE_QUESTION_AS_GOOD = 10
+        nices_questions = Question.objects.questions_by_min_scope(min_scope=SCOPE_QUESTION_AS_GOOD)
+        account_pks = nices_questions.values_list('author', flat=True).distinct()
+        self.added_badge_to_accounts(account_pks=account_pks, badge_name='good question')
 
     @point_execution_in_terminal
-    def check_badge_Great_Question(self, account):
+    def check_badge_Great_Question(self):
         """Scope of question must be 20 and more."""
-        SCOPES_QUESTION_AS_GREAT = 20
-        for account in self.iterator():
-            scopes_questions = account.get_scopes_questions_of_account()
-            result = tuple(filter(lambda item: item[1] >= SCOPES_QUESTION_AS_GREAT, scopes_questions.items()))
-            if result:
-                self.added_badge_to_account(account=account, badge_name='great question')
+        SCOPE_QUESTION_AS_GREAT = 20
+        nices_questions = Question.objects.questions_by_min_scope(min_scope=SCOPE_QUESTION_AS_GREAT)
+        account_pks = nices_questions.values_list('author', flat=True).distinct()
+        self.added_badge_to_accounts(account_pks=account_pks, badge_name='great question')
 
     @point_execution_in_terminal
-    def check_badge_Popular_Question(self, account):
+    def check_badge_Popular_Question(self):
         """Count views of question must be 100 and more."""
         COUNT_VIEWS_QUESTION_AS_POPULAR = 100
-        for account in self.iterator():
-            if account.questions.filter(views__gte=COUNT_VIEWS_QUESTION_AS_POPULAR).exists():
-                self.added_badge_to_account(account=account, badge_name='popular question')
+        questions = Question.objects.filter(views__gte=COUNT_VIEWS_QUESTION_AS_POPULAR)
+        account_pks = questions.values_list('author', flat=True).distinct()
+        self.added_badge_to_accounts(account_pks=account_pks, badge_name='popular question')
 
     @point_execution_in_terminal
-    def check_badge_Notable_Question(self, account):
-        """Count views of question must be 100 and more."""
+    def check_badge_Notable_Question(self):
+        """Count views of question must be 500 and more."""
         COUNT_VIEWS_QUESTION_AS_NOTABLE = 500
-        for account in self.iterator():
-            if account.questions.filter(views__gte=COUNT_VIEWS_QUESTION_AS_NOTABLE).exists():
-                self.added_badge_to_account(account=account, badge_name='notable question')
+        questions = Question.objects.filter(views__gte=COUNT_VIEWS_QUESTION_AS_NOTABLE)
+        account_pks = questions.values_list('author', flat=True).distinct()
+        self.added_badge_to_accounts(account_pks=account_pks, badge_name='notable question')
 
     @point_execution_in_terminal
-    def check_badge_Famous_Question(self, account):
+    def check_badge_Famous_Question(self):
         """Count views of question must be 1000 and more."""
         COUNT_VIEWS_QUESTION_AS_FAMOUS = 1000
-        for account in self.iterator():
-            if account.questions.filter(views__gte=COUNT_VIEWS_QUESTION_AS_FAMOUS).exists():
-                self.added_badge_to_account(account=account, badge_name='famous question')
+        questions = Question.objects.filter(views__gte=COUNT_VIEWS_QUESTION_AS_FAMOUS)
+        account_pks = questions.values_list('author', flat=True).distinct()
+        self.added_badge_to_accounts(account_pks=account_pks, badge_name='famous question')
 
     @point_execution_in_terminal
-    def check_badge_Schoolar(self, account):
+    def check_badge_Schoolar(self):
         """Have question with acceptabled answer."""
-        for account in self.iterator():
-            for question in account.questions.iterator():
-                if question.has_acceptabled_answer():
-                    self.added_badge_to_account(account=account, badge_name='schoolar')
-                    break
+        account_pks = Answer.objects.accepted_answers().values_list('question__author', flat=True).distinct()
+        self.added_badge_to_accounts(account_pks=account_pks, badge_name='schoolar')
 
     @point_execution_in_terminal
-    def check_badge_Student(self, account):
+    def check_badge_Student(self):
         """Accept an answers on 5 questions."""
-        NECESSARY_COUNT_ACCEPT_ANSWERS = 5
-        questions_with_acceptabled_answer = frozenset(Question.questions_with_acceptabled_answer.all())
-        for account in self.iterator():
-            common_questions_with_acceptabled_answer = questions_with_acceptabled_answer & frozenset(account.questions.all())
-            if len(common_questions_with_acceptabled_answer) >= NECESSARY_COUNT_ACCEPT_ANSWERS:
-                self.added_badge_to_account(account=account, badge_name='student')
+        NECESSARY_COUNT_ACCEPTED_ANSWERS = 5
+        undistinct_account_pks = Answer.objects.accepted_answers().values_list('question__author', flat=True)
+        counter_undistinct_account_pks = collections.Counter(undistinct_account_pks)
+        # choice accounts satisfied restriction
+        tuple_with_account_pks_and_count_accepted_answers = filter(
+            lambda item: item[1] >= NECESSARY_COUNT_ACCEPTED_ANSWERS,
+            counter_undistinct_account_pks.items(),
+        )
+        # replace two-nested tuple on single-nested tuple with removing count accepted answer,
+        # left only primary keyes of accounts
+        account_pks = tuple(item[0] for item in tuple_with_account_pks_and_count_accepted_answers)
+        self.added_badge_to_accounts(account_pks=account_pks, badge_name='student')
 
     @point_execution_in_terminal
-    def check_badge_Tumbleweed(self, account):
+    def check_badge_Tumbleweed(self):
         """Asked a question with zero score or less, no answers."""
-        non_interesting_questions = frozenset(Question.objects.non_interesting_questions())
-        for account in self.iterator():
-            if non_interesting_questions & frozenset(account.questions.all()):
-                self.added_badge_to_account(account=account, badge_name='tumbleweed')
+        non_interesting_questions = Question.objects.non_interesting_questions()
+        account_pks = non_interesting_questions.values_list('author', flat=True).distinct()
+        self.added_badge_to_accounts(account_pks=account_pks, badge_name='tumbleweed')
 
     @point_execution_in_terminal
-    def check_badge_Enlightened(self, account):
+    def check_badge_Enlightened(self):
         """Had accepted answer with score of 10 or more."""
-        good_answers = frozenset(Answer.objects.good_answers())
-        for account in self.iterator():
-            if good_answers & frozenset(account.answers.all()):
-                self.added_badge_to_account(account=account, badge_name='enlightened')
+        MIN_SCOPE_ANSWER_FOR_ENLIGHTENED = 10
+        answers_with_min_scope = Answer.objects.answers_by_min_scope(min_scope=MIN_SCOPE_ANSWER_FOR_ENLIGHTENED)
+        accepted_answers = Answer.objects.accepted_answers()
+        accepted_answers_with_min_scope = answers_with_min_scope & accepted_answers
+        account_pks = accepted_answers_with_min_scope.values_list('author', flat=True).distinct()
+        self.added_badge_to_accounts(account_pks=account_pks, badge_name='enlightened')
 
-    # Explainer
-    # Refiner
-    # Illuminator
-    # Guru
-    # Nice answer
-    # Good answer
-    # Great answer
-    # Populist
-    # Reversal
-    # Revival
-    # Necromancer
-    # Self-learner
-    # Teacher
-    # Autobiograther
-    # Commentator
-    # Sociable
-    # Enthusiast
-    # Fanatic
-    # Assduous
-    # Epic
-    # Legendary
-    # Citize
-    # Talkative
-    # Outspoken
-    # Yearning
-    # Civic Duty
-    # Electorate
-    # Citizen Patrol
-    # Depute
-    # Marshal
-    # Critic
-    # Editor
-    # Organizer
-    # Proofreader
-    # Suffrage
-    # Vox populi
-    # Supporter
-    # Taxonomist
-    # Publicist
-    # Tester
-    # Creator tests
-    # Clear mind
-    # Clear head
-    # Closer questions
-    # Deleter questions
-    # Dispatcher
-    # Sage
-    # Have opinion
+    @point_execution_in_terminal
+    def check_badge_Explainer(self):
+        """Answer on 1 question within 24 hours and with scope > 0."""
+        useful_answers = Answer.objects.answers_by_min_scope(min_scope=1)
+        quickly_answers = Answer.objects.quickly_answers()
+        useful_quickly_answers = useful_answers & quickly_answers
+        account_pks = useful_quickly_answers.values_list('author', flat=True).distinct()
+        self.added_badge_to_accounts(account_pks=account_pks, badge_name='explainer')
 
+    @point_execution_in_terminal
+    def check_badge_Refiner(self):
+        """Answer on 5 questions within 24 hours and with scope > 0."""
+        useful_answers = Answer.objects.answers_by_min_scope(min_scope=1)
+        quickly_answers = Answer.objects.quickly_answers()
+        useful_quickly_answers = useful_answers & quickly_answers
+        undistinct_account_pks = useful_quickly_answers.values_list('author', flat=True)
+        counter_undistinct_account_pks = collections.Counter(undistinct_account_pks)
+        # choice accounts satisfied restriction
+        tuple_with_account_pks_and_count_answers = filter(
+            lambda item: item[1] >= 5,
+            counter_undistinct_account_pks.items(),
+        )
+        # replace two-nested tuple on single-nested tuple with removing count accepted answer,
+        # left only primary keyes of accounts
+        account_pks = tuple(item[0] for item in tuple_with_account_pks_and_count_answers)
+        self.added_badge_to_accounts(account_pks=account_pks, badge_name='refiner')
+
+    @point_execution_in_terminal
+    def check_badge_Illuminator(self):
+        """Answer on 10 questions within 24 hours and with scope > 0."""
+        useful_answers = Answer.objects.answers_by_min_scope(min_scope=1)
+        quickly_answers = Answer.objects.quickly_answers()
+        useful_quickly_answers = useful_answers & quickly_answers
+        undistinct_account_pks = useful_quickly_answers.values_list('author', flat=True)
+        counter_undistinct_account_pks = collections.Counter(undistinct_account_pks)
+        # choice accounts satisfied restriction
+        tuple_with_account_pks_and_count_answers = filter(
+            lambda item: item[1] >= 10,
+            counter_undistinct_account_pks.items(),
+        )
+        # replace two-nested tuple on single-nested tuple with removing count accepted answer,
+        # left only primary keyes of accounts
+        account_pks = tuple(item[0] for item in tuple_with_account_pks_and_count_answers)
+        self.added_badge_to_accounts(account_pks=account_pks, badge_name='illuminator')
+
+    @point_execution_in_terminal
+    def check_badge_Guru(self):
+        """Given accepted answer with score of 5 or more."""
+        useful_answers = Answer.objects.answers_by_min_scope(min_scope=5)
+        accepted_answers = Answer.objects.accepted_answers()
+        good_accepted_answers = useful_answers & accepted_answers
+        account_pks = good_accepted_answers.values_list('author', flat=True).distinct()
+        self.added_badge_to_accounts(account_pks=account_pks, badge_name='guru')
+
+    @point_execution_in_terminal
+    def check_badge_Nice_Answer(self):
+        """Answer score of 5 or more."""
+        answers = Answer.objects.answers_by_min_scope(min_scope=5)
+        account_pks = answers.values_list('author', flat=True).distinct()
+        self.added_badge_to_accounts(account_pks=account_pks, badge_name='nice answer')
+
+    @point_execution_in_terminal
+    def check_badge_Good_Answer(self):
+        """Answer score of 10 or more."""
+        answers = Answer.objects.answers_by_min_scope(min_scope=10)
+        account_pks = answers.values_list('author', flat=True).distinct()
+        self.added_badge_to_accounts(account_pks=account_pks, badge_name='good answer')
+
+    @point_execution_in_terminal
+    def check_badge_Great_Answer(self):
+        """Answer score of 15 or more."""
+        answers = Answer.objects.answers_by_min_scope(min_scope=15)
+        account_pks = answers.values_list('author', flat=True).distinct()
+        self.added_badge_to_accounts(account_pks=account_pks, badge_name='great answer')
+
+    @point_execution_in_terminal
+    def check_badge_Populist(self):
+        """Highest scoring answer that outscored an accepted answe."""
+
+    @point_execution_in_terminal
+    def check_badge_Reversal(self):
+        """Provide an answer of +1 score to a question of -1 score."""
+        # Question.objects.
+
+    @point_execution_in_terminal
+    def check_badge_Revivel(self):
+        """Answer more than 7 days after a question was asked."""
+        # Question.objects
+
+    @point_execution_in_terminal
+    def check_badge_Necromancer(self):
+        """ """
+        # account_pks = answers.values_list('author', flat=True).distinct()
+        # self.added_badge_to_accounts(account_pks=account_pks, badge_name='')
+
+    @point_execution_in_terminal
+    def check_badge_SelfLearner(self):
+        """ """
+        # account_pks = answers.values_list('author', flat=True).distinct()
+        # self.added_badge_to_accounts(account_pks=account_pks, badge_name='')
+
+    @point_execution_in_terminal
+    def check_badge_Teacher(self):
+        """ """
+        # account_pks = answers.values_list('author', flat=True).distinct()
+        # self.added_badge_to_accounts(account_pks=account_pks, badge_name='')
+
+    @point_execution_in_terminal
+    def check_badge_Autobiograther(self):
+        """ """
+        # account_pks = answers.values_list('author', flat=True).distinct()
+        # self.added_badge_to_accounts(account_pks=account_pks, badge_name='')
+
+    @point_execution_in_terminal
+    def check_badge_Commentator(self):
+        """ """
+        # account_pks = answers.values_list('author', flat=True).distinct()
+        # self.added_badge_to_accounts(account_pks=account_pks, badge_name='')
+
+    @point_execution_in_terminal
+    def check_badge_Sociable(self):
+        """ """
+        # account_pks = answers.values_list('author', flat=True).distinct()
+        # self.added_badge_to_accounts(account_pks=account_pks, badge_name='')
+
+    @point_execution_in_terminal
+    def check_badge_Enthusiast(self):
+        """ """
+        # account_pks = answers.values_list('author', flat=True).distinct()
+        # self.added_badge_to_accounts(account_pks=account_pks, badge_name='')
+
+    @point_execution_in_terminal
+    def check_badge_Fanatic(self):
+        """ """
+        # account_pks = answers.values_list('author', flat=True).distinct()
+        # self.added_badge_to_accounts(account_pks=account_pks, badge_name='')
+
+    @point_execution_in_terminal
+    def check_badge_Assduous(self):
+        """ """
+        # account_pks = answers.values_list('author', flat=True).distinct()
+        # self.added_badge_to_accounts(account_pks=account_pks, badge_name='')
+
+    @point_execution_in_terminal
+    def check_badge_Epic(self):
+        """ """
+        # account_pks = answers.values_list('author', flat=True).distinct()
+        # self.added_badge_to_accounts(account_pks=account_pks, badge_name='')
+
+    @point_execution_in_terminal
+    def check_badge_Legendary(self):
+        """ """
+        # account_pks = answers.values_list('author', flat=True).distinct()
+        # self.added_badge_to_accounts(account_pks=account_pks, badge_name='')
+
+    @point_execution_in_terminal
+    def check_badge_Citize(self):
+        """ """
+        # account_pks = answers.values_list('author', flat=True).distinct()
+        # self.added_badge_to_accounts(account_pks=account_pks, badge_name='')
+
+    @point_execution_in_terminal
+    def check_badge_Talkative(self):
+        """ """
+        # account_pks = answers.values_list('author', flat=True).distinct()
+        # self.added_badge_to_accounts(account_pks=account_pks, badge_name='')
+
+    @point_execution_in_terminal
+    def check_badge_Outspoken(self):
+        """ """
+        # account_pks = answers.values_list('author', flat=True).distinct()
+        # self.added_badge_to_accounts(account_pks=account_pks, badge_name='')
+
+    @point_execution_in_terminal
+    def check_badge_Yearning(self):
+        """ """
+        # account_pks = answers.values_list('author', flat=True).distinct()
+        # self.added_badge_to_accounts(account_pks=account_pks, badge_name='')
+
+    @point_execution_in_terminal
+    def check_badge_Civic_Duty(self):
+        """ """
+        # account_pks = answers.values_list('author', flat=True).distinct()
+        # self.added_badge_to_accounts(account_pks=account_pks, badge_name='')
+
+    @point_execution_in_terminal
+    def check_badge_Electorate(self):
+        """ """
+        # account_pks = answers.values_list('author', flat=True).distinct()
+        # self.added_badge_to_accounts(account_pks=account_pks, badge_name='')
+
+    @point_execution_in_terminal
+    def check_badge_Citizen_Patrol(self):
+        """ """
+        # account_pks = answers.values_list('author', flat=True).distinct()
+        # self.added_badge_to_accounts(account_pks=account_pks, badge_name='')
+
+    @point_execution_in_terminal
+    def check_badge_Depute(self):
+        """ """
+        # account_pks = answers.values_list('author', flat=True).distinct()
+        # self.added_badge_to_accounts(account_pks=account_pks, badge_name='')
+
+    @point_execution_in_terminal
+    def check_badge_Marshal(self):
+        """ """
+        # account_pks = answers.values_list('author', flat=True).distinct()
+        # self.added_badge_to_accounts(account_pks=account_pks, badge_name='')
+
+    @point_execution_in_terminal
+    def check_badge_Critic(self):
+        """ """
+        # account_pks = answers.values_list('author', flat=True).distinct()
+        # self.added_badge_to_accounts(account_pks=account_pks, badge_name='')
+
+    @point_execution_in_terminal
+    def check_badge_Editor(self):
+        """ """
+        # account_pks = answers.values_list('author', flat=True).distinct()
+        # self.added_badge_to_accounts(account_pks=account_pks, badge_name='')
+
+    @point_execution_in_terminal
+    def check_badge_Organizer(self):
+        """ """
+        # account_pks = answers.values_list('author', flat=True).distinct()
+        # self.added_badge_to_accounts(account_pks=account_pks, badge_name='')
+
+    @point_execution_in_terminal
+    def check_badge_Proofreader(self):
+        """ """
+        # account_pks = answers.values_list('author', flat=True).distinct()
+        # self.added_badge_to_accounts(account_pks=account_pks, badge_name='')
+
+    @point_execution_in_terminal
+    def check_badge_Suffrage(self):
+        """ """
+        # account_pks = answers.values_list('author', flat=True).distinct()
+        # self.added_badge_to_accounts(account_pks=account_pks, badge_name='')
+
+    @point_execution_in_terminal
+    def check_badge_Vox_Populi(self):
+        """ """
+        # account_pks = answers.values_list('author', flat=True).distinct()
+        # self.added_badge_to_accounts(account_pks=account_pks, badge_name='')
+
+    @point_execution_in_terminal
+    def check_badge_Supporter(self):
+        """ """
+        # account_pks = answers.values_list('author', flat=True).distinct()
+        # self.added_badge_to_accounts(account_pks=account_pks, badge_name='')
+
+    @point_execution_in_terminal
+    def check_badge_Taxonomist(self):
+        """ """
+        # account_pks = answers.values_list('author', flat=True).distinct()
+        # self.added_badge_to_accounts(account_pks=account_pks, badge_name='')
+
+    @point_execution_in_terminal
+    def check_badge_Publicist(self):
+        """ """
+        # account_pks = answers.values_list('author', flat=True).distinct()
+        # self.added_badge_to_accounts(account_pks=account_pks, badge_name='')
+
+    @point_execution_in_terminal
+    def check_badge_Tester(self):
+        """ """
+        # account_pks = answers.values_list('author', flat=True).distinct()
+        # self.added_badge_to_accounts(account_pks=account_pks, badge_name='')
+
+    @point_execution_in_terminal
+    def check_badge_Creator_Tests(self):
+        """ """
+        # account_pks = answers.values_list('author', flat=True).distinct()
+        # self.added_badge_to_accounts(account_pks=account_pks, badge_name='')
+
+    @point_execution_in_terminal
+    def check_badge_Clear_Mind(self):
+        """ """
+        # account_pks = answers.values_list('author', flat=True).distinct()
+        # self.added_badge_to_accounts(account_pks=account_pks, badge_name='')
+
+    @point_execution_in_terminal
+    def check_badge_Clear_Head(self):
+        """ """
+        # account_pks = answers.values_list('author', flat=True).distinct()
+        # self.added_badge_to_accounts(account_pks=account_pks, badge_name='')
+
+    @point_execution_in_terminal
+    def check_badge_Closer_Questions(self):
+        """ """
+        # account_pks = answers.values_list('author', flat=True).distinct()
+        # self.added_badge_to_accounts(account_pks=account_pks, badge_name='')
+
+    @point_execution_in_terminal
+    def check_badge_Deleter_Questions(self):
+        """ """
+        # account_pks = answers.values_list('author', flat=True).distinct()
+        # self.added_badge_to_accounts(account_pks=account_pks, badge_name='')
+
+    @point_execution_in_terminal
+    def check_badge_Dispatcher(self):
+        """ """
+        # account_pks = answers.values_list('author', flat=True).distinct()
+        # self.added_badge_to_accounts(account_pks=account_pks, badge_name='')
+
+    @point_execution_in_terminal
+    def check_badge_Sage(self):
+        """ """
+        # account_pks = answers.values_list('author', flat=True).distinct()
+        # self.added_badge_to_accounts(account_pks=account_pks, badge_name='')
+
+    @point_execution_in_terminal
+    def check_badge_Have_Opinion(self):
+        """ """
+        # account_pks = answers.values_list('author', flat=True).distinct()
+        # self.added_badge_to_accounts(account_pks=account_pks, badge_name='')

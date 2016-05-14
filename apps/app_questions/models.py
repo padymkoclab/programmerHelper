@@ -73,8 +73,8 @@ class Question(TimeStampedModel):
     def get_absolute_url(self):
         return reverse('app_questions:question', kwargs={'slug': self.slug})
 
-    def has_acceptabled_answer(self):
-        count_acceptabled_answers = self.answers.filter(is_acceptabled=True).count()
+    def has_accepted_answer(self):
+        count_acceptabled_answers = self.answers.filter(is_accepted=True).count()
         if count_acceptabled_answers == 0:
             return False
         elif count_acceptabled_answers == 1:
@@ -82,7 +82,7 @@ class Question(TimeStampedModel):
         else:
             error_message = ugettext('Question "{0}" have more than a single acceptabled answer!'.format(self.title))
             raise ValidationError(error_message)
-    has_acceptabled_answer.boolean = True
+    has_accepted_answer.boolean = True
 
     def get_scope(self):
         good_opinions = self.opinions.filter(is_useful=True).count()
@@ -125,15 +125,12 @@ class Answer(TimeStampedModel):
         related_name='answers',
         limit_choices_to={'is_active': True},
     )
-    is_acceptabled = models.BooleanField(_('Is acceptabled answer?'), default=False)
+    is_accepted = models.BooleanField(_('Is accepted answer?'), default=False)
     comments = GenericRelation(CommentGeneric)
     likes = GenericRelation(LikeGeneric)
 
     objects = models.Manager()
     objects = AnswerManager()
-
-    # simple managers
-    acceptabled_answers = QueryManager(is_acceptabled=True)
 
     class Meta:
         db_table = 'answers'
@@ -150,3 +147,7 @@ class Answer(TimeStampedModel):
         count_dislikes = self.likes.filter(liked_it=False).count()
         return count_likes - count_dislikes
     get_scope.short_description = _('Scope')
+    get_scope.admin_order_field = 'scope'
+
+    def time_after_published_question(self):
+        return self.date_added - self.question.date_added

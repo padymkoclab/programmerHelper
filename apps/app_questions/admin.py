@@ -1,7 +1,7 @@
 
 from django.utils.translation import ugettext_lazy as _
 from django.contrib import admin
-from django.db.models import Count
+from django.db import models
 
 from apps.app_generic_models.admin import OpinionGenericInline, CommentGenericInline, LikeGenericInline
 
@@ -17,7 +17,7 @@ class AnswerInline(admin.StackedInline):
     model = Answer
     extra = 0
     fk_name = 'question'
-    fields = ['author', 'is_acceptabled', 'text_answer']
+    fields = ['author', 'is_accepted', 'text_answer']
 
 
 class QuestionAdmin(admin.ModelAdmin):
@@ -29,13 +29,12 @@ class QuestionAdmin(admin.ModelAdmin):
         'title',
         'author',
         'status',
-        'get_count_answers',
-        'has_acceptabled_answer',
+        # 'get_count_answers',
+        'has_accepted_answer',
+        'get_scope2',
         'get_scope',
-        'get_count_favorites',
-        'get_count_unfavorites',
-        'get_count_opinions',
-        'get_count_tags',
+        # 'get_count_opinions',
+        # 'get_count_tags',
         'is_dublicated',
         'is_new',
         'last_activity',
@@ -64,9 +63,18 @@ class QuestionAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
         qs = super(QuestionAdmin, self).get_queryset(request)
         qs = qs.annotate(
-            count_answers=Count('answers', distinct=True),
-            count_tags=Count('tags', distinct=True),
-            count_opinions=Count('opinions', distinct=True),
+            count_answers=models.Count('answers', distinct=True),
+            count_tags=models.Count('tags', distinct=True),
+            count_opinions=models.Count('opinions', distinct=True),
+        )
+        qs = qs.annotate(
+            scope=models.Sum(
+                models.Case(
+                    models.When(opinions__is_useful=True, then=1),
+                    models.When(opinions__is_useful=False, then=-1),
+                    output_field=models.IntegerField()
+                ), distinct=True
+            ),
         )
         return qs
 
@@ -85,6 +93,11 @@ class QuestionAdmin(admin.ModelAdmin):
     get_count_opinions.admin_order_field = 'count_opinions'
     get_count_opinions.short_description = _('Count opinions')
 
+    def get_scope2(self, obj):
+        return obj.scope
+    get_scope2.admin_order_field = 'scope'
+    get_scope2.short_description = _('Scope')
+
 
 class AnswerAdmin(admin.ModelAdmin):
     '''
@@ -94,7 +107,7 @@ class AnswerAdmin(admin.ModelAdmin):
     list_display = (
         'question',
         'author',
-        'is_acceptabled',
+        'is_accepted',
         'get_count_comments',
         'get_count_likes',
         'get_scope',
@@ -105,7 +118,7 @@ class AnswerAdmin(admin.ModelAdmin):
     list_filter = (
         ('author', admin.RelatedOnlyFieldListFilter),
         ('question', admin.RelatedOnlyFieldListFilter),
-        'is_acceptabled',
+        'is_accepted',
         'date_modified',
         'date_added',
     )
@@ -114,14 +127,17 @@ class AnswerAdmin(admin.ModelAdmin):
         LikeGenericInline,
         CommentGenericInline,
     ]
-    fields = ['question', 'author', 'text_answer', 'is_acceptabled']
+    fields = ['question', 'author', 'text_answer', 'is_accepted']
 
     def get_queryset(self, request):
         qs = super(AnswerAdmin, self).get_queryset(request)
         qs = qs.annotate(
-            count_likes=Count('likes', distinct=True),
-            count_comments=Count('comments', distinct=True),
+            count_likes=models.Count('likes', distinct=True),
+            count_comments=models.Count('comments', distinct=True),
         )
+        for i in qs:
+            i.scope = i.get_scope()
+            i.save()
         return qs
 
     def get_count_likes(self, obj):

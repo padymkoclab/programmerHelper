@@ -1,6 +1,7 @@
 
 import random
 
+from django.utils import timezone
 from django.contrib.auth import get_user_model
 
 import factory
@@ -19,8 +20,8 @@ class Factory_Question(factory.DjangoModelFactory):
         model = Question
 
     text_question = factory.Faker('text', locale='ru')
-    author = fuzzy.FuzzyChoice(tuple(Accounts))
-    status = fuzzy.FuzzyChoice(tuple(Question.CHOICES_STATUS._db_values))
+    author = fuzzy.FuzzyChoice(Accounts)
+    status = fuzzy.FuzzyChoice(Question.CHOICES_STATUS._db_values)
     views = fuzzy.FuzzyInteger(1000)
 
     @factory.lazy_attribute
@@ -41,18 +42,22 @@ class Factory_Question(factory.DjangoModelFactory):
 
     @factory.post_generation
     def opinions(self, create, extracted, **kwargs):
-        for i in range(random.randrange(10)):
+        for i in range(random.randint(0, 12)):
             Factory_OpinionGeneric(content_object=self)
 
     @factory.post_generation
     def comments(self, create, extracted, **kwargs):
-        for i in range(random.randrange(10)):
+        for i in range(random.randint(0, 12)):
             Factory_CommentGeneric(content_object=self)
 
 
 Question.objects.filter().delete()
 for i in range(100):
-    Factory_Question()
+    question = Factory_Question()
+    # change date_added
+    date_added = fuzzy.FuzzyDateTime(timezone.now() - timezone.timedelta(weeks=1), timezone.now()).fuzz()
+    question.date_added = date_added
+    question.save()
 
 
 class Factory_Answer(factory.DjangoModelFactory):
@@ -61,23 +66,23 @@ class Factory_Answer(factory.DjangoModelFactory):
         model = Answer
 
     text_answer = factory.Faker('text', locale='ru')
-    author = fuzzy.FuzzyChoice(tuple(Accounts))
-    question = fuzzy.FuzzyChoice(tuple(Question.objects.all()))
+    author = fuzzy.FuzzyChoice(Accounts)
+    question = fuzzy.FuzzyChoice(Question.objects.all())
 
     @factory.lazy_attribute
-    def is_acceptabled(self):
-        if self.question.has_acceptabled_answer():
+    def is_accepted(self):
+        if self.question.has_accepted_answer():
             return False
         return random.choice([True, False])
 
     @factory.post_generation
     def likes(self, create, extracted, **kwargs):
-        for i in range(random.randrange(10)):
+        for i in range(random.randint(0, 12)):
             Factory_LikeGeneric(content_object=self)
 
     @factory.post_generation
     def comments(self, create, extracted, **kwargs):
-        for i in range(random.randrange(10)):
+        for i in range(random.randint(0, 12)):
             Factory_CommentGeneric(content_object=self)
 
 

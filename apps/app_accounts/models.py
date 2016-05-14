@@ -176,23 +176,6 @@ class Account(AbstractBaseUser, PermissionsMixin):
     def get_reputation(self):
         pass
 
-    def get_badges(self):
-        pass
-
-    def get_scopes_questions_of_account(self):
-        """Return dictionary scopes all questions of account as {question: scope}."""
-        result = dict()
-        for question in self.questions.iterator():
-            result[question] = question.get_scope()
-        return result
-
-    def get_questions_of_account_with_count_favorites_this_questions(self):
-        """Return dictionary with question and count his favories of account as {question: count favotires}."""
-        result = dict()
-        for question in self.questions.iterator():
-            result[question] = question.get_count_favorites()
-        return result
-
     def last_seen(self):
         # Last seen 11 mins ago
         pass

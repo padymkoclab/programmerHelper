@@ -1,8 +1,5 @@
 
-from django.contrib.auth import get_user_model
-
 import factory
-from factory import fuzzy
 
 from .models import *
 
@@ -13,28 +10,28 @@ class Factory_Badges(factory.DjangoModelFactory):
         model = Badge
 
 
-Factory_Badges(name='Favorite question', short_description='Question favorited by 5 users')
-Factory_Badges(name='Stellar question', short_description='Question favorited by 10 users')
-Factory_Badges(name='Nice Question', short_description='Question score of 5 or more')
-Factory_Badges(name='Good Question', short_description='Question score of 10 or more')
-Factory_Badges(name='Great Question', short_description='Question score of 20 or more')
-Factory_Badges(name='Popular Question', short_description='Question with 100 views')
-Factory_Badges(name='Notable Question', short_description='Question with 500 views')
-Factory_Badges(name='Famous Question', short_description='Question with 1000 views')
-Factory_Badges(name='Schoolar', short_description='Ask a question and accept an answer')
-Factory_Badges(name='Student', short_description='Accept an answer on 5 questions')
-Factory_Badges(name='Tumbleweed', short_description='Asked a question with zero score or less, no answers.')
-Factory_Badges(name='Enlightened', short_description='Have accepted answer with score of 10 or more')
-Factory_Badges(name='Explainer', short_description='Answer on 1 question with scope > 0 within 12 hours')
-Factory_Badges(name='Refiner', short_description='Answer on 50 questions with scope > 0 within 12 hours')
-Factory_Badges(name='Illuminator', short_description='Answer on 500 question with scope > 0 within 12 hours')
-Factory_Badges(name='Guru', short_description='Accepted answer and score of 40 or more')
-Factory_Badges(name='Nice answer', short_description='Answer score of 10 or more')
-Factory_Badges(name='Good answer', short_description='Answer score of 25 or more')
-Factory_Badges(name='Great answer', short_description='Answer score of 100 or more')
+# Factory_Badges(name='Favorite question', short_description='Question favorited by 5 users')
+# Factory_Badges(name='Stellar question', short_description='Question favorited by 10 users')
+# Factory_Badges(name='Nice Question', short_description='Question score of 5 or more')
+# Factory_Badges(name='Good Question', short_description='Question score of 10 or more')
+# Factory_Badges(name='Great Question', short_description='Question score of 20 or more')
+# Factory_Badges(name='Popular Question', short_description='Question with 100 views')
+# Factory_Badges(name='Notable Question', short_description='Question with 500 views')
+# Factory_Badges(name='Famous Question', short_description='Question with 1000 views')
+# Factory_Badges(name='Schoolar', short_description='Ask a question and acceped an answer')
+# Factory_Badges(name='Student', short_description='Accepted an answer on 5 questions')
+# Factory_Badges(name='Tumbleweed', short_description='Asked a question with zero score or less, no answers.')
+# Factory_Badges(name='Enlightened', short_description='Have accepted answer with score of 10 or more')
+# Factory_Badges(name='Explainer', short_description='Answer on 1 question within 24 hours and with scope > 0')
+# Factory_Badges(name='Refiner', short_description='Answer on 5 questions within 24 hours with scope > 0')
+# Factory_Badges(name='Illuminator', short_description='Answer on 10 question within 24 hours with scope > 0')
+# Factory_Badges(name='Guru', short_description='Given accepted answer with score of 5 or more.')
+# Factory_Badges(name='Nice answer', short_description='Answer score of 5 or more')
+# Factory_Badges(name='Good answer', short_description='Answer score of 10 or more')
+# Factory_Badges(name='Great answer', short_description='Answer score of 15 or more')
 Factory_Badges(name='Populist', short_description='Highest scoring answer that outscored an accepted answer')
-Factory_Badges(name='Reversal', short_description='Provide an answer of +20 score to a question of -5 score')
-Factory_Badges(name='Revival', short_description='Answer more than 30 days after a question was asked')
+Factory_Badges(name='Reversal', short_description='Provide an answer of +1 score to a question of -1 score')
+Factory_Badges(name='Revival', short_description='Answer more than 7 days after a question was asked')
 Factory_Badges(name='Necromancer', short_description='Answer a question more than 60 days later with score of 5 or more')
 Factory_Badges(name='Self-learner', short_description='Answer your own question with score of 3 or more')
 Factory_Badges(name='Teacher', short_description='Answer a question with score of 1 or more')
@@ -73,12 +70,3 @@ Factory_Badges(name='Deleter questions', short_description='Deleted questions')
 Factory_Badges(name='Dispatcher', short_description='Used links in own articles or solutions')
 Factory_Badges(name='Sage', short_description='Participating in creating courses')
 Factory_Badges(name='Have opinion', short_description='Voted in polls')
-
-
-# class Factory_GettingBadgeUser(factory.DjangoModelFactory):
-
-#     class Meta:
-#         model = GettingBadgeUser
-
-#     user = fuzzy.FuzzyChoice(get_user_model().objects.all())
-#     badge = fuzzy.FuzzyChoice(Badge.objects.all())
