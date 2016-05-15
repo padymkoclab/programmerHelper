@@ -66,6 +66,7 @@ class TagAdmin(admin.ModelAdmin):
         'date_modified',
     )
     date_hierarchy = 'date_modified'
+    prepopulated_fields = {'name': ['name']}
     # list_filter = (
     #     'date_modified',
     # )

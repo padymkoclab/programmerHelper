@@ -58,7 +58,6 @@ class Question(TimeStampedModel):
     # simple managers
     open_questions = QueryManager(status=CHOICES_STATUS.open)
     closed_questions = QueryManager(status=CHOICES_STATUS.closed)
-    questions_with_acceptabled_answer = QueryManager(answers__is_acceptabled=True)
 
     class Meta:
         db_table = 'questions'

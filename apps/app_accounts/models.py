@@ -121,6 +121,7 @@ class Account(AbstractBaseUser, PermissionsMixin):
     gender = models.CharField(_('Gender'), max_length=50, choices=CHOICES_GENDER, default=CHOICES_GENDER.vague)
     date_birthday = models.DateField(_('Date birthday'))
     real_name = models.CharField(_('Real name'), max_length=200, default='', blank=True)
+    # signature = models.CharField(_('Signature'), max_length=50)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username', 'date_birthday']
@@ -173,9 +174,6 @@ class Account(AbstractBaseUser, PermissionsMixin):
     def has_module_perms(self, app_label):
         return True
 
-    def get_reputation(self):
-        pass
-
     def last_seen(self):
         # Last seen 11 mins ago
         pass
@@ -185,6 +183,102 @@ class Account(AbstractBaseUser, PermissionsMixin):
 
     def get_activity(self):
         pass
+
+    def filled_account_profile(self):
+        pass
+
+    def get_reputation(self):
+        """Getting reputation of account based on his activity, actions, badges."""
+        pass
+
+    def get_reputation_for_badges(self):
+        """Getting reputation of account for badges."""
+        return self.badges.count() * 10
+
+    def get_reputation_for_answers(self):
+        """Getting reputation for all scopes of answers of account."""
+        return self.answers.aggregate(
+            total_scope_for_answers=models.Sum(
+                models.Case(
+                    models.When(likes__liked_it=True, then=1),
+                    models.When(likes__liked_it=False, then=-1),
+                    output_field=models.IntegerField()
+                )
+            )
+        ).total_scope_for_answers
+
+    def get_reputation_for_questions(self):
+        """Getting reputation for all scopes of questions of account."""
+        return self.questions.aggregate(
+            total_scope_for_questions=models.Sum(
+                models.Case(
+                    models.When(opinions__is_useful=True, then=1),
+                    models.When(opinions__is_useful=False, then=-1),
+                    output_field=models.IntegerField()
+                )
+            )
+        ).total_scope_for_questions
+
+    def get_reputation_for_solutions(self):
+        """Getting reputation for all scopes of solutions of account."""
+        return self.solutions.aggregate(
+            total_scope_for_solutions=models.Sum(
+                models.Case(
+                    models.When(opinions__is_useful=True, then=1),
+                    models.When(opinions__is_useful=False, then=-1),
+                    output_field=models.IntegerField()
+                )
+            )
+        ).total_scope_for_solutions
+
+    def get_reputation_for_snippets(self):
+        """Getting reputation for all scopes of snippets of account."""
+        return self.snippets.aggregate(
+            total_scope_for_snippets=models.Sum(
+                models.Case(
+                    models.When(opinions__is_useful=True, then=1),
+                    models.When(opinions__is_useful=False, then=-1),
+                    output_field=models.IntegerField()
+                )
+            )
+        ).total_scope_for_snippets
+
+    def get_reputation_for_participate_in_polls(self):
+        """Getting reputation for all scopes of snippets of account."""
+        return self.votes_in_polls.count()
+
+    def get_reputation_for_filled_account_profile(self):
+        return self.__class__.objects.get_filled_accounts_profiles()[self.pk]
+
+    def get_reputation_for_articles(self):
+        pass
+
+    def get_reputation_for_actions(self):
+        """
+        Getting reputation of account for actions on website:
+        scopes of published snippets, answers, questions and rating of articles,
+        participate in polls.
+        ---------------------------------------
+            Evaluate reputation for actions
+        ---------------------------------------
+        Scope answers                   = *2
+        Scope questions                 = *1
+        Scope solutions                 = *3
+        Rating articles                 = *4
+        Scope snippets                  = *2
+        Filled profile                  = +50
+        Participate in poll             = Count polls
+        Popular topic                   = +100
+        Participate in creating tests   = +100
+        Participate in creating courses = +200
+        ---------------------------------------
+        """
+        reputation_for_snippets = self.get_reputation_for_snippets() * 2
+        reputation_for_solutions = self.get_reputation_for_solutions() * 3
+        reputation_for_questions = self.get_reputation_for_questions() * 1
+        reputation_for_answers = self.get_reputation_for_answers() * 2
+        reputation_for_polls= self.get_reputation_for_participate_in_polls()
+        return 1
 
 
 class AccountView(models.Model):

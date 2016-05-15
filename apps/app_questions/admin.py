@@ -29,12 +29,12 @@ class QuestionAdmin(admin.ModelAdmin):
         'title',
         'author',
         'status',
-        # 'get_count_answers',
+        'get_count_answers',
         'has_accepted_answer',
-        'get_scope2',
+        # 'get_scope2',
         'get_scope',
-        # 'get_count_opinions',
-        # 'get_count_tags',
+        'get_count_opinions',
+        'get_count_tags',
         'is_dublicated',
         'is_new',
         'last_activity',
@@ -66,8 +66,6 @@ class QuestionAdmin(admin.ModelAdmin):
             count_answers=models.Count('answers', distinct=True),
             count_tags=models.Count('tags', distinct=True),
             count_opinions=models.Count('opinions', distinct=True),
-        )
-        qs = qs.annotate(
             scope=models.Sum(
                 models.Case(
                     models.When(opinions__is_useful=True, then=1),
@@ -108,9 +106,10 @@ class AnswerAdmin(admin.ModelAdmin):
         'question',
         'author',
         'is_accepted',
-        'get_count_comments',
-        'get_count_likes',
+        # 'get_count_comments',
+        # 'get_count_likes',
         'get_scope',
+        'myscope',
         'is_new',
         'date_modified',
         'date_added',
@@ -134,10 +133,14 @@ class AnswerAdmin(admin.ModelAdmin):
         qs = qs.annotate(
             count_likes=models.Count('likes', distinct=True),
             count_comments=models.Count('comments', distinct=True),
+            scope=models.Sum(
+                models.Case(
+                    models.When(likes__liked_it=True, then=1),
+                    models.When(likes__liked_it=False, then=-1),
+                    output_field=models.IntegerField()
+                ),
+            ),
         )
-        for i in qs:
-            i.scope = i.get_scope()
-            i.save()
         return qs
 
     def get_count_likes(self, obj):
@@ -149,3 +152,6 @@ class AnswerAdmin(admin.ModelAdmin):
         return obj.count_comments
     get_count_comments.admin_order_field = 'count_comments'
     get_count_comments.short_description = _('Count comments')
+
+    def myscope(self, obj):
+        return obj.scope

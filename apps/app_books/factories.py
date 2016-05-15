@@ -51,7 +51,7 @@ class Factory_Book(factory.django.DjangoModelFactory):
 
     @factory.post_generation
     def comments(self, created, extracted, **kwargs):
-        for i in range(random.randint(0, 5)):
+        for i in range(random.randint(0, 3)):
             Factory_CommentGeneric(content_object=self)
 
     @factory.post_generation
@@ -68,7 +68,7 @@ class Factory_Book(factory.django.DjangoModelFactory):
 
     @factory.post_generation
     def scopes(self, created, extracted, **kwargs):
-        for i in range(random.randint(0, 10)):
+        for i in range(random.randint(0, 7)):
             Factory_ScopeGeneric(content_object=self)
 
     @factory.post_generation

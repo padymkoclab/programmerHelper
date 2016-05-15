@@ -64,7 +64,7 @@ class Factory_Solution(factory.DjangoModelFactory):
 
     @factory.post_generation
     def comments(self, created, extracted, **kwargs):
-        for i in range(random.randint(0, 5)):
+        for i in range(random.randint(0, 3)):
             Factory_CommentGeneric(content_object=self)
 
     @factory.post_generation

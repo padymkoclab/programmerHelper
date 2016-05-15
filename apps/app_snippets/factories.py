@@ -40,7 +40,7 @@ class Factory_Snippet(factory.DjangoModelFactory):
 
     @factory.post_generation
     def comments(self, created, extracted, **kwargs):
-        for i in range(random.randrange(5)):
+        for i in range(random.randrange(3)):
             Factory_CommentGeneric(content_object=self)
 
     @factory.post_generation

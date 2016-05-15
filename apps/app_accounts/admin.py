@@ -31,19 +31,19 @@ class AccountAdmin(BaseUserAdmin):
         'level',
         'is_active',
         'is_superuser',
-        # 'get_count_comments',
-        # 'get_count_opinions',
-        # 'get_count_likes',
+        'get_count_comments',
+        'get_count_opinions',
+        'get_count_likes',
         'get_count_scopes',
-        'get_count_questions',
-        'get_count_snippets',
-        'get_count_answers',
-        'get_count_solutions',
-        'get_count_solutions',
-        'get_count_posts',
-        'get_count_topics',
-        'get_count_test_suits',
-        'get_count_passages',
+        # 'get_count_questions',
+        # 'get_count_snippets',
+        # 'get_count_answers',
+        # 'get_count_articles',
+        # 'get_count_solutions',
+        # 'get_count_posts',
+        # 'get_count_topics',
+        # 'get_count_test_suits',
+        # 'get_count_passages',
         'last_login',
         'date_joined',
     ]
@@ -124,20 +124,20 @@ class AccountAdmin(BaseUserAdmin):
     def get_queryset(self, request):
         qs = super(AccountAdmin, self).get_queryset(request)
         qs = qs.annotate(
-            # count_comments=models.Count('comments', distinct=True),
-            # count_opinions=models.Count('opinions', distinct=True),
-            # count_likes=models.Count('likes', distinct=True),
+            count_comments=models.Count('comments', distinct=True),
+            count_opinions=models.Count('opinions', distinct=True),
+            count_likes=models.Count('likes', distinct=True),
             count_scopes=models.Count('scopes', distinct=True),
-            count_articles=models.Count('articles', distinct=True),
-            count_answers=models.Count('answers', distinct=True),
-            count_courses=models.Count('courses', distinct=True),
-            count_posts=models.Count('posts', distinct=True),
-            count_solutions=models.Count('solutions', distinct=True),
-            count_topics=models.Count('topics', distinct=True),
-            count_test_suits=models.Count('test_suits', distinct=True),
-            count_questions=models.Count('questions', distinct=True),
-            count_snippets=models.Count('snippets', distinct=True),
-            count_passages=models.Count('passages', distinct=True),
+            # count_articles=models.Count('articles', distinct=True),
+            # count_answers=models.Count('answers', distinct=True),
+            # count_posts=models.Count('posts', distinct=True),
+            # count_solutions=models.Count('solutions', distinct=True),
+            # count_topics=models.Count('topics', distinct=True),
+            # count_questions=models.Count('questions', distinct=True),
+            # count_snippets=models.Count('snippets', distinct=True),
+            # count_courses=models.Count('courses', distinct=True),
+            # count_test_suits=models.Count('test_suits', distinct=True),
+            # count_passages=models.Count('passages', distinct=True),
         )
         return qs
 
@@ -170,6 +170,11 @@ class AccountAdmin(BaseUserAdmin):
         return obj.count_snippets
     get_count_snippets.admin_order_field = 'count_snippets'
     get_count_snippets.short_description = _('Count snippets')
+
+    def get_count_articles(self, obj):
+        return obj.count_articles
+    get_count_articles.admin_order_field = 'count_articles'
+    get_count_articles.short_description = _('Count article')
 
     def get_count_answers(self, obj):
         return obj.count_answers

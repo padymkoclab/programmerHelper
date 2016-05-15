@@ -45,11 +45,6 @@ class Factory_Question(factory.DjangoModelFactory):
         for i in range(random.randint(0, 12)):
             Factory_OpinionGeneric(content_object=self)
 
-    @factory.post_generation
-    def comments(self, create, extracted, **kwargs):
-        for i in range(random.randint(0, 12)):
-            Factory_CommentGeneric(content_object=self)
-
 
 Question.objects.filter().delete()
 for i in range(100):
@@ -82,7 +77,7 @@ class Factory_Answer(factory.DjangoModelFactory):
 
     @factory.post_generation
     def comments(self, create, extracted, **kwargs):
-        for i in range(random.randint(0, 12)):
+        for i in range(random.randint(0, 6)):
             Factory_CommentGeneric(content_object=self)
 
 
