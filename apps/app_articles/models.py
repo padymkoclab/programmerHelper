@@ -16,7 +16,7 @@ from mylabour.models import TimeStampedModel
 from apps.app_tags.models import Tag
 from apps.app_web_links.models import WebLink
 
-from .managers import ArticleQuerySet
+from .managers import ArticleManager
 
 
 class Article(TimeStampedModel):
@@ -65,7 +65,7 @@ class Article(TimeStampedModel):
 
     # managers
     objects = models.Manager()
-    objects = ArticleQuerySet.as_manager()
+    objects = ArticleManager()
 
     class Meta:
         db_table = 'articles'

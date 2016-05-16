@@ -24,6 +24,8 @@ class Badge(models.Model):
     slug = AutoSlugField(_('Slug'), populate_from='name', unique=True, always_update=True, allow_unicode=True, db_index=True)
     short_description = models.CharField(_('Short description'), max_length=100)
     date_created = models.DateTimeField(_('Date created'), auto_now_add=True)
+    # weight
+    # type
     users = models.ManyToManyField(
         settings.AUTH_USER_MODEL,
         verbose_name=_('Users'),
@@ -56,6 +58,7 @@ class GettingBadge(models.Model):
     )
     badge = models.ForeignKey('Badge', verbose_name=_('Badge'), on_delete=models.CASCADE, related_name='+')
     conditions = models.TextField(_('Pleasurable conditions'))
+    # reasons
     date_getting = models.DateTimeField(_('Date getting'), auto_now_add=True)
 
     class Meta:

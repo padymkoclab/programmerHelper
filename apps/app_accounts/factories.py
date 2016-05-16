@@ -4,7 +4,7 @@ import random
 import factory
 from factory import fuzzy
 
-# from .models import *
+from .models import *
 
 
 class Factory_AccountLevel(factory.DjangoModelFactory):

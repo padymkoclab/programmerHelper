@@ -11,6 +11,8 @@ from autoslug import AutoSlugField
 
 from mylabour.models import TimeStampedModel
 
+from .managers import ForumTopicManager, ForumTopicQuesrySet
+
 
 class ForumSection(TimeStampedModel):
     """
@@ -82,6 +84,10 @@ class ForumTopic(TimeStampedModel):
     status_changed = MonitorField(verbose_name=_('Status changed'), monitor='status')
     views = models.IntegerField(_('Count views'), default=0, editable=False)
 
+    # managers
+    objects = models.Manager()
+    objects = ForumTopicManager.from_queryset(ForumTopicQuesrySet)()
+
     class Meta:
         db_table = 'forum_topics'
         verbose_name = _('Topic')
@@ -112,7 +118,7 @@ class ForumTopic(TimeStampedModel):
 
 
 class ForumPost(TimeStampedModel):
-    """
+    """ForumManager
 
     """
 

@@ -2,6 +2,13 @@
 from django.db import models
 
 
+class TestingSuitQuerySet(models.QuerySet):
+    """
+
+    """
+    pass
+
+
 class TestingQuestionManager(models.Manager):
     """
     Model manager

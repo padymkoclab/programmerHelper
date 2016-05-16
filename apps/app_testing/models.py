@@ -15,7 +15,7 @@ from model_utils.fields import StatusField
 
 from mylabour.models import TimeStampedModel
 
-from .managers import TestingQuestionManager
+from .managers import TestingQuestionManager, TestingSuitQuerySet
 
 
 class TestingSuit(TimeStampedModel):
@@ -45,15 +45,18 @@ class TestingSuit(TimeStampedModel):
         settings.AUTH_USER_MODEL,
         verbose_name=_('Author'),
         on_delete=models.PROTECT,
-        related_name='test_suits',
+        related_name='testing_suits',
     )
     passages = models.ManyToManyField(
         settings.AUTH_USER_MODEL,
         verbose_name=_('Passages'),
         related_name='+',
         through='TestingPassage',
-        through_fields=['test_suit', 'user'],
+        through_fields=['testing_suit', 'user'],
     )
+
+    objects = models.Manager()
+    objects = TestingSuitQuerySet.as_manager()
 
     class Meta:
         db_table = 'testing_suits'
@@ -104,7 +107,7 @@ class TestingPassage(models.Model):
         on_delete=models.CASCADE,
         verbose_name=_('User'),
     )
-    test_suit = models.ForeignKey(
+    testing_suit = models.ForeignKey(
         'TestingSuit',
         on_delete=models.CASCADE,
         verbose_name=_('Testing suit'),
@@ -132,16 +135,21 @@ class TestingQuestion(TimeStampedModel):
     title = models.CharField(
         _('Title'), max_length=200, validators=[MinLengthValidator(settings.MIN_LENGTH_FOR_NAME_OR_TITLE_OBJECT)]
     )
-    test_suit = models.ForeignKey('TestingSuit', verbose_name=_('Test suit'), related_name='questions', on_delete=models.CASCADE)
+    testing_suit = models.ForeignKey(
+        'TestingSuit',
+        verbose_name=_('Test suit'),
+        related_name='questions',
+        on_delete=models.CASCADE,
+    )
     text_question = models.TextField(_('Text question'))
 
     class Meta:
         db_table = 'testing_questions'
         verbose_name = _("Testing question")
         verbose_name_plural = _("Testing questions")
-        unique_together = ['title', 'test_suit']
+        unique_together = ['title', 'testing_suit']
         get_latest_by = 'date_modified'
-        ordering = ['test_suit', 'title']
+        ordering = ['testing_suit', 'title']
 
     objects = models.Manager()
     objects = TestingQuestionManager()
@@ -166,7 +174,12 @@ class TestingVariant(models.Model):
     """
 
     id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
-    question = models.ForeignKey('TestingQuestion', related_name='variants', verbose_name=_('Question'), on_delete=models.CASCADE)
+    question = models.ForeignKey(
+        'TestingQuestion',
+        related_name='variants',
+        verbose_name=_('Question'),
+        on_delete=models.CASCADE,
+    )
     text_variant = models.CharField(_('Text variant'), max_length=300)
     is_right_variant = models.BooleanField(_('It is right variant of answer?'), default=False)
 

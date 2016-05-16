@@ -14,6 +14,8 @@ from apps.app_tags.models import Tag
 from mylabour.models import TimeStampedModel
 from mylabour.utils import CHOICES_LEXERS
 
+from .managers import SolutionQuerySet, SolutionManager
+
 
 class SolutionCategory(TimeStampedModel):
     """
@@ -77,7 +79,7 @@ class Solution(TimeStampedModel):
         related_name='solutions',
         verbose_name=_('Tags'),
     )
-    useful_links = models.ManyToManyField(
+    links = models.ManyToManyField(
         WebLink,
         related_name='solutions',
         verbose_name=_('Useful links'),
@@ -85,8 +87,9 @@ class Solution(TimeStampedModel):
     comments = GenericRelation(CommentGeneric)
     opinions = GenericRelation(OpinionGeneric)
 
-    # run code JSBin
-    # testing with online run code
+    # managers
+    objects = models.Manager()
+    objects = SolutionManager.from_queryset(SolutionQuerySet)()
 
     class Meta:
         db_table = 'solutions'

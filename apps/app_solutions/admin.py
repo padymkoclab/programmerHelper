@@ -17,8 +17,8 @@ class SolutionInline(admin.StackedInline):
     model = Solution
     extra = 0
     fk_name = 'category'
-    fields = ['title', 'body', 'tags', 'useful_links']
-    filter_vertical = ['useful_links']
+    fields = ['title', 'body', 'tags', 'links']
+    filter_vertical = ['links']
     filter_horizontal = ['tags']
 
 
@@ -76,7 +76,8 @@ class SolutionAdmin(admin.ModelAdmin):
         'category',
         'get_scope',
         'views',
-        'get_count_useful_links',
+        'author',
+        'get_count_links',
         'get_count_opinions',
         'get_count_comments',
         'get_count_tags',
@@ -85,9 +86,10 @@ class SolutionAdmin(admin.ModelAdmin):
         'date_added',
     )
     list_filter = (
+        ('category', admin.RelatedOnlyFieldListFilter),
+        ('author', admin.RelatedOnlyFieldListFilter),
         'date_modified',
         'date_added',
-        ('category', admin.RelatedFieldListFilter),
     )
     search_fields = ('title',)
     date_hierarchy = 'date_added'
@@ -98,29 +100,29 @@ class SolutionAdmin(admin.ModelAdmin):
     fieldsets = [
         [
             Solution._meta.verbose_name, {
-                'fields': ['title', 'category', 'body', 'tags', 'useful_links'],
+                'fields': ['title', 'category', 'body', 'tags', 'links'],
             }
         ],
     ]
 
     filter_horizontal = ['tags']
-    filter_vertical = ['useful_links']
+    filter_vertical = ['links']
     form = SolutionForm
 
     def get_queryset(self, request):
         qs = super(SolutionAdmin, self).get_queryset(request)
         qs = qs.annotate(
-            count_useful_links=Count('useful_links', distinct=True),
+            count_links=Count('links', distinct=True),
             count_opinions=Count('opinions', distinct=True),
             count_comments=Count('comments', distinct=True),
             count_tags=Count('tags', distinct=True),
         )
         return qs
 
-    def get_count_useful_links(self, obj):
-        return obj.count_useful_links
-    get_count_useful_links.short_description = _('Count links')
-    get_count_useful_links.admin_order_field = 'count_useful_links'
+    def get_count_links(self, obj):
+        return obj.count_links
+    get_count_links.short_description = _('Count links')
+    get_count_links.admin_order_field = 'count_links'
 
     def get_count_opinions(self, obj):
         return obj.count_opinions

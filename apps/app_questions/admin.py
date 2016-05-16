@@ -31,8 +31,8 @@ class QuestionAdmin(admin.ModelAdmin):
         'status',
         'get_count_answers',
         'has_accepted_answer',
-        # 'get_scope2',
-        'get_scope',
+        'get_scope2',
+        # 'get_scope',
         'get_count_opinions',
         'get_count_tags',
         'is_dublicated',
@@ -66,14 +66,15 @@ class QuestionAdmin(admin.ModelAdmin):
             count_answers=models.Count('answers', distinct=True),
             count_tags=models.Count('tags', distinct=True),
             count_opinions=models.Count('opinions', distinct=True),
-            scope=models.Sum(
-                models.Case(
-                    models.When(opinions__is_useful=True, then=1),
-                    models.When(opinions__is_useful=False, then=-1),
-                    output_field=models.IntegerField()
-                ), distinct=True
-            ),
+            # scope=models.Sum(
+            #     models.Case(
+            #         models.When(opinions__is_useful=True, then=1),
+            #         models.When(opinions__is_useful=False, then=-1),
+            #         output_field=models.IntegerField()
+            #     ), distinct=True
+            # ),
         )
+        (setattr(i, 'scope', i.get_scope()) for i in qs)
         return qs
 
     def get_count_answers(self, obj):

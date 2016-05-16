@@ -2,11 +2,18 @@
 import collections
 import functools
 
+from django.utils import timezone
 from django.contrib.auth import get_user_model
 from django.db import models
 
 from apps.app_badges.models import GettingBadge, Badge
 from apps.app_questions.models import Question, Answer
+from apps.app_forum.models import ForumTopic
+from apps.app_snippets.models import Snippet
+from apps.app_solutions.models import Solution
+from apps.app_articles.models import Article
+from apps.app_courses.models import Course
+from apps.app_polls.models import VoteInPoll
 
 
 def point_execution_in_terminal(function):
@@ -75,7 +82,7 @@ class BadgeManager(models.Manager):
 
         if accounts_pks and badge_name:
             # get badge
-            badge = Badge.objects.get(name__icontains=badge_name)
+            badge = Badge.objects.get(name__iexact=badge_name)
             # iteration on primary keys of accounts and adding badge
             for account_pk in accounts_pks:
                 account = self.get(pk=account_pk)
@@ -375,211 +382,257 @@ class BadgeManager(models.Manager):
         # self.added_badge_to_accounts(accounts_pks=accounts_pks, badge_name='')
 
     @point_execution_in_terminal
-    def check_badge_Assduous(self):
-        """ """
-
-        # accounts_pks = answers.values_list('author', flat=True).distinct()
-        # self.added_badge_to_accounts(accounts_pks=accounts_pks, badge_name='')
+    def check_badge_Eager(self):
+        """Earn reputation 100 and more."""
+        accounts_pks = list()
+        for account in self.iterator():
+            if account.get_reputation() >= 100:
+                accounts_pks.append(account.pk)
+        self.added_badge_to_accounts(accounts_pks=accounts_pks, badge_name='eager')
 
     @point_execution_in_terminal
     def check_badge_Epic(self):
-        """ """
+        """Earn reputation 1000 and more."""
 
-        # accounts_pks = answers.values_list('author', flat=True).distinct()
-        # self.added_badge_to_accounts(accounts_pks=accounts_pks, badge_name='')
+        accounts_pks = list()
+        for account in self.iterator():
+            if account.get_reputation() >= 1000:
+                accounts_pks.append(account.pk)
+        self.added_badge_to_accounts(accounts_pks=accounts_pks, badge_name='epic')
 
     @point_execution_in_terminal
     def check_badge_Legendary(self):
-        """ """
+        """Earn reputation 10000 and more."""
 
-        # accounts_pks = answers.values_list('author', flat=True).distinct()
-        # self.added_badge_to_accounts(accounts_pks=accounts_pks, badge_name='')
+        accounts_pks = list()
+        for account in self.iterator():
+            if account.get_reputation() >= 10000:
+                accounts_pks.append(account.pk)
+        self.added_badge_to_accounts(accounts_pks=accounts_pks, badge_name='legendary')
 
     @point_execution_in_terminal
-    def check_badge_Citize(self):
-        """ """
+    def check_badge_Citizen(self):
+        """Have more than 1 post on forum."""
 
-        # accounts_pks = answers.values_list('author', flat=True).distinct()
-        # self.added_badge_to_accounts(accounts_pks=accounts_pks, badge_name='')
+        accounts_with_one_or_more_posts = ForumTopic.objects.topics_with_count_posts().filter(count_posts__gte=1)
+        accounts_pks = accounts_with_one_or_more_posts.values_list('author', flat=True)
+        self.added_badge_to_accounts(accounts_pks=accounts_pks, badge_name='citizen')
 
     @point_execution_in_terminal
     def check_badge_Talkative(self):
-        """ """
+        """Have more than 10 post on forum."""
 
-        # accounts_pks = answers.values_list('author', flat=True).distinct()
-        # self.added_badge_to_accounts(accounts_pks=accounts_pks, badge_name='')
+        accounts_with_one_or_more_posts = ForumTopic.objects.topics_with_count_posts().filter(count_posts__gte=10)
+        accounts_pks = accounts_with_one_or_more_posts.values_list('author', flat=True)
+        self.added_badge_to_accounts(accounts_pks=accounts_pks, badge_name='citizen')
 
     @point_execution_in_terminal
     def check_badge_Outspoken(self):
-        """ """
+        """Have more than 15 post on forum."""
 
-        # accounts_pks = answers.values_list('author', flat=True).distinct()
-        # self.added_badge_to_accounts(accounts_pks=accounts_pks, badge_name='')
+        accounts_with_one_or_more_posts = ForumTopic.objects.topics_with_count_posts().filter(count_posts__gte=15)
+        accounts_pks = accounts_with_one_or_more_posts.values_list('author', flat=True)
+        self.added_badge_to_accounts(accounts_pks=accounts_pks, badge_name='citizen')
 
     @point_execution_in_terminal
     def check_badge_Yearning(self):
-        """ """
+        """Active member for a year, earning at least 200 reputation."""
 
-        # accounts_pks = answers.values_list('author', flat=True).distinct()
-        # self.added_badge_to_accounts(accounts_pks=accounts_pks, badge_name='')
+        accounts_pks = list()
+        for account in self.iterator():
+            if account.get_reputation() >= 200 and account.date_joined <= timezone.now() - timezone.timedelta(days=365):
+                accounts_pks.append(account.pk)
+        self.added_badge_to_accounts(accounts_pks=accounts_pks, badge_name='yearning')
 
     @point_execution_in_terminal
     def check_badge_Civic_Duty(self):
-        """ """
+        """Given 10 opinions or more times."""
 
-        # accounts_pks = answers.values_list('author', flat=True).distinct()
-        # self.added_badge_to_accounts(accounts_pks=accounts_pks, badge_name='')
+        civic_duty = get_user_model().objects.objects_with_count_opinions().filter(count_opinions__gte=10)
+        accounts_pks = civic_duty.values_list('pk', flat=True)
+        self.added_badge_to_accounts(accounts_pks=accounts_pks, badge_name='civic duty')
 
     @point_execution_in_terminal
     def check_badge_Electorate(self):
-        """ """
+        """Given 15 opinions or more times."""
 
-        # accounts_pks = answers.values_list('author', flat=True).distinct()
-        # self.added_badge_to_accounts(accounts_pks=accounts_pks, badge_name='')
+        electorate = get_user_model().objects.objects_with_count_opinions().filter(count_opinions__gte=15)
+        accounts_pks = electorate.values_list('pk', flat=True)
+        self.added_badge_to_accounts(accounts_pks=accounts_pks, badge_name='electorate')
 
     @point_execution_in_terminal
     def check_badge_Citizen_Patrol(self):
-        """ """
+        """Have 5 and more favorited objects."""
 
-        # accounts_pks = answers.values_list('author', flat=True).distinct()
-        # self.added_badge_to_accounts(accounts_pks=accounts_pks, badge_name='')
+        accounts_with_count_favorites_and_unfavorites = get_user_model().objects.objects_with_count_favorites_and_unfavorites()
+        accounts_as_citizen_patrol = accounts_with_count_favorites_and_unfavorites.filter(count_favorites__gte=5)
+        accounts_pks = accounts_as_citizen_patrol.values_list('pk', flat=True).distinct()
+        self.added_badge_to_accounts(accounts_pks=accounts_pks, badge_name='citizen patrol')
 
     @point_execution_in_terminal
     def check_badge_Depute(self):
-        """ """
+        """Have 10 and more favorited objects."""
 
-        # accounts_pks = answers.values_list('author', flat=True).distinct()
-        # self.added_badge_to_accounts(accounts_pks=accounts_pks, badge_name='')
+        accounts_with_count_favorites_and_unfavorites = get_user_model().objects.objects_with_count_favorites_and_unfavorites()
+        accounts_as_citizen_patrol = accounts_with_count_favorites_and_unfavorites.filter(count_favorites__gte=10)
+        accounts_pks = accounts_as_citizen_patrol.values_list('pk', flat=True).distinct()
+        self.added_badge_to_accounts(accounts_pks=accounts_pks, badge_name='depute')
 
     @point_execution_in_terminal
     def check_badge_Marshal(self):
-        """ """
+        """Have 15 and more favorited objects."""
 
-        # accounts_pks = answers.values_list('author', flat=True).distinct()
-        # self.added_badge_to_accounts(accounts_pks=accounts_pks, badge_name='')
+        accounts_with_count_favorites_and_unfavorites = get_user_model().objects.objects_with_count_favorites_and_unfavorites()
+        accounts_as_citizen_patrol = accounts_with_count_favorites_and_unfavorites.filter(count_favorites__gte=15)
+        accounts_pks = accounts_as_citizen_patrol.values_list('pk', flat=True).distinct()
+        self.added_badge_to_accounts(accounts_pks=accounts_pks, badge_name='marshal')
 
     @point_execution_in_terminal
     def check_badge_Critic(self):
-        """ """
+        """Have answer with scope -3 and less."""
 
-        # accounts_pks = answers.values_list('author', flat=True).distinct()
-        # self.added_badge_to_accounts(accounts_pks=accounts_pks, badge_name='')
+        critic_answers = Answer.objects.answers_by_scopes(max_scope=-3)
+        accounts_pks = critic_answers.values_list('author', flat=True).distinct()
+        self.added_badge_to_accounts(accounts_pks=accounts_pks, badge_name='critic')
+
+    @point_execution_in_terminal
+    def check_badge_Nonsense(self):
+        """Have question with scope -3 and less."""
+
+        nonsense_questions = Question.objects.questions_by_scopes(max_scope=-3)
+        accounts_pks = nonsense_questions.values_list('author', flat=True).distinct()
+        self.added_badge_to_accounts(accounts_pks=accounts_pks, badge_name='nonsense')
 
     @point_execution_in_terminal
     def check_badge_Editor(self):
         """ """
 
         # accounts_pks = answers.values_list('author', flat=True).distinct()
-        # self.added_badge_to_accounts(accounts_pks=accounts_pks, badge_name='')
+        # self.added_badge_to_accounts(accounts_pks=accounts_pks, badge_name='editor')
 
     @point_execution_in_terminal
     def check_badge_Organizer(self):
         """ """
 
         # accounts_pks = answers.values_list('author', flat=True).distinct()
-        # self.added_badge_to_accounts(accounts_pks=accounts_pks, badge_name='')
+        # self.added_badge_to_accounts(accounts_pks=accounts_pks, badge_name='organizer')
 
     @point_execution_in_terminal
     def check_badge_Proofreader(self):
         """ """
 
         # accounts_pks = answers.values_list('author', flat=True).distinct()
-        # self.added_badge_to_accounts(accounts_pks=accounts_pks, badge_name='')
+        # self.added_badge_to_accounts(accounts_pks=accounts_pks, badge_name='proofreader')
 
     @point_execution_in_terminal
     def check_badge_Suffrage(self):
         """ """
 
         # accounts_pks = answers.values_list('author', flat=True).distinct()
-        # self.added_badge_to_accounts(accounts_pks=accounts_pks, badge_name='')
+        # self.added_badge_to_accounts(accounts_pks=accounts_pks, badge_name='suffrage')
 
     @point_execution_in_terminal
     def check_badge_Vox_Populi(self):
         """ """
 
         # accounts_pks = answers.values_list('author', flat=True).distinct()
-        # self.added_badge_to_accounts(accounts_pks=accounts_pks, badge_name='')
+        # self.added_badge_to_accounts(accounts_pks=accounts_pks, badge_name='vox_populi')
 
     @point_execution_in_terminal
     def check_badge_Supporter(self):
-        """ """
+        """Have answer and question with scope +3 and more."""
 
-        # accounts_pks = answers.values_list('author', flat=True).distinct()
-        # self.added_badge_to_accounts(accounts_pks=accounts_pks, badge_name='')
+        good_answers = Answer.objects.answers_by_scopes(min_scope=3)
+        good_questions = Question.objects.questions_by_scopes(min_scope=3)
+        authors_good_answers = good_answers.values_list('author', flat=True)
+        authors_good_questions = good_questions.values_list('author', flat=True)
+        authors_good_answers_and_questions = frozenset(authors_good_answers) & frozenset(authors_good_questions)
+        self.added_badge_to_accounts(accounts_pks=authors_good_answers_and_questions, badge_name='supporter')
 
     @point_execution_in_terminal
     def check_badge_Taxonomist(self):
         """ """
 
         # accounts_pks = answers.values_list('author', flat=True).distinct()
-        # self.added_badge_to_accounts(accounts_pks=accounts_pks, badge_name='')
+        # self.added_badge_to_accounts(accounts_pks=accounts_pks, badge_name='taxonomist')
 
     @point_execution_in_terminal
     def check_badge_Publicist(self):
-        """ """
+        """Publicated own article."""
 
-        # accounts_pks = answers.values_list('author', flat=True).distinct()
-        # self.added_badge_to_accounts(accounts_pks=accounts_pks, badge_name='')
+        publicists = get_user_model().objects.objects_with_count_articles().filter(count_articles__gte=1)
+        accounts_pks = publicists.values_list('pk', flat=True).distinct()
+        self.added_badge_to_accounts(accounts_pks=accounts_pks, badge_name='publicist')
 
     @point_execution_in_terminal
     def check_badge_Tester(self):
-        """ """
+        """Passed at leat 1 testsuit."""
 
-        # accounts_pks = answers.values_list('author', flat=True).distinct()
-        # self.added_badge_to_accounts(accounts_pks=accounts_pks, badge_name='')
+        accaunts_passages_testsuits = get_user_model().objects.objects_passages_testsuits()
+        accounts_pks = accaunts_passages_testsuits.values_list('pk', flat=True).distinct()
+        self.added_badge_to_accounts(accounts_pks=accounts_pks, badge_name='tester')
 
     @point_execution_in_terminal
     def check_badge_Creator_Tests(self):
-        """ """
+        """Create own testing suit."""
 
-        # accounts_pks = answers.values_list('author', flat=True).distinct()
-        # self.added_badge_to_accounts(accounts_pks=accounts_pks, badge_name='')
+        creators_testing_suits = get_user_model().objects.creators_testing_suits()
+        accounts_pks = creators_testing_suits.values_list('pk', flat=True).distinct()
+        self.added_badge_to_accounts(accounts_pks=accounts_pks, badge_name='creator tests')
 
     @point_execution_in_terminal
     def check_badge_Clear_Mind(self):
-        """ """
+        """Added own solution with scope +1 or more."""
 
-        # accounts_pks = answers.values_list('author', flat=True).distinct()
-        # self.added_badge_to_accounts(accounts_pks=accounts_pks, badge_name='')
+        solutions_by_min_scope = Solution.objects.solutions_by_scopes(min_scope=1)
+        accounts_pks = solutions_by_min_scope.values_list('author', flat=True).distinct()
+        self.added_badge_to_accounts(accounts_pks=accounts_pks, badge_name='clear mind')
 
     @point_execution_in_terminal
     def check_badge_Clear_Head(self):
-        """ """
+        """Added own snippet with scope +1 or more."""
 
-        # accounts_pks = answers.values_list('author', flat=True).distinct()
-        # self.added_badge_to_accounts(accounts_pks=accounts_pks, badge_name='')
+        snippets_by_min_scope = Snippet.objects.snippets_by_scopes(min_scope=1)
+        accounts_pks = snippets_by_min_scope.values_list('author', flat=True).distinct()
+        self.added_badge_to_accounts(accounts_pks=accounts_pks, badge_name='clear head')
 
     @point_execution_in_terminal
     def check_badge_Closer_Questions(self):
         """ """
 
         # accounts_pks = answers.values_list('author', flat=True).distinct()
-        # self.added_badge_to_accounts(accounts_pks=accounts_pks, badge_name='')
+        # self.added_badge_to_accounts(accounts_pks=accounts_pks, badge_name='closer_questions')
 
     @point_execution_in_terminal
     def check_badge_Deleter_Questions(self):
         """ """
 
         # accounts_pks = answers.values_list('author', flat=True).distinct()
-        # self.added_badge_to_accounts(accounts_pks=accounts_pks, badge_name='')
+        # self.added_badge_to_accounts(accounts_pks=accounts_pks, badge_name='deleter_questions')
 
     @point_execution_in_terminal
     def check_badge_Dispatcher(self):
-        """ """
+        """Used links in own articles or solutions."""
 
-        # accounts_pks = answers.values_list('author', flat=True).distinct()
-        # self.added_badge_to_accounts(accounts_pks=accounts_pks, badge_name='')
+        articles_with_links = Article.objects.filter(links__isnull=False).distinct()
+        solutions_with_links = Solution.objects.filter(links__isnull=False).distinct()
+        accounts_pks_articles_with_links = articles_with_links.values_list('author', flat=True).distinct()
+        accounts_pks_solutions_with_links = solutions_with_links.values_list('author', flat=True).distinct()
+        accounts_pks = frozenset(accounts_pks_articles_with_links) & frozenset(accounts_pks_solutions_with_links)
+        self.added_badge_to_accounts(accounts_pks=accounts_pks, badge_name='dispatcher')
 
     @point_execution_in_terminal
     def check_badge_Sage(self):
-        """ """
+        """Participated in creating courses."""
 
-        # accounts_pks = answers.values_list('author', flat=True).distinct()
-        # self.added_badge_to_accounts(accounts_pks=accounts_pks, badge_name='')
+        creators_courses = Course.objects.creators_courses()
+        accounts_pks = creators_courses.values_list('authorship', flat=True).distinct()
+        self.added_badge_to_accounts(accounts_pks=accounts_pks, badge_name='sage')
 
     @point_execution_in_terminal
-    def check_badge_Have_Opinion(self):
-        """ """
+    def check_badge_Voter(self):
+        """Voted in polls."""
 
-        # accounts_pks = answers.values_list('author', flat=True).distinct()
-        # self.added_badge_to_accounts(accounts_pks=accounts_pks, badge_name='')
+        all_voters = VoteInPoll.objects.all_voters()
+        accounts_pks = all_voters.values_list('user', flat=True).distinct()
+        self.added_badge_to_accounts(accounts_pks=accounts_pks, badge_name='voter')

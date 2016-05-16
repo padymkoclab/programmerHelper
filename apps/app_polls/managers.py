@@ -2,10 +2,18 @@
 from django.db import models
 
 
-class Manager(models.Manager):
+class PollQuerySet(models.QuerySet):
+    """
+
+    """
+
+    pass
+
+
+class VoteInPollManager(models.Manager):
     """
     Model manager
     """
 
-
-# create managers
+    def all_voters(self):
+        return self.values_list('user', flat=True).distinct()

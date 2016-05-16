@@ -14,6 +14,8 @@ from apps.app_generic_models.models import CommentGeneric, OpinionGeneric
 from mylabour.models import TimeStampedModel
 from mylabour.utils import CHOICES_LEXERS
 
+from .managers import CourseManager, CourseQuerySet
+
 # отзывы о course
 
 
@@ -51,6 +53,7 @@ class Course(TimeStampedModel):
         ordering = ['name']
 
     objects = models.Manager()
+    objects = CourseManager.from_queryset(CourseQuerySet)()
 
     def __str__(self):
         return '{0.name}'.format(self)

@@ -15,8 +15,11 @@ from autoslug import AutoSlugField
 from model_utils import Choices
 from model_utils.managers import QueryManager
 
+from apps.app_articles.models import Article
+from apps.app_forum.models import ForumTopic
 from apps.app_badges.managers import BadgeManager
-from .managers import AccountManager
+
+from .managers import AccountManager, AccountQuerySet
 
 
 class AccountLevel(models.Model):
@@ -81,8 +84,8 @@ class Account(AbstractBaseUser, PermissionsMixin):
     def limit_choices_badges():
         return {'pub_date__lte': datetime.date.utcnow()}
 
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     # account detail
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     email = models.EmailField(
             _('Email'),
             unique=True,
@@ -128,7 +131,7 @@ class Account(AbstractBaseUser, PermissionsMixin):
 
     # managers
     objects = models.Manager()
-    objects = AccountManager()
+    objects = AccountManager.from_queryset(AccountQuerySet)()
     badges_manager = BadgeManager()
 
     # simple managers
@@ -184,74 +187,92 @@ class Account(AbstractBaseUser, PermissionsMixin):
     def get_activity(self):
         pass
 
-    def filled_account_profile(self):
-        pass
-
     def get_reputation(self):
         """Getting reputation of account based on his activity, actions, badges."""
-        pass
+        return sum([
+            self.get_reputation_for_badges(),
+            self.get_reputation_for_actions(),
+        ])
 
     def get_reputation_for_badges(self):
         """Getting reputation of account for badges."""
         return self.badges.count() * 10
 
-    def get_reputation_for_answers(self):
-        """Getting reputation for all scopes of answers of account."""
-        return self.answers.aggregate(
-            total_scope_for_answers=models.Sum(
-                models.Case(
-                    models.When(likes__liked_it=True, then=1),
-                    models.When(likes__liked_it=False, then=-1),
-                    output_field=models.IntegerField()
-                )
-            )
-        ).total_scope_for_answers
+    def get_total_scope_for_answers(self):
+        """Getting total scope for answers of account."""
+        # getting instance as queryset
+        queryset = self.__class__.objects.filter(email=self.email)
+        # pass single queryset for execution once iteration in method of manager
+        account_with_total_scope_for_answers = self.__class__.objects.accounts_with_total_scope_for_answers(queryset=queryset)
+        # getting back instance after processing
+        account_with_total_scope_for_answers = account_with_total_scope_for_answers.get()
+        # return total_scope_for_answers of instance
+        return account_with_total_scope_for_answers.total_scope_for_answers
 
-    def get_reputation_for_questions(self):
-        """Getting reputation for all scopes of questions of account."""
-        return self.questions.aggregate(
-            total_scope_for_questions=models.Sum(
-                models.Case(
-                    models.When(opinions__is_useful=True, then=1),
-                    models.When(opinions__is_useful=False, then=-1),
-                    output_field=models.IntegerField()
-                )
-            )
-        ).total_scope_for_questions
+    def get_total_scope_for_questions(self):
+        """Getting total scope for questions of account."""
+        # getting instance as queryset
+        queryset = self.__class__.objects.filter(email=self.email)
+        # pass single queryset for execution once iteration in method of manager
+        account_with_total_scope_for_questions = self.__class__.objects.accounts_with_total_scope_for_questions(queryset=queryset)
+        # getting back instance after processing
+        account_with_total_scope_for_questions = account_with_total_scope_for_questions.get()
+        # return total_scope_for_questions of instance
+        return account_with_total_scope_for_questions.total_scope_for_questions
 
-    def get_reputation_for_solutions(self):
-        """Getting reputation for all scopes of solutions of account."""
-        return self.solutions.aggregate(
-            total_scope_for_solutions=models.Sum(
-                models.Case(
-                    models.When(opinions__is_useful=True, then=1),
-                    models.When(opinions__is_useful=False, then=-1),
-                    output_field=models.IntegerField()
-                )
-            )
-        ).total_scope_for_solutions
+    def get_total_scope_for_solutions(self):
+        """Getting total scope for solutions of account."""
+        # getting instance as queryset
+        queryset = self.__class__.objects.filter(email=self.email)
+        # pass single queryset for execution once iteration in method of manager
+        account_with_total_scope_for_solutions = self.__class__.objects.accounts_with_total_scope_for_solutions(queryset=queryset)
+        # getting back instance after processing
+        account_with_total_scope_for_solutions = account_with_total_scope_for_solutions.get()
+        # return total_scope_for_solutions of instance
+        return account_with_total_scope_for_solutions.total_scope_for_solutions
 
-    def get_reputation_for_snippets(self):
-        """Getting reputation for all scopes of snippets of account."""
-        return self.snippets.aggregate(
-            total_scope_for_snippets=models.Sum(
-                models.Case(
-                    models.When(opinions__is_useful=True, then=1),
-                    models.When(opinions__is_useful=False, then=-1),
-                    output_field=models.IntegerField()
-                )
-            )
-        ).total_scope_for_snippets
+    def get_total_scope_for_snippets(self):
+        """Getting total scope for snippets of account."""
+        # getting instance as queryset
+        queryset = self.__class__.objects.filter(email=self.email)
+        # pass single queryset for execution once iteration in method of manager
+        account_with_total_scope_for_snippets = self.__class__.objects.accounts_with_total_scope_for_snippets(queryset=queryset)
+        # getting back instance after processing
+        account_with_total_scope_for_snippets = account_with_total_scope_for_snippets.get()
+        # return total_scope_for_snippets of instance
+        return account_with_total_scope_for_snippets.total_scope_for_snippets
 
-    def get_reputation_for_participate_in_polls(self):
-        """Getting reputation for all scopes of snippets of account."""
+    def get_count_participate_in_polls(self):
+        """Getting how many polls of account participated."""
         return self.votes_in_polls.count()
 
-    def get_reputation_for_filled_account_profile(self):
+    def get_percent_filled_account_profile(self):
+        """Getting percent filled profile of account."""
         return self.__class__.objects.get_filled_accounts_profiles()[self.pk]
 
-    def get_reputation_for_articles(self):
-        pass
+    def get_total_rating_for_articles(self):
+        """Getting total ratings of all articles of account."""
+        evaluation_total_rating_for_articles_of_account = Article.objects.articles_with_rating().filter(author=self).aggregate(
+            total_rating_for_articles=models.Sum('rating')
+        )
+        # return 0 if account not have articles
+        total_rating_for_articles = evaluation_total_rating_for_articles_of_account['total_rating_for_articles'] or 0
+        return total_rating_for_articles
+        # 3.8
+        # фотийодинцова@hotmail.com
+
+    def get_count_popular_topics(self):
+        """Getting count popular topics of account."""
+        popular_topics_of_account = ForumTopic.objects.popular_topics().filter(author=self)
+        return popular_topics_of_account.count()
+
+    def get_count_test_suits_in_which_account_involed(self):
+        """In creating, how many testSuit involved account."""
+        return self.test_suits.count()
+
+    def get_count_courses_in_which_account_involed(self):
+        """In creating, how many testSuit involved account."""
+        return self.courses.count()
 
     def get_reputation_for_actions(self):
         """
@@ -266,19 +287,35 @@ class Account(AbstractBaseUser, PermissionsMixin):
         Scope solutions                 = *3
         Rating articles                 = *4
         Scope snippets                  = *2
-        Filled profile                  = +50
-        Participate in poll             = Count polls
-        Popular topic                   = +100
-        Participate in creating tests   = +100
-        Participate in creating courses = +200
+        Filled profile                  = *1
+        Participate in poll             = *1
+        Popular topic                   = *100
+        Participate in creating tests   = *100
+        Participate in creating courses = *200
         ---------------------------------------
         """
-        reputation_for_snippets = self.get_reputation_for_snippets() * 2
-        reputation_for_solutions = self.get_reputation_for_solutions() * 3
-        reputation_for_questions = self.get_reputation_for_questions() * 1
-        reputation_for_answers = self.get_reputation_for_answers() * 2
-        reputation_for_polls= self.get_reputation_for_participate_in_polls()
-        return 1
+        reputation_for_snippets = (self.get_total_scope_for_snippets() or 0) * 2
+        reputation_for_solutions = (self.get_total_scope_for_solutions() or 0) * 3
+        reputation_for_questions = (self.get_total_scope_for_questions() or 0) * 1
+        reputation_for_answers = (self.get_total_scope_for_answers() or 0) * 2
+        reputation_for_polls = self.get_count_participate_in_polls() or 0
+        reputation_for_filled_account_profile = self.get_percent_filled_account_profile() or 0
+        reputation_for_polls = (self.get_total_rating_for_articles() or 0) * 4
+        reputation_for_polls = (self.get_count_popular_topics() or 0) * 100
+        reputation_for_test_suits = (self.get_count_test_suits_in_which_account_involed() or 0) * 100
+        reputation_for_courses = (self.get_count_courses_in_which_account_involed() or 0) * 200
+        return sum([
+            reputation_for_snippets,
+            reputation_for_solutions,
+            reputation_for_questions,
+            reputation_for_answers,
+            reputation_for_polls,
+            reputation_for_filled_account_profile,
+            reputation_for_polls,
+            reputation_for_polls,
+            reputation_for_test_suits,
+            reputation_for_courses,
+        ])
 
 
 class AccountView(models.Model):

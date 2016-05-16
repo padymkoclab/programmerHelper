@@ -2,10 +2,17 @@
 from django.db import models
 
 
-class Manager(models.Manager):
+class CourseQuerySet(models.QuerySet):
     """
-    Model manager
+    QuerySet for using with queryset model Course
     """
 
+    def creators_courses(self):
+        return self.values_list('authorship', flat=True).distinct()
 
-# create managers
+
+class CourseManager(models.Manager):
+    """
+    Model manager for model Couse
+    """
+    pass

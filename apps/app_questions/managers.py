@@ -24,9 +24,9 @@ class QuestionManager(models.Manager):
         # annotated questions with scopes
         questions_with_scopes = self.questions_with_scopes()
         # questions without answers
-        questions_wthput_answers = questions_with_scopes.filter(answers=None)
+        questions_without_answers = questions_with_scopes.filter(answers=None)
         # questions without answers and with scope 0 and less
-        non_interesting_questions = questions_wthput_answers.exclude(scope__gt=0)
+        non_interesting_questions = questions_without_answers.exclude(scope__gt=0)
         return non_interesting_questions
 
     def questions_for_past_24_hours(self):
@@ -52,15 +52,11 @@ class QuestionManager(models.Manager):
         """Questions with certain range of scopes."""
         # annotated questions with scopes
         questions_with_scopes = self.questions_with_scopes()
-        # restrict
+        # conditional branches
         if min_scope is not None and max_scope is None:
-            if isinstance(min_scope, int):
-                return questions_with_scopes.filter(scope__gte=min_scope)
-            raise ValueError('min_scope is not integer number.')
+            return questions_with_scopes.filter(scope__gte=min_scope)
         elif min_scope is None and max_scope is not None:
-            if isinstance(max_scope, int):
-                return questions_with_scopes.filter(scope__lte=max_scope)
-            raise ValueError('max_scope is not integer number.')
+            return questions_with_scopes.filter(scope__lte=max_scope)
         elif min_scope is not None and max_scope is not None:
             if isinstance(min_scope, int) and isinstance(max_scope, int):
                 return questions_with_scopes.filter(scope__gte=min_scope).filter(scope__lte=max_scope)
@@ -92,15 +88,11 @@ class AnswerManager(models.Manager):
         """Answers with certain range of scopes."""
         # answers with scopes
         answers_with_scopes = self.answers_with_scopes()
-        # restrict
+        # conditional branches
         if min_scope is not None and max_scope is None:
-            if isinstance(min_scope, int):
-                return answers_with_scopes.filter(scope__gte=min_scope)
-            raise ValueError('min_scope is not integer number.')
+            return answers_with_scopes.filter(scope__gte=min_scope)
         elif min_scope is None and max_scope is not None:
-            if isinstance(max_scope, int):
-                return answers_with_scopes.filter(scope__lte=max_scope)
-            raise ValueError('max_scope is not integer number.')
+            return answers_with_scopes.filter(scope__lte=max_scope)
         elif min_scope is not None and max_scope is not None:
             if isinstance(min_scope, int) and isinstance(max_scope, int):
                 return answers_with_scopes.filter(scope__gte=min_scope).filter(scope__lte=max_scope)

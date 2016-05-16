@@ -4,8 +4,7 @@ from django.db import models
 
 class ArticleQuerySet(models.QuerySet):
 
-    def function(self):
-        print(1)
+    pass
 
 
 class ArticleManager(models.Manager):

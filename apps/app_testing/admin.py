@@ -16,7 +16,7 @@ class TestingQuestionInline(admin.StackedInline):
     max_num = 20
     min_num = 3
     extra = 0
-    fk_name = 'test_suit'
+    fk_name = 'testing_suit'
     fields = ['title', 'text_question']
 
 
@@ -84,10 +84,10 @@ class TestingPassageAdmin(admin.ModelAdmin):
 
     """
 
-    list_display = ['test_suit', 'user', 'status', 'scope', 'date_passage']
+    list_display = ['testing_suit', 'user', 'status', 'scope', 'date_passage']
     date_hierarchy = 'date_passage'
     list_filter = [
-        ('test_suit', admin.RelatedOnlyFieldListFilter),
+        ('testing_suit', admin.RelatedOnlyFieldListFilter),
         ('user', admin.RelatedOnlyFieldListFilter),
         'status',
         'date_passage',
@@ -95,11 +95,11 @@ class TestingPassageAdmin(admin.ModelAdmin):
     fieldsets = [
         [
             TestingPassage._meta.verbose_name, {
-                'fields': ['test_suit', 'user', 'status', 'scope'],
+                'fields': ['testing_suit', 'user', 'status', 'scope'],
             }
         ]
     ]
-    readonly_fields = ['test_suit', 'user', 'status', 'scope']
+    readonly_fields = ['testing_suit', 'user', 'status', 'scope']
 
 
 class TestingVariantInline(admin.TabularInline):
@@ -121,11 +121,11 @@ class TestingQuestionAdmin(admin.ModelAdmin):
     """
 
     search_fields = ('title',)
-    list_display = ('cropped_title', 'test_suit', 'is_new', 'get_count_variants', 'date_modified', 'date_added')
+    list_display = ('cropped_title', 'testing_suit', 'is_new', 'get_count_variants', 'date_modified', 'date_added')
     list_filter = (
         'date_modified',
         'date_added',
-        ('test_suit', admin.RelatedOnlyFieldListFilter),
+        ('testing_suit', admin.RelatedOnlyFieldListFilter),
     )
     inlines = [
         TestingVariantInline,
@@ -134,7 +134,7 @@ class TestingQuestionAdmin(admin.ModelAdmin):
     fieldsets = [
         [
             TestingQuestion._meta.verbose_name, {
-                'fields': ['title', 'test_suit', 'text_question'],
+                'fields': ['title', 'testing_suit', 'text_question'],
             }
         ]
     ]

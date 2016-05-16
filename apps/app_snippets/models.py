@@ -13,6 +13,8 @@ from apps.app_tags.models import Tag
 from mylabour.models import TimeStampedModel
 from mylabour.utils import CHOICES_LEXERS
 
+from .managers import SnippetManager, SnippetQuerySet
+
 
 class Snippet(TimeStampedModel):
     """
@@ -41,6 +43,10 @@ class Snippet(TimeStampedModel):
     )
     opinions = GenericRelation(OpinionGeneric)
     comments = GenericRelation(CommentGeneric)
+
+    # managers
+    objects = models.Manager()
+    objects = SnippetManager.from_queryset(SnippetQuerySet)()
 
     class Meta:
         db_table = 'snippets'

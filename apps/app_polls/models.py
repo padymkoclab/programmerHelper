@@ -15,6 +15,8 @@ from model_utils.managers import QueryManager
 
 from mylabour.models import TimeStampedModel
 
+from .managers import VoteInPollManager
+
 
 class Poll(TimeStampedModel):
     """
@@ -118,6 +120,9 @@ class VoteInPoll(models.Model):
         related_name='votes',
     )
     date_voting = models.DateTimeField(_('Date voting'), auto_now=True)
+
+    objects = models.Manager()
+    objects = VoteInPollManager()
 
     class Meta:
         db_table = 'votes_in_polls'

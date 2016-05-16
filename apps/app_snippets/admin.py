@@ -21,6 +21,7 @@ class SnippetAdmin(admin.ModelAdmin):
         'lexer',
         'views',
         'get_scope',
+        'get_scope2',
         'get_good_opinions',
         'get_count_comments',
         'get_count_opinions',
@@ -56,15 +57,19 @@ class SnippetAdmin(admin.ModelAdmin):
             count_tags=models.Count('tags', distinct=True),
             count_comments=models.Count('comments', distinct=True),
             count_opinions=models.Count('opinions', distinct=True),
+            scope=models.Count('opinions', distinct=True),
             count_good_opinions=models.Count(
                 models.Case(
                     models.When(opinions__is_useful=True, then=True),
-                    default=None,
                     ouput_field=models.BooleanField(),
                 ),
                 distinct=True,
-            )
+            ),
         )
+        (setattr(i, 'scope', 111111) for i in qs)
+        for i in qs:
+            i.scope = 11111111111111111
+        import ipdb; ipdb.set_trace()
         return qs
 
     def get_count_comments(self, obj):
@@ -86,3 +91,8 @@ class SnippetAdmin(admin.ModelAdmin):
         return obj.count_good_opinions
     get_good_opinions.admin_order_field = 'count_good_opinions'
     get_good_opinions.short_description = _('Count good opinions')
+
+    def get_scope2(self, obj):
+        return obj.scope
+    get_scope2.admin_order_field = 'scope'
+    get_scope2.short_description = _('Scope2')
