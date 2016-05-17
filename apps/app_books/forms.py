@@ -15,6 +15,7 @@ class BookForm(forms.ModelForm):
         fields = ['name']
 
     def clean(self):
+        super(BookForm, self).clean()
         # validation restrict count tags
         tags = self.cleaned_data.get('tags', tuple())
         if not settings.MIN_COUNT_TAGS_ON_OBJECT <= len(tags) <= settings.MAX_COUNT_TAGS_ON_OBJECT:

@@ -79,10 +79,7 @@ class Account(AbstractBaseUser, PermissionsMixin):
         ('woman', _('Woman')),
     )
 
-    PATH_TO_ACCOUNT_DEFAULT_PICTURES = str(settings.STATIC_ROOT) + '/app_accounts/images/avatar_pictures_default/'
-
-    def limit_choices_badges():
-        return {'pub_date__lte': datetime.date.utcnow()}
+    PATH_TO_ACCOUNT_DEFAULT_PICTURES = settings.STATIC_ROOT + '/app_accounts/images/avatar_pictures_default/'
 
     # account detail
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -266,9 +263,9 @@ class Account(AbstractBaseUser, PermissionsMixin):
         popular_topics_of_account = ForumTopic.objects.popular_topics().filter(author=self)
         return popular_topics_of_account.count()
 
-    def get_count_test_suits_in_which_account_involed(self):
-        """In creating, how many testSuit involved account."""
-        return self.test_suits.count()
+    def get_count_testing_suits_in_which_account_involed(self):
+        """In creating, how many testing suit involved account."""
+        return self.testing_suits.count()
 
     def get_count_courses_in_which_account_involed(self):
         """In creating, how many testSuit involved account."""
@@ -302,7 +299,7 @@ class Account(AbstractBaseUser, PermissionsMixin):
         reputation_for_filled_account_profile = self.get_percent_filled_account_profile() or 0
         reputation_for_polls = (self.get_total_rating_for_articles() or 0) * 4
         reputation_for_polls = (self.get_count_popular_topics() or 0) * 100
-        reputation_for_test_suits = (self.get_count_test_suits_in_which_account_involed() or 0) * 100
+        reputation_for_test_suits = (self.get_count_testing_suits_in_which_account_involed() or 0) * 100
         reputation_for_courses = (self.get_count_courses_in_which_account_involed() or 0) * 200
         return sum([
             reputation_for_snippets,

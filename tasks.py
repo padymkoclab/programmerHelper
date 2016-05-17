@@ -44,9 +44,9 @@ def startapp(list_apps_names_separeted_commas):
             apps_names = list_apps_names_separeted_commas.split(',')
         else:
             apps_names = [list_apps_names_separeted_commas]
-        print('-'*80)
+        print('-' * 80)
         print('Attentively check out next listing wished applications:')
-        print('-'*80)
+        print('-' * 80)
         for app_name in apps_names:
             app_name = 'app_' + app_name
             print(app_name)
@@ -63,6 +63,7 @@ def startapp(list_apps_names_separeted_commas):
                 for dirname in [
                     'migrations',
                     'templates',
+                    'tests',
                     'templates/' + app_name,
                     'static',
                     'static/' + app_name,
@@ -77,12 +78,15 @@ def startapp(list_apps_names_separeted_commas):
                     'urls.py',
                     'views.py',
                     'models.py',
+                    'managers.py',
+                    'signals.py',
                     'forms.py',
                     'admin.py',
                     'apps.py',
-                    'test_models.py',
-                    'test_views.py',
-                    'test_forms.py',
+                    'tests/test_models.py',
+                    'tests/test_views.py',
+                    'tests/test_forms.py',
+                    'tests/test_managers.py',
                     'templates/' + app_name + '/' + app_name + '_skeleton.html',
                     'static/' + app_name + '/js/' + app_name + '.js',
                     'migrations/__init__.py',
@@ -129,15 +133,15 @@ def startapp(list_apps_names_separeted_commas):
                     f.writelines('\n'.join([
                         '\nfrom django import forms\n',
                     ]))
-                with open(path_to_app + 'test_models.py', 'w') as f:
-                    f.writelines('\n'.join([
-                        '\nimport random\n',
-                        'import factory',
-                        'from factory import fuzzy\n',
-                        'from .models import *\n',
-                    ]))
+                # with open(path_to_app + 'test_models.py', 'w') as f:
+                #     f.writelines('\n'.join([
+                #         '\nimport random\n',
+                #         'import factory',
+                #         'from factory import fuzzy\n',
+                #         'from .models import *\n',
+                #     ]))
         else:
-            print('-'*80)
+            print('-' * 80)
             print('Nothing worked')
     else:
         print('Nothing worked')
@@ -205,6 +209,6 @@ def create_default_superuser():
         password='lv210493',
         date_birthday='2000-12-12',
     )
-    print('-'*50)
+    print('-' * 50)
     print('Succesful added superuser!')
-    print('-'*50)
+    print('-' * 50)

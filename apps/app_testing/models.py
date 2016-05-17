@@ -36,7 +36,14 @@ class TestingSuit(TimeStampedModel):
     name = models.CharField(
         _('Name'), max_length=200, validators=[MinLengthValidator(settings.MIN_LENGTH_FOR_NAME_OR_TITLE_OBJECT)]
     )
-    slug = AutoSlugField(_('Slug'), populate_from='name', unique_with=['author'], always_update=True, allow_unicode=True, db_index=True)
+    slug = AutoSlugField(
+        _('Slug'),
+        populate_from='name',
+        unique_with=['author'],
+        always_update=True,
+        allow_unicode=True,
+        db_index=True,
+    )
     description = models.TextField(_('Description'))
     picture = models.URLField(_('Picture'), max_length=1000)
     duration = models.DurationField(_('Duration'), default=timedelta(minutes=1))
@@ -73,20 +80,22 @@ class TestingSuit(TimeStampedModel):
         return reverse('app_testing:suit', kwargs={'slug': self.slug})
 
     def count_attempts_passing(self):
-        return self.passages.filter(passages_testing__status=TestingPassage.CHOICES_STATUS.attempt).count()
+        return self.passages.filter(passages__status=TestingPassage.CHOICES_STATUS.attempt).count()
     count_attempts_passing.short_description = _('Count attempts passing')
 
     def count_completed_passing(self):
-        return self.passages.filter(passages_testing__status=TestingPassage.CHOICES_STATUS.passed).count()
+        return self.passages.filter(passages__status=TestingPassage.CHOICES_STATUS.passed).count()
     count_completed_passing.short_description = _('Count completed passing')
 
     def get_avg_scope_by_completed_passing(self):
         """ Average value by scopes on passed testing"""
         # selected only passed
-        result = self.passages.filter(passages_testing__status=TestingPassage.CHOICES_STATUS.passed)
+        result = self.passages.filter(passages__status=TestingPassage.CHOICES_STATUS.passed)
         # aggregation for getting average scope
-        result = result.aggregate(avg_scope=models.Avg('passages_testing__scope')) or float(0)
-        result = '{0:.3}'.format(result['avg_scope'])
+        avg_scope = result.aggregate(avg_scope=models.Avg('passages__scope'))['avg_scope']
+        if not avg_scope:
+            avg_scope = 0
+        result = '{0:.3}'.format(float(avg_scope))
         return float(result)
     get_avg_scope_by_completed_passing.short_description = _('Average scope')
 

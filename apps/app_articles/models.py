@@ -35,7 +35,11 @@ class Article(TimeStampedModel):
     title = models.CharField(
         _('Title'), max_length=200, validators=[MinLengthValidator(settings.MIN_LENGTH_FOR_NAME_OR_TITLE_OBJECT)]
     )
-    slug = AutoSlugField(_('Slug'), populate_from='title', unique_with=['author'], always_update=True, allow_unicode=True, db_index=True)
+    # slug = AutoSlugField(
+    #                     _('Slug'),
+    #                     editable=False,
+    #                     populate_from='title', unique_with=['author'], always_update=True, allow_unicode=True, db_index=True)
+    # slug = models.SlugField(_('Slug'), editable=False, blank=True)
     quotation = models.CharField(_('Quotation'), max_length=200)
     picture = models.URLField(_('Picture'), max_length=1000)
     header = models.TextField(_('Header'))
@@ -77,6 +81,10 @@ class Article(TimeStampedModel):
 
     def __str__(self):
         return '{0.title}'.format(self)
+
+    def save(self, *args, **kwargs):
+        # self.slug =
+        super(Article, self).save(*args, **kwargs)
 
     def get_absolute_url(self):
         return reverse('app_articles:article', kwargs={'slug': self.slug})

@@ -69,7 +69,7 @@ class SnippetAdmin(admin.ModelAdmin):
         (setattr(i, 'scope', 111111) for i in qs)
         for i in qs:
             i.scope = 11111111111111111
-        import ipdb; ipdb.set_trace()
+        # import ipdb; ipdb.set_trace()
         return qs
 
     def get_count_comments(self, obj):

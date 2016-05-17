@@ -16,7 +16,7 @@ from mylabour.models import TimeStampedModel
 
 class UtilityCategory(TimeStampedModel):
     """
-
+    Category of unitilities.
     """
 
     name = models.CharField(

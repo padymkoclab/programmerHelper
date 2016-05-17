@@ -8,45 +8,8 @@ from django.core.exceptions import ImproperlyConfigured
 from pygments import lexers
 
 
-CHOICES_LEXERS = [
-    ('Awk', 'Awk'),
-    ('Base Makefile', 'Base Makefile'),
-    ('Bash', 'Bash'),
-    ('CoffeeScript', 'CoffeeScript'),
-    ('CSS', 'CSS'),
-    ('CSS+Django/Jinja', 'CSS+Django/Jinja'),
-    ('CSS+PHP', 'CSS+PHP'),
-    ('CSS+Ruby', 'CSS+Ruby'),
-    ('Django/Jinja', 'Django/Jinja'),
-    ('HTML', 'HTML'),
-    ('HTML+Django/Jinja', 'HTML+Django/Jinja'),
-    ('HTML+PHP', 'HTML+PHP'),
-    ('IPython3', 'IPython3'),
-    ('Java', 'Java'),
-    ('JavaScript', 'JavaScript'),
-    ('JavaScript+Django/Jinja', 'JavaScript+Django/Jinja'),
-    ('JavaScript+PHP', 'JavaScript+PHP'),
-    ('JavaScript+Ruby', 'JavaScript+Ruby'),
-    ('JSON', 'JSON'),
-    ('LessCss', 'LessCss'),
-    ('Makefile', 'Makefile'),
-    ('MySQL', 'MySQL'),
-    ('NumPy', 'NumPy'),
-    ('Perl', 'Perl'),
-    ('Perl6', 'Perl6'),
-    ('PHP', 'PHP'),
-    ('PostgreSQL console (psql)', 'PostgreSQL console (psql)'),
-    ('Python', 'Python'),
-    ('Python 3', 'Python 3'),
-    ('reStructuredText', 'reStructuredText'),
-    ('Ruby', 'Ruby'),
-    ('Sass', 'Sass'),
-    ('Scala', 'Scala'),
-    ('SCSS', 'SCSS'),
-    ('SQL', 'SQL'),
-    ('XML', 'XML'),
-    ('YAML', 'YAML'),
-]
+def delete_or_create(model, field, value):
+    pass
 
 
 def get_secret_value_for_setting_from_file(setting_name, filename='secrets.json'):
@@ -90,3 +53,44 @@ def get_random_objects(queryset, count=1):
         return random_objects
     else:
         raise TypeError('Type queryset must be \'django.db.models.query\'.')
+
+
+CHOICES_LEXERS = [
+    ('Awk', 'Awk'),
+    ('Base Makefile', 'Base Makefile'),
+    ('Bash', 'Bash'),
+    ('CoffeeScript', 'CoffeeScript'),
+    ('CSS', 'CSS'),
+    ('CSS+Django/Jinja', 'CSS+Django/Jinja'),
+    ('CSS+PHP', 'CSS+PHP'),
+    ('CSS+Ruby', 'CSS+Ruby'),
+    ('Django/Jinja', 'Django/Jinja'),
+    ('HTML', 'HTML'),
+    ('HTML+Django/Jinja', 'HTML+Django/Jinja'),
+    ('HTML+PHP', 'HTML+PHP'),
+    ('IPython3', 'IPython3'),
+    ('Java', 'Java'),
+    ('JavaScript', 'JavaScript'),
+    ('JavaScript+Django/Jinja', 'JavaScript+Django/Jinja'),
+    ('JavaScript+PHP', 'JavaScript+PHP'),
+    ('JavaScript+Ruby', 'JavaScript+Ruby'),
+    ('JSON', 'JSON'),
+    ('LessCss', 'LessCss'),
+    ('Makefile', 'Makefile'),
+    ('MySQL', 'MySQL'),
+    ('NumPy', 'NumPy'),
+    ('Perl', 'Perl'),
+    ('Perl6', 'Perl6'),
+    ('PHP', 'PHP'),
+    ('PostgreSQL console (psql)', 'PostgreSQL console (psql)'),
+    ('Python', 'Python'),
+    ('Python 3', 'Python 3'),
+    ('reStructuredText', 'reStructuredText'),
+    ('Ruby', 'Ruby'),
+    ('Sass', 'Sass'),
+    ('Scala', 'Scala'),
+    ('SCSS', 'SCSS'),
+    ('SQL', 'SQL'),
+    ('XML', 'XML'),
+    ('YAML', 'YAML'),
+]

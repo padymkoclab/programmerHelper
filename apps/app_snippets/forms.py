@@ -11,6 +11,7 @@ class SnippetForm(forms.ModelForm):
         fields = ('title', 'author')
 
     def clean(self):
+        super(SnippetForm, self).clean()
         count_tags = len(self.cleaned_data.get('tags', '0'))
         if count_tags < Tag.MIN_COUNT_TAGS_ON_OBJECT:
             raise forms.ValidationError({

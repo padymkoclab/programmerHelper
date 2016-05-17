@@ -11,6 +11,7 @@ class QuestionForm(forms.ModelForm):
         fields = ('title',)
 
     def clean(self):
+        super(QuestionForm, self).clean()
         count_tags = len(self.cleaned_data.get('tags', '0'))
         if count_tags < Tag.MIN_COUNT_TAGS_ON_OBJECT:
             raise forms.ValidationError({

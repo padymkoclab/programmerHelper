@@ -13,6 +13,7 @@ class CourseForm(forms.ModelForm):
         fields = ('name',)
 
     def clean(self):
+        super(CourseForm, self).clean()
         authorship = self.cleaned_data.get('authorship', None)
         if authorship is not None:
             count_authors = len(authorship)
