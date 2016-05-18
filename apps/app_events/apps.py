@@ -15,3 +15,4 @@ class AppEventsConfig(AppConfig):
         from .signals import signal_account_removed_from_voters_in_poll
         from .signals import signal_creating_updating_of_account
         from .signals import signal_deleted_account
+        # from .signals import signal_visit_account

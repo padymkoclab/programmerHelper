@@ -2,6 +2,7 @@
 import random
 import json
 
+from django.utils import timezone
 from django.db import models
 from django.core.exceptions import ImproperlyConfigured
 
@@ -53,6 +54,17 @@ def get_random_objects(queryset, count=1):
         return random_objects
     else:
         raise TypeError('Type queryset must be \'django.db.models.query\'.')
+
+
+def attempt_get_value_attribute_or_return_default(object, attribute, default):
+    try:
+        if not isinstance(attribute, str):
+            attribute = str(attribute)
+        value = getattr(object, attribute)
+    except AttributeError:
+        return default
+    else:
+        return value
 
 
 CHOICES_LEXERS = [

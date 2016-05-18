@@ -6,6 +6,7 @@ from django.contrib import admin
 from apps.app_accounts.admin import AccountAdmin, AccountLevelAdmin
 from apps.app_accounts.models import Account, AccountLevel
 from django.contrib.auth.models import Group
+# from django.contrib.sessions.models import Session
 # apps
 from apps.app_articles.admin import ArticleAdmin, ArticleSubsectionAdmin
 from apps.app_articles.models import Article, ArticleSubsection
@@ -41,6 +42,8 @@ from apps.app_events.models import Event
 from apps.app_events.admin import EventAdmin
 from apps.app_inboxes.models import Inbox
 from apps.app_inboxes.admin import InboxAdmin
+from apps.app_sessions.models import ExtendedSession
+from apps.app_sessions.admin import ExtendedSessionAdmin
 
 
 class ProgrammerHelperSite(admin.AdminSite):
@@ -107,3 +110,5 @@ ProgrammerHelper_AdminSite.register(ScopeGeneric, ScopeGenericAdmin)
 ProgrammerHelper_AdminSite.register(Event, EventAdmin)
 # app_inboxes
 ProgrammerHelper_AdminSite.register(Inbox, InboxAdmin)
+
+ProgrammerHelper_AdminSite.register(ExtendedSession, ExtendedSessionAdmin)

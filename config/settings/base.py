@@ -12,7 +12,7 @@ from mylabour.utils import get_secret_value_for_setting_from_file
 # --------------------------------
 
 
-BASE_DIR = Path(__file__).ancestor(2)
+BASE_DIR = Path(__file__).ancestor(3)
 
 SITE_ID = 1
 
@@ -25,9 +25,9 @@ DJANGO_APPS = [
     'django.contrib.admin.apps.SimpleAdminConfig',  # disable auto-discovery
     'django.contrib.auth',
     'django.contrib.contenttypes',
-    'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.humanize',
 ]
 
 MY_APPS = [
@@ -50,6 +50,7 @@ MY_APPS = [
     'apps.app_generic_models.apps.AppGenericModelsConfig',
     'apps.app_events.apps.AppEventsConfig',
     'apps.app_inboxes.apps.AppInboxesConfig',
+    'apps.app_sessions.apps.AppSessionsConfig',
 ]
 
 THIRD_PARTY_APPS = [
@@ -58,12 +59,12 @@ THIRD_PARTY_APPS = [
 
 INSTALLED_APPS = DJANGO_APPS + MY_APPS + THIRD_PARTY_APPS
 
-
 # Project settings
 
-MIDDLEWARE_CLASSES = [
+DJANGO_MIDDLEWARE_CLASSES = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -72,7 +73,13 @@ MIDDLEWARE_CLASSES = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'project_programmerHelper.urls'
+MY_MIDDLEWARE_CLASSES = [
+    'apps.app_visits.middlewares.LastSeenAccountMiddleware',
+]
+
+MIDDLEWARE_CLASSES = DJANGO_MIDDLEWARE_CLASSES + MY_MIDDLEWARE_CLASSES
+
+ROOT_URLCONF = 'config.urls'
 
 TEMPLATES = [
     {
@@ -88,13 +95,14 @@ TEMPLATES = [
                 'django.template.context_processors.i18n',
                 'django.template.context_processors.media',
                 'django.template.context_processors.static',
-                'mylabour.context_processors.time_existence_of_website',
+                # 'django.template.context_processors.tz',
+                'mylabour.context_processors.date_creating_website',
             ],
         },
     },
 ]
 
-WSGI_APPLICATION = 'project_programmerHelper.wsgi.application'
+WSGI_APPLICATION = 'config.wsgi.application'
 
 
 # -----------------------------
@@ -132,22 +140,12 @@ AUTH_PASSWORD_VALIDATORS = [
 
 
 # -----------------------------
-# CACHE
-# -----------------------------
-
-CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-    }
-}
-
-# -----------------------------
 # MESSAGES
 # -----------------------------
 
-MESSAGE_LEVEL = 'messages.INFO'
+# MESSAGE_LEVEL = 'messages.INFO'
 
-MESSAGE_STORAGE = 'django.contrib.messages.storage.fallback.FallbackStorage'
+# MESSAGE_STORAGE = 'django.contrib.messages.storage.fallback.FallbackStorage'
 
 # MESSAGE_TAGS = {
 #     messages.DEBUG: 'debug',
@@ -174,6 +172,10 @@ USE_TZ = True
 LOCALE_PATHS = (
     BASE_DIR.child('locale'),
 )
+
+# FIXTURE_DIRS = (
+#     str(APPS_DIR.path('fixtures')),
+# )
 
 LAMGUAGES = (
     ('en', 'English'),
@@ -203,7 +205,31 @@ MEDIA_URL = '/media/'
 
 MEDIA_ROOT = str(BASE_DIR.child('media'))
 
-# Mail
+# ----------------------------------------
+# SESSIONS
+# ----------------------------------------
+
+# SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'
+SESSION_ENGINE = 'apps.app_sessions.backends.extended_session_store'
+
+SESSION_COOKIE_AGE = 60 * 60 * 24 * 30
+
+SESSION_SERIALIZER = 'mylabour.serializers.ComprehensiveJSONSerializer'
+
+# ----------------------------------------
+# CACHE
+# ----------------------------------------
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+        'LOCATION': 'chachetable_for_website',
+    }
+}
+
+# ----------------------------------------
+# MAIL
+# ----------------------------------------
 
 ADMINS = [('Seti', 'setivolkylany@gmail.com')]
 
@@ -244,6 +270,11 @@ PASSWORD_COMPLEXITY = {
 }
 
 
+def auto_slug(value):
+    return slugify(value, allow_unicode=True).replace('-', '_')
+
+AUTOSLUG_SLUGIFY_FUNCTION = auto_slug
+
 # MY SETTINGS
 
 COUNT_DAYS_DISTINGUISH_ELEMENTS_AS_NEW = 7
@@ -256,6 +287,4 @@ MIN_COUNT_TAGS_ON_OBJECT = 1
 
 MAX_COUNT_TAGS_ON_OBJECT = 5
 
-AUTOSLUG_SLUGIFY_FUNCTION = lambda value: slugify(value, allow_unicode=True).replace('-', '_')
-
-DATE_CREATING_WEBSITE = timezone.datetime(year=2016, month=6, day=1, tzinfo=timezone.utc)
+DATE_CREATING_WEBSITE = timezone.datetime(year=2016, month=3, day=1, tzinfo=timezone.utc)

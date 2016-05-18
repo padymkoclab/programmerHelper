@@ -15,7 +15,7 @@ urlpatterns = [
     url(r'^jsi18n/$', javascript_catalog, js_info_dict, name='javascript-catalog'),
     url(r'^i18n/', include('django.conf.urls.i18n')),
     # main
-    url(r'^$', IndexView, {}, 'index'),
+    url(r'^$', IndexView.as_view(), {}, 'index'),
     # url(r'^$', IndexView.as_view(), {}, 'index'),
     # apps
     url(r'^accounts/', include('apps.app_accounts.urls')),

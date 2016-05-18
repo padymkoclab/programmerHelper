@@ -4,6 +4,7 @@ import random
 import shutil
 import uuid
 
+from importlib import import_module
 from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
@@ -18,6 +19,7 @@ from model_utils.managers import QueryManager
 from apps.app_articles.models import Article
 from apps.app_forum.models import ForumTopic
 from apps.app_badges.managers import BadgeManager
+from apps.app_sessions.models import ExtendedSession
 
 from .managers import AccountManager, AccountQuerySet
 
@@ -84,11 +86,11 @@ class Account(AbstractBaseUser, PermissionsMixin):
     # account detail
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     email = models.EmailField(
-            _('Email'),
-            unique=True,
-            error_messages={
-                'unique': _('Account with this email already exists.')
-            }
+        _('Email'),
+        unique=True,
+        error_messages={
+            'unique': _('Account with this email already exists.')
+        }
     )
     username = models.CharField(_('Username'), max_length=200, help_text=_('Displayed name'))
     is_active = models.BooleanField(_('Is active'), default=True, help_text=_('Designated that this user is not disabled.'))
@@ -175,8 +177,12 @@ class Account(AbstractBaseUser, PermissionsMixin):
         return True
 
     def last_seen(self):
-        # Last seen 11 mins ago
-        pass
+        last_session_of_account = ExtendedSession.objects.filter(account_pk=self.pk).order_by('expire_date').last()
+        SessionStore = import_module(settings.SESSION_ENGINE).SessionStore
+        session = SessionStore(session_key=last_session_of_account.session_key)
+        last_seen_as_JSON = session['last_seen']
+        last_seen = timezone.datetime(**last_seen_as_JSON)
+        import ipdb; ipdb.set_trace()
 
     def last_activity(self):
         pass

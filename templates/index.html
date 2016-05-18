@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+
+{% load i18n %}
+{% load l10n %}
+{% load myfilters %}
+{% load mytags %}
+{% load humanize %}
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block block_title %}{% trans "Index" %}{% endblock block_title %}</title>
+    {% block block_css %}
+
+    {% endblock block_css %}
+</head>
+<body>
+{% block block_body %}
+    {% block block_header %}
+    <p>{{ user }}</p>
+
+    {% endblock block_header %}
+    {% block content %}
+
+    {% endblock content %}
+    {% block footer %}
+
+    <h3 align="center">{% trans "Website already exists" %} {{ date_creating_website|timesince }}</h3>
+    {% endblock footer %}
+    {% block block_js %}
+
+    {% endblock block_js %}
+{% endblock block_body %}
+</body>
+</html>

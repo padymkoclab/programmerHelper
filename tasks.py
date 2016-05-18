@@ -87,7 +87,7 @@ def startapp(list_apps_names_separeted_commas):
                     'tests/test_views.py',
                     'tests/test_forms.py',
                     'tests/test_managers.py',
-                    'templates/' + app_name + '/' + app_name + '_skeleton.html',
+                    'templates/' + app_name + '/base.html',
                     'static/' + app_name + '/js/' + app_name + '.js',
                     'migrations/__init__.py',
                     'static/' + app_name + '/css/' + app_name + '.css',
