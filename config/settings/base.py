@@ -75,6 +75,7 @@ DJANGO_MIDDLEWARE_CLASSES = [
 
 MY_MIDDLEWARE_CLASSES = [
     'apps.app_visits.middlewares.LastSeenAccountMiddleware',
+    'apps.app_visits.middlewares.CountVisitsMiddleware',
 ]
 
 MIDDLEWARE_CLASSES = DJANGO_MIDDLEWARE_CLASSES + MY_MIDDLEWARE_CLASSES
@@ -209,12 +210,11 @@ MEDIA_ROOT = str(BASE_DIR.child('media'))
 # SESSIONS
 # ----------------------------------------
 
-# SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'
 SESSION_ENGINE = 'apps.app_sessions.backends.extended_session_store'
 
 SESSION_COOKIE_AGE = 60 * 60 * 24 * 30
 
-SESSION_SERIALIZER = 'mylabour.serializers.ComprehensiveJSONSerializer'
+SESSION_SERIALIZER = 'apps.app_sessions.serializers.ComprehensiveSessionJSONSerializer'
 
 # ----------------------------------------
 # CACHE
@@ -288,3 +288,9 @@ MIN_COUNT_TAGS_ON_OBJECT = 1
 MAX_COUNT_TAGS_ON_OBJECT = 5
 
 DATE_CREATING_WEBSITE = timezone.datetime(year=2016, month=3, day=1, tzinfo=timezone.utc)
+
+IGNORABLE_404_ENDS = ('',)
+
+IGNORABLE_URLS_FOR_COUNT_VISITS = (
+    r'admin/*',
+)

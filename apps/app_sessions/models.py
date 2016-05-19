@@ -52,3 +52,6 @@ class ExtendedSession(AbstractBaseSession):
     status_session.short_description = _('Status')
     status_session.admin_order_field = 'expire_date'
     status_session.boolean = True
+
+    # def get_decoded(self):
+    #     return self

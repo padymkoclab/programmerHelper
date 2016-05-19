@@ -4,6 +4,7 @@ import random
 import shutil
 import uuid
 
+from django.utils import timezone
 from importlib import import_module
 from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ValidationError
@@ -180,9 +181,8 @@ class Account(AbstractBaseUser, PermissionsMixin):
         last_session_of_account = ExtendedSession.objects.filter(account_pk=self.pk).order_by('expire_date').last()
         SessionStore = import_module(settings.SESSION_ENGINE).SessionStore
         session = SessionStore(session_key=last_session_of_account.session_key)
-        last_seen_as_JSON = session['last_seen']
-        last_seen = timezone.datetime(**last_seen_as_JSON)
-        import ipdb; ipdb.set_trace()
+        last_seen = session['last_seen']
+        return last_seen
 
     def last_activity(self):
         pass
