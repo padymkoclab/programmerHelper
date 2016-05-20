@@ -75,7 +75,8 @@ DJANGO_MIDDLEWARE_CLASSES = [
 
 MY_MIDDLEWARE_CLASSES = [
     'apps.app_visits.middlewares.LastSeenAccountMiddleware',
-    'apps.app_visits.middlewares.CountVisitsMiddleware',
+    'apps.app_visits.middlewares.CountVisitsPagesMiddleware',
+    'apps.app_visits.middlewares.RegistratorVisitAccountMiddleware',
 ]
 
 MIDDLEWARE_CLASSES = DJANGO_MIDDLEWARE_CLASSES + MY_MIDDLEWARE_CLASSES
@@ -98,6 +99,7 @@ TEMPLATES = [
                 'django.template.context_processors.static',
                 # 'django.template.context_processors.tz',
                 'mylabour.context_processors.date_creating_website',
+                'apps.app_visits.context_processors.count_visits',
             ],
         },
     },
@@ -292,5 +294,11 @@ DATE_CREATING_WEBSITE = timezone.datetime(year=2016, month=3, day=1, tzinfo=time
 IGNORABLE_404_ENDS = ('',)
 
 IGNORABLE_URLS_FOR_COUNT_VISITS = (
-    r'admin/*',
+    r'admin/[\w]*',
+    r'\.jpeg$',
+    r'\.png$',
+    r'\.jpg$',
+    r'\.gif$',
+    r'/favicon.ico$',
+    r'/(robots.txt)|(humans.txt)$',
 )

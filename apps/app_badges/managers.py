@@ -14,6 +14,7 @@ from apps.app_solutions.models import Solution
 from apps.app_articles.models import Article
 from apps.app_courses.models import Course
 from apps.app_polls.models import VoteInPoll
+from apps.app_sessions.models import ExpandedSession
 
 
 def point_execution_in_terminal(function):
@@ -369,14 +370,23 @@ class BadgeManager(models.Manager):
 
     @point_execution_in_terminal
     def check_badge_Enthusiast(self):
-        """ """
+        """Visit the site each day for 5 consecutive days."""
 
+        for account in get_user_model().objects.iterator():
+            days_attendance = account.days_attendance()
+        for i, date in enumerate(l):
+            try:
+                diff = (l[i+5] - date).days
+                if diff == 5:
+                    print(date)
+            except IndexError:
+                pass
         # accounts_pks = answers.values_list('author', flat=True).distinct()
         # self.added_badge_to_accounts(accounts_pks=accounts_pks, badge_name='')
 
     @point_execution_in_terminal
     def check_badge_Fanatic(self):
-        """ """
+        """Visit the site each day for 10 consecutive days."""
 
         # accounts_pks = answers.values_list('author', flat=True).distinct()
         # self.added_badge_to_accounts(accounts_pks=accounts_pks, badge_name='')

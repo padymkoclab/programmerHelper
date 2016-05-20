@@ -42,8 +42,8 @@ from apps.app_events.models import Event
 from apps.app_events.admin import EventAdmin
 from apps.app_inboxes.models import Inbox
 from apps.app_inboxes.admin import InboxAdmin
-from apps.app_sessions.models import ExtendedSession
-from apps.app_sessions.admin import ExtendedSessionAdmin
+from apps.app_sessions.models import ExpandedSession
+from apps.app_sessions.admin import ExpandedSessionAdmin
 
 
 class ProgrammerHelperSite(admin.AdminSite):
@@ -111,4 +111,4 @@ ProgrammerHelper_AdminSite.register(Event, EventAdmin)
 # app_inboxes
 ProgrammerHelper_AdminSite.register(Inbox, InboxAdmin)
 
-ProgrammerHelper_AdminSite.register(ExtendedSession, ExtendedSessionAdmin)
+ProgrammerHelper_AdminSite.register(ExpandedSession, ExpandedSessionAdmin)

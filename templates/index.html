@@ -17,7 +17,8 @@
 <body>
 {% block block_body %}
     {% block block_header %}
-    <p>{{ user }}</p>
+    <p>Hi {{ user }}.</p>
+    <p>Count visits this page: {{ count_visits_this_page }}</p>
 
     {% endblock block_header %}
     {% block content %}

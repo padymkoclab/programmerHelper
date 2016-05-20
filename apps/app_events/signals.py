@@ -1,7 +1,6 @@
 
 from django.dispatch import receiver
 from django.db.models.signals import post_delete, post_save, m2m_changed, pre_save
-from django.core.signals import request_finished
 
 from apps.app_events.models import Event
 from apps.app_accounts.models import Account
@@ -89,29 +88,30 @@ def signal_change_authorhip_of_course(sender, instance, action, reverse, model, 
             )
 
 
-@receiver(post_save)
+@receiver(post_save, sender=VoteInPoll)
 def signal_account_participated_in_poll(sender, instance, **kwargs):
     """Signal, what account participated in poll."""
-    if sender is VoteInPoll:
-        Event.objects.create(
-            account=instance.user,
-            flag=Event.CHOICES_FLAGS.adding,
-            message='Participated in {0} "{1}".'.format(instance.poll._meta.verbose_name.lower(), instance.poll),
-        )
+    Event.objects.create(
+        account=instance.user,
+        flag=Event.CHOICES_FLAGS.adding,
+        message='Participated in {0} "{1}".'.format(instance.poll._meta.verbose_name.lower(), instance.poll),
+    )
 
 
-@receiver(post_delete)
+@receiver(post_delete, sender=VoteInPoll)
 def signal_account_removed_from_voters_in_poll(sender, instance, **kwargs):
     """Signal, what account removed from voters in poll."""
-    if sender is VoteInPoll:
-        Event.objects.create(
-            account=instance.user,
-            flag=Event.CHOICES_FLAGS.deleting,
-            message='Removed from voters in {0} "{1}".'.format(instance.poll._meta.verbose_name.lower(), instance.poll),
-        )
+    Event.objects.create(
+        account=instance.user,
+        flag=Event.CHOICES_FLAGS.deleting,
+        message='Removed from voters in {0} "{1}".'.format(instance.poll._meta.verbose_name.lower(), instance.poll),
+    )
 
 
-# @receiver(pre_save, sender=Account)
+CHANGE_STATUS_ACCOUNT = False
+
+
+@receiver(pre_save, sender=Account)
 def signal_changed_status_of_account(sender, instance, **kwargs):
     """Signal attempt change status of account: is_superuser or is_active."""
     try:
@@ -119,22 +119,46 @@ def signal_changed_status_of_account(sender, instance, **kwargs):
     except sender.DoesNotExist:
         pass
     else:
-        if not obj.some_field == instance.some_field:
-            pass
+        global CHANGE_STATUS_ACCOUNT
+        if not obj.is_superuser == instance.is_superuser:
+            new_status_account = 'superuser' if instance.is_superuser else 'non superuser'
+            message = 'Change status account as {0}.'.format(new_status_account)
+            Event.objects.create(
+                account=instance,
+                flag=Event.CHOICES_FLAGS.profiling,
+                message=message,
+            )
+            CHANGE_STATUS_ACCOUNT = True
+        elif not obj.is_active == instance.is_active:
+            if instance.is_active:
+                message = 'Now account is active.'
+            else:
+                message = 'Account disabled.'
+            Event.objects.create(
+                account=instance,
+                flag=Event.CHOICES_FLAGS.profiling,
+                message=message,
+            )
+            CHANGE_STATUS_ACCOUNT = True
+        else:
+            CHANGE_STATUS_ACCOUNT = False
 
 
 @receiver(post_save, sender=Account)
 def signal_creating_updating_of_account(sender, instance, created, **kwargs):
     """Signal creating or update account of user."""
+    global CHANGE_STATUS_ACCOUNT
     if created:
         message = 'Created account'
     else:
         message = 'Update account'
-    Event.objects.create(
-        account=instance,
-        flag=Event.CHOICES_FLAGS.profiling,
-        message=message,
-    )
+    if not CHANGE_STATUS_ACCOUNT:
+        Event.objects.create(
+            account=instance,
+            flag=Event.CHOICES_FLAGS.profiling,
+            message=message,
+        )
+    CHANGE_STATUS_ACCOUNT = False
 
 
 @receiver(post_delete, sender=Account)
@@ -146,16 +170,3 @@ def signal_deleted_account(sender, instance, **kwargs):
         flag=Event.CHOICES_FLAGS.profiling,
         message=message,
     )
-
-
-# @receiver(request_finished)
-def signal_visit_account(sender, **kwargs):
-    """Signal visit account of website."""
-    print('111111111111111111111111111111')
-    # if sender is Account:
-    #     message = 'Delete {0} "{1.username} ({1.email})"'.format(instance._meta.verbose_name.lower(), instance)
-    #     Event.objects.create(
-    #         account=instance,
-    #         flag=Event.CHOICES_FLAGS.profiling,
-    #         message=message,
-    #     )

@@ -35,11 +35,9 @@ class Article(TimeStampedModel):
     title = models.CharField(
         _('Title'), max_length=200, validators=[MinLengthValidator(settings.MIN_LENGTH_FOR_NAME_OR_TITLE_OBJECT)]
     )
-    # slug = AutoSlugField(
-    #                     _('Slug'),
-    #                     editable=False,
-    #                     populate_from='title', unique_with=['author'], always_update=True, allow_unicode=True, db_index=True)
-    # slug = models.SlugField(_('Slug'), editable=False, blank=True)
+    slug = AutoSlugField(
+        _('Slug'), populate_from='title', unique_with=['author'], always_update=True, allow_unicode=True, db_index=True
+    )
     quotation = models.CharField(_('Quotation'), max_length=200)
     picture = models.URLField(_('Picture'), max_length=1000)
     header = models.TextField(_('Header'))
@@ -62,7 +60,8 @@ class Article(TimeStampedModel):
         WebLink,
         related_name='articles',
         verbose_name=_('Links'),
-        help_text=_('Useful weblinks')
+        help_text=_('Useful weblinks'),
+        blank=True,
     )
     comments = GenericRelation(CommentGeneric)
     scopes = GenericRelation(ScopeGeneric)
@@ -109,7 +108,9 @@ class ArticleSubsection(TimeStampedModel):
     title = models.CharField(
         _('Title'), max_length=200, validators=[MinLengthValidator(settings.MIN_LENGTH_FOR_NAME_OR_TITLE_OBJECT)]
     )
-    slug = AutoSlugField(_('Slug'), populate_from='title', unique_with=['article'], always_update=True, allow_unicode=True, db_index=True)
+    slug = AutoSlugField(
+        _('Slug'), populate_from='title', unique_with=['article'], always_update=True, allow_unicode=True, db_index=True
+    )
     content = models.TextField(_('Content'))
 
     class Meta:

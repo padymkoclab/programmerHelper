@@ -1,4 +1,5 @@
 
+import re
 from django.utils.encoding import uri_to_iri
 from django.utils import timezone
 from django.conf import settings
@@ -15,7 +16,7 @@ class LastSeenAccountMiddleware(object):
         return response
 
 
-class CountVisitsMiddleware(object):
+class CountVisitsPagesMiddleware(object):
     """
 
     """
@@ -31,8 +32,8 @@ class CountVisitsMiddleware(object):
         "WebAlta Crawler", "MJ12bot", "Yandex/", "YaDirectBot", "StackRambler", "DotBot", "dotbot"
     ]
 
-    def _is_ignorable_URL(self, url_path):
-        pass
+    def _is_ignorable_URL(self, url_path, list_igno_urls):
+        return any(re.search(pattern, url_path) for pattern in list_igno_urls)
 
     def _check_present_setting_for_restriction_urls_for_count(self):
         try:
@@ -52,13 +53,29 @@ class CountVisitsMiddleware(object):
             # correct displaying unicode in URL
             url_path = uri_to_iri(request.path)
             # check_url_as_ignorabled if defined corresponding setting
-            list_igno_urls = self._check_present_setting_for_restriction_urls_for_count
+            list_igno_urls = self._check_present_setting_for_restriction_urls_for_count()
             if list_igno_urls:
-                self._is_ignorable_URL(url_path)
+                if self._is_ignorable_URL(url_path, list_igno_urls):
+                    return response
             # get value variable stored in session or create new as list()
             visited_pages = request.session.get(self.SESSION_VARIABLE_FOR_KEEPING_VISITED_PAGES, list())
             # adding new url
             visited_pages.append(url_path)
             # save new value in current session
             request.session[self.SESSION_VARIABLE_FOR_KEEPING_VISITED_PAGES] = list(set(visited_pages))
+        return response
+
+
+class RegistratorVisitAccountMiddleware(object):
+    """
+
+    """
+
+    def process_response(self, request, response):
+        if request.user.is_authenticated() and response.status_code == 200:
+            dates_visits = request.session.get('dates_visits', list())
+            if timezone.now().date() in dates_visits:
+                return response
+            dates_visits.append(timezone.now().date())
+            request.session['dates_visits'] = list(set(dates_visits))
         return response

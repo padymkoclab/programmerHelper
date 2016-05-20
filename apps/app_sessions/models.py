@@ -9,7 +9,7 @@ from django.db import models
 from apps.app_sessions.backends.extended_session_store import SessionStore
 
 
-class ExtendedSession(AbstractBaseSession):
+class ExpandedSession(AbstractBaseSession):
     """
     Extended and enhanced build-in in Django application for sessions.
     Addionaly storing account and session detail, as well as have several useful methods.
@@ -37,7 +37,7 @@ class ExtendedSession(AbstractBaseSession):
     #     return '{0.name}'.format(self)
 
     # def save(self, *args, **kwargs):
-    #     super(ExtendedSession, self).save(*args, **kwargs)
+    #     super(ExpandedSession, self).save(*args, **kwargs)
 
     # def get_absolute_url(self):
     #     return reverse('app_:', kwargs={'slug': self.slug})

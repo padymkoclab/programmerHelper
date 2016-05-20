@@ -9,9 +9,9 @@ class SessionExpireListFiler(admin.SimpleListFilter):
     pass
 
 
-class ExtendedSessionAdmin(admin.ModelAdmin):
+class ExpandedSessionAdmin(admin.ModelAdmin):
     '''
-        Admin View for ExtendedSession
+        Admin View for ExpandedSession
     '''
     list_display = ('display_account_name_insted_of_pk', 'session_key', 'status_session', 'expire_date')
     list_filter = (

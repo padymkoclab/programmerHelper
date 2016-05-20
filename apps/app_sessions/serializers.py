@@ -39,6 +39,13 @@ class ComprehensiveSessionJSONDecoder(json.JSONDecoder):
     def decode(self, json_data):
         json_result = json.loads(json_data)
         for key, value in json_result.items():
+            if isinstance(value, (list, tuple)):
+                for i, el in enumerate(value):
+                    if re.match(r'\Adatetime.date\(\d{1,4}, \d{1,2}, \d{1,2}\)\Z', el):
+                        date = el[14:-1]
+                        el = parse(date).date()
+                        del value[i]
+                        value.insert(i, el)
             if isinstance(value, str):
                 if re.match(r'\Adatetime.datetime\(\d{1,4}', value):
                     datetime = value[18:-1]
@@ -47,7 +54,6 @@ class ComprehensiveSessionJSONDecoder(json.JSONDecoder):
                 elif re.match(r'\Adatetime.date\(\d{1,4}, \d{1,2}, \d{1,2}\)\Z', value):
                     date = value[14:-1]
                     value = parse(date).date()
-                    value = parse(datetime)
                     json_result[key] = value
                 elif re.match(r'\ADecimal\(\'[.\w]+\'\)\Z', value):
                     number_as_str = value[9:-2]

@@ -20,11 +20,11 @@ class IndexView(TemplateView):
         account = authenticate(**a)
         if account:
             login(request, account)
+        a = {'email': '2vlysenko@gmail.com', 'password': 'lv210493'}
+        account = authenticate(**a)
+        if account:
+            login(request, account)
         # import ipdb; ipdb.set_trace()
-        # a = {'email': '2vlysenko@gmail.com', 'password': '2vlysenko'}
-        # account = authenticate(**a)
-        # if account:
-        #     login(request, account)
         # request.session.set_test_cookie()
         # if request.session.test_cookie_worked():
         #     request.session.delete_test_cookie()
