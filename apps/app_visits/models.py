@@ -6,11 +6,13 @@ from django.db import models
 from django.conf import settings
 
 from .validators import validate_url_path
+from .managers import VisitManager
 
 
 class Visit(models.Model):
     """
-
+    Model for working with visits users the pages.
+    Have features keeping users and url visited them.
     """
 
     id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
@@ -27,6 +29,7 @@ class Visit(models.Model):
         verbose_name_plural = _('Visits')
 
     objects = models.Manager()
+    objects = VisitManager()
 
     def __str__(self):
         return 'URLPathPage(\'{0.url}\')'.format(self)

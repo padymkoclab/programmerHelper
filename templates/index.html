@@ -25,7 +25,14 @@
 
     {% endblock content %}
     {% block footer %}
-
+    <p>
+        {% blocktrans count count_online_users=count_online_users trimmed %}
+            Now is one user is on-line:
+        {% plural %}
+            Now is {{ count_online_users }} users is on-line:
+        {% endblocktrans %}
+        {{ credentials_online_users }}
+    </p>
     <h3 align="center">{% trans "Website already exists" %} {{ date_creating_website|timesince }}</h3>
     {% endblock footer %}
     {% block block_js %}

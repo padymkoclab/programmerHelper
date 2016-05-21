@@ -38,8 +38,8 @@ from apps.app_utilities.admin import UtilityCategoryAdmin, UtilityAdmin
 from apps.app_utilities.models import UtilityCategory, Utility
 from apps.app_web_links.admin import WebLinkAdmin
 from apps.app_web_links.models import WebLink
-from apps.app_events.models import Event
-from apps.app_events.admin import EventAdmin
+from apps.app_actions.models import Action
+from apps.app_actions.admin import ActionAdmin
 from apps.app_inboxes.models import Inbox
 from apps.app_inboxes.admin import InboxAdmin
 from apps.app_sessions.models import ExpandedSession
@@ -106,8 +106,8 @@ ProgrammerHelper_AdminSite.register(CommentGeneric, CommentGenericAdmin)
 ProgrammerHelper_AdminSite.register(OpinionGeneric, OpinionGenericAdmin)
 ProgrammerHelper_AdminSite.register(LikeGeneric, LikeGenericAdmin)
 ProgrammerHelper_AdminSite.register(ScopeGeneric, ScopeGenericAdmin)
-# app_events
-ProgrammerHelper_AdminSite.register(Event, EventAdmin)
+# app_actions
+ProgrammerHelper_AdminSite.register(Action, ActionAdmin)
 # app_inboxes
 ProgrammerHelper_AdminSite.register(Inbox, InboxAdmin)
 

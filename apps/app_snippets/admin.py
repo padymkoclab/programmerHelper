@@ -19,7 +19,7 @@ class SnippetAdmin(admin.ModelAdmin):
         'title',
         'author',
         'lexer',
-        'views',
+        # 'views',
         'get_scope',
         'get_scope2',
         'get_good_opinions',

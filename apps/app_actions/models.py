@@ -12,7 +12,7 @@ from model_utils import Choices
 # from .managers import LogQuerySet
 
 
-class Event(models.Model):
+class Action(models.Model):
     """
 
     """
@@ -27,7 +27,7 @@ class Event(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     account = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        related_name='events',
+        related_name='actions',
         verbose_name=_('Account'),
         on_delete=models.CASCADE,
     )
@@ -36,9 +36,9 @@ class Event(models.Model):
     date_action = models.DateTimeField(_('Date action'), auto_now_add=True)
 
     class Meta:
-        db_table = 'events'
-        verbose_name = _('Event')
-        verbose_name_plural = _('Events')
+        db_table = 'actions'
+        verbose_name = _('Action')
+        verbose_name_plural = _('Actions')
         get_latest_by = 'date_action'
         ordering = ['-date_action']
 

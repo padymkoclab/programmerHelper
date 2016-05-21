@@ -31,6 +31,6 @@ urlpatterns = [
     url(r'^questions/', include('apps.app_questions.urls')),
     url(r'^testing/', include('apps.app_testing.urls')),
     url(r'^utilities/', include('apps.app_utilities.urls')),
-    url(r'^events/', include('apps.app_events.urls')),
+    url(r'^actions/', include('apps.app_actions.urls')),
     url(r'^inboxes/', include('apps.app_inboxes.urls')),
 ]

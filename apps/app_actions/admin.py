@@ -1,10 +1,10 @@
 
 from django.contrib import admin
 
-from .models import Event
+from .models import Action
 
 
-class EventAdmin(admin.ModelAdmin):
+class ActionAdmin(admin.ModelAdmin):
     '''
     Admin view for events
     '''
@@ -20,7 +20,7 @@ class EventAdmin(admin.ModelAdmin):
     date_hierarchy = 'date_action'
     fieldsets = [
         [
-            Event._meta.verbose_name, {
+            Action._meta.verbose_name, {
                 'fields': ['account', 'flag', 'message'],
                 'classes': ['wide'],
             }

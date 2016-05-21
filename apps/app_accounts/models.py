@@ -18,6 +18,7 @@ from model_utils import Choices
 from model_utils.managers import QueryManager
 
 from apps.app_articles.models import Article
+from apps.app_actions.models import Action
 from apps.app_forum.models import ForumTopic
 from apps.app_badges.managers import BadgeManager
 from apps.app_sessions.models import ExpandedSession
@@ -184,22 +185,19 @@ class Account(AbstractBaseUser, PermissionsMixin):
         last_seen = session['last_seen']
         return last_seen
 
-    def last_activity(self):
-        pass
+    def actions_with_accounts(self):
+        return self.actions.filter(flag=Action.CHOICES_FLAGS.profiling).all()
 
-    def actions(self):
-        pass
-
-    def days_attendance(self):
-        last_session_of_account = ExpandedSession.objects.filter(account_pk=self.pk).order_by('expire_date').last()
-        if last_session_of_account is not None:
-            SessionStore = import_module(settings.SESSION_ENGINE).SessionStore
-            session = SessionStore(session_key=last_session_of_account.session_key)
-            dates_visits = session['dates_visits']
-            dates_visits.sort()
-            return dates_visits
-        else:
-            return None
+    # def days_attendance(self):
+    #     last_session_of_account = ExpandedSession.objects.filter(account_pk=self.pk).order_by('expire_date').last()
+    #     if last_session_of_account is not None:
+    #         SessionStore = import_module(settings.SESSION_ENGINE).SessionStore
+    #         session = SessionStore(session_key=last_session_of_account.session_key)
+    #         dates_visits = session['dates_visits']
+    #         dates_visits.sort()
+    #         return dates_visits
+    #     else:
+    #         return None
 
     def get_reputation(self):
         """Getting reputation of account based on his activity, actions, badges."""

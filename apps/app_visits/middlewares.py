@@ -59,7 +59,7 @@ class CountVisitsPagesMiddleware(object):
                 if self._is_ignorable_URL(url_path, list_igno_urls):
                     return response
             # get value variable stored in session or create new as list()
-            visit = Visit.objects.get_or_create(url=url_path)[0]
+            visit = Visit.objects.get_or_create(url__exact=url_path)[0]
             visit.users.add(request.user)
         return response
 
@@ -70,10 +70,5 @@ class RegistratorVisitAccountMiddleware(object):
     """
 
     def process_response(self, request, response):
-        if request.user.is_authenticated() and response.status_code == 200:
-            dates_visits = request.session.get('dates_visits', list())
-            if timezone.now().date() in dates_visits:
-                return response
-            dates_visits.append(timezone.now().date())
-            request.session['dates_visits'] = dates_visits
+        # if request.user.is_authenticated() and response.status_code == 200:
         return response

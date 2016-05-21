@@ -7,6 +7,8 @@ from django.views.generic import TemplateView
 
 # from PIL import Image, ImageDraw
 
+from apps.app_accounts.models import Account
+
 
 class IndexView(TemplateView):
     """
@@ -16,11 +18,8 @@ class IndexView(TemplateView):
     template_name = 'index.html'
 
     def get(self, request, *args, **kwargs):
-        a = {'email': '2vlysenko@gmail.com', 'password': 'lv210493'}
-        account = authenticate(**a)
-        if account:
-            login(request, account)
-            logout(request)
+        # a = {'email': 'дроздоваплатон@yahoo.com', 'password': 'lv210493'}
+        # a = {'email': 'pситников@дьячков-дьячкова.com', 'password': 'lv210493'}
         a = {'email': 'setivolkylany@gmail.com', 'password': 'lv210493'}
         account = authenticate(**a)
         if account:

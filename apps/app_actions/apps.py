@@ -3,9 +3,9 @@ from django.utils.translation import ugettext_lazy as _
 from django.apps import AppConfig
 
 
-class AppEventsConfig(AppConfig):
-    name = "apps.app_events"
-    verbose_name = _("Events")
+class AppActionsConfig(AppConfig):
+    name = "apps.app_actions"
+    verbose_name = _("Actions")
 
     def ready(self):
         from .signals import signal_created_object
