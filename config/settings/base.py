@@ -51,6 +51,7 @@ MY_APPS = [
     'apps.app_events.apps.AppEventsConfig',
     'apps.app_inboxes.apps.AppInboxesConfig',
     'apps.app_sessions.apps.AppSessionsConfig',
+    'apps.app_visits.apps.AppVisitsConfig',
 ]
 
 THIRD_PARTY_APPS = [

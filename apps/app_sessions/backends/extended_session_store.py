@@ -8,8 +8,8 @@ class SessionStore(CachedDBStore):
 
     @classmethod
     def get_model_class(cls):
-        from apps.app_sessions.models import ExtendedSession
-        return ExtendedSession
+        from apps.app_sessions.models import ExpandedSession
+        return ExpandedSession
 
     def create_model_instance(self, data):
         obj = super(SessionStore, self).create_model_instance(data)

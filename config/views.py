@@ -1,7 +1,7 @@
 
 # import random
 
-from django.contrib.auth import login, authenticate
+from django.contrib.auth import login, authenticate, logout
 # from django.http import HttpResponse
 from django.views.generic import TemplateView
 
@@ -16,14 +16,16 @@ class IndexView(TemplateView):
     template_name = 'index.html'
 
     def get(self, request, *args, **kwargs):
-        a = {'email': 'setivolkylany@gmail.com', 'password': 'lv210493'}
-        account = authenticate(**a)
-        if account:
-            login(request, account)
         a = {'email': '2vlysenko@gmail.com', 'password': 'lv210493'}
         account = authenticate(**a)
         if account:
             login(request, account)
+            logout(request)
+        a = {'email': 'setivolkylany@gmail.com', 'password': 'lv210493'}
+        account = authenticate(**a)
+        if account:
+            login(request, account)
+            # logout(request)
         # import ipdb; ipdb.set_trace()
         # request.session.set_test_cookie()
         # if request.session.test_cookie_worked():
@@ -50,4 +52,3 @@ class IndexView(TemplateView):
     #     im.save(response, "PNG")
     #     return HttpResponse(c, content_type="text/plain")
     #     return super(IndexView, self).post(request, *args, **kwargs)
-

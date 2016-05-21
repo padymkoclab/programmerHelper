@@ -4,6 +4,8 @@ from django.utils.encoding import uri_to_iri
 from django.utils import timezone
 from django.conf import settings
 
+from .models import Visit
+
 
 class LastSeenAccountMiddleware(object):
     """
@@ -18,11 +20,10 @@ class LastSeenAccountMiddleware(object):
 
 class CountVisitsPagesMiddleware(object):
     """
-
+    Count visits pages by authenticated users.
     """
 
     SETTING_NAME_FOR_IGNORABLE_URLS = 'IGNORABLE_URLS_FOR_COUNT_VISITS'
-    SESSION_VARIABLE_FOR_KEEPING_VISITED_PAGES = 'visited_pages'
     BOTS_USER_AGENT = [
         "Teoma", "alexa", "froogle", "Gigabot", "inktomi", "looksmart", "URL_Spider_SQL", "Firefly",
         "NationalDirectory", "Ask Jeeves", "TECNOSEEK", "InfoSeek", "WebFindBot", "girafabot", "crawler",
@@ -58,11 +59,8 @@ class CountVisitsPagesMiddleware(object):
                 if self._is_ignorable_URL(url_path, list_igno_urls):
                     return response
             # get value variable stored in session or create new as list()
-            visited_pages = request.session.get(self.SESSION_VARIABLE_FOR_KEEPING_VISITED_PAGES, list())
-            # adding new url
-            visited_pages.append(url_path)
-            # save new value in current session
-            request.session[self.SESSION_VARIABLE_FOR_KEEPING_VISITED_PAGES] = list(set(visited_pages))
+            visit = Visit.objects.get_or_create(url=url_path)[0]
+            visit.users.add(request.user)
         return response
 
 
@@ -77,5 +75,5 @@ class RegistratorVisitAccountMiddleware(object):
             if timezone.now().date() in dates_visits:
                 return response
             dates_visits.append(timezone.now().date())
-            request.session['dates_visits'] = list(set(dates_visits))
+            request.session['dates_visits'] = dates_visits
         return response

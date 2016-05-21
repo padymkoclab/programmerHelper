@@ -374,13 +374,14 @@ class BadgeManager(models.Manager):
 
         for account in get_user_model().objects.iterator():
             days_attendance = account.days_attendance()
-        for i, date in enumerate(l):
-            try:
-                diff = (l[i+5] - date).days
-                if diff == 5:
-                    print(date)
-            except IndexError:
-                pass
+            if days_attendance is not None:
+                for i, date in enumerate(days_attendance):
+                    try:
+                        diff = (days_attendance[i + 5] - date).days
+                        if diff == 5:
+                            print(date)
+                    except IndexError:
+                        pass
         # accounts_pks = answers.values_list('author', flat=True).distinct()
         # self.added_badge_to_accounts(accounts_pks=accounts_pks, badge_name='')
 

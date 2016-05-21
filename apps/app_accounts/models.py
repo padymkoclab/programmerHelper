@@ -192,11 +192,14 @@ class Account(AbstractBaseUser, PermissionsMixin):
 
     def days_attendance(self):
         last_session_of_account = ExpandedSession.objects.filter(account_pk=self.pk).order_by('expire_date').last()
-        SessionStore = import_module(settings.SESSION_ENGINE).SessionStore
-        session = SessionStore(session_key=last_session_of_account.session_key)
-        dates_visits = session['dates_visits']
-        dates_visits.sort()
-        return dates_visits
+        if last_session_of_account is not None:
+            SessionStore = import_module(settings.SESSION_ENGINE).SessionStore
+            session = SessionStore(session_key=last_session_of_account.session_key)
+            dates_visits = session['dates_visits']
+            dates_visits.sort()
+            return dates_visits
+        else:
+            return None
 
     def get_reputation(self):
         """Getting reputation of account based on his activity, actions, badges."""
