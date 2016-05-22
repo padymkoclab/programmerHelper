@@ -1,20 +1,21 @@
 
 import re
+import datetime
+
 from django.utils.encoding import uri_to_iri
-from django.utils import timezone
 from django.conf import settings
 
-from .models import Visit
+from .models import Visit, DayAttendance
 
 
-class LastSeenAccountMiddleware(object):
+class RegistratorVisitAccountMiddleware(object):
     """
-    Middleware for trake down time last seen on website.
+    Registrator dates visits of website the users.
     """
 
     def process_response(self, request, response):
         if request.user.is_authenticated() and response.status_code == 200:
-            request.session['last_seen'] = timezone.now()
+            DayAttendance.objects.get_or_create(user=request.user, day_attendance=datetime.date.today())
         return response
 
 
@@ -61,14 +62,4 @@ class CountVisitsPagesMiddleware(object):
             # get value variable stored in session or create new as list()
             visit = Visit.objects.get_or_create(url__exact=url_path)[0]
             visit.users.add(request.user)
-        return response
-
-
-class RegistratorVisitAccountMiddleware(object):
-    """
-
-    """
-
-    def process_response(self, request, response):
-        # if request.user.is_authenticated() and response.status_code == 200:
         return response

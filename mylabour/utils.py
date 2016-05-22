@@ -67,6 +67,37 @@ def attempt_get_value_attribute_or_return_default(object, attribute, default):
         return value
 
 
+def get_different_between_elements(sequence, left_to_right=True):
+    """Return different between adjoining element in the one-nested sequence, with elements same types."""
+    if hasattr(sequence, '__iter__'):
+        lst = list()
+        for i, el in enumerate(sequence):
+            try:
+                different = el - sequence[i + 1] if left_to_right else sequence[i + 1] - el
+            except IndexError:
+                pass
+            else:
+                lst.append(different)
+        return lst
+    raise TypeError('Type of sequence must iterable.')
+
+
+def show_concecutive_certain_element(sequence, element):
+    iteration = iter(sequence)
+    k = list()
+    t = list()
+    for i in iteration:
+        if i == 1:
+            t.append(i)
+        else:
+            if t:
+                k.append(t)
+            t = list()
+    if t:
+        k.append(t)
+    return k
+
+
 CHOICES_LEXERS = [
     ('Awk', 'Awk'),
     ('Base Makefile', 'Base Makefile'),

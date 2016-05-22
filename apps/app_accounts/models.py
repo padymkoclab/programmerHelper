@@ -22,6 +22,7 @@ from apps.app_actions.models import Action
 from apps.app_forum.models import ForumTopic
 from apps.app_badges.managers import BadgeManager
 from apps.app_sessions.models import ExpandedSession
+from mylabour import utils
 
 from .managers import AccountManager, AccountQuerySet
 
@@ -180,27 +181,37 @@ class Account(AbstractBaseUser, PermissionsMixin):
 
     def last_seen(self):
         last_session_of_account = ExpandedSession.objects.filter(account_pk=self.pk).order_by('expire_date').last()
-        SessionStore = import_module(settings.SESSION_ENGINE).SessionStore
-        session = SessionStore(session_key=last_session_of_account.session_key)
-        last_seen = session['last_seen']
-        return last_seen
+        if last_session_of_account:
+            SessionStore = import_module(settings.SESSION_ENGINE).SessionStore
+            session = SessionStore(session_key=last_session_of_account.session_key)
+            last_seen = session['last_seen']
+            return last_seen
+        return None
+
+    def have_certain_count_consecutive_days(self, count_consecutive_days):
+        if count_consecutive_days > 0:
+            if count_consecutive_days <= self.days_attendances.count():
+                list_all_dates = self.days_attendances.only('day_attendance').values_list('day_attendance', flat=True)
+                # getting differents between dates as timedelta objects
+                differents_dates = utils.get_different_between_elements(sequence=list_all_dates, left_to_right=False)
+                # converting timedelta objects in numbers
+                differents_dates = tuple(timedelta.days for timedelta in differents_dates)
+                # find the groups consecutive elements
+                groups_concecutive_elements = utils.show_concecutive_certain_element(differents_dates, 1)
+                # determinate max count consecutive elements
+                max_count_concecutive_elements = max(len(group) for group in groups_concecutive_elements)
+                # add 1 for учитывания первого дня
+                max_count_concecutive_elements = max_count_concecutive_elements + 1 if max_count_concecutive_elements else 0
+                if 0 < count_consecutive_days <= max_count_concecutive_elements:
+                    return True
+            return False
+        raise ValueError('Count consecutive days must be 1 or more,')
 
     def actions_with_accounts(self):
         return self.actions.filter(flag=Action.CHOICES_FLAGS.profiling).all()
 
-    # def days_attendance(self):
-    #     last_session_of_account = ExpandedSession.objects.filter(account_pk=self.pk).order_by('expire_date').last()
-    #     if last_session_of_account is not None:
-    #         SessionStore = import_module(settings.SESSION_ENGINE).SessionStore
-    #         session = SessionStore(session_key=last_session_of_account.session_key)
-    #         dates_visits = session['dates_visits']
-    #         dates_visits.sort()
-    #         return dates_visits
-    #     else:
-    #         return None
-
     def get_reputation(self):
-        """Getting reputation of account based on his activity, actions, badges."""
+        """Getting reputation 1of account based on his activity, actions, badges."""
         return sum([
             self.get_reputation_for_badges(),
             self.get_reputation_for_actions(),
