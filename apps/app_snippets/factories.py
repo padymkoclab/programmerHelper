@@ -48,6 +48,7 @@ class Factory_Snippet(factory.DjangoModelFactory):
             Factory_OpinionGeneric(content_object=self)
 
 
-Snippet.objects.filter().delete()
-for i in range(50):
-    Factory_Snippet()
+def factory_snippets(count):
+    Snippet.objects.filter().delete()
+    for i in range(count):
+        Factory_Snippet()

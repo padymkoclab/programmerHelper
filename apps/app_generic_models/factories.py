@@ -18,7 +18,6 @@ def get_unique_user(instance, counter=0):
         instance.full_clean()
     except:
         if counter == len(Accounts):
-            import ipdb; ipdb.set_trace()
             raise Exception('Accounts depleted.')
         counter += 1
         return get_unique_user(instance, counter)

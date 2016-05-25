@@ -27,19 +27,19 @@ class Snippet(TimeStampedModel):
     )
     slug = AutoSlugField(_('Slug'), populate_from='title', always_update=True, unique=True, allow_unicode=True, db_index=True)
     lexer = models.CharField(_('Lexer of code'), max_length=50, choices=CHOICES_LEXERS)
-    description = models.TextField(_('Decription'))
-    code = models.TextField(_('Code'))
-    tags = models.ManyToManyField(
-        Tag,
-        verbose_name=_('Tags'),
-        related_name='snippets',
-    )
     author = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         verbose_name=_('Author'),
         related_name='snippets',
         on_delete=models.DO_NOTHING,
         limit_choices_to={'is_active': True},
+    )
+    description = models.TextField(_('Decription'))
+    code = models.TextField(_('Code'))
+    tags = models.ManyToManyField(
+        Tag,
+        verbose_name=_('Tags'),
+        related_name='snippets',
     )
     opinions = GenericRelation(OpinionGeneric)
     comments = GenericRelation(CommentGeneric)

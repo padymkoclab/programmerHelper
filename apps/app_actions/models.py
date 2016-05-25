@@ -18,10 +18,10 @@ class Action(models.Model):
     """
 
     CHOICES_FLAGS = Choices(
-        ('profiling', _('Working with profile')),
-        ('adding', _('Adding')),
-        ('updating', _('Updating')),
-        ('deleting', _('Deleting')),
+        ('USER', _('Working with profile')),
+        ('ADD', _('Adding')),
+        ('UPDT', _('Updating')),
+        ('DEL', _('Deleting')),
     )
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

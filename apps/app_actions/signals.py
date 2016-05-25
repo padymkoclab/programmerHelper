@@ -1,6 +1,6 @@
 
 from django.dispatch import receiver
-from django.db.models.signals import post_delete, post_save, m2m_changed, pre_save, pre_delete
+from django.db.models.signals import post_delete, post_save, m2m_changed, pre_save
 
 from apps.app_accounts.models import Account
 from apps.app_courses.models import Course
@@ -24,7 +24,7 @@ MODELS_WITH_FK_ACCOUNT = [
     TestingSuit,
     ForumTopic,
     ForumPost,
-    CommentGeneric,
+    # CommentGeneric,
     OpinionGeneric,
     LikeGeneric,
     ScopeGeneric,
@@ -35,6 +35,7 @@ MODELS_WITH_FK_ACCOUNT = [
 
 
 OLD_ACCOUNT = None
+
 
 @receiver(pre_save)
 def signal_for_keeping_old_account(sender, instance, **kwargs):
@@ -71,13 +72,13 @@ def signal_created_updated_object(sender, instance, created, **kwargs):
         if created:
             Action.objects.create(
                 account=account,
-                flag=Action.CHOICES_FLAGS.adding,
+                flag=Action.CHOICES_FLAGS.ADD,
                 message='Created new {0} "{1}".'.format(instance._meta.verbose_name.lower(), instance),
             )
         else:
             Action.objects.create(
                 account=account,
-                flag=Action.CHOICES_FLAGS.updating,
+                flag=Action.CHOICES_FLAGS.UPDT,
                 message='Updated {0} "{1}".'.format(instance._meta.verbose_name.lower(), instance),
             )
         # check on current account
@@ -99,7 +100,7 @@ def signal_deleted_object(sender, instance, **kwargs):
             account = instance.user
         Action.objects.create(
             account=account,
-            flag=Action.CHOICES_FLAGS.deleting,
+            flag=Action.CHOICES_FLAGS.DEL,
             message='Deleted {0} "{1}".'.format(instance._meta.verbose_name.lower(), instance),
         )
         account.check_badge('Dispatcher')
@@ -126,6 +127,14 @@ def signal_deleted_course(sender, instance, **kwargs):
 
     for author in Account.objects.objects_with_badge('Sage'):
         author.check_badge('Sage')
+        if not author.has_badge('Sage'):
+            flag = Action.CHOICES_FLAGS.DEL
+            message = 'Removed as author from the {0} "{1}".'.format(instance._meta.verbose_name.lower(), instance)
+            Action.objects.create(
+                account=author,
+                flag=flag,
+                message=message,
+            )
 
 
 ALL_COURSES = list()
@@ -148,11 +157,11 @@ def signal_change_authorhip_of_course(sender, instance, action, reverse, model, 
         if not reverse:
             if action in ['post_remove', 'post_add']:
                 if action == 'post_remove':
-                    flag = Action.CHOICES_FLAGS.deleting
-                    message = 'Removed as author from {0} "{1}".'.format(instance._meta.verbose_name.lower(), instance)
+                    flag = Action.CHOICES_FLAGS.DEL
+                    message = 'Removed as author from the {0} "{1}".'.format(instance._meta.verbose_name.lower(), instance)
                 elif action == 'post_add':
-                    flag = Action.CHOICES_FLAGS.adding
-                    message = 'Added as author to {0} "{1}".'.format(instance._meta.verbose_name.lower(), instance)
+                    flag = Action.CHOICES_FLAGS.ADD
+                    message = 'Added as author to the {0} "{1}".'.format(instance._meta.verbose_name.lower(), instance)
                 for pk in pk_set:
                     account = model.objects.get(pk=pk)
                     Action.objects.create(
@@ -162,8 +171,8 @@ def signal_change_authorhip_of_course(sender, instance, action, reverse, model, 
                     )
                     account.check_badge('Sage')
             if action == 'post_clear':
-                flag = Action.CHOICES_FLAGS.deleting
-                message = 'Removed as author from {0} "{1}".'.format(instance._meta.verbose_name.lower(), instance)
+                flag = Action.CHOICES_FLAGS.DEL
+                message = 'Removed as author from the {0} "{1}".'.format(instance._meta.verbose_name.lower(), instance)
                 for pk in ALL_PKS_AUTHORSHIP:
                     account = model.objects.get(pk=pk)
                     Action.objects.create(
@@ -178,21 +187,21 @@ def signal_change_authorhip_of_course(sender, instance, action, reverse, model, 
                 for pk in pk_set:
                     course = model.objects.get(pk=pk)
                     if action == 'post_remove':
-                        flag = Action.CHOICES_FLAGS.deleting
-                        message = 'Removed as author from {0} "{1}".'.format(model._meta.verbose_name.lower(), course)
+                        flag = Action.CHOICES_FLAGS.DEL
+                        message = 'Removed as author from the {0} "{1}".'.format(model._meta.verbose_name.lower(), course)
                     elif action == 'post_add':
-                        flag = Action.CHOICES_FLAGS.adding
-                        message = 'Added as author to {0} "{1}".'.format(model._meta.verbose_name.lower(), course)
+                        flag = Action.CHOICES_FLAGS.ADD
+                        message = 'Added as author to the {0} "{1}".'.format(model._meta.verbose_name.lower(), course)
                     Action.objects.create(
                         account=account,
                         flag=flag,
                         message=message,
                     )
             if action == 'post_clear':
-                flag = Action.CHOICES_FLAGS.deleting
+                flag = Action.CHOICES_FLAGS.DEL
                 for pk in ALL_COURSES:
                     course = Course.objects.get(pk=pk)
-                    message = 'Removed as author from {0} "{1}".'.format(model._meta.verbose_name.lower(), course)
+                    message = 'Removed as author from the {0} "{1}".'.format(model._meta.verbose_name.lower(), course)
                     Action.objects.create(
                         account=account,
                         flag=flag,
@@ -206,8 +215,8 @@ def signal_account_participated_in_poll(sender, instance, **kwargs):
     """Signal, what account participated in poll."""
     Action.objects.create(
         account=instance.user,
-        flag=Action.CHOICES_FLAGS.adding,
-        message='Participated in {0} "{1}".'.format(instance.poll._meta.verbose_name.lower(), instance.poll),
+        flag=Action.CHOICES_FLAGS.ADD,
+        message='Participated in the {0} "{1}".'.format(instance.poll._meta.verbose_name.lower(), instance.poll),
     )
     instance.user.check_badge('Voter')
 
@@ -217,8 +226,8 @@ def signal_account_removed_from_voters_in_poll(sender, instance, **kwargs):
     """Signal, what account removed from voters in poll."""
     Action.objects.create(
         account=instance.user,
-        flag=Action.CHOICES_FLAGS.deleting,
-        message='Removed from voters in {0} "{1}".'.format(instance.poll._meta.verbose_name.lower(), instance.poll),
+        flag=Action.CHOICES_FLAGS.DEL,
+        message='Removed from voters in the {0} "{1}".'.format(instance.poll._meta.verbose_name.lower(), instance.poll),
     )
     instance.user.check_badge('Voter')
 
@@ -237,10 +246,10 @@ def signal_changed_status_of_account(sender, instance, **kwargs):
         global CHANGE_STATUS_ACCOUNT
         if not obj.is_superuser == instance.is_superuser:
             new_status_account = 'superuser' if instance.is_superuser else 'non superuser'
-            message = 'Change status account as {0}.'.format(new_status_account)
+            message = 'Changed status account as {0}.'.format(new_status_account)
             Action.objects.create(
                 account=instance,
-                flag=Action.CHOICES_FLAGS.profiling,
+                flag=Action.CHOICES_FLAGS.USER,
                 message=message,
             )
             CHANGE_STATUS_ACCOUNT = True
@@ -251,7 +260,7 @@ def signal_changed_status_of_account(sender, instance, **kwargs):
                 message = 'Account disabled.'
             Action.objects.create(
                 account=instance,
-                flag=Action.CHOICES_FLAGS.profiling,
+                flag=Action.CHOICES_FLAGS.USER,
                 message=message,
             )
             CHANGE_STATUS_ACCOUNT = True
@@ -261,27 +270,29 @@ def signal_changed_status_of_account(sender, instance, **kwargs):
 
 @receiver(post_save, sender=Account)
 def signal_creating_updating_of_account(sender, instance, created, **kwargs):
-    """Signal creating or update account of user."""
+    """Signal creating or updating account of user."""
+
     global CHANGE_STATUS_ACCOUNT
     if created:
-        message = 'Created account'
+        message = 'Created account.'
     else:
-        message = 'Update account'
+        message = 'Updated account.'
     if not CHANGE_STATUS_ACCOUNT:
         Action.objects.create(
             account=instance,
-            flag=Action.CHOICES_FLAGS.profiling,
+            flag=Action.CHOICES_FLAGS.USER,
             message=message,
         )
     CHANGE_STATUS_ACCOUNT = False
 
 
-@receiver(post_delete, sender=Account)
-def signal_deleted_account(sender, instance, **kwargs):
-    """Signal creating or update account of user."""
-    message = 'Delete {0} "{1.username} ({1.email})"'.format(instance._meta.verbose_name.lower(), instance)
-    Action.objects.create(
-        account=instance,
-        flag=Action.CHOICES_FLAGS.profiling,
-        message=message,
-    )
+# @receiver(post_delete, sender=Account)
+# def signal_deleted_account(sender, instance, **kwargs):
+#     """Signal creating or update account of user."""
+
+#     message = 'Deleted account.'
+#     Action.objects.create(
+#         account=instance,
+#         flag=Action.CHOICES_FLAGS.USER,
+#         message=message,
+#     )

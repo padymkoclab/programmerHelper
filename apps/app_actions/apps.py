@@ -16,5 +16,5 @@ class AppActionsConfig(AppConfig):
         from .signals import signal_account_participated_in_poll
         from .signals import signal_account_removed_from_voters_in_poll
         from .signals import signal_creating_updating_of_account
-        from .signals import signal_deleted_account
+        # from .signals import signal_deleted_account
         from .signals import signal_change_useful_links_of_solutions_or_articles

@@ -11,13 +11,12 @@ class SnippetQuerySet(models.QuerySet):
         """Added for each snippet new field 'scope' where storage her scope."""
 
         return self.annotate(scope=models.Sum(
-                models.Case(
-                    models.When(opinions__is_useful=True, then=1),
-                    models.When(opinions__is_useful=False, then=-1),
-                    output_field=models.IntegerField()
-                )
+            models.Case(
+                models.When(opinions__is_useful=True, then=1),
+                models.When(opinions__is_useful=False, then=-1),
+                output_field=models.IntegerField()
             )
-        )
+        ))
 
     def snippets_by_scopes(self, min_scope=None, max_scope=None):
         """Snippets with certain range of scopes."""

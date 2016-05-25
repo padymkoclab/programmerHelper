@@ -108,7 +108,7 @@ class BadgeManager(models.Manager):
                 msg = 'Parametr "accounts" must be queryset from the model "{0}"'.format(str(self.model._meta.verbose_name))
                 raise TypeError(msg)
         restricted_pks = accounts.values_list('pk', flat=True)
-        accounts_pks= tuple(filter(lambda x: x in restricted_pks, accounts_pks))
+        accounts_pks = tuple(filter(lambda x: x in restricted_pks, accounts_pks))
         return accounts_pks
 
     def objects_with_badge(self, badge_name):
@@ -713,6 +713,20 @@ class BadgeManager(models.Manager):
     def check_badge_Clear_Head(self, accounts=None):
         """Added own snippet with scope +1 or more."""
 
+        badge_name = 'Clear Head'
+        badge = Badge.objects.get(name__iexact=badge_name)
+
+        if accounts is None:
+            accounts = self.iterator()
+        # for account in accounts:
+        #     if not account.has_badge(badge_name):
+        #         if account.articles.filter(links__isnull=False).count() or \
+        #                 account.solutions.filter(links__isnull=False).count():
+        #             GettingBadge.objects.create(user=account, badge=badge)
+        #     if account.has_badge(badge_name):
+        #         if not account.articles.filter(links__isnull=False).count() and \
+        #                 not account.solutions.filter(links__isnull=False).count():
+        #             GettingBadge.objects.get(user=account, badge=badge).delete()
         snippets_by_min_scope = Snippet.objects.snippets_by_scopes(min_scope=1)
         accounts_pks = snippets_by_min_scope.values_list('author', flat=True).distinct()
         if accounts is not None:
@@ -744,7 +758,6 @@ class BadgeManager(models.Manager):
         if accounts is None:
             accounts = self.iterator()
         for account in accounts:
-            # import ipdb; ipdb.set_trace()
             if not account.has_badge(badge_name):
                 if account.articles.filter(links__isnull=False).count() or \
                         account.solutions.filter(links__isnull=False).count():
