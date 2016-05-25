@@ -179,6 +179,9 @@ class Account(AbstractBaseUser, PermissionsMixin):
     def has_module_perms(self, app_label):
         return True
 
+    def _as_queryset(self):
+        return self.__class__.objects.filter(pk=self.pk)
+
     def last_seen(self):
         last_session_of_account = ExpandedSession.objects.filter(account_pk=self.pk).order_by('expire_date').last()
         if last_session_of_account:
@@ -209,6 +212,13 @@ class Account(AbstractBaseUser, PermissionsMixin):
 
     def actions_with_accounts(self):
         return self.actions.filter(flag=Action.CHOICES_FLAGS.profiling).all()
+
+    def check_badge(self, badge_name):
+        instance = self._as_queryset()
+        return self.__class__.badges_manager.validate_badges(accounts=instance, badges_names=[badge_name])
+
+    def has_badge(self, badge_name):
+        return self.__class__.badges_manager.has_badge(account=self, badge_name=badge_name)
 
     def get_reputation(self):
         """Getting reputation 1of account based on his activity, actions, badges."""

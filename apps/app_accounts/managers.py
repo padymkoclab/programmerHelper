@@ -149,6 +149,13 @@ class AccountQuerySet(models.QuerySet):
         """Getting accounts what passed at least 1 testing suit."""
         return self.filter(testing_suits__isnull=False)
 
+    def objects_with_badge(self, badge_name):
+        result = self.filter()
+        for obj in self.iterator():
+            if not obj.has_badge(badge_name):
+                result = result.exclude(pk=obj.pk)
+        return result
+
 
 class AccountManager(BaseUserManager):
     """

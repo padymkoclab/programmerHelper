@@ -130,6 +130,7 @@ class VoteInPoll(models.Model):
         verbose_name_plural = "Votes in poll"
         ordering = ['poll', 'date_voting']
         get_latest_by = 'date_voting'
+        unique_together = ['poll', 'user']
 
     def __str__(self):
         return 'Vote of user "{0.user}" in poll "{0.poll}"'.format(self)

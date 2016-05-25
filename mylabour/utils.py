@@ -2,7 +2,7 @@
 import random
 import json
 
-from django.utils import timezone
+# from django.utils import timezone
 from django.db import models
 from django.core.exceptions import ImproperlyConfigured
 
@@ -45,12 +45,14 @@ def get_random_objects(queryset, count=1):
     if isinstance(queryset, models.QuerySet):
         all_primary_keys = tuple(queryset.values_list('pk', flat=True))
         count_primary_keys = len(all_primary_keys)
-        if count > count_primary_keys:
-            count = count_primary_keys
         if count_primary_keys == 0:
             raise ValueError('QuerySet is empty.')
+        if count > count_primary_keys:
+            count = count_primary_keys
         random_pks = random.sample(all_primary_keys, count)
         random_objects = queryset.filter(pk__in=random_pks)
+        if count == 1:
+            return random_objects.first()
         return random_objects
     else:
         raise TypeError('Type queryset must be \'django.db.models.query\'.')
@@ -96,44 +98,3 @@ def show_concecutive_certain_element(sequence, element):
     if t:
         k.append(t)
     return k
-
-
-CHOICES_LEXERS = [
-    ('Awk', 'Awk'),
-    ('Base Makefile', 'Base Makefile'),
-    ('Bash', 'Bash'),
-    ('CoffeeScript', 'CoffeeScript'),
-    ('CSS', 'CSS'),
-    ('CSS+Django/Jinja', 'CSS+Django/Jinja'),
-    ('CSS+PHP', 'CSS+PHP'),
-    ('CSS+Ruby', 'CSS+Ruby'),
-    ('Django/Jinja', 'Django/Jinja'),
-    ('HTML', 'HTML'),
-    ('HTML+Django/Jinja', 'HTML+Django/Jinja'),
-    ('HTML+PHP', 'HTML+PHP'),
-    ('IPython3', 'IPython3'),
-    ('Java', 'Java'),
-    ('JavaScript', 'JavaScript'),
-    ('JavaScript+Django/Jinja', 'JavaScript+Django/Jinja'),
-    ('JavaScript+PHP', 'JavaScript+PHP'),
-    ('JavaScript+Ruby', 'JavaScript+Ruby'),
-    ('JSON', 'JSON'),
-    ('LessCss', 'LessCss'),
-    ('Makefile', 'Makefile'),
-    ('MySQL', 'MySQL'),
-    ('NumPy', 'NumPy'),
-    ('Perl', 'Perl'),
-    ('Perl6', 'Perl6'),
-    ('PHP', 'PHP'),
-    ('PostgreSQL console (psql)', 'PostgreSQL console (psql)'),
-    ('Python', 'Python'),
-    ('Python 3', 'Python 3'),
-    ('reStructuredText', 'reStructuredText'),
-    ('Ruby', 'Ruby'),
-    ('Sass', 'Sass'),
-    ('Scala', 'Scala'),
-    ('SCSS', 'SCSS'),
-    ('SQL', 'SQL'),
-    ('XML', 'XML'),
-    ('YAML', 'YAML'),
-]

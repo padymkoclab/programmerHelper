@@ -22,7 +22,6 @@ class Factory_Snippet(factory.DjangoModelFactory):
     author = fuzzy.FuzzyChoice(Accounts)
     description = factory.Faker('text', locale='ru')
     code = factory.Faker('text', locale='en')
-    views = fuzzy.FuzzyInteger(1000)
 
     @factory.lazy_attribute
     def title(self):

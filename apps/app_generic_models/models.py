@@ -45,7 +45,6 @@ class CommentGeneric(BaseGeneric):
         db_table = 'comments'
         verbose_name = _('Comment')
         verbose_name_plural = _('Comments')
-        unique_together = ['author', 'object_id']
 
 
 class OpinionGeneric(BaseGeneric):

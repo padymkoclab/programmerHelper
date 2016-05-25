@@ -63,8 +63,7 @@ class Factory_Account(factory.DjangoModelFactory):
         return 'http://{0}.com'.format(slug_name)
 
 
-def fillup_models_app_accounts_data():
-
+def factory_account_level():
     AccountLevel.objects.filter().delete()
     Factory_AccountLevel(name=AccountLevel.CHOICES_LEVEL.platinum, color='#D8BFD8', description='Regular level of account')
     Factory_AccountLevel(name=AccountLevel.CHOICES_LEVEL.golden, color='#FFD700', description='Golder level of account')
@@ -79,14 +78,11 @@ def fillup_models_app_accounts_data():
     Factory_AccountLevel(name=AccountLevel.CHOICES_LEVEL.turquoise, color='#40E0D0', description='Turquoise level of account')
     Factory_AccountLevel(name=AccountLevel.CHOICES_LEVEL.amber, color='#FF8C00', description='Amber level of account')
     Factory_AccountLevel(name=AccountLevel.CHOICES_LEVEL.opal, color='#FF7F50', description='Opal level of account')
+    Factory_AccountLevel(name=AccountLevel.CHOICES_LEVEL.regular, color='#F0F8FF', description='Regular level of account')
 
-    # create default level of account if it not exists
-    if not AccountLevel.objects.filter(name=AccountLevel.CHOICES_LEVEL.regular).exists():
-        Factory_AccountLevel(name=AccountLevel.CHOICES_LEVEL.regular, color='#F0F8FF', description='Regular level of account')
 
-    for i in range(100):
+def factory_accounts(count):
+    if not AccountLevel.objects.count() and count > 0:
+        factory_account_level()
+    for i in range(count):
         Factory_Account()
-
-
-if __name__ == '__main__':
-    fillup_models_app_accounts_data()

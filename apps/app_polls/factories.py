@@ -34,15 +34,16 @@ class Factory_Choice(factory.django.DjangoModelFactory):
     text_choice = factory.Faker('text', locale='ru')
 
 
-Poll.objects.filter().delete()
-for i in range(20):
-    poll = Factory_Poll()
-    count_random_choices = random.randint(Poll.MIN_COUNT_CHOICES_IN_POLL, Poll.MAX_COUNT_CHOICES_IN_POLL)
-    for i in range(count_random_choices):
-        Factory_Choice(poll=poll)
-for poll in Poll.objects.all():
-    random_count_users = random.randrange(len(Accounts))
-    users = random.sample(tuple(Accounts), random_count_users)
-    for user in users:
-        choice = random.choice(tuple(poll.choices.all()))
-        VoteInPoll.objects.create(user=user, poll=poll, choice=choice)
+def factory_polls(count):
+    Poll.objects.filter().delete()
+    for i in range(count):
+        poll = Factory_Poll()
+        count_random_choices = random.randint(Poll.MIN_COUNT_CHOICES_IN_POLL, Poll.MAX_COUNT_CHOICES_IN_POLL)
+        for i in range(count_random_choices):
+            Factory_Choice(poll=poll)
+    for poll in Poll.objects.all():
+        random_count_users = random.randrange(len(Accounts))
+        users = random.sample(tuple(Accounts), random_count_users)
+        for user in users:
+            choice = random.choice(tuple(poll.choices.all()))
+            VoteInPoll.objects.create(user=user, poll=poll, choice=choice)

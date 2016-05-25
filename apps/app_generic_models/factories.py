@@ -8,10 +8,9 @@ from django.contrib.auth import get_user_model
 
 from .models import *
 
-Accounts = get_user_model().objects.all()
-
 
 def get_unique_user(instance, counter=0):
+    Accounts = get_user_model().objects.all()
     account = random.choice(Accounts)
     try:
         instance.user = account
@@ -19,6 +18,7 @@ def get_unique_user(instance, counter=0):
         instance.full_clean()
     except:
         if counter == len(Accounts):
+            import ipdb; ipdb.set_trace()
             raise Exception('Accounts depleted.')
         counter += 1
         return get_unique_user(instance, counter)
@@ -32,11 +32,7 @@ class Factory_CommentGeneric(factory.DjangoModelFactory):
         model = CommentGeneric
 
     text_comment = factory.Faker('text', locale='ru')
-
-    @factory.lazy_attribute
-    def author(self):
-        instance = CommentGeneric(content_object=self.content_object, text_comment=self.text_comment)
-        return get_unique_user(instance)
+    author = fuzzy.FuzzyChoice(get_user_model().objects.all())
 
 
 class Factory_OpinionGeneric(factory.DjangoModelFactory):

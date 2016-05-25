@@ -12,7 +12,7 @@ from autoslug import AutoSlugField
 
 from apps.app_generic_models.models import CommentGeneric, OpinionGeneric
 from mylabour.models import TimeStampedModel
-from mylabour.utils import CHOICES_LEXERS
+from mylabour.constants import CHOICES_LEXERS
 
 from .managers import CourseManager, CourseQuerySet
 

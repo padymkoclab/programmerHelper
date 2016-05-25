@@ -1,15 +1,14 @@
 
 import random
 
+from django.contrib.auth import get_user_model
+
 import factory
 from factory import fuzzy
 
 from apps.app_generic_models.factories import Factory_CommentGeneric, Factory_OpinionGeneric
 
 from .models import *
-
-
-Accounts = Account.objects.all()
 
 
 class Factory_SolutionCategory(factory.DjangoModelFactory):
@@ -36,7 +35,7 @@ class Factory_Solution(factory.DjangoModelFactory):
         model = Solution
 
     category = fuzzy.FuzzyChoice(SolutionCategory.objects.all())
-    author = fuzzy.FuzzyChoice(Account.objects.all())
+    author = fuzzy.FuzzyChoice(get_user_model().objects.all())
     views = fuzzy.FuzzyInteger(1000)
 
     @factory.lazy_attribute
@@ -57,10 +56,10 @@ class Factory_Solution(factory.DjangoModelFactory):
         self.tags.set(tags)
 
     @factory.post_generation
-    def useful_links(self, created, extracted, **kwargs):
-        count_useful_links = random.randint(0, WebLink.MAX_COUNT_WEBLINKS_ON_OBJECT)
-        useful_links = random.sample(tuple(WebLink.objects.all()), count_useful_links)
-        self.useful_links.set(useful_links)
+    def links(self, created, extracted, **kwargs):
+        count_links = random.randint(0, WebLink.MAX_COUNT_WEBLINKS_ON_OBJECT)
+        links = random.sample(tuple(WebLink.objects.all()), count_links)
+        self.links.set(links)
 
     @factory.post_generation
     def comments(self, created, extracted, **kwargs):
@@ -73,8 +72,17 @@ class Factory_Solution(factory.DjangoModelFactory):
             Factory_OpinionGeneric(content_object=self)
 
 
-SolutionCategory.objects.filter().delete()
-for i in range(10):
-    category = Factory_SolutionCategory()
-    for j in range(random.randrange(8)):
-        solution = Factory_Solution(category=category)
+def factory_solutions_categories():
+    SolutionCategory.objects.filter().delete()
+    for i in range(10):
+        category = Factory_SolutionCategory()
+
+def factory_solutions(count):
+    factory_solutions_categories()
+    for i in range(count):
+        Factory_Solution(category=SolutionCategory.objects.get_random_category())
+
+
+def factory_categories_of_solutions_and_solutions(count_solutions):
+    factory_solutions_categories()
+    factory_solutions(count_solutions)

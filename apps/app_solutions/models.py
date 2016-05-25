@@ -12,9 +12,9 @@ from apps.app_generic_models.models import CommentGeneric, OpinionGeneric
 from apps.app_web_links.models import WebLink
 from apps.app_tags.models import Tag
 from mylabour.models import TimeStampedModel
-from mylabour.utils import CHOICES_LEXERS
+from mylabour.constants import CHOICES_LEXERS
 
-from .managers import SolutionQuerySet, SolutionManager
+from .managers import SolutionQuerySet, SolutionCategoryManager
 
 
 class SolutionCategory(TimeStampedModel):
@@ -35,6 +35,9 @@ class SolutionCategory(TimeStampedModel):
         verbose_name_plural = _("Categories of solutions")
         get_latest_by = 'date_modified'
         ordering = ['lexer', 'name']
+
+    objects = models.Manager()
+    objects = SolutionCategoryManager()
 
     def __str__(self):
         return '{0.name}'.format(self)
@@ -89,7 +92,7 @@ class Solution(TimeStampedModel):
 
     # managers
     objects = models.Manager()
-    objects = SolutionManager.from_queryset(SolutionQuerySet)()
+    # objects = SolutionManager.from_queryset(SolutionQuerySet)()
 
     class Meta:
         db_table = 'solutions'

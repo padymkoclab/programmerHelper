@@ -16,7 +16,7 @@ from mylabour.models import TimeStampedModel
 from apps.app_tags.models import Tag
 from apps.app_web_links.models import WebLink
 
-from .managers import ArticleManager
+from .managers import ArticleManager, ArticleQuerySet
 
 
 class Article(TimeStampedModel):
@@ -60,15 +60,14 @@ class Article(TimeStampedModel):
         WebLink,
         related_name='articles',
         verbose_name=_('Links'),
-        help_text=_('Useful weblinks'),
-        blank=True,
+        help_text=_('Useful links'),
     )
     comments = GenericRelation(CommentGeneric)
     scopes = GenericRelation(ScopeGeneric)
 
     # managers
     objects = models.Manager()
-    objects = ArticleManager()
+    objects = ArticleManager.from_queryset(ArticleQuerySet)()
 
     class Meta:
         db_table = 'articles'

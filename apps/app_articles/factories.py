@@ -47,7 +47,7 @@ class Factory_Article(factory.DjangoModelFactory):
 
     @factory.post_generation
     def links(self, created, extracted, **kwargs):
-        count_links = random.randrange(0, settings.MAX_COUNT_WEBLINKS_ON_OBJECT)
+        count_links = random.randrange(1, settings.MAX_COUNT_WEBLINKS_ON_OBJECT)
         weblinks = random.sample(tuple(WebLink.objects.all()), count_links)
         self.links.set(weblinks)
 
@@ -69,8 +69,9 @@ class Factory_ArticleSubsection(factory.DjangoModelFactory):
         return factory.Faker('text', locale='ru').generate([])[:50]
 
 
-Article.objects.filter().delete()
-for i in range(20):
-    article = Factory_Article()
-    for j in range(random.randrange(Article.MIN_COUNT_SUBSECTIONS, Article.MAX_COUNT_SUBSECTIONS)):
-        Factory_ArticleSubsection(article=article)
+def factory_articles(count):
+    Article.objects.filter().delete()
+    for i in range(count):
+        article = Factory_Article()
+        for j in range(random.randrange(Article.MIN_COUNT_SUBSECTIONS, Article.MAX_COUNT_SUBSECTIONS)):
+            Factory_ArticleSubsection(article=article)

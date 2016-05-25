@@ -1,4 +1,6 @@
 
+import random
+
 from django.db import models
 
 
@@ -36,9 +38,12 @@ class SolutionQuerySet(models.QuerySet):
             raise TypeError('Missing 1 required argument: min_scope or max_scope.')
 
 
-class SolutionManager(models.Manager):
+class SolutionCategoryManager(models.Manager):
     """
     Model manager
     """
 
-    pass
+    def get_random_category(self):
+        random_pk = random.choice(self.values_list('pk', flat=True))
+        return self.get(pk=random_pk)
+

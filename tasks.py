@@ -1,14 +1,14 @@
 
 import random
 import string
-
-from django import setup
-from django.apps import apps
 import pathlib
 import shutil
 
+from django import setup
+from django.apps import apps
 from django.contrib.auth import get_user_model
 from django.conf import settings
+from django.core import management
 
 from invoke import run, task
 
@@ -212,3 +212,14 @@ def create_default_superuser():
     print('-' * 50)
     print('Succesful added superuser!')
     print('-' * 50)
+
+
+@task
+def delete_testing_database():
+    run('sudo service postgresql stop')
+    run('sudo service postgresql start')
+    # load apps in registry if not ready
+    if not apps.ready:
+        setup()
+    management.call_command('delete_test_database')
+

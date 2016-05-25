@@ -12,7 +12,7 @@ from apps.app_generic_models.models import CommentGeneric, OpinionGeneric
 from apps.app_visits.models import Visit
 from apps.app_tags.models import Tag
 from mylabour.models import TimeStampedModel
-from mylabour.utils import CHOICES_LEXERS
+from mylabour.constants import CHOICES_LEXERS
 
 from .managers import SnippetManager, SnippetQuerySet
 

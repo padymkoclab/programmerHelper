@@ -3,8 +3,16 @@ from django.db import models
 
 
 class ArticleQuerySet(models.QuerySet):
+    """
+
+    """
 
     pass
+
+    # def find_articles_without_tags_and_links(self):
+    #     """ """
+
+    #     return self.get_queryset().function()
 
 
 class ArticleManager(models.Manager):
@@ -18,5 +26,5 @@ class ArticleManager(models.Manager):
     def articles_with_rating(self):
         return self.annotate(rating=models.Avg('scopes__scope'))
 
-    def myy(self):
-        return self.get_queryset().function()
+
+

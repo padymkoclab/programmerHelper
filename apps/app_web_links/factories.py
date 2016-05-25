@@ -22,5 +22,7 @@ class Factory_WebLink(factory.DjangoModelFactory):
         return '{0} {1}'.format(name_en, name_ru)
 
 
-for i in range(300):
-    Factory_WebLink()
+def factory_web_links(count):
+    WebLink.objects.filter().delete()
+    for i in range(count):
+        Factory_WebLink()

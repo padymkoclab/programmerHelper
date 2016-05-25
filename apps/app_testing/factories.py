@@ -38,7 +38,7 @@ class Factory_TestingPassage(factory.django.DjangoModelFactory):
         model = TestingPassage
 
     user = fuzzy.FuzzyChoice(Account.objects.all())
-    test_suit = fuzzy.FuzzyChoice(TestingSuit.objects.all())
+    testing_suit = fuzzy.FuzzyChoice(TestingSuit.objects.all())
     status = fuzzy.FuzzyChoice(TestingPassage.CHOICES_STATUS._db_values)
     scope = fuzzy.FuzzyInteger(TestingPassage.MIN_SCOPE, TestingPassage.MAX_SCOPE)
 
@@ -48,7 +48,7 @@ class Factory_TestingQuestion(factory.DjangoModelFactory):
     class Meta:
         model = TestingQuestion
 
-    test_suit = fuzzy.FuzzyChoice(TestingSuit.objects.all())
+    testing_suit = fuzzy.FuzzyChoice(TestingSuit.objects.all())
     text_question = factory.Faker('text', locale='ru')
 
     @factory.lazy_attribute
@@ -73,10 +73,10 @@ class Factory_TestingVariant(factory.DjangoModelFactory):
 
 TestingSuit.objects.filter().delete()
 for i in range(10):
-    test_suit = Factory_TestingSuit()
+    testing_suit = Factory_TestingSuit()
     for j in range(random.randrange(30)):
-        Factory_TestingPassage(test_suit=test_suit)
+        Factory_TestingPassage(testing_suit=testing_suit)
     for h in range(random.randint(TestingSuit.MIN_COUNT_QUESTIONS, TestingSuit.MAX_COUNT_QUESTIONS)):
-        question = Factory_TestingQuestion(test_suit=test_suit)
+        question = Factory_TestingQuestion(testing_suit=testing_suit)
         for g in range(random.randint(TestingQuestion.MIN_COUNT_VARIANTS, TestingQuestion.MAX_COUNT_VARIANTS)):
             Factory_TestingVariant(question=question)
