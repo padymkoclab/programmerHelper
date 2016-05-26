@@ -46,15 +46,6 @@ class Factory_Question(factory.DjangoModelFactory):
             Factory_OpinionGeneric(content_object=self)
 
 
-Question.objects.filter().delete()
-for i in range(100):
-    question = Factory_Question()
-    # change date_added
-    date_added = fuzzy.FuzzyDateTime(timezone.now() - timezone.timedelta(weeks=1), timezone.now()).fuzz()
-    question.date_added = date_added
-    question.save()
-
-
 class Factory_Answer(factory.DjangoModelFactory):
 
     class Meta:
@@ -81,5 +72,13 @@ class Factory_Answer(factory.DjangoModelFactory):
             Factory_CommentGeneric(content_object=self)
 
 
-for j in range(300):
-    Factory_Answer()
+def factory_questions_and_answers(count_questions, count_answers):
+    Question.objects.filter().delete()
+    for i in range(count_questions):
+        question = Factory_Question()
+        # change date_added
+        date_added = fuzzy.FuzzyDateTime(timezone.now() - timezone.timedelta(weeks=1), timezone.now()).fuzz()
+        question.date_added = date_added
+        question.save()
+    for j in range(count_answers):
+        Factory_Answer()

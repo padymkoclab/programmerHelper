@@ -6,4 +6,6 @@ from .models import Tag
 
 class TagDetailView(DetailView):
     model = Tag
-    template_name = "TEMPLATE_NAME"
+    template_name = "app_tags/detail.html"
+    slug_url_kwarg = 'name'
+    slug_field = 'name'

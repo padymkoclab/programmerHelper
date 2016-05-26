@@ -66,7 +66,7 @@ class TagAdmin(admin.ModelAdmin):
         'date_modified',
     )
     date_hierarchy = 'date_modified'
-    prepopulated_fields = {'name': ['name']}
+    # prepopulated_fields = {'name': ['name']}
     # list_filter = (
     #     'date_modified',
     # )
@@ -88,12 +88,7 @@ class TagAdmin(admin.ModelAdmin):
 
     def get_queryset(self, request):
         qs = super(TagAdmin, self).get_queryset(request)
-        qs = qs.annotate(
-            count_solutions=Count('solutions', distinct=True),
-            count_snippets=Count('snippets', distinct=True),
-            count_questions=Count('questions', distinct=True),
-            count_articles=Count('articles', distinct=True),
-        )
+        qs = qs.tags_with_total_count_usage()
         return qs
 
     def get_count_solutions_presents(self, obj):

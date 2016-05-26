@@ -73,16 +73,18 @@ class Factory_Solution(factory.DjangoModelFactory):
 
 
 def factory_solutions_categories():
+    # import ipdb; ipdb.set_trace()
     SolutionCategory.objects.filter().delete()
     for i in range(10):
-        category = Factory_SolutionCategory()
+        Factory_SolutionCategory()
+
 
 def factory_solutions(count):
-    factory_solutions_categories()
+    if not SolutionCategory.objects.count():
+        factory_solutions_categories()
     for i in range(count):
         Factory_Solution(category=SolutionCategory.objects.get_random_category())
 
 
 def factory_categories_of_solutions_and_solutions(count_solutions):
-    factory_solutions_categories()
     factory_solutions(count_solutions)

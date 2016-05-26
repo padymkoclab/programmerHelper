@@ -87,9 +87,10 @@ class Factory_Writter(factory.django.DjangoModelFactory):
     about = factory.Faker('text', locale='ru')
 
 
-Writter.objects.filter().delete()
-for i in range(20):
-    Factory_Writter()
-Book.objects.filter().delete()
-for i in range(30):
-    Factory_Book()
+def factory_books(count):
+    Writter.objects.filter().delete()
+    for i in range(20):
+        Factory_Writter()
+    Book.objects.filter().delete()
+    for i in range(count):
+        Factory_Book()
