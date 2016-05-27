@@ -116,7 +116,7 @@ class AccountQuerySet(models.QuerySet):
             queryset = self
         return queryset.annotate(count_opinions=models.Count('scopes', distinct=True))
 
-    def random_objects(self, count=1):
+    def random_accounts(self, count=1):
         """Getting certain count random objects from queryset."""
         return get_random_objects(queryset=self, count=count)
 

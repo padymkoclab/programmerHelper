@@ -47,6 +47,7 @@ class Test_Tag(TestCase):
     def test_update_tag(self):
         new_name = 'документация-jQuery'
         self.tag.name = new_name
+        self.tag.full_clean()
         self.tag.save()
         self.assertEqual(self.tag.name, 'документация-jQuery')
 

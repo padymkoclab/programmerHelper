@@ -74,7 +74,7 @@ class Solution(TimeStampedModel):
         settings.AUTH_USER_MODEL,
         related_name='solutions',
         verbose_name=_('Author'),
-        on_delete=models.DO_NOTHING,
+        on_delete=models.CASCADE,
     )
     views = models.IntegerField(_('Count views'), default=0, editable=False)
     tags = models.ManyToManyField(

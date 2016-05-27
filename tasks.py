@@ -1,8 +1,6 @@
 
 import random
 import string
-import pathlib
-import shutil
 
 from django import setup
 from django.apps import apps
@@ -35,116 +33,6 @@ def rm_migrations_files():
         print('Deteting raise error')
     else:
         print("All migrations files in apps succeful deleted.")
-
-
-@task
-def startapp(list_apps_names_separeted_commas):
-    if list_apps_names_separeted_commas:
-        if ',' in list_apps_names_separeted_commas:
-            apps_names = list_apps_names_separeted_commas.split(',')
-        else:
-            apps_names = [list_apps_names_separeted_commas]
-        print('-' * 80)
-        print('Attentively check out next listing wished applications:')
-        print('-' * 80)
-        for app_name in apps_names:
-            app_name = 'app_' + app_name
-            print(app_name)
-        flag_continuation = input('If all right, please enter "yes" or 1: ')
-        if flag_continuation.lower() == 'yes' or flag_continuation == '1':
-            path_to_base_dir = shutil.os.path.dirname(__file__)
-            path_to_folder_apps = path_to_base_dir + '/apps'
-            if not shutil.os.path.isdir(path_to_folder_apps):
-                pathlib.Path(path_to_folder_apps).mkdir()
-            for app_name in apps_names:
-                app_name = 'app_' + app_name
-                path_to_app = '{0}/{1}/'.format(path_to_folder_apps, app_name)
-                # creating folders
-                for dirname in [
-                    'migrations',
-                    'templates',
-                    'tests',
-                    'templates/' + app_name,
-                    'static',
-                    'static/' + app_name,
-                    'static/' + app_name + '/js',
-                    'static/' + app_name + '/css',
-                    'static/' + app_name + '/img',
-                ]:
-                    run('mkdir -p {0}{1}'.format(path_to_app, dirname))
-                # creating empty files
-                for filename in [
-                    '__init__.py',
-                    'urls.py',
-                    'views.py',
-                    'models.py',
-                    'managers.py',
-                    'signals.py',
-                    'forms.py',
-                    'admin.py',
-                    'apps.py',
-                    'tests/test_models.py',
-                    'tests/test_views.py',
-                    'tests/test_forms.py',
-                    'tests/test_managers.py',
-                    'templates/' + app_name + '/base.html',
-                    'static/' + app_name + '/js/' + app_name + '.js',
-                    'migrations/__init__.py',
-                    'static/' + app_name + '/css/' + app_name + '.css',
-                ]:
-                    path_to_file = '{0}/{1}/{2}'.format(path_to_folder_apps, app_name, filename)
-                    pathlib.Path(path_to_file).touch()
-                path_to_app = '{0}/{1}/'.format(path_to_folder_apps, app_name)
-                with open(path_to_app + 'models.py', 'w') as f:
-                    f.writelines('\n'.join([
-                        '\nimport uuid\n',
-                        'from django.core.urlresolvers import reverse',
-                        'from django.core.validators import MinLengthValidator',
-                        'from django.utils.translation import ugettext_lazy as _',
-                        'from django.db import models',
-                        'from django.conf import settings',
-                        '\n\n\n',
-                    ]))
-                with open(path_to_app + 'urls.py', 'w') as f:
-                    f.writelines('\n'.join([
-                        "\nfrom django.conf.urls import url\n",
-                        "\napp_name = 'app_'\n",
-                        "urlpatterns = [\n    url(r'/$', .as_view(), {}, ''),\n]\n",
-                    ]))
-                with open(path_to_app + 'views.py', 'w') as f:
-                    f.writelines('\n'.join([
-                        '\nfrom django.views.generic import DetailView\n',
-                    ]))
-                with open(path_to_app + 'apps.py', 'w') as f:
-                    f.writelines('\n'.join([
-                        '\nfrom django.utils.translation import ugettext_lazy as _',
-                        'from django.apps import AppConfig\n',
-                        '\nclass AppConfig(AppConfig):',
-                        '    name = "apps.app_"',
-                        '    verbose_name = _("")\n',
-                    ]))
-                with open(path_to_app + 'admin.py', 'w') as f:
-                    f.writelines('\n'.join([
-                        '\nfrom django.db.models import Count',
-                        'from django.utils.translation import ugettext_lazy as _',
-                        'from django.contrib import admin\n\n',
-                    ]))
-                with open(path_to_app + 'forms.py', 'w') as f:
-                    f.writelines('\n'.join([
-                        '\nfrom django import forms\n',
-                    ]))
-                # with open(path_to_app + 'test_models.py', 'w') as f:
-                #     f.writelines('\n'.join([
-                #         '\nimport random\n',
-                #         'import factory',
-                #         'from factory import fuzzy\n',
-                #         'from .models import *\n',
-                #     ]))
-        else:
-            print('-' * 80)
-            print('Nothing worked')
-    else:
-        print('Nothing worked')
 
 
 @task
@@ -222,4 +110,3 @@ def delete_testing_database():
     if not apps.ready:
         setup()
     management.call_command('delete_test_database')
-

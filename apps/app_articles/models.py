@@ -50,6 +50,7 @@ class Article(TimeStampedModel):
         verbose_name=_('Author'),
         related_name='articles',
         limit_choices_to={'is_active': True},
+        on_delete=models.CASCADE,
     )
     tags = models.ManyToManyField(
         Tag,

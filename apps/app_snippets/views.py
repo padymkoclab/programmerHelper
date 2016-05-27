@@ -6,4 +6,4 @@ from .models import Snippet
 
 class SnippetDetailView(DetailView):
     model = Snippet
-    template_name = "TEMPLATE_NAME"
+    template_name = "app_snippets/detail.html"

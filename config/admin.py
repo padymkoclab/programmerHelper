@@ -7,6 +7,9 @@ from apps.app_accounts.admin import AccountAdmin, AccountLevelAdmin
 from apps.app_accounts.models import Account, AccountLevel
 from django.contrib.auth.models import Group
 # from django.contrib.sessions.models import Session
+
+from mylabour.admin_actions import export_as_csv, export_as_json, export_as_xml, export_as_yaml, export_as_xlsx
+
 # apps
 from apps.app_articles.admin import ArticleAdmin, ArticleSubsectionAdmin
 from apps.app_articles.models import Article, ArticleSubsection
@@ -54,6 +57,13 @@ class ProgrammerHelperSite(admin.AdminSite):
 
 
 ProgrammerHelper_AdminSite = ProgrammerHelperSite(name='ProgrammerHelper')
+
+ProgrammerHelper_AdminSite.add_action(export_as_csv)
+ProgrammerHelper_AdminSite.add_action(export_as_json)
+ProgrammerHelper_AdminSite.add_action(export_as_xml)
+ProgrammerHelper_AdminSite.add_action(export_as_yaml)
+ProgrammerHelper_AdminSite.add_action(export_as_xlsx)
+
 ProgrammerHelper_AdminSite.register(Group)
 # app_accounts
 ProgrammerHelper_AdminSite.register(Account, AccountAdmin)

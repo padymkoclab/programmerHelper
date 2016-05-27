@@ -7,10 +7,11 @@ from factory import fuzzy
 from django.contrib.auth import get_user_model
 
 from .models import *
+from .exceptions import UniqueAccountDepletedError
 
 
-def get_unique_user(instance, counter=0):
-    Accounts = get_user_model().objects.all()
+def get_unique_user(instance, excluded_pks, counter=0):
+    Accounts = get_user_model().objects.exclude(pk__in=excluded_pks)
     account = random.choice(Accounts)
     try:
         instance.user = account
@@ -18,9 +19,9 @@ def get_unique_user(instance, counter=0):
         instance.full_clean()
     except:
         if counter == len(Accounts):
-            raise Exception('Accounts depleted.')
+            raise UniqueAccountDepletedError('Accounts depleted.')
         counter += 1
-        return get_unique_user(instance, counter)
+        return get_unique_user(instance, excluded_pks, counter)
     else:
         return account
 
@@ -51,7 +52,15 @@ class Factory_OpinionGeneric(factory.DjangoModelFactory):
     @factory.lazy_attribute
     def user(self):
         instance = OpinionGeneric(content_object=self.content_object, is_useful=self.is_useful, is_favorite=self.is_favorite)
-        return get_unique_user(instance)
+        if hasattr(self.content_object, 'author'):
+            excluded_pks = [self.content_object.author.pk]
+        elif hasattr(self.content_object, 'user'):
+            excluded_pks = [self.content_object.user.pk]
+        elif hasattr(self.content_object, 'authorship'):
+            excluded_pks = self.content_object.authorship.values_list('pk', flat=True)
+        else:
+            raise Exception()
+        return get_unique_user(instance, excluded_pks)
 
 
 class Factory_LikeGeneric(factory.DjangoModelFactory):
@@ -64,7 +73,15 @@ class Factory_LikeGeneric(factory.DjangoModelFactory):
     @factory.lazy_attribute
     def user(self):
         instance = LikeGeneric(content_object=self.content_object, liked_it=self.liked_it)
-        return get_unique_user(instance)
+        if hasattr(self.content_object, 'author'):
+            excluded_pks = [self.content_object.author.pk]
+        elif hasattr(self.content_object, 'user'):
+            excluded_pks = [self.content_object.user.pk]
+        elif hasattr(self.content_object, 'authorship'):
+            excluded_pks = self.content_object.authorship.values_list('pk', flat=True)
+        else:
+            raise Exception()
+        return get_unique_user(instance, excluded_pks)
 
 
 class Factory_ScopeGeneric(factory.DjangoModelFactory):
@@ -79,4 +96,13 @@ class Factory_ScopeGeneric(factory.DjangoModelFactory):
     @factory.lazy_attribute
     def user(self):
         instance = ScopeGeneric(content_object=self.content_object, scope=self.scope)
-        return get_unique_user(instance)
+        if hasattr(self.content_object, 'author'):
+            excluded_pks = [self.content_object.author.pk]
+        elif hasattr(self.content_object, 'user'):
+            excluded_pks = [self.content_object.user.pk]
+        elif hasattr(self.content_object, 'authorship'):
+            excluded_pks = self.content_object.authorship.values_list('pk', flat=True)
+        else:
+            import ipdb; ipdb.set_trace()
+            raise Exception()
+        return get_unique_user(instance, excluded_pks)

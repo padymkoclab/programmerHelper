@@ -1,7 +1,7 @@
 
 import logging
 
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 from django.conf import settings
 
 import psycopg2 as Database  # NOQA
@@ -40,4 +40,3 @@ class Command(BaseCommand):
         finally:
             if 'connection' in vars():
                 connection.close()
-

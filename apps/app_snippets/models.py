@@ -14,7 +14,8 @@ from apps.app_tags.models import Tag
 from mylabour.models import TimeStampedModel
 from mylabour.constants import CHOICES_LEXERS
 
-from .managers import SnippetManager, SnippetQuerySet
+from .managers import SnippetManager
+from .querysets import SnippetQuerySet
 
 
 class Snippet(TimeStampedModel):
@@ -31,7 +32,7 @@ class Snippet(TimeStampedModel):
         settings.AUTH_USER_MODEL,
         verbose_name=_('Author'),
         related_name='snippets',
-        on_delete=models.DO_NOTHING,
+        on_delete=models.CASCADE,
         limit_choices_to={'is_active': True},
     )
     description = models.TextField(_('Decription'))
@@ -62,9 +63,7 @@ class Snippet(TimeStampedModel):
         return reverse('app_snippets:snippet', kwargs={'slug': self.slug})
 
     def get_scope(self):
-        count_good_opinions = self.opinions.filter(is_useful=True).count()
-        count_bad_opinions = self.opinions.filter(is_useful=False).count()
-        return count_good_opinions - count_bad_opinions
+        return self.__class__.objects.snippets_with_scopes().get(pk=self.pk).scope
     get_scope.short_description = _('Scope')
 
     def get_count_views(self):

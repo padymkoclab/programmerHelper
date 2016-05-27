@@ -1,6 +1,7 @@
 
 from django.dispatch import receiver
-from django.db.models.signals import post_delete, post_save, m2m_changed, pre_save
+from django.db.models.signals import post_delete, post_save, m2m_changed, pre_save, pre_delete
+from django.utils.translation import ugettext_lazy as _
 
 from apps.app_accounts.models import Account
 from apps.app_courses.models import Course
@@ -24,7 +25,7 @@ MODELS_WITH_FK_ACCOUNT = [
     TestingSuit,
     ForumTopic,
     ForumPost,
-    # CommentGeneric,
+    CommentGeneric,
     OpinionGeneric,
     LikeGeneric,
     ScopeGeneric,
@@ -32,9 +33,6 @@ MODELS_WITH_FK_ACCOUNT = [
     Question,
     Answer,
 ]
-
-
-OLD_ACCOUNT = None
 
 
 @receiver(pre_save)
@@ -45,19 +43,14 @@ def signal_for_keeping_old_account(sender, instance, **kwargs):
         try:
             obj = sender.objects.get(pk=instance.pk)
         except sender.DoesNotExist:
+            # it is new object
             pass
         else:
+            # exists object
             if hasattr(instance, 'author'):
-                account = instance.author
-                old_account = obj.author
+                instance.old_value_field_for_account = obj.author
             elif hasattr(instance, 'user'):
-                account = instance.user
-                old_account = obj.user
-            global OLD_ACCOUNT
-            if account != old_account:
-                OLD_ACCOUNT = old_account
-            else:
-                OLD_ACCOUNT = None
+                instance.old_value_field_for_account = obj.user
 
 
 @receiver(post_save)
@@ -81,11 +74,11 @@ def signal_created_updated_object(sender, instance, created, **kwargs):
                 flag=Action.CHOICES_FLAGS.UPDT,
                 message='Updated {0} "{1}".'.format(instance._meta.verbose_name.lower(), instance),
             )
+            # check on old account if here
+            if account != instance.old_value_field_for_account:
+                instance.old_value_field_for_account.check_badge('Dispatcher')
         # check on current account
         account.check_badge('Dispatcher')
-        # check on old account if here
-        if OLD_ACCOUNT is not None:
-            OLD_ACCOUNT.check_badge('Dispatcher')
 
 
 @receiver(post_delete)
@@ -93,7 +86,6 @@ def signal_deleted_object(sender, instance, **kwargs):
     """Write action in log."""
 
     if sender in MODELS_WITH_FK_ACCOUNT:
-        # import ipdb; ipdb.set_trace()
         if hasattr(instance, 'author'):
             account = instance.author
         elif hasattr(instance, 'user'):
@@ -286,13 +278,26 @@ def signal_creating_updating_of_account(sender, instance, created, **kwargs):
     CHANGE_STATUS_ACCOUNT = False
 
 
-# @receiver(post_delete, sender=Account)
-# def signal_deleted_account(sender, instance, **kwargs):
-#     """Signal creating or update account of user."""
+class ProtectDeleteAccount(Exception):
+    pass
 
-#     message = 'Deleted account.'
-#     Action.objects.create(
-#         account=instance,
-#         flag=Action.CHOICES_FLAGS.USER,
-#         message=message,
-#     )
+
+@receiver(pre_delete, sender=Account)
+def signal_deleted_account(sender, instance, **kwargs):
+    """Signal deleting account of user."""
+
+    raise ProtectDeleteAccount(
+        _(
+            """
+            Sorry, but features our the website not allow deleting account.
+            If you want, you can made account as non-active. Sorry again.
+            """
+        )
+    )
+
+    # message = 'Deleted account.'
+    # Action.objects.create(
+    #     account=instance,
+    #     flag=Action.CHOICES_FLAGS.USER,
+    #     message=message,
+    # )

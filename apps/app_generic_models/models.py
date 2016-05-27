@@ -1,6 +1,7 @@
 
 import uuid
 
+from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator
 from django.utils import timezone
 from django.contrib.contenttypes.fields import GenericForeignKey
@@ -35,7 +36,7 @@ class CommentGeneric(BaseGeneric):
     text_comment = models.TextField(_('Text comment'))
     author = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        on_delete=models.DO_NOTHING,
+        on_delete=models.CASCADE,
         related_name='comments',
         verbose_name=_('Author'),
     )
@@ -51,7 +52,7 @@ class OpinionGeneric(BaseGeneric):
 
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        on_delete=models.DO_NOTHING,
+        on_delete=models.CASCADE,
         related_name='opinions',
         verbose_name=_('User'),
     )
@@ -65,6 +66,16 @@ class OpinionGeneric(BaseGeneric):
         permissions = (('can_view_opinions', _('Can view opinions')),)
         unique_together = ['user', 'object_id']
 
+    def clean(self):
+        if self.content_object.author == self.user:
+            raise ValidationError(_('User not allowed have opinion about hisself labour.'))
+        if self.is_useful is None and self.is_favorite is None:
+            raise ValidationError(_('User must be given his opinion or share his preference.'))
+
+    def save(self, *args, **kwargs):
+        self.clean()
+        super(OpinionGeneric, self).save(*args, **kwargs)
+
 
 class LikeGeneric(BaseGeneric):
     """
@@ -73,7 +84,7 @@ class LikeGeneric(BaseGeneric):
 
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        on_delete=models.DO_NOTHING,
+        on_delete=models.CASCADE,
         related_name='likes',
         verbose_name=_('User'),
     )
@@ -86,6 +97,14 @@ class LikeGeneric(BaseGeneric):
         permissions = (('can_view_likes', _('Can view likes')),)
         unique_together = ['user', 'object_id']
 
+    def clean(self):
+        if self.content_object.author == self.user:
+            raise ValidationError(_('User not allowed give his "like" about hisself labour.'))
+
+    def save(self, *args, **kwargs):
+        self.clean()
+        super(LikeGeneric, self).save(*args, **kwargs)
+
 
 class ScopeGeneric(BaseGeneric):
     """
@@ -97,7 +116,7 @@ class ScopeGeneric(BaseGeneric):
 
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        on_delete=models.DO_NOTHING,
+        on_delete=models.CASCADE,
         related_name='scopes',
         verbose_name=_('User'),
     )
@@ -109,3 +128,11 @@ class ScopeGeneric(BaseGeneric):
         verbose_name_plural = _('Scopes')
         permissions = (('can_view_scopes', _('Can view scopes')),)
         unique_together = ['user', 'object_id']
+
+    def clean(self):
+        if self.content_object.author == self.user:
+            raise ValidationError(_('User not allowed give scope about hisself labour.'))
+
+    def save(self, *args, **kwargs):
+        self.clean()
+        super(ScopeGeneric, self).save(*args, **kwargs)

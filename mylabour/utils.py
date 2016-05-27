@@ -1,4 +1,7 @@
 
+import pip
+import pathlib
+import time
 import random
 import json
 
@@ -98,3 +101,11 @@ def show_concecutive_certain_element(sequence, element):
     if t:
         k.append(t)
     return k
+
+
+def pip_installed_packeges():
+    for package in pip.get_installed_distributions():
+        date_installed_in_seconds = pathlib.os.path.getctime(package.location)
+        date_installed = time.ctime(date_installed_in_seconds)
+        msg = '{0:<30} {1:<10}'.format(date_installed, package.key)
+        print(msg)
