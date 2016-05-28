@@ -21,8 +21,8 @@ from apps.app_courses.admin import CourseAdmin, LessonAdmin, SublessonAdmin
 from apps.app_courses.models import Course, Lesson, Sublesson
 from apps.app_forum.admin import ForumSectionAdmin, ForumTopicAdmin, ForumPostAdmin
 from apps.app_forum.models import ForumSection, ForumTopic, ForumPost
-from apps.app_generic_models.admin import CommentGenericAdmin, OpinionGenericAdmin, LikeGenericAdmin, ScopeGenericAdmin
-from apps.app_generic_models.models import CommentGeneric, OpinionGeneric, LikeGeneric, ScopeGeneric
+# from apps.app_generic_models.admin import CommentAdmin, OpinionAdmin, ScopeAdmin
+# from apps.app_generic_models.models import Comment, Opinion, Scope
 from apps.app_newsletters.admin import NewsletterAdmin
 from apps.app_newsletters.models import Newsletter
 from apps.app_polls.admin import PollAdmin, VoteInPollAdmin, ChoiceAdmin
@@ -111,14 +111,13 @@ ProgrammerHelper_AdminSite.register(Sublesson, SublessonAdmin)
 ProgrammerHelper_AdminSite.register(Poll, PollAdmin)
 ProgrammerHelper_AdminSite.register(Choice, ChoiceAdmin)
 ProgrammerHelper_AdminSite.register(VoteInPoll, VoteInPollAdmin)
-# app_generic_models
-ProgrammerHelper_AdminSite.register(CommentGeneric, CommentGenericAdmin)
-ProgrammerHelper_AdminSite.register(OpinionGeneric, OpinionGenericAdmin)
-ProgrammerHelper_AdminSite.register(LikeGeneric, LikeGenericAdmin)
-ProgrammerHelper_AdminSite.register(ScopeGeneric, ScopeGenericAdmin)
+# Apps with generic models
+# ProgrammerHelper_AdminSite.register(Comment, CommentAdmin)
+# ProgrammerHelper_AdminSite.register(Opinion, OpinionAdmin)
+# ProgrammerHelper_AdminSite.register(Scope, ScopeAdmin)
 # app_actions
 ProgrammerHelper_AdminSite.register(Action, ActionAdmin)
 # app_inboxes
 ProgrammerHelper_AdminSite.register(Inbox, InboxAdmin)
-
+# app_sessions
 ProgrammerHelper_AdminSite.register(ExpandedSession, ExpandedSessionAdmin)

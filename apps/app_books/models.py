@@ -12,7 +12,9 @@ from django.conf import settings
 
 from autoslug import AutoSlugField
 
-from apps.app_generic_models.models import CommentGeneric, ScopeGeneric
+from apps.app_comments.models import Comment
+from apps.app_scopes.models import Scope
+from apps.app_replies.models import Reply
 from apps.app_tags.models import Tag
 from apps.app_web_links.models import WebLink
 
@@ -30,7 +32,6 @@ class Book(models.Model):
     description = models.TextField(_('Description'))
     picture = models.URLField(_('Picture'), max_length=1000)
     pages = models.PositiveSmallIntegerField(_('Count pages'), validators=[MinValueValidator(1)])
-    views = models.PositiveIntegerField(_('Count views'), default=0, editable=False)
     authorship = models.ManyToManyField(
         'Writter',
         verbose_name=_('Authorship'),
@@ -57,8 +58,9 @@ class Book(models.Model):
         verbose_name=_('Where downloads'),
         help_text=_('Weblinks where can download this book.')
     )
-    comments = GenericRelation(CommentGeneric)
-    scopes = GenericRelation(ScopeGeneric)
+    comments = GenericRelation(Comment)
+    scopes = GenericRelation(Scope)
+    replies = GenericRelation(Reply)
 
     class Meta:
         db_table = 'books'

@@ -13,7 +13,10 @@ from apps.app_polls.models import VoteInPoll
 from apps.app_newsletters.models import Newsletter
 from apps.app_questions.models import Question, Answer
 from apps.app_forum.models import ForumTopic, ForumPost
-from apps.app_generic_models.models import CommentGeneric, OpinionGeneric, LikeGeneric, ScopeGeneric
+from apps.app_comments.models import Comment
+# from apps.app_replies.models import Reply
+from apps.app_scopes.models import Scope
+from apps.app_opinions.models import Opinion
 
 from .models import Action
 
@@ -25,10 +28,9 @@ MODELS_WITH_FK_ACCOUNT = [
     TestingSuit,
     ForumTopic,
     ForumPost,
-    CommentGeneric,
-    OpinionGeneric,
-    LikeGeneric,
-    ScopeGeneric,
+    Comment,
+    Opinion,
+    Scope,
     Newsletter,
     Question,
     Answer,
@@ -47,10 +49,8 @@ def signal_for_keeping_old_account(sender, instance, **kwargs):
             pass
         else:
             # exists object
-            if hasattr(instance, 'author'):
-                instance.old_value_field_for_account = obj.author
-            elif hasattr(instance, 'user'):
-                instance.old_value_field_for_account = obj.user
+            if hasattr(instance, 'account'):
+                instance.old_value_field_for_account = obj.account
 
 
 @receiver(post_save)
@@ -58,10 +58,8 @@ def signal_created_updated_object(sender, instance, created, **kwargs):
     """Write action in log."""
 
     if sender in MODELS_WITH_FK_ACCOUNT:
-        if hasattr(instance, 'author'):
-            account = instance.author
-        elif hasattr(instance, 'user'):
-            account = instance.user
+        if hasattr(instance, 'account'):
+            account = instance.account
         if created:
             Action.objects.create(
                 account=account,
@@ -86,10 +84,8 @@ def signal_deleted_object(sender, instance, **kwargs):
     """Write action in log."""
 
     if sender in MODELS_WITH_FK_ACCOUNT:
-        if hasattr(instance, 'author'):
-            account = instance.author
-        elif hasattr(instance, 'user'):
-            account = instance.user
+        if hasattr(instance, 'account'):
+            account = instance.account
         Action.objects.create(
             account=account,
             flag=Action.CHOICES_FLAGS.DEL,

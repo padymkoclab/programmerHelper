@@ -8,7 +8,9 @@ from django.conf import settings
 
 from autoslug import AutoSlugField
 
-from apps.app_generic_models.models import CommentGeneric, OpinionGeneric
+from apps.app_comments.models import Comment
+from apps.app_opinions.models import Opinion
+from apps.app_favours.models import Favour
 from apps.app_visits.models import Visit
 from apps.app_tags.models import Tag
 from mylabour.models import TimeStampedModel
@@ -28,7 +30,7 @@ class Snippet(TimeStampedModel):
     )
     slug = AutoSlugField(_('Slug'), populate_from='title', always_update=True, unique=True, allow_unicode=True, db_index=True)
     lexer = models.CharField(_('Lexer of code'), max_length=50, choices=CHOICES_LEXERS)
-    author = models.ForeignKey(
+    account = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         verbose_name=_('Author'),
         related_name='snippets',
@@ -42,8 +44,9 @@ class Snippet(TimeStampedModel):
         verbose_name=_('Tags'),
         related_name='snippets',
     )
-    opinions = GenericRelation(OpinionGeneric)
-    comments = GenericRelation(CommentGeneric)
+    opinions = GenericRelation(Opinion, related_query_name='snippets')
+    comments = GenericRelation(Comment, related_query_name='snippets')
+    favours = GenericRelation(Favour, related_query_name='snippets')
 
     # managers
     objects = models.Manager()
@@ -59,11 +62,15 @@ class Snippet(TimeStampedModel):
     def __str__(self):
         return '{0.title}'.format(self)
 
+    def save(self, *args, **kwargs):
+        super(Snippet, self).save(*args, **kwargs)
+
     def get_absolute_url(self):
         return reverse('app_snippets:snippet', kwargs={'slug': self.slug})
 
     def get_scope(self):
         return self.__class__.objects.snippets_with_scopes().get(pk=self.pk).scope
+    get_scope.admin_order_field = 'scope'
     get_scope.short_description = _('Scope')
 
     def get_count_views(self):

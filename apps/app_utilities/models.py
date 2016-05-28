@@ -8,7 +8,8 @@ from django.conf import settings
 
 from autoslug import AutoSlugField
 
-from apps.app_generic_models.models import OpinionGeneric, CommentGeneric
+from apps.app_comments.models import Comment
+from apps.app_opinions.models import Opinion
 from mylabour.models import TimeStampedModel
 
 
@@ -78,8 +79,8 @@ class Utility(TimeStampedModel):
         on_delete=models.CASCADE,
     )
     web_link = models.URLField(_('Web link'))
-    opinions = GenericRelation(OpinionGeneric)
-    comments = GenericRelation(CommentGeneric)
+    opinions = GenericRelation(Opinion)
+    comments = GenericRelation(Comment)
 
     class Meta:
         db_table = 'utilities'

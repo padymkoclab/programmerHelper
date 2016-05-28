@@ -3,7 +3,7 @@ from django.db.models import Count
 from django.utils.translation import ugettext_lazy as _
 from django.contrib import admin
 
-from apps.app_generic_models.admin import OpinionGenericInline, CommentGenericInline
+# from apps.app_generic_models.admin import OpinionGenericInline, CommentGenericInline
 
 from .models import Course, Lesson, Sublesson
 from .forms import CourseForm, LessonInlineFormSet, SublessonInlineFormSet
@@ -95,16 +95,15 @@ class LessonAdmin(admin.ModelAdmin):
         'get_count_opinions',
         'get_count_comments',
         'get_scope',
-        'views',
         'get_count_sublessons',
         'date_modified',
         'date_added',
     )
     list_filter = ('date_modified',)
     inlines = [
-        OpinionGenericInline,
+        # OpinionGenericInline,
         SublessonInline,
-        CommentGenericInline,
+        # CommentGenericInline,
     ]
     search_fields = ('name',)
     fieldsets = [

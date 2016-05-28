@@ -67,9 +67,9 @@ class SnippetQuerySet(models.QuerySet):
         ))
 
     def snippets_with_count_tags_opinions_comments_scopes_and_count_good_or_bad_opinions(self):
-        return self.snippets_with_count_tags().\
-            snippets_with_count_comments().\
-            snippets_with_count_opinions().\
-            snippets_with_count_good_opinions().\
-            snippets_with_count_bad_opinions().\
-            snippets_with_scopes()
+        self = self.snippets_with_count_tags()
+        self = self.snippets_with_count_comments()
+        self = self.snippets_with_count_opinions()
+        self = self.snippets_with_count_good_opinions()
+        self = self.snippets_with_count_bad_opinions()
+        return self

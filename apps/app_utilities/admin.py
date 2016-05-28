@@ -3,7 +3,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.db.models import Count
 from django.contrib import admin
 
-from apps.app_generic_models.admin import OpinionGenericInline, CommentGenericInline
+# from apps.app_generic_models.admin import OpinionGenericInline, CommentGenericInline
 
 from .models import UtilityCategory, Utility
 
@@ -81,8 +81,8 @@ class UtilityAdmin(admin.ModelAdmin):
     )
     search_fields = ('name',)
     inlines = [
-        OpinionGenericInline,
-        CommentGenericInline,
+        # OpinionGenericInline,
+        # CommentGenericInline,
     ]
     fieldsets = [
         [

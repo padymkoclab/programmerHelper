@@ -39,7 +39,7 @@ class TestingSuit(TimeStampedModel):
     slug = AutoSlugField(
         _('Slug'),
         populate_from='name',
-        unique_with=['author'],
+        unique_with=['account'],
         always_update=True,
         allow_unicode=True,
         db_index=True,
@@ -48,7 +48,7 @@ class TestingSuit(TimeStampedModel):
     picture = models.URLField(_('Picture'), max_length=1000)
     duration = models.DurationField(_('Duration'), default=timedelta(minutes=1))
     complexity = models.CharField(_('Complexity'), max_length=50, choices=CHOICES_COMPLEXITY)
-    author = models.ForeignKey(
+    account = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         verbose_name=_('Author'),
         on_delete=models.PROTECT,
@@ -59,7 +59,7 @@ class TestingSuit(TimeStampedModel):
         verbose_name=_('Passages'),
         related_name='+',
         through='TestingPassage',
-        through_fields=['testing_suit', 'user'],
+        through_fields=['testing_suit', 'account'],
     )
 
     objects = models.Manager()
@@ -71,7 +71,7 @@ class TestingSuit(TimeStampedModel):
         verbose_name_plural = _("Suits of tests")
         ordering = ['date_added']
         get_latest_by = 'date_modified'
-        unique_together = ['author', 'name']
+        unique_together = ['account', 'name']
 
     def __str__(self):
         return '{0.name}'.format(self)
@@ -110,7 +110,7 @@ class TestingPassage(models.Model):
         ('attempt', _('Attempt')),
     )
 
-    user = models.ForeignKey(
+    account = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         related_name='passages',
         on_delete=models.CASCADE,

@@ -6,12 +6,11 @@ from django.contrib.auth import get_user_model
 import factory
 from factory import fuzzy
 
-from apps.app_generic_models.factories import Factory_OpinionGeneric, Factory_CommentGeneric
+from apps.app_opinions.factories import Factory_Opinion
+from apps.app_comments.factories import Factory_Comment
+from apps.app_favours.factories import Factory_Favour
 
 from .models import *
-
-
-Accounts = get_user_model().objects.all()
 
 
 class Factory_Snippet(factory.DjangoModelFactory):
@@ -19,7 +18,7 @@ class Factory_Snippet(factory.DjangoModelFactory):
     class Meta:
         model = Snippet
 
-    author = fuzzy.FuzzyChoice(Accounts)
+    account = fuzzy.FuzzyChoice(get_user_model().objects.all())
     description = factory.Faker('text', locale='ru')
     code = factory.Faker('text', locale='en')
 
@@ -40,12 +39,17 @@ class Factory_Snippet(factory.DjangoModelFactory):
     @factory.post_generation
     def comments(self, created, extracted, **kwargs):
         for i in range(random.randrange(3)):
-            Factory_CommentGeneric(content_object=self)
+            Factory_Comment(content_object=self)
 
     @factory.post_generation
     def opinions(self, created, extracted, **kwargs):
         for i in range(random.randrange(5)):
-            Factory_OpinionGeneric(content_object=self)
+            Factory_Opinion(content_object=self)
+
+    @factory.post_generation
+    def favours(self, created, extracted, **kwargs):
+        for i in range(random.randrange(5)):
+            Factory_Favour(content_object=self)
 
 
 def factory_snippets(count):

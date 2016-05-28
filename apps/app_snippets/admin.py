@@ -1,9 +1,10 @@
 
-from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.contrib import admin
 
-from apps.app_generic_models.admin import OpinionGenericInline, CommentGenericInline
+from apps.app_comments.admin import CommentInline
+from apps.app_opinions.admin import OpinionInline
+from apps.app_favours.admin import FavourInline
 
 from .models import Snippet
 from .forms import SnippetForm
@@ -17,28 +18,29 @@ class SnippetAdmin(admin.ModelAdmin):
     form = SnippetForm
     list_display = (
         'title',
-        'author',
+        'account',
         'lexer',
         # 'views',
         'get_scope',
-        'get_scope2',
-        'get_good_opinions',
         'get_count_comments',
-        'get_count_opinions',
         'get_count_tags',
+        'get_count_good_opinions',
+        'get_count_bad_opinions',
+        'get_count_opinions',
         'is_new',
         'date_modified',
         'date_added',
     )
     list_filter = (
-        ('author', admin.RelatedOnlyFieldListFilter),
+        ('account', admin.RelatedOnlyFieldListFilter),
         'lexer',
         'date_modified',
         'date_added',
     )
     inlines = [
-        OpinionGenericInline,
-        CommentGenericInline,
+        OpinionInline,
+        FavourInline,
+        CommentInline,
     ]
     search_fields = ('title',)
     filter_horizontal = ['tags']
@@ -46,30 +48,14 @@ class SnippetAdmin(admin.ModelAdmin):
     fieldsets = [
         [
             Snippet._meta.verbose_name, {
-                'fields': ['title', 'author', 'lexer', 'description', 'code', 'tags']
+                'fields': ['title', 'account', 'lexer', 'description', 'code', 'tags']
             }
         ]
     ]
 
     def get_queryset(self, request):
         qs = super(SnippetAdmin, self).get_queryset(request)
-        qs = qs.annotate(
-            count_tags=models.Count('tags', distinct=True),
-            count_comments=models.Count('comments', distinct=True),
-            count_opinions=models.Count('opinions', distinct=True),
-            scope=models.Count('opinions', distinct=True),
-            count_good_opinions=models.Count(
-                models.Case(
-                    models.When(opinions__is_useful=True, then=True),
-                    ouput_field=models.BooleanField(),
-                ),
-                distinct=True,
-            ),
-        )
-        (setattr(i, 'scope', 111111) for i in qs)
-        for i in qs:
-            i.scope = 11111111111111111
-        # import ipdb; ipdb.set_trace()
+        qs = qs.snippets_with_count_tags_opinions_comments_scopes_and_count_good_or_bad_opinions()
         return qs
 
     def get_count_comments(self, obj):
@@ -87,12 +73,12 @@ class SnippetAdmin(admin.ModelAdmin):
     get_count_tags.admin_order_field = 'count_tags'
     get_count_tags.short_description = _('Count tags')
 
-    def get_good_opinions(self, obj):
+    def get_count_good_opinions(self, obj):
         return obj.count_good_opinions
-    get_good_opinions.admin_order_field = 'count_good_opinions'
-    get_good_opinions.short_description = _('Count good opinions')
+    get_count_good_opinions.admin_order_field = 'count_good_opinions'
+    get_count_good_opinions.short_description = _('Count good opinions')
 
-    def get_scope2(self, obj):
-        return obj.scope
-    get_scope2.admin_order_field = 'scope'
-    get_scope2.short_description = _('Scope2')
+    def get_count_bad_opinions(self, obj):
+        return obj.count_bad_opinions
+    get_count_bad_opinions.admin_order_field = 'count_bad_opinions'
+    get_count_bad_opinions.short_description = _('Count bad opinions')

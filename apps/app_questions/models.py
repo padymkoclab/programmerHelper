@@ -12,7 +12,8 @@ from autoslug import AutoSlugField
 from model_utils import Choices
 from model_utils.managers import QueryManager
 
-from apps.app_generic_models.models import CommentGeneric, OpinionGeneric, LikeGeneric
+from apps.app_comments.models import Comment
+from apps.app_opinions.models import Opinion
 from apps.app_tags.models import Tag
 from mylabour.models import TimeStampedModel
 
@@ -35,7 +36,7 @@ class Question(TimeStampedModel):
     slug = AutoSlugField(_('Slug'), populate_from='title', unique=True, always_update=True, allow_unicode=True)
     text_question = models.TextField(_('Text question'))
     status = models.CharField(_('Status'), max_length=50, choices=CHOICES_STATUS, default=CHOICES_STATUS.open)
-    author = models.ForeignKey(
+    account = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         verbose_name=_('Author'),
         related_name='questions',
@@ -47,9 +48,8 @@ class Question(TimeStampedModel):
         related_name='questions',
         verbose_name=_('Tags'),
     )
-    views = models.IntegerField(_('Count views'), default=0, editable=False)
     is_dublicated = models.BooleanField(_('Is dublicated question?'), default=False)
-    opinions = GenericRelation(OpinionGeneric)
+    opinions = GenericRelation(Opinion)
 
     # managers
     objects = models.Manager()
@@ -117,7 +117,7 @@ class Answer(TimeStampedModel):
         related_name='answers',
         limit_choices_to={'status': Question.CHOICES_STATUS.open}
     )
-    author = models.ForeignKey(
+    account = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         verbose_name=_('Author'),
         on_delete=models.DO_NOTHING,
@@ -125,8 +125,7 @@ class Answer(TimeStampedModel):
         limit_choices_to={'is_active': True},
     )
     is_accepted = models.BooleanField(_('Is accepted answer?'), default=False)
-    comments = GenericRelation(CommentGeneric)
-    likes = GenericRelation(LikeGeneric)
+    comments = GenericRelation(Comment)
 
     objects = models.Manager()
     objects = AnswerManager()
@@ -135,11 +134,17 @@ class Answer(TimeStampedModel):
         db_table = 'answers'
         verbose_name = _("Answer")
         verbose_name_plural = _("Answers")
-        ordering = ['question', 'author']
+        ordering = ['question', 'account']
         get_latest_by = 'date_modified'
 
     def __str__(self):
-        return _('Answer on question "{0.question}" from user "{0.author}"').format(self)
+        return _('Answer on question "{0.question}" from user "{0.account}"').format(self)
+
+    def clean(self):
+        raise Exception('')
+        # user may can only single answer on question
+        if self.question and self.account:
+            pass
 
     def get_scope(self):
         count_likes = self.likes.filter(liked_it=True).count()

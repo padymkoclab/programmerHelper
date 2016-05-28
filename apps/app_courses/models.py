@@ -10,13 +10,13 @@ from django.conf import settings
 
 from autoslug import AutoSlugField
 
-from apps.app_generic_models.models import CommentGeneric, OpinionGeneric
+from apps.app_opinions.models import Opinion
+from apps.app_comments.models import Comment
+from apps.app_replies.models import Reply
 from mylabour.models import TimeStampedModel
 from mylabour.constants import CHOICES_LEXERS
 
 from .managers import CourseManager, CourseQuerySet
-
-# отзывы о course
 
 
 class Course(TimeStampedModel):
@@ -44,6 +44,8 @@ class Course(TimeStampedModel):
         limit_choices_to={'is_active': True},
         related_name='courses',
     )
+
+    replies = GenericRelation(Reply)
 
     class Meta:
         db_table = 'courses'
@@ -96,9 +98,8 @@ class Lesson(TimeStampedModel):
     is_completed = models.BooleanField(_('Lesson is completed?'), default=False)
     header = models.TextField(_('Header'))
     conclusion = models.TextField(_('Conclusion'))
-    views = models.IntegerField(_('Count views'), default=0, editable=False)
-    comments = GenericRelation(CommentGeneric)
-    opinions = GenericRelation(OpinionGeneric)
+    comments = GenericRelation(Comment)
+    opinions = GenericRelation(Opinion)
 
     class Meta:
         db_table = 'Lessons'

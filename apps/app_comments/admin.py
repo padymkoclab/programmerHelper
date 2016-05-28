@@ -1,4 +1,16 @@
 
-from django.db import models
-from django.utils.translation import ugettext_lazy as _
-from django.contrib import admin
+from django.contrib.contenttypes import admin
+
+from .models import Comment
+
+
+class CommentInline(admin.GenericStackedInline):
+    '''
+    Stacked Inline View for Comment
+    '''
+
+    model = Comment
+    extra = 0
+    ct_field = 'content_type'
+    ct_fk_field = 'object_id'
+    template = 'app_comments/stacked.html'

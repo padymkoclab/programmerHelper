@@ -5,6 +5,8 @@ from django.utils import timezone
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from django.db import models
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
 
 
 class TimeStampedModel(models.Model):
@@ -24,3 +26,14 @@ class TimeStampedModel(models.Model):
     is_new.admin_order_field = 'date_added'
     is_new.short_description = _('Is new?')
     is_new.boolean = True
+
+
+class BaseGenericModel(models.Model):
+
+    id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, verbose_name=_('Type object'))
+    object_id = models.UUIDField()
+    content_object = GenericForeignKey('content_type', 'object_id')
+
+    class Meta:
+        abstract = True

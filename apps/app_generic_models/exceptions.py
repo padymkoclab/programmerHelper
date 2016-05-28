@@ -1,3 +1,0 @@
-
-class UniqueAccountDepletedError(Exception):
-    pass

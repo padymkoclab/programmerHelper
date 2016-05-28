@@ -24,7 +24,7 @@ class VoteInPollInline(admin.TabularInline):
 
     model = VoteInPoll
     extra = 0
-    fields = ['choice', 'user']
+    fields = ['choice', 'account']
 
 
 class PollAdmin(admin.ModelAdmin):
@@ -100,18 +100,18 @@ class VoteInPollAdmin(admin.ModelAdmin):
     '''
         Admin View for VoteInPoll
     '''
-    list_display = ('poll', 'user', 'choice', 'date_voting')
+    list_display = ('poll', 'account', 'choice', 'date_voting')
     list_filter = (
         ('poll', admin.RelatedOnlyFieldListFilter),
-        ('user', admin.RelatedOnlyFieldListFilter),
+        ('account', admin.RelatedOnlyFieldListFilter),
         'choice',
         'date_voting',
     )
-    readonly_fields = ['poll', 'user', 'choice']
+    readonly_fields = ['poll', 'account', 'choice']
     fieldsets = [
         [
             VoteInPoll._meta.verbose_name, {
-                'fields': ['poll', 'user', 'choice']
+                'fields': ['poll', 'account', 'choice']
             }
         ]
     ]

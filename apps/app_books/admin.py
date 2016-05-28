@@ -5,7 +5,7 @@ from django.template.defaultfilters import truncatewords
 from django.utils.translation import ugettext_lazy as _
 from django.contrib import admin
 
-from apps.app_generic_models.admin import ScopeGenericInline, CommentGenericInline
+# from apps.app_generic_models.admin import ScopeGenericInline, CommentGenericInline
 
 from .models import Book, Writter
 from .forms import BookForm
@@ -21,7 +21,6 @@ class BookAdmin(admin.ModelAdmin):
         'name',
         'writters',
         'pages',
-        'views',
         'publishers',
         'isbn',
         'get_count_links',
@@ -32,10 +31,10 @@ class BookAdmin(admin.ModelAdmin):
         'date_published',
     )
     list_filter = ('date_published',)
-    inlines = [
-        ScopeGenericInline,
-        CommentGenericInline,
-    ]
+    # inlines = [
+    #     ScopeGenericInline,
+    #     CommentGenericInline,
+    # ]
     search_fields = ('name', 'publishers', 'authorship__name')
     date_hierarchy = 'date_published'
     filter_horizontal = ['tags', 'authorship']

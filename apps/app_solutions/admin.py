@@ -3,7 +3,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.contrib import admin
 from django.db.models import Count
 
-from apps.app_generic_models.admin import OpinionGenericInline, CommentGenericInline
+# from apps.app_generic_models.admin import OpinionGenericInline, CommentGenericInline
 
 from .forms import SolutionForm
 from .models import SolutionCategory, Solution
@@ -75,8 +75,7 @@ class SolutionAdmin(admin.ModelAdmin):
         'title',
         'category',
         'get_scope',
-        'views',
-        'author',
+        'account',
         'get_count_links',
         'get_count_opinions',
         'get_count_comments',
@@ -87,15 +86,15 @@ class SolutionAdmin(admin.ModelAdmin):
     )
     list_filter = (
         ('category', admin.RelatedOnlyFieldListFilter),
-        ('author', admin.RelatedOnlyFieldListFilter),
+        ('account', admin.RelatedOnlyFieldListFilter),
         'date_modified',
         'date_added',
     )
     search_fields = ('title',)
     date_hierarchy = 'date_added'
     inlines = [
-        OpinionGenericInline,
-        CommentGenericInline,
+        # OpinionGenericInline,
+        # CommentGenericInline,
     ]
     fieldsets = [
         [

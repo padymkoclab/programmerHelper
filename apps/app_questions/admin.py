@@ -3,7 +3,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.contrib import admin
 from django.db import models
 
-from apps.app_generic_models.admin import OpinionGenericInline, CommentGenericInline, LikeGenericInline
+# from apps.app_generic_models.admin import OpinionGenericInline, CommentGenericInline
 
 from .forms import QuestionForm
 from .models import Answer
@@ -17,7 +17,7 @@ class AnswerInline(admin.StackedInline):
     model = Answer
     extra = 0
     fk_name = 'question'
-    fields = ['author', 'is_accepted', 'text_answer']
+    fields = ['account', 'is_accepted', 'text_answer']
 
 
 class QuestionAdmin(admin.ModelAdmin):
@@ -27,7 +27,7 @@ class QuestionAdmin(admin.ModelAdmin):
 
     list_display = (
         'title',
-        'author',
+        'account',
         'status',
         'get_count_answers',
         'has_accepted_answer',
@@ -41,19 +41,19 @@ class QuestionAdmin(admin.ModelAdmin):
         'date_modified',
         'date_added')
     list_filter = (
-        ('author', admin.RelatedOnlyFieldListFilter),
+        ('account', admin.RelatedOnlyFieldListFilter),
         'status',
         'date_modified',
         'date_added',
         'is_dublicated',
     )
     inlines = [
-        OpinionGenericInline,
+        # OpinionGenericInline,
         AnswerInline,
     ]
     fieldsets = [
         (_('Question'), {
-            'fields': ['title', 'author', 'status', 'text_question', 'is_dublicated', 'tags'],
+            'fields': ['title', 'account', 'status', 'text_question', 'is_dublicated', 'tags'],
         }),
     ]
     filter_horizontal = ['tags']
@@ -105,7 +105,7 @@ class AnswerAdmin(admin.ModelAdmin):
 
     list_display = (
         'question',
-        'author',
+        'account',
         'is_accepted',
         # 'get_count_comments',
         # 'get_count_likes',
@@ -116,7 +116,7 @@ class AnswerAdmin(admin.ModelAdmin):
         'date_added',
     )
     list_filter = (
-        ('author', admin.RelatedOnlyFieldListFilter),
+        ('account', admin.RelatedOnlyFieldListFilter),
         ('question', admin.RelatedOnlyFieldListFilter),
         'is_accepted',
         'date_modified',
@@ -124,10 +124,9 @@ class AnswerAdmin(admin.ModelAdmin):
     )
     date_hierarchy = 'date_added'
     inlines = [
-        LikeGenericInline,
-        CommentGenericInline,
+        # CommentGenericInline,
     ]
-    fields = ['question', 'author', 'text_answer', 'is_accepted']
+    fields = ['question', 'account', 'text_answer', 'is_accepted']
 
     def get_queryset(self, request):
         qs = super(AnswerAdmin, self).get_queryset(request)

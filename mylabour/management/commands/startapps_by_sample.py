@@ -43,10 +43,11 @@ class Command(BaseCommand):
             app_dir = apps_dir.child(app_name)
             if app_dir.exists():
                 logger.warning('App with name "%s" already exists.' % app_name)
-                # raise ValueError('Conflict name of app: "%s"' % app_name)
+                raise ValueError('Conflict name of app: "%s"' % app_name)
             logger.info('Start creating new app "%s" ...' % app_name)
             # create tree of directories
             Path(app_dir, 'migrations').mkdir(parents=True)
+            Path(app_dir, 'locale').mkdir(parents=True)
             Path(app_dir, 'migrations', '__init__.py').write_file('')
             Path(app_dir, 'static', app_name, 'img').mkdir(parents=True)
             dir_for_css = Path(app_dir, 'static', app_name, 'css')
@@ -164,10 +165,14 @@ class %sConfig(AppConfig):
                 app_name.title().replace('_', ' ')
             )
             )
+            app_dir.child('factories.py').write_file("""
+import factory
+from factory import fuzzy
+""")
             app_dir.child('admin.py').write_file("""
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.contrib import admin
 """)
             logger.info('Created working fiels!')
-            logger.info('Succeful finished creating app "%s"!' % app_name)
+            logger.info('Successful finished creating app "%s"!' % app_name)

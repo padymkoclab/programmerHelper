@@ -53,7 +53,7 @@ class Poll(TimeStampedModel):
         settings.AUTH_USER_MODEL,
         related_name='+',
         through='VoteInPoll',
-        through_fields=['poll', 'user'],
+        through_fields=['poll', 'account'],
         verbose_name=_('Voted users'),
     )
 
@@ -107,7 +107,7 @@ class VoteInPoll(models.Model):
         verbose_name=_('Poll'),
         on_delete=models.CASCADE,
     )
-    user = models.ForeignKey(
+    account = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         verbose_name=_('User'),
         on_delete=models.CASCADE,
@@ -130,7 +130,7 @@ class VoteInPoll(models.Model):
         verbose_name_plural = "Votes in poll"
         ordering = ['poll', 'date_voting']
         get_latest_by = 'date_voting'
-        unique_together = ['poll', 'user']
+        unique_together = ['poll', 'account']
 
     def __str__(self):
-        return 'Vote of user "{0.user}" in poll "{0.poll}"'.format(self)
+        return 'Vote of user "{0.account}" in poll "{0.poll}"'.format(self)

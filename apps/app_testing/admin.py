@@ -27,7 +27,7 @@ class TestingPassageInline(admin.TabularInline):
 
     model = TestingSuit.passages.through
     extra = 0
-    fields = ['user', 'status', 'scope']
+    fields = ['account', 'status', 'scope']
 
 
 class TestingSuitAdmin(admin.ModelAdmin):
@@ -38,7 +38,7 @@ class TestingSuitAdmin(admin.ModelAdmin):
     search_fields = ('name',)
     list_display = (
         'name',
-        'author',
+        'account',
         'duration',
         'complexity',
         'count_attempts_passing',
@@ -53,7 +53,7 @@ class TestingSuitAdmin(admin.ModelAdmin):
         'complexity',
         'date_modified',
         'date_added',
-        ('author', admin.RelatedOnlyFieldListFilter),
+        ('account', admin.RelatedOnlyFieldListFilter),
     )
     inlines = [
         TestingQuestionInline,
@@ -63,7 +63,7 @@ class TestingSuitAdmin(admin.ModelAdmin):
     fieldsets = [
         [
             TestingSuit._meta.verbose_name, {
-                'fields': ['name', 'author', 'picture', 'duration', 'complexity', 'description'],
+                'fields': ['name', 'account', 'picture', 'duration', 'complexity', 'description'],
             }
         ]
     ]
@@ -84,22 +84,22 @@ class TestingPassageAdmin(admin.ModelAdmin):
 
     """
 
-    list_display = ['testing_suit', 'user', 'status', 'scope', 'date_passage']
+    list_display = ['testing_suit', 'account', 'status', 'scope', 'date_passage']
     date_hierarchy = 'date_passage'
     list_filter = [
         ('testing_suit', admin.RelatedOnlyFieldListFilter),
-        ('user', admin.RelatedOnlyFieldListFilter),
+        ('account', admin.RelatedOnlyFieldListFilter),
         'status',
         'date_passage',
     ]
     fieldsets = [
         [
             TestingPassage._meta.verbose_name, {
-                'fields': ['testing_suit', 'user', 'status', 'scope'],
+                'fields': ['testing_suit', 'account', 'status', 'scope'],
             }
         ]
     ]
-    readonly_fields = ['testing_suit', 'user', 'status', 'scope']
+    readonly_fields = ['testing_suit', 'account', 'status', 'scope']
 
 
 class TestingVariantInline(admin.TabularInline):

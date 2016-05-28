@@ -8,9 +8,9 @@ class NewsletterAdmin(admin.ModelAdmin):
     '''
         Admin View for News
     '''
-    list_display = ('title', 'author', 'web_link', 'is_new', 'date_modified', 'date_added')
+    list_display = ('title', 'account', 'web_link', 'is_new', 'date_modified', 'date_added')
     list_filter = (
-        ('author', admin.RelatedOnlyFieldListFilter),
+        ('account', admin.RelatedOnlyFieldListFilter),
         'date_modified',
         'date_added',
     )
@@ -19,7 +19,7 @@ class NewsletterAdmin(admin.ModelAdmin):
     fieldsets = [
         [
             Newsletter._meta.verbose_name, {
-                'fields': ['title', 'content', 'author', 'web_link']
+                'fields': ['title', 'content', 'account', 'web_link']
             }
         ]
     ]

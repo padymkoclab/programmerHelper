@@ -3,7 +3,7 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.contrib import admin
 
-from apps.app_generic_models.admin import ScopeGenericInline, CommentGenericInline
+# from apps.app_generic_models.admin import ScopeGenericInline, CommentGenericInline
 
 from .forms import ArticleForm
 from .models import Article, ArticleSubsection
@@ -31,7 +31,7 @@ class ArticleAdmin(admin.ModelAdmin):
     list_display = (
         'title',
         'picture',
-        'author',
+        'account',
         'get_rating',
         'get_count_subsections',
         'get_count_links',
@@ -42,19 +42,19 @@ class ArticleAdmin(admin.ModelAdmin):
         'date_added',
     )
     list_filter = (
-        ('author', admin.RelatedOnlyFieldListFilter),
+        ('account', admin.RelatedOnlyFieldListFilter),
         'date_modified',
         'date_added',
     )
     search_fields = ('title', 'web_url')
     inlines = [
-        ScopeGenericInline,
+        # ScopeGenericInline,
         ArticleSubsectionInline,
-        CommentGenericInline,
+        # CommentGenericInline,
     ]
     fieldsets = [
         (_('Basic'), {
-            'fields': ['title', 'picture', 'author']
+            'fields': ['title', 'picture', 'account']
         }),
         (_('Status'), {
             'fields': ['status', 'status_changed']

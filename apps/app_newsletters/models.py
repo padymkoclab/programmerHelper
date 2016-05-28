@@ -15,9 +15,9 @@ class Newsletter(TimeStampedModel):
     title = models.CharField(
         _('Title'), max_length=200, validators=[MinLengthValidator(settings.MIN_LENGTH_FOR_NAME_OR_TITLE_OBJECT)]
     )
-    slug = AutoSlugField(populate_from='title', unique_with=['author'], always_update=True)
+    slug = AutoSlugField(populate_from='title', unique_with=['account'], always_update=True)
     content = models.TextField(_('Content'))
-    author = models.ForeignKey(
+    account = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         related_name='news',
         verbose_name=_('Author'),
@@ -31,7 +31,7 @@ class Newsletter(TimeStampedModel):
         verbose_name_plural = _("Newsletters")
         get_latest_by = 'date_added'
         ordering = ['date_added']
-        unique_together = ['title', 'author']
+        unique_together = ['title', 'account']
 
     def __str__(self):
         return '{0.title}'.format(self)

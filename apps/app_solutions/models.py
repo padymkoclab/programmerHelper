@@ -8,7 +8,8 @@ from django.conf import settings
 
 from autoslug import AutoSlugField
 
-from apps.app_generic_models.models import CommentGeneric, OpinionGeneric
+from apps.app_comments.models import Comment
+from apps.app_opinions.models import Opinion
 from apps.app_web_links.models import WebLink
 from apps.app_tags.models import Tag
 from mylabour.models import TimeStampedModel
@@ -70,13 +71,12 @@ class Solution(TimeStampedModel):
         related_name='solutions',
         verbose_name=_('Category'),
     )
-    author = models.ForeignKey(
+    account = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         related_name='solutions',
         verbose_name=_('Author'),
         on_delete=models.CASCADE,
     )
-    views = models.IntegerField(_('Count views'), default=0, editable=False)
     tags = models.ManyToManyField(
         Tag,
         related_name='solutions',
@@ -87,8 +87,8 @@ class Solution(TimeStampedModel):
         related_name='solutions',
         verbose_name=_('Useful links'),
     )
-    comments = GenericRelation(CommentGeneric)
-    opinions = GenericRelation(OpinionGeneric)
+    comments = GenericRelation(Comment)
+    opinions = GenericRelation(Opinion)
 
     # managers
     objects = models.Manager()
