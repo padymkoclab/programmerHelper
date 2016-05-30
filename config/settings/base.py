@@ -32,30 +32,30 @@ DJANGO_APPS = [
 
 MY_APPS = [
     'mylabour',
-    'apps.app_accounts.apps.AppAccountsConfig',
-    'apps.app_actions.apps.AppActionsConfig',
-    'apps.app_articles.apps.AppArticlesConfig',
-    'apps.app_badges.apps.AppBadgesConfig',
-    'apps.app_books.apps.AppBooksConfig',
-    'apps.app_comments.apps.AppCommentsConfig',
-    'apps.app_courses.apps.AppCoursesConfig',
-    'apps.app_favours.apps.AppFavoursConfig',
-    'apps.app_forum.apps.AppForumConfig',
-    'apps.app_inboxes.apps.AppInboxesConfig',
-    'apps.app_newsletters.apps.AppNewslettersConfig',
-    'apps.app_opinions.apps.AppOpinionsConfig',
-    'apps.app_polls.apps.AppPollsConfig',
-    'apps.app_questions.apps.AppQuestionsConfig',
-    'apps.app_replies.apps.AppRepliesConfig',
-    'apps.app_scopes.apps.AppScopesConfig',
-    'apps.app_sessions.apps.AppSessionsConfig',
-    'apps.app_snippets.apps.AppSnippetsConfig',
-    'apps.app_solutions.apps.AppSolutionsConfig',
-    'apps.app_tags.apps.AppTagsConfig',
-    'apps.app_testing.apps.AppTestingConfig',
-    'apps.app_utilities.apps.AppUtilitiesConfig',
-    'apps.app_visits.apps.AppVisitsConfig',
-    'apps.app_web_links.apps.AppWebLinksConfig',
+    'apps.accounts.apps.AccountsConfig',
+    'apps.actions.apps.ActionsConfig',
+    'apps.articles.apps.ArticlesConfig',
+    'apps.badges.apps.BadgesConfig',
+    'apps.books.apps.BooksConfig',
+    'apps.comments.apps.CommentsConfig',
+    'apps.courses.apps.CoursesConfig',
+    'apps.favours.apps.FavoursConfig',
+    'apps.forum.apps.ForumConfig',
+    'apps.inboxes.apps.InboxesConfig',
+    'apps.newsletters.apps.NewslettersConfig',
+    'apps.opinions.apps.OpinionsConfig',
+    'apps.polls.apps.PollsConfig',
+    'apps.questions.apps.QuestionsConfig',
+    'apps.replies.apps.RepliesConfig',
+    'apps.scopes.apps.ScopesConfig',
+    'apps.sessions.apps.SessionsConfig',
+    'apps.snippets.apps.SnippetsConfig',
+    'apps.solutions.apps.SolutionsConfig',
+    'apps.tags.apps.TagsConfig',
+    'apps.testing.apps.TestingConfig',
+    'apps.utilities.apps.UtilitiesConfig',
+    'apps.visits.apps.VisitsConfig',
+    'apps.web_links.apps.WebLinksConfig',
 ]
 
 THIRD_PARTY_APPS = [
@@ -79,9 +79,9 @@ DJANGO_MIDDLEWARE_CLASSES = [
 ]
 
 MY_MIDDLEWARE_CLASSES = [
-    'apps.app_accounts.middleware.LastSeenAccountMiddleware',
-    'apps.app_visits.middleware.CountVisitsPagesMiddleware',
-    'apps.app_visits.middleware.RegistratorVisitAccountMiddleware',
+    'apps.accounts.middleware.LastSeenAccountMiddleware',
+    'apps.visits.middleware.CountVisitsPagesMiddleware',
+    'apps.visits.middleware.RegistratorVisitAccountMiddleware',
 ]
 
 MIDDLEWARE_CLASSES = DJANGO_MIDDLEWARE_CLASSES + MY_MIDDLEWARE_CLASSES
@@ -104,8 +104,8 @@ TEMPLATES = [
                 'django.template.context_processors.static',
                 # 'django.template.context_processors.tz',
                 'mylabour.context_processors.date_creating_website',
-                'apps.app_visits.context_processors.count_visits',
-                'apps.app_sessions.context_processors.users_online',
+                'apps.visits.context_processors.count_visits',
+                'apps.sessions.context_processors.users_online',
             ],
         },
     },
@@ -118,7 +118,7 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # AUTH
 # -----------------------------
 
-AUTH_USER_MODEL = 'app_accounts.Account'
+AUTH_USER_MODEL = 'accounts.Account'
 
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
@@ -218,11 +218,11 @@ MEDIA_ROOT = str(BASE_DIR.child('media'))
 # SESSIONS
 # ----------------------------------------
 
-SESSION_ENGINE = 'apps.app_sessions.backends.extended_session_store'
+SESSION_ENGINE = 'apps.sessions.backends.extended_session_store'
 
 SESSION_COOKIE_AGE = 60 * 60 * 24 * 30
 
-SESSION_SERIALIZER = 'apps.app_sessions.serializers.ComprehensiveSessionJSONSerializer'
+SESSION_SERIALIZER = 'apps.sessions.serializers.ComprehensiveSessionJSONSerializer'
 
 # ----------------------------------------
 # CACHE

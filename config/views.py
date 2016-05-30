@@ -7,7 +7,7 @@ from django.views.generic import TemplateView
 
 # from PIL import Image, ImageDraw
 
-from apps.app_accounts.models import Account
+from apps.accounts.models import Account
 
 
 class IndexView(TemplateView):

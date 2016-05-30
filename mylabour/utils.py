@@ -1,11 +1,12 @@
 
+import pprint
 import pip
 import pathlib
 import time
 import random
 import json
 
-# from django.utils import timezone
+from django.utils import timezone
 from django.db import models
 from django.core.exceptions import ImproperlyConfigured
 
@@ -103,9 +104,31 @@ def show_concecutive_certain_element(sequence, element):
     return k
 
 
-def pip_installed_packeges():
+def pip_installed_packages():
+    """ """
+
     for package in pip.get_installed_distributions():
         date_installed_in_seconds = pathlib.os.path.getctime(package.location)
         date_installed = time.ctime(date_installed_in_seconds)
         msg = '{0:<30} {1:<10}'.format(date_installed, package.key)
         print(msg)
+
+
+def get_paths_all_nested_files(path, show=False):
+    """ """
+
+    all_paths = list()
+    tree = pathlib.os.walk(path)
+    for root, dirs, files in tree:
+        for d in dirs:
+            all_paths.append('{0}/{1}'.format(root, d))
+        for f in files:
+            all_paths.append('{0}/{1}'.format(root, f))
+    # distinct paths
+    all_paths = set(all_paths)
+    all_paths = list(all_paths)
+    all_paths.sort()
+    # show if required
+    if show:
+        pprint.pprint(all_paths, indent=8)
+    return all_paths
