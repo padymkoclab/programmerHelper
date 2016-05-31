@@ -66,7 +66,7 @@ class BaseTestClass_for_prepopulated_data(TestCase):
             Factory_Favour(content_object=snippet)
         #
         self.assertEqual(snippet.title, data['title'])
-        self.assertEqual(snippet.slug, slugify(data['title'], allow_unicode=True).replace('-', '_'))
+        self.assertEqual(snippet.slug, slugify(data['title'], allow_unicode=True))
         self.assertEqual(snippet.lexer, data['lexer'])
         self.assertEqual(snippet.account, data['account'])
         self.assertEqual(snippet.description, data['description'])
@@ -81,7 +81,7 @@ class BaseTestClass_for_prepopulated_data(TestCase):
         same_title_as_lower = same_title.lower()
         same_title_as_upper = same_title.upper()
         same_title_as_title = same_title.title()
-        slug_same_title = slugify(same_title, allow_unicode=True).replace('-', '_')
+        slug_same_title = slugify(same_title, allow_unicode=True)
         #
         snippet1 = Factory_Snippet()
         snippet2 = Factory_Snippet()
@@ -149,16 +149,14 @@ def signal_for_keeping_old_account(sender, instance, **kwargs):
         self.snippet.full_clean()
         self.snippet.save()
         self.assertEqual(self.snippet.title, data_for_update['title'])
-        self.assertEqual(self.snippet.slug, slugify(data_for_update['title'], allow_unicode=True).replace('-', '_'))
+        self.assertEqual(self.snippet.slug, slugify(data_for_update['title'], allow_unicode=True))
         self.assertEqual(self.snippet.lexer, data_for_update['lexer'])
         self.assertEqual(self.snippet.account, data_for_update['account'])
         self.assertEqual(self.snippet.description, data_for_update['description'])
         self.assertEqual(self.snippet.code, data_for_update['code'])
 
     def test_delete_snippet(self):
-        old_count = Snippet.objects.count()
         self.snippet.delete()
-        self.assertEqual(Snippet.objects.count(), old_count - 1)
 
     def test_get_absolute_url(self):
         response = self.client.get(self.snippet.get_absolute_url())

@@ -18,7 +18,6 @@ class Factory_Book(factory.django.DjangoModelFactory):
     class Meta:
         model = Book
 
-    description = factory.Faker('text', locale='ru')
     pages = fuzzy.FuzzyInteger(1, 1000)
     year_published = fuzzy.FuzzyInteger(1950, NOW_YEAR)
 
@@ -35,6 +34,10 @@ class Factory_Book(factory.django.DjangoModelFactory):
     @factory.lazy_attribute
     def publishers(self):
         return factory.Faker('text', locale='ru').generate([])[:20]
+
+    @factory.lazy_attribute
+    def description(self):
+        return factory.Faker('text', locale='ru').generate([]) + factory.Faker('text', locale='ru').generate([])
 
     @factory.lazy_attribute
     def isbn(self):
@@ -78,7 +81,10 @@ class Factory_Writter(factory.django.DjangoModelFactory):
         model = Writter
 
     name = factory.Faker('name', locale='ru')
-    about = factory.Faker('text', locale='ru')
+
+    @factory.lazy_attribute
+    def about(self):
+        return factory.Faker('text', locale='ru').generate([]) + factory.Faker('text', locale='ru').generate([])
 
     @factory.lazy_attribute
     def birthyear(self):

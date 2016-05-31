@@ -28,7 +28,7 @@ class BookAdmin(admin.ModelAdmin):
         'get_count_tags',
         'get_rating',
         'get_count_replies',
-        # 'is_new',
+        'is_new',
         'year_published',
     )
     # list_filter = ('year_published',)
@@ -90,7 +90,14 @@ class WritterAdmin(admin.ModelAdmin):
     '''
         Admin View for Writter
     '''
-    list_display = ('name', 'birthyear', 'deathyear', 'show_books', 'get_count_books', 'short_about')
+    list_display = (
+        'name',
+        'birthyear',
+        'deathyear',
+        'show_books',
+        'get_count_books',
+        'short_about',
+    )
     search_fields = ['name', 'about']
     fieldsets = [
         [

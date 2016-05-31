@@ -41,3 +41,34 @@ class BookQuerySet(models.QuerySet):
         """Books published no later in this and past year."""
 
         return self.filter(year_published__gte=NOW_YEAR - 1).filter(year_published__lte=NOW_YEAR)
+
+    def giant_books(self):
+        """Books with pages 500 and more."""
+
+        return self.filter(pages__gte=500)
+
+    def big_books(self):
+        """Books with pages from 200 to 500."""
+
+        return self.filter(pages__range=[200, 499])
+
+    def middle_books(self):
+        """Books with pages from 50 to 200."""
+
+        return self.filter(pages__range=[50, 199])
+
+    def tiny_books(self):
+        """Books with pages until 50."""
+
+        return self.filter(pages__lt=50)
+
+    def books_with_sizes(self):
+        """ """
+
+        return self.annotate(size=models.Case(
+            models.When(pk__in=self.giant_books(), then=models.Value('Giant book')),
+            models.When(pk__in=self.big_books(), then=models.Value('Big book')),
+            models.When(pk__in=self.middle_books(), then=models.Value('Middle book')),
+            models.When(pk__in=self.tiny_books(), then=models.Value('Tiny book')),
+            output_field=models.CharField(),
+        ))

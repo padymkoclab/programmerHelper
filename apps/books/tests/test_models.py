@@ -66,7 +66,7 @@ Wouldn’t it be great to add some smooth transitions to create a more proficien
         #
         book.refresh_from_db()
         self.assertEqual(book.name, data['name'])
-        self.assertEqual(book.slug, slugify(data['name'], allow_unicode=True).replace('-', '_'))
+        self.assertEqual(book.slug, slugify(data['name'], allow_unicode=True))
         self.assertEqual(book.description, data['description'])
         self.assertEqual(book.picture, data['picture'])
         self.assertEqual(book.pages, data['pages'])
@@ -104,7 +104,7 @@ Especially for something using flex-box or 100vh (full height – which you add 
         book.full_clean()
         book.save()
         self.assertEqual(book.name, data['name'])
-        self.assertEqual(book.slug, slugify(data['name'], allow_unicode=True).replace('-', '_'))
+        self.assertEqual(book.slug, slugify(data['name'], allow_unicode=True))
         self.assertEqual(book.description, data['description'])
         self.assertEqual(book.picture, data['picture'])
         self.assertEqual(book.pages, data['pages'])
@@ -120,7 +120,7 @@ Especially for something using flex-box or 100vh (full height – which you add 
         same_name_as_lower = same_name.lower()
         same_name_as_upper = same_name.upper()
         same_name_as_title = same_name.title()
-        slug_same_name = slugify(same_name, allow_unicode=True).replace('-', '_')
+        slug_same_name = slugify(same_name, allow_unicode=True)
         #
         book1 = Factory_Book()
         book2 = Factory_Book()
@@ -184,6 +184,9 @@ Especially for something using flex-box or 100vh (full height – which you add 
         self.assertTrue(new_book1.is_new())
         self.assertFalse(new_book2.is_new())
         self.assertFalse(new_book3.is_new())
+
+    def test_get_size(self):
+        pass
 
 
 class WritterTest(TestCase):
@@ -266,7 +269,7 @@ class WritterTest(TestCase):
         same_name_as_lower = same_name.lower()
         same_name_as_upper = same_name.upper()
         same_name_as_title = same_name.title()
-        slug_same_name = slugify('Омар Хайам', allow_unicode=True).replace('-', '_')
+        slug_same_name = slugify(same_name, allow_unicode=True)
         #
         writter1 = Factory_Writter()
         writter2 = Factory_Writter()
@@ -297,10 +300,72 @@ class WritterTest(TestCase):
 
     def test_if_birthyear_is_in_future(self):
         self.writter.birthyear = NOW_YEAR + 1
-        self.writter.full_clean()
-        self.assertRaisesMessage(ValidationError, _('Year of birth can not in future.'), self.writter.full_clean)
+        self.assertRaisesMessage(ValidationError, 'Year of birth can not in future.', self.writter.full_clean)
 
     def test_if_deathyear_is_in_future(self):
         self.writter.dearthyear = NOW_YEAR + 1
+        self.assertRaisesMessage(ValidationError, 'Year of dearth can not in future.', self.writter.full_clean)
+
+    def test_if_deathyear_is_more_or_equal_birthyear(self):
+        self.writter.dearthyear = 1990
+        self.writter.birthyear = 2015
+        self.assertRaisesMessage(
+            ValidationError, 'Year of birth can not more or equal year of dearth.', self.writter.full_clean
+        )
+        self.writter.dearthyear = 2014
+        self.writter.birthyear = 2014
+        self.assertRaisesMessage(
+            ValidationError, 'Year of birth can not more or equal year of dearth.', self.writter.full_clean
+        )
+
+    def test_if_small_range_beetween_deathyear_and_birthyear(self):
+        self.writter.birthyear = 1990
+        self.writter.dearthyear = 1999
+        self.assertRaisesMessage(
+            ValidationError, 'Very small range between year of birth and year of death.', self.writter.full_clean
+        )
+        self.writter.birthyear = 1990
+        self.writter.dearthyear = 2008
+        self.assertRaisesMessage(
+            ValidationError, 'Very small range between year of birth and year of death.', self.writter.full_clean
+        )
+        self.writter.birthyear = 1991
+        self.writter.dearthyear = 2010
+        self.assertRaisesMessage(
+            ValidationError, 'Very small range between year of birth and year of death.', self.writter.full_clean
+        )
+        self.writter.birthyear = 1960
+        self.writter.dearthyear = 1980
         self.writter.full_clean()
-        self.assertRaisesMessage(ValidationError, _('Year of dearth can not in future.'), self.writter.full_clean)
+
+    def test_if_big_range_beetween_deathyear_and_birthyear(self):
+        self.writter.birthyear = 1800
+        self.writter.dearthyear = 2000
+        self.assertRaisesMessage(
+            ValidationError, 'Very big range between year of birth and year of death.', self.writter.full_clean
+        )
+        self.writter.birthyear = 1860
+        self.writter.dearthyear = 2015
+        self.assertRaisesMessage(
+            ValidationError, 'Very big range between year of birth and year of death.', self.writter.full_clean
+        )
+        self.writter.birthyear = 1830
+        self.writter.dearthyear = 2005
+        self.assertRaisesMessage(
+            ValidationError, 'Very big range between year of birth and year of death.', self.writter.full_clean
+        )
+        self.writter.birthyear = 1850
+        self.writter.dearthyear = 2000
+        self.writter.full_clean()
+
+    def test_if_very_young_writter(self):
+        self.writter.dearthyear = None
+        #
+        self.writter.birthyear = NOW_YEAR
+        self.assertRaisesMessage(ValidationError, 'Writter not possible born so early.', self.writter.full_clean)
+        self.writter.birthyear = NOW_YEAR - 5
+        self.assertRaisesMessage(ValidationError, 'Writter not possible born so early.', self.writter.full_clean)
+        self.writter.birthyear = NOW_YEAR - 15
+        self.assertRaisesMessage(ValidationError, 'Writter not possible born so early.', self.writter.full_clean)
+        self.writter.birthyear = NOW_YEAR - 20
+        self.writter.full_clean()

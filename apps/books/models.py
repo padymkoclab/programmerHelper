@@ -98,7 +98,7 @@ class Book(models.Model):
         return reverse('books:book', kwargs={'slug': self.slug})
 
     def get_rating(self):
-        """Get rating of book on based it scopes."""
+        """Getting rating of book on based scopes."""
 
         return self.__class__.objects.books_with_rating().get(pk=self.pk).rating
     get_rating.admin_order_field = 'rating'
@@ -111,6 +111,11 @@ class Book(models.Model):
     is_new.admin_order_field = 'year_published'
     is_new.short_description = _('Is new')
     is_new.boolean = True
+
+    def get_size(self):
+        """Getting size of books on based count pages."""
+
+        pass
 
 
 class Writter(models.Model):
@@ -166,13 +171,13 @@ class Writter(models.Model):
         if isinstance(self.birthyear, int) and isinstance(self.deathyear, int):
             if self.birthyear >= self.deathyear:
                 raise ValidationError({
-                    '__all__': [_('Year of death can not more or equal year of birth.')]
+                    '__all__': [_('Year of birth can not more or equal year of dearth.')]
                 })
             if not self.deathyear - self.birthyear > 20:
                 raise ValidationError({
                     '__all__': [_('Very small range between year of birth and year of death.')]
                 })
-            if not self.deathyear - self.birthyear < 150:
+            if not self.deathyear - self.birthyear <= 150:
                 raise ValidationError({
                     '__all__': [_('Very big range between year of birth and year of death.')]
                 })

@@ -107,6 +107,7 @@ TEMPLATES = [
                 'apps.visits.context_processors.count_visits',
                 'apps.sessions.context_processors.users_online',
             ],
+            'string_if_invalid': 'ERROR HERE!!!',
         },
     },
 ]
@@ -278,11 +279,6 @@ PASSWORD_COMPLEXITY = {
 }
 
 
-def auto_slug(value):
-    return slugify(value, allow_unicode=True).replace('-', '_')
-
-AUTOSLUG_SLUGIFY_FUNCTION = auto_slug
-
 # MY SETTINGS
 
 COUNT_DAYS_DISTINGUISH_ELEMENTS_AS_NEW = 7
@@ -301,10 +297,10 @@ IGNORABLE_404_ENDS = ('',)
 
 IGNORABLE_URLS_FOR_COUNT_VISITS = (
     r'admin/[\w]*',
-    r'\.jpeg$',
-    r'\.png$',
-    r'\.jpg$',
-    r'\.gif$',
+    r'*\.jpeg$',
+    r'*\.png$',
+    r'*\.jpg$',
+    r'*\.gif$',
     r'/favicon.ico$',
     r'/(robots.txt)|(humans.txt)$',
 )
