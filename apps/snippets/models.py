@@ -74,3 +74,13 @@ class Snippet(TimeStampedModel):
 
     def get_count_views(self):
         return Visit.objects.get_count_visits_by_url(self.get_absolute_url)
+
+    def show_users_given_bad_opinions(self):
+        """Return the users determined this snippet as not useful."""
+
+        return self.opinions.filter(is_useful=False).values_list('account__username', flat=True)
+
+    def show_users_given_good_opinions(self):
+        """Return the users determined this snippet as useful."""
+
+        return self.opinions.filter(is_useful=True).values_list('account__username', flat=True)

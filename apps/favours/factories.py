@@ -7,7 +7,7 @@ from factory import fuzzy
 from .models import Favour
 
 
-class Factory_Favour(factory.DjangoModelFactory):
+class FavourFactory(factory.DjangoModelFactory):
 
     class Meta:
         model = Favour

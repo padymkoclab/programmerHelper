@@ -55,7 +55,7 @@ class SnippetAdmin(admin.ModelAdmin):
 
     def get_queryset(self, request):
         qs = super(SnippetAdmin, self).get_queryset(request)
-        qs = qs.snippets_with_count_tags_opinions_comments_scopes_and_count_good_or_bad_opinions()
+        qs = qs.snippets_with_total_counters_on_related_fields()
         return qs
 
     def get_count_comments(self, obj):

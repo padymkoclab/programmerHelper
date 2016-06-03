@@ -64,7 +64,7 @@ def signal_created_updated_object(sender, instance, created, **kwargs):
             Action.objects.create(
                 account=account,
                 flag=Action.CHOICES_FLAGS.ADD,
-                message='Created new {0} "{1}".'.format(instance._meta.verbose_name.lower(), instance),
+                message='Created {0} "{1}".'.format(instance._meta.verbose_name.lower(), instance),
             )
         else:
             Action.objects.create(

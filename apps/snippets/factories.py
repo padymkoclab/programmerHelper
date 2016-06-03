@@ -52,7 +52,7 @@ class SnippetFactory(factory.DjangoModelFactory):
             FavourFactory(content_object=self)
 
 
-def factory_snippets(count):
+def snippets_factory(count):
     Snippet.objects.filter().delete()
     for i in range(count):
         SnippetFactory()

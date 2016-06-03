@@ -14,6 +14,7 @@ class SnippetQuerySet(models.QuerySet):
             models.Case(
                 models.When(opinions__is_useful=True, then=1),
                 models.When(opinions__is_useful=False, then=-1),
+                default=0,
                 output_field=models.IntegerField()
             )
         ))
@@ -52,6 +53,7 @@ class SnippetQuerySet(models.QuerySet):
         return self.annotate(count_good_opinions=models.Sum(
             models.Case(
                 models.When(opinions__is_useful=True, then=1),
+                default=0,
                 output_field=models.IntegerField()
             )
         ))
@@ -62,14 +64,49 @@ class SnippetQuerySet(models.QuerySet):
         return self.annotate(count_bad_opinions=models.Sum(
             models.Case(
                 models.When(opinions__is_useful=False, then=1),
+                default=0,
                 output_field=models.IntegerField()
             )
         ))
 
-    def snippets_with_count_tags_opinions_comments_scopes_and_count_good_or_bad_opinions(self):
+    def snippets_with_count_favours(self):
+        """Added to each snippet new field with count of favours of the each snippet."""
+
+        return self.annotate(count_favours=models.Count('favours', distinct=True))
+
+    def snippets_with_count_like_favours(self):
+        """Added to each snippet new field with count of liked favours of the each snippet."""
+
+        return self.annotate(count_like_favours=models.Sum(
+            models.Case(
+                models.When(favours__is_favour=True, then=1),
+                default=0,
+                output_field=models.IntegerField()
+            )
+        ))
+
+    def snippets_with_count_dislike_favours(self):
+        """Added to each snippet new field with count of disliked favours of the each snippet."""
+
+        return self.annotate(count_dislike_favours=models.Sum(
+            models.Case(
+                models.When(favours__is_favour=False, then=1),
+                default=0,
+                output_field=models.IntegerField()
+            )
+        ))
+
+    def snippets_with_total_counters_on_related_fields(self):
+        """Determinating for each snippet count_tags, opinions, favours, comments,
+        getting scope, count good/bad opinions, and count likes/dislikes favours."""
+
+        self = self.snippets_with_count_good_opinions()
+        self = self.snippets_with_count_bad_opinions()
+        self = self.snippets_with_scopes()
         self = self.snippets_with_count_tags()
         self = self.snippets_with_count_comments()
         self = self.snippets_with_count_opinions()
-        self = self.snippets_with_count_good_opinions()
-        self = self.snippets_with_count_bad_opinions()
+        self = self.snippets_with_count_favours()
+        self = self.snippets_with_count_like_favours()
+        self = self.snippets_with_count_dislike_favours()
         return self

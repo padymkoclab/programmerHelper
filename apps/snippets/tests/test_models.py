@@ -22,7 +22,7 @@ class SnippetTest(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        accounts_factory(15)
+        accounts_factory(20)
         tags_factory(10)
         badges_factory()
 
@@ -182,5 +182,37 @@ def signal_for_keeping_old_account(sender, instance, **kwargs):
             self.snippet.opinions.create(account=couple[0], is_useful=couple[1])
         self.assertEqual(self.snippet.get_scope(), -4)
 
+    def test_processing_tags(self):
+        # restrict on max count tags and clear method
+        pass
+
     def test_get_count_views(self):
         pass
+
+    def test_show_users_given_bad_opinions(self):
+        self.snippet.opinions.clear()
+        self.assertFalse(self.snippet.show_users_given_bad_opinions())
+        #
+        account1, account2, account3, account4, account5 = Account.objects.random_accounts(5)
+        self.snippet.opinions.create(account=account1, is_useful=True)
+        self.snippet.opinions.create(account=account2, is_useful=False)
+        self.snippet.opinions.create(account=account3, is_useful=False)
+        self.snippet.opinions.create(account=account4, is_useful=True)
+        self.snippet.opinions.create(account=account5, is_useful=False)
+        #
+        show_users_given_bad_opinions = self.snippet.show_users_given_bad_opinions()
+        self.assertCountEqual([account2.username, account3.username, account5.username], show_users_given_bad_opinions)
+
+    def test_show_users_given_good_opinions(self):
+        self.snippet.opinions.clear()
+        self.assertFalse(self.snippet.show_users_given_good_opinions())
+        #
+        account1, account2, account3, account4, account5 = Account.objects.random_accounts(5)
+        self.snippet.opinions.create(account=account1, is_useful=False)
+        self.snippet.opinions.create(account=account2, is_useful=False)
+        self.snippet.opinions.create(account=account3, is_useful=True)
+        self.snippet.opinions.create(account=account4, is_useful=False)
+        self.snippet.opinions.create(account=account5, is_useful=True)
+        #
+        show_users_given_good_opinions = self.snippet.show_users_given_good_opinions()
+        self.assertCountEqual([account3.username, account5.username], show_users_given_good_opinions)
