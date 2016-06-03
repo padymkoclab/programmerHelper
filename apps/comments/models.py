@@ -1,11 +1,11 @@
 
-from django.core.validators import MinLengthValidator
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from django.db import models
 from django.conf import settings
 
 from mylabour.models import BaseGenericModel
+from mylabour.validators import MinCountWordsValidator
 
 
 # comment design from website
@@ -13,14 +13,14 @@ from mylabour.models import BaseGenericModel
 
 class Comment(BaseGenericModel):
 
-    MIN_LENGTH_COMMENT = 10
+    MIN_LENGTH_COMMENT = 3
 
     text_comment = models.TextField(
         _('Text comment'),
         validators=[
-            MinLengthValidator(
+            MinCountWordsValidator(
                 MIN_LENGTH_COMMENT,
-                _('Comment must be contains at least {0} characters.').format(MIN_LENGTH_COMMENT),
+                _('Comment must be contains at least {0} words.').format(MIN_LENGTH_COMMENT)
             )
         ]
     )

@@ -24,7 +24,8 @@ class SnippetFactory(factory.DjangoModelFactory):
 
     @factory.lazy_attribute
     def title(self):
-        return factory.Faker('text', locale='ru').generate([])[:30]
+        length_snippet_title = random.randint(20, 200)
+        return factory.Faker('text', locale='ru').generate([])[:length_snippet_title]
 
     @factory.lazy_attribute
     def lexer(self):

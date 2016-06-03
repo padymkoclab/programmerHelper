@@ -74,6 +74,9 @@ class BookQuerySet(models.QuerySet):
             output_field=models.CharField(),
         ))
 
+    def popular_books(self):
+        pass
+
 
 class WritterQuerySet(models.QuerySet):
     """

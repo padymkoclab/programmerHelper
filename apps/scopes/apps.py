@@ -5,7 +5,7 @@ from django.apps import AppConfig
 
 class ScopesConfig(AppConfig):
     name = "apps.scopes"
-    verbose_name = _("App Scopes")
+    verbose_name = _("Scopes")
 
     def ready(self):
         pass

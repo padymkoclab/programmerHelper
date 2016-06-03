@@ -103,10 +103,10 @@ def signal_change_useful_links_of_solutions_or_articles(sender, instance, action
             if reverse:
                 if pk_set:
                     for article_pk in pk_set:
-                        account = Article.objects.get(pk=article_pk).author
+                        account = Article.objects.get(pk=article_pk).account
                         account.check_badge('Dispatcher')
             else:
-                account = instance.author
+                account = instance.account
                 account.check_badge('Dispatcher')
 
 
@@ -201,6 +201,7 @@ def signal_change_authorhip_of_course(sender, instance, action, reverse, model, 
 @receiver(post_save, sender=VoteInPoll)
 def signal_account_participated_in_poll(sender, instance, **kwargs):
     """Signal, what account participated in poll."""
+
     Action.objects.create(
         account=instance.user,
         flag=Action.CHOICES_FLAGS.ADD,
@@ -212,6 +213,7 @@ def signal_account_participated_in_poll(sender, instance, **kwargs):
 @receiver(post_delete, sender=VoteInPoll)
 def signal_account_removed_from_voters_in_poll(sender, instance, **kwargs):
     """Signal, what account removed from voters in poll."""
+
     Action.objects.create(
         account=instance.user,
         flag=Action.CHOICES_FLAGS.DEL,
@@ -226,6 +228,7 @@ CHANGE_STATUS_ACCOUNT = False
 @receiver(pre_save, sender=Account)
 def signal_changed_status_of_account(sender, instance, **kwargs):
     """Signal attempt change status of account: is_superuser or is_active."""
+
     try:
         obj = sender.objects.get(pk=instance.pk)
     except sender.DoesNotExist:

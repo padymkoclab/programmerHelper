@@ -5,7 +5,7 @@ from django.apps import AppConfig
 
 class CommentsConfig(AppConfig):
     name = "apps.comments"
-    verbose_name = _("App Comments")
+    verbose_name = _("Comments")
 
     def ready(self):
         pass

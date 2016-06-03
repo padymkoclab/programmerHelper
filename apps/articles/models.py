@@ -1,24 +1,24 @@
 
-from django.db.models import Avg
 from django.contrib.contenttypes.fields import GenericRelation
 from django.core.urlresolvers import reverse
-from django.core.validators import MinLengthValidator, RegexValidator, MinValueValidator, MaxValueValidator
+from django.core.validators import MinLengthValidator, MinValueValidator
 from django.utils.translation import ugettext_lazy as _
 from django.db import models
 from django.conf import settings
 
 from model_utils.fields import StatusField, MonitorField
 from model_utils import Choices
-from autoslug import AutoSlugField
 
-from mylabour.models import TimeStampedModel
 from apps.comments.models import Comment
 from apps.scopes.models import Scope
 from apps.tags.models import Tag
 from apps.web_links.models import WebLink
 from mylabour.fields_db import ConfiguredAutoSlugField
+from mylabour.models import TimeStampedModel
+from mylabour.validators import MinCountWordsValidator
 
-from .managers import ArticleManager, ArticleQuerySet
+from .managers import ArticleManager
+from .querysets import ArticleQuerySet
 
 
 class Article(TimeStampedModel):
@@ -38,10 +38,10 @@ class Article(TimeStampedModel):
         _('Title'), max_length=200, validators=[MinLengthValidator(settings.MIN_LENGTH_FOR_NAME_OR_TITLE_OBJECT)]
     )
     slug = ConfiguredAutoSlugField(_('Slug'), populate_from='title', unique_with=['account'])
-    quotation = models.CharField(_('Quotation'), max_length=200)
+    quotation = models.CharField(_('Quotation'), max_length=200, validators=[MinLengthValidator(10)])
     picture = models.URLField(_('Picture'), max_length=1000)
-    header = models.TextField(_('Header'))
-    conclusion = models.TextField(_('Conclusion'))
+    header = models.TextField(_('Header'), validators=[MinCountWordsValidator(5)])
+    conclusion = models.TextField(_('Conclusion'), validators=[MinCountWordsValidator(5)])
     status = StatusField(verbose_name=_('Status'), choices_name='STATUS_ARTICLE', default=STATUS_ARTICLE.draft)
     status_changed = MonitorField(monitor='status', verbose_name=_('Status changed'))
     account = models.ForeignKey(
@@ -50,6 +50,11 @@ class Article(TimeStampedModel):
         related_name='articles',
         limit_choices_to={'is_active': True},
         on_delete=models.CASCADE,
+    )
+    source = models.URLField(
+        _('Source'),
+        null=True,
+        help_text=_('If this article is taken from another a web resource, please point URL to there.')
     )
     tags = models.ManyToManyField(
         Tag,
@@ -62,8 +67,8 @@ class Article(TimeStampedModel):
         verbose_name=_('Links'),
         help_text=_('Useful links'),
     )
-    comments = GenericRelation(Comment)
-    scopes = GenericRelation(Scope)
+    comments = GenericRelation(Comment, related_query_name='articles')
+    scopes = GenericRelation(Scope, related_query_name='articles')
 
     # managers
     objects = models.Manager()
@@ -81,19 +86,18 @@ class Article(TimeStampedModel):
         return '{0.title}'.format(self)
 
     def save(self, *args, **kwargs):
-        # self.slug =
         super(Article, self).save(*args, **kwargs)
 
     def get_absolute_url(self):
         return reverse('articles:article', kwargs={'slug': self.slug})
 
     def get_rating(self):
-        rating = self.scopes.aggregate(rating=Avg('scope'))['rating']
-        if rating is not None:
-            return float('{0:.3}'.format(rating))
         return None
-    get_rating.admin_order_field = 'rating'  # annotation in admin.py
+    get_rating.admin_order_field = 'rating'
     get_rating.short_description = _('Rating')
+
+    def hide_numbers_subasections(self):
+        pass
 
 
 class ArticleSubsection(TimeStampedModel):
@@ -107,10 +111,9 @@ class ArticleSubsection(TimeStampedModel):
     title = models.CharField(
         _('Title'), max_length=200, validators=[MinLengthValidator(settings.MIN_LENGTH_FOR_NAME_OR_TITLE_OBJECT)]
     )
-    slug = AutoSlugField(
-        _('Slug'), populate_from='title', unique_with=['article'], always_update=True, allow_unicode=True, db_index=True
-    )
-    content = models.TextField(_('Content'))
+    slug = ConfiguredAutoSlugField(_('Slug'), populate_from='title', unique_with=['article'])
+    number = models.PositiveSmallIntegerField(_('Number'), validators=[MinValueValidator(1)])
+    content = models.TextField(_('Content'), validators=[MinLengthValidator(100)])
 
     class Meta:
         db_table = 'articles_subsections'

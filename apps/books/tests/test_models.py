@@ -189,6 +189,12 @@ Especially for something using flex-box or 100vh (full height – which you add 
         self.book.save()
         self.assertEqual(self.book.get_size(), 'Tiny book')
 
+    def test_tags_restrict(self):
+        pass
+
+    def test_links_restrict(self):
+        pass
+
 
 class WritterTest(TestCase):
     """

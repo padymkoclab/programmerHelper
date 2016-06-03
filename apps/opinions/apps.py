@@ -5,7 +5,7 @@ from django.apps import AppConfig
 
 class OpinionsConfig(AppConfig):
     name = "apps.opinions"
-    verbose_name = _("App Opinions")
+    verbose_name = _("Opinions")
 
     def ready(self):
         pass

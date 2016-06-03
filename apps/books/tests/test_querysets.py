@@ -120,6 +120,9 @@ class BookQuerySetTest(TestCase):
             else:
                 self.assertEqual(book.size, 'Giant book')
 
+    def test_popular_books(self):
+        pass
+
 
 class WritterTest(TestCase):
     """

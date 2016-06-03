@@ -36,8 +36,8 @@ class Snippet(TimeStampedModel):
         on_delete=models.CASCADE,
         limit_choices_to={'is_active': True},
     )
-    description = models.TextField(_('Decription'))
-    code = models.TextField(_('Code'))
+    description = models.TextField(_('Decription'), validators=[MinLengthValidator(15)])
+    code = models.TextField(_('Code'), validators=[MinLengthValidator(5)])
     tags = models.ManyToManyField(
         Tag,
         verbose_name=_('Tags'),

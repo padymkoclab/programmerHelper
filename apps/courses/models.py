@@ -120,6 +120,10 @@ class Lesson(TimeStampedModel):
     def get_absolute_url(self):
         return reverse('courses:lesson_detail', kwargs={'number': self.number, 'slug': self.slug})
 
+    def clean(self):
+        # consecutevely numbers of course
+        pass
+
     def get_scope(self):
         count_good_opinions = self.opinions.filter(is_useful=True).count()
         count_bad_opinions = self.opinions.filter(is_useful=False).count()

@@ -51,3 +51,6 @@ class IndexView(TemplateView):
     #     im.save(response, "PNG")
     #     return HttpResponse(c, content_type="text/plain")
     #     return super(IndexView, self).post(request, *args, **kwargs)
+
+
+# Today newly objects

@@ -19,10 +19,9 @@ def UserNameValidator(username):
 @deconstructible
 class MaxCountWordsValidator(object):
     compare = lambda self, a, b: a > b
-    # message = _('You may can using not more %(max_count_words)s words.')
     message = ungettext_lazy(
-        'You may can using not more %(max_count_words)s words. Now it has %(count_words)d word.',
-        'You may can using not more %(max_count_words)s words. Now it has %(count_words)d words.',
+        'You may using not more %(max_count_words)s words. Now it has %(count_words)d word.',
+        'You may using not more %(max_count_words)s words. Now it has %(count_words)d words.',
         'max_count_words')
     code = 'max_count_words'
 
@@ -41,6 +40,38 @@ class MaxCountWordsValidator(object):
         return (
             isinstance(other, self.__class__) and
             (self.max_count_words == other.max_count_words) and
+            (self.message == other.message) and
+            (self.code == other.code)
+        )
+
+    def _get_count_words(self, text):
+        return len(tuple(chars.strip() for chars in text.split(' ')))
+
+
+@deconstructible
+class MinCountWordsValidator(object):
+    compare = lambda self, a, b: a < b
+    message = ungettext_lazy(
+        'You must using at least %(min_count_words)s words. Now it has %(count_words)d word.',
+        'You must using at least %(min_count_words)s words. Now it has %(count_words)d words.',
+        'min_count_words')
+    code = 'min_count_words'
+
+    def __init__(self, min_count_words, message=None):
+        self.min_count_words = min_count_words
+        if message:
+            self.message = message
+
+    def __call__(self, text):
+        count_words = self._get_count_words(text)
+        params = {'min_count_words': self.min_count_words, 'count_words': count_words, 'text': text}
+        if self.compare(count_words, self.min_count_words):
+            raise ValidationError(self.message, code=self.code, params=params)
+
+    def __eq__(self, other):
+        return (
+            isinstance(other, self.__class__) and
+            (self.min_count_words == other.min_count_words) and
             (self.message == other.message) and
             (self.code == other.code)
         )

@@ -23,7 +23,8 @@ class BookFactory(factory.django.DjangoModelFactory):
 
     @factory.lazy_attribute
     def name(self):
-        return factory.Faker('text', locale='ru').generate([])[:30]
+        length_book_name = random.randint(10, 200)
+        return factory.Faker('text', locale='ru').generate([])[:length_book_name]
 
     @factory.lazy_attribute
     def picture(self):

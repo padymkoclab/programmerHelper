@@ -3,7 +3,8 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.contrib import admin
 
-# from apps.generic_models.admin import ScopeGenericInline, CommentGenericInline
+from apps.scopes.admin import ScopeInline
+from apps.comments.admin import CommentInline
 
 from .forms import ArticleForm
 from .models import Article, ArticleSubsection
@@ -48,9 +49,9 @@ class ArticleAdmin(admin.ModelAdmin):
     )
     search_fields = ('title', 'web_url')
     inlines = [
-        # ScopeGenericInline,
         ArticleSubsectionInline,
-        # CommentGenericInline,
+        ScopeInline,
+        CommentInline,
     ]
     fieldsets = [
         (_('Basic'), {
@@ -72,13 +73,7 @@ class ArticleAdmin(admin.ModelAdmin):
 
     def get_queryset(self, request):
         qs = super(ArticleAdmin, self).get_queryset(request)
-        qs = qs.annotate(
-            count_tags=models.Count('tags', distinct=True),
-            count_links=models.Count('links', distinct=True),
-            count_subsections=models.Count('subsections', distinct=True),
-            count_comments=models.Count('comments', distinct=True),
-            rating=models.Avg('scopes__scope', distinct=True),
-        )
+        qs = qs.articles_with_rating_and_count_comments_subsections_tags_links()
         return qs
 
     def get_count_links(self, obj):
