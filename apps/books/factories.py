@@ -7,13 +7,13 @@ from django.conf import settings
 import factory
 from factory import fuzzy
 
-from apps.replies.factories import Factory_Reply
-from apps.scopes.factories import Factory_Scope
+from apps.replies.factories import ReplyFactory
+from apps.scopes.factories import ScopeFactory
 
 from .models import *
 
 
-class Factory_Book(factory.django.DjangoModelFactory):
+class BookFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = Book
@@ -49,7 +49,7 @@ class Factory_Book(factory.django.DjangoModelFactory):
     @factory.post_generation
     def replies(self, created, extracted, **kwargs):
         for i in range(random.randint(0, 3)):
-            Factory_Reply(content_object=self)
+            ReplyFactory(content_object=self)
 
     @factory.post_generation
     def tags(self, created, extracted, **kwargs):
@@ -66,7 +66,7 @@ class Factory_Book(factory.django.DjangoModelFactory):
     @factory.post_generation
     def scopes(self, created, extracted, **kwargs):
         for i in range(random.randint(0, 7)):
-            Factory_Scope(content_object=self)
+            ScopeFactory(content_object=self)
 
     @factory.post_generation
     def accounts(self, created, extracted, **kwargs):
@@ -75,7 +75,7 @@ class Factory_Book(factory.django.DjangoModelFactory):
         self.accounts.set(authors)
 
 
-class Factory_Writter(factory.django.DjangoModelFactory):
+class WritterFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = Writter
@@ -100,15 +100,15 @@ class Factory_Writter(factory.django.DjangoModelFactory):
         return fuzzy.FuzzyInteger(self.birthyear + 20, now_year).fuzz()
 
 
-def factory_writters(count):
+def writters_factory(count):
     Writter.objects.filter().delete()
     for i in range(count):
-        Factory_Writter()
+        WritterFactory()
 
 
-def factory_books(count):
+def books_factory(count):
     Book.objects.filter().delete()
     if not Writter.objects.count():
-        factory_writters(20)
+        writters_factory(20)
     for i in range(count):
-        Factory_Book()
+        BookFactory()

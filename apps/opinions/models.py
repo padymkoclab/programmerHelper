@@ -22,18 +22,16 @@ class Opinion(BaseGenericModel):
         db_table = 'opinions'
         verbose_name = _('Opinion')
         verbose_name_plural = _('Opinions')
-        permissions = (('can_view_opinions', _('Can view opinions')),)
-        unique_together = ['account', 'object_id']
         get_latest_by = 'date_modified'
         ordering = ['date_modified']
+        permissions = (('can_view_opinions', _('Can view opinions')),)
+        unique_together = ['account', 'object_id']
 
     def __str__(self):
-        if self.content_object:
-            return _('Opinion about {0} "{1}"').format(
-                self.content_object._meta.verbose_name.lower(),
-                self.content_object.__str__()
-            )
-        return str()
+        return _('Opinion about {0} "{1}"').format(
+            self.content_type.model_class()._meta.verbose_name.lower(),
+            self.content_object.__str__(),
+        )
 
     def save(self, *args, **kwargs):
         super(Opinion, self).save(*args, **kwargs)

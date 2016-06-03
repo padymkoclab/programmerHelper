@@ -30,3 +30,4 @@ class BookForm(forms.ModelForm):
             self.add_error('links', _('Count links must be not more than {0}').format(
                 settings.MAX_COUNT_WEBLINKS_ON_OBJECT
             ))
+        return links

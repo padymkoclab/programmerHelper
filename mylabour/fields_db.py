@@ -3,7 +3,6 @@ import datetime
 
 from autoslug import AutoSlugField
 
-from django.utils.text import slugify
 from django import forms
 from django.utils.text import capfirst
 from django.core.exceptions import ValidationError
@@ -285,7 +284,6 @@ class PhoneField(models.CharField):
     def __init__(self, *args, **kwargs):
         kwargs['max_length'] = 40
         super(PhoneField, self).__init__(*args, **kwargs)
-        import ipdb; ipdb.set_trace()
         # is_digits()
 
 
@@ -300,7 +298,6 @@ class ConfiguredAutoSlugField(AutoSlugField):
         kwargs['blank'] = True
         kwargs['always_update'] = True
         kwargs['db_index'] = True
-        kwargs['slugify'] = lambda value: slugify(value, allow_unicode=True)
         kwargs['allow_unicode'] = True
         super(ConfiguredAutoSlugField, self).__init__(*args, **kwargs)
         # replace SlugValidator and SlugUnicodeValidator

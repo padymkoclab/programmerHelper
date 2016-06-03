@@ -6,14 +6,14 @@ from django.contrib.auth import get_user_model
 import factory
 from factory import fuzzy
 
-from apps.opinions.factories import Factory_Opinion
-from apps.comments.factories import Factory_Comment
-from apps.favours.factories import Factory_Favour
+from apps.opinions.factories import OpinionFactory
+from apps.comments.factories import CommentFactory
+from apps.favours.factories import FavourFactory
 
 from .models import *
 
 
-class Factory_Snippet(factory.DjangoModelFactory):
+class SnippetFactory(factory.DjangoModelFactory):
 
     class Meta:
         model = Snippet
@@ -39,20 +39,20 @@ class Factory_Snippet(factory.DjangoModelFactory):
     @factory.post_generation
     def comments(self, created, extracted, **kwargs):
         for i in range(random.randrange(3)):
-            Factory_Comment(content_object=self)
+            CommentFactory(content_object=self)
 
     @factory.post_generation
     def opinions(self, created, extracted, **kwargs):
         for i in range(random.randrange(5)):
-            Factory_Opinion(content_object=self)
+            OpinionFactory(content_object=self)
 
     @factory.post_generation
     def favours(self, created, extracted, **kwargs):
         for i in range(random.randrange(5)):
-            Factory_Favour(content_object=self)
+            FavourFactory(content_object=self)
 
 
 def factory_snippets(count):
     Snippet.objects.filter().delete()
     for i in range(count):
-        Factory_Snippet()
+        SnippetFactory()

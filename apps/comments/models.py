@@ -8,7 +8,7 @@ from django.conf import settings
 from mylabour.models import BaseGenericModel
 
 
-# comment design
+# comment design from website
 
 
 class Comment(BaseGenericModel):
@@ -20,7 +20,7 @@ class Comment(BaseGenericModel):
         validators=[
             MinLengthValidator(
                 MIN_LENGTH_COMMENT,
-                _('Comment must be contains at least {0} chars.').format(MIN_LENGTH_COMMENT),
+                _('Comment must be contains at least {0} characters.').format(MIN_LENGTH_COMMENT),
             )
         ]
     )

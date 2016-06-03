@@ -40,7 +40,7 @@ class Scope(BaseGenericModel):
         ordering = ['date_modified']
 
     def __str__(self):
-        type_instance = self.content_object._meta.verbose_name.lower()
+        type_instance = self.content_type._meta.verbose_name.lower()
         return _('Scope on {0} "{1.content_object}" from {1.account}').format(type_instance, self)
 
     def clean(self):

@@ -4,18 +4,16 @@ from django.utils.text import slugify
 from django.test import TestCase
 from django.core.exceptions import ValidationError
 
-from django.utils.translation import ugettext_lazy as _
-from apps.accounts.models import Account
-from apps.accounts.factories import factory_accounts, Factory_Account
-from apps.tags.factories import factory_tags
-from apps.badges.factories import factory_badges
-from apps.web_links.factories import factory_web_links
-from apps.replies.factories import Factory_Reply
-from apps.scopes.factories import Factory_Scope
+from apps.accounts.factories import accounts_factory
+from apps.tags.factories import tags_factory
+from apps.badges.factories import badges_factory
+from apps.web_links.factories import web_links_factory
+from apps.replies.factories import ReplyFactory
+from apps.scopes.factories import ScopeFactory
 from apps.tags.models import Tag
 from apps.web_links.models import WebLink
 
-from apps.books.factories import Factory_Book, Factory_Writter, factory_books, factory_writters
+from apps.books.factories import BookFactory, WritterFactory, books_factory, writters_factory
 from apps.books.models import Book, Writter
 
 
@@ -26,14 +24,14 @@ class BookTest(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        factory_tags(15)
-        factory_web_links(15)
-        factory_badges()
-        factory_accounts(15)
-        factory_writters(15)
+        tags_factory(15)
+        web_links_factory(15)
+        badges_factory()
+        accounts_factory(15)
+        writters_factory(15)
 
     def setUp(self):
-        self.book = Factory_Book()
+        self.book = BookFactory()
 
     def test_create_book(self):
         data = dict(
@@ -58,11 +56,11 @@ Wouldn’t it be great to add some smooth transitions to create a more proficien
         book.links.add(*WebLink.objects.random_weblinks(4))
         book.accounts.add(*Writter.objects.all()[:3])
         #
-        Factory_Reply(content_object=book)
-        Factory_Reply(content_object=book)
-        Factory_Reply(content_object=book)
+        ReplyFactory(content_object=book)
+        ReplyFactory(content_object=book)
+        ReplyFactory(content_object=book)
         for i in range(10):
-            Factory_Scope(content_object=book)
+            ScopeFactory(content_object=book)
         #
         book.refresh_from_db()
         self.assertEqual(book.name, data['name'])
@@ -93,7 +91,7 @@ Especially for something using flex-box or 100vh (full height – which you add 
             isbn='785121-4512-7515-4215-784',
             year_published=2015,
         )
-        book = Factory_Book()
+        book = BookFactory()
         book.name = data['name']
         book.description = data['description']
         book.picture = data['picture']
@@ -122,9 +120,9 @@ Especially for something using flex-box or 100vh (full height – which you add 
         same_name_as_title = same_name.title()
         slug_same_name = slugify(same_name, allow_unicode=True)
         #
-        book1 = Factory_Book()
-        book2 = Factory_Book()
-        book3 = Factory_Book()
+        book1 = BookFactory()
+        book2 = BookFactory()
+        book3 = BookFactory()
         #
         book1.name = same_name_as_lower
         book2.name = same_name_as_upper
@@ -151,14 +149,14 @@ Especially for something using flex-box or 100vh (full height – which you add 
 
     def test_get_rating(self):
         self.book.scopes.clear()
-        Factory_Scope(content_object=self.book, scope=3)
-        Factory_Scope(content_object=self.book, scope=5)
-        Factory_Scope(content_object=self.book, scope=1)
-        Factory_Scope(content_object=self.book, scope=2)
-        Factory_Scope(content_object=self.book, scope=4)
-        Factory_Scope(content_object=self.book, scope=4)
-        Factory_Scope(content_object=self.book, scope=1)
-        Factory_Scope(content_object=self.book, scope=5)
+        ScopeFactory(content_object=self.book, scope=3)
+        ScopeFactory(content_object=self.book, scope=5)
+        ScopeFactory(content_object=self.book, scope=1)
+        ScopeFactory(content_object=self.book, scope=2)
+        ScopeFactory(content_object=self.book, scope=4)
+        ScopeFactory(content_object=self.book, scope=4)
+        ScopeFactory(content_object=self.book, scope=1)
+        ScopeFactory(content_object=self.book, scope=5)
         self.assertEqual(self.book.get_rating(), 3.125)
 
     def test_is_new(self):
@@ -167,9 +165,9 @@ Especially for something using flex-box or 100vh (full height – which you add 
         self.book.full_clean()
         self.book.save()
         #
-        new_book1 = Factory_Book()
-        new_book2 = Factory_Book()
-        new_book3 = Factory_Book()
+        new_book1 = BookFactory()
+        new_book2 = BookFactory()
+        new_book3 = BookFactory()
         new_book1.year_published = NOW_YEAR - 1
         new_book2.year_published = NOW_YEAR - 2
         new_book3.year_published = NOW_YEAR - 3
@@ -186,7 +184,10 @@ Especially for something using flex-box or 100vh (full height – which you add 
         self.assertFalse(new_book3.is_new())
 
     def test_get_size(self):
-        pass
+        self.book.pages = 40
+        self.book.full_clean()
+        self.book.save()
+        self.assertEqual(self.book.get_size(), 'Tiny book')
 
 
 class WritterTest(TestCase):
@@ -196,14 +197,14 @@ class WritterTest(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        factory_tags(15)
-        factory_web_links(15)
-        factory_badges()
-        factory_accounts(15)
-        factory_books(10)
+        tags_factory(15)
+        web_links_factory(15)
+        badges_factory()
+        accounts_factory(15)
+        books_factory(10)
 
     def setUp(self):
-        self.writter = Factory_Writter()
+        self.writter = WritterFactory()
 
     def test_create_writter(self):
         data = dict(
@@ -271,9 +272,9 @@ class WritterTest(TestCase):
         same_name_as_title = same_name.title()
         slug_same_name = slugify(same_name, allow_unicode=True)
         #
-        writter1 = Factory_Writter()
-        writter2 = Factory_Writter()
-        writter3 = Factory_Writter()
+        writter1 = WritterFactory()
+        writter2 = WritterFactory()
+        writter3 = WritterFactory()
         #
         writter1.name = same_name_as_lower
         writter2.name = same_name_as_upper
@@ -303,16 +304,16 @@ class WritterTest(TestCase):
         self.assertRaisesMessage(ValidationError, 'Year of birth can not in future.', self.writter.full_clean)
 
     def test_if_deathyear_is_in_future(self):
-        self.writter.dearthyear = NOW_YEAR + 1
-        self.assertRaisesMessage(ValidationError, 'Year of dearth can not in future.', self.writter.full_clean)
+        self.writter.deathyear = NOW_YEAR + 1
+        self.assertRaisesMessage(ValidationError, 'Year of death can not in future.', self.writter.full_clean)
 
     def test_if_deathyear_is_more_or_equal_birthyear(self):
-        self.writter.dearthyear = 1990
+        self.writter.deathyear = 1990
         self.writter.birthyear = 2015
         self.assertRaisesMessage(
             ValidationError, 'Year of birth can not more or equal year of dearth.', self.writter.full_clean
         )
-        self.writter.dearthyear = 2014
+        self.writter.deathyear = 2014
         self.writter.birthyear = 2014
         self.assertRaisesMessage(
             ValidationError, 'Year of birth can not more or equal year of dearth.', self.writter.full_clean
@@ -320,46 +321,46 @@ class WritterTest(TestCase):
 
     def test_if_small_range_beetween_deathyear_and_birthyear(self):
         self.writter.birthyear = 1990
-        self.writter.dearthyear = 1999
+        self.writter.deathyear = 1999
         self.assertRaisesMessage(
             ValidationError, 'Very small range between year of birth and year of death.', self.writter.full_clean
         )
         self.writter.birthyear = 1990
-        self.writter.dearthyear = 2008
+        self.writter.deathyear = 2008
         self.assertRaisesMessage(
             ValidationError, 'Very small range between year of birth and year of death.', self.writter.full_clean
         )
         self.writter.birthyear = 1991
-        self.writter.dearthyear = 2010
+        self.writter.deathyear = 2010
         self.assertRaisesMessage(
             ValidationError, 'Very small range between year of birth and year of death.', self.writter.full_clean
         )
         self.writter.birthyear = 1960
-        self.writter.dearthyear = 1980
+        self.writter.deathyear = 1980
         self.writter.full_clean()
 
     def test_if_big_range_beetween_deathyear_and_birthyear(self):
         self.writter.birthyear = 1800
-        self.writter.dearthyear = 2000
+        self.writter.deathyear = 2000
         self.assertRaisesMessage(
             ValidationError, 'Very big range between year of birth and year of death.', self.writter.full_clean
         )
         self.writter.birthyear = 1860
-        self.writter.dearthyear = 2015
+        self.writter.deathyear = 2015
         self.assertRaisesMessage(
             ValidationError, 'Very big range between year of birth and year of death.', self.writter.full_clean
         )
         self.writter.birthyear = 1830
-        self.writter.dearthyear = 2005
+        self.writter.deathyear = 2005
         self.assertRaisesMessage(
             ValidationError, 'Very big range between year of birth and year of death.', self.writter.full_clean
         )
         self.writter.birthyear = 1850
-        self.writter.dearthyear = 2000
+        self.writter.deathyear = 2000
         self.writter.full_clean()
 
     def test_if_very_young_writter(self):
-        self.writter.dearthyear = None
+        self.writter.deathyear = None
         #
         self.writter.birthyear = NOW_YEAR
         self.assertRaisesMessage(ValidationError, 'Writter not possible born so early.', self.writter.full_clean)

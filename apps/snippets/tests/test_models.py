@@ -3,15 +3,15 @@ from django.utils.text import slugify
 from django.test import TestCase
 
 from apps.accounts.models import Account
-from apps.accounts.factories import factory_accounts, Factory_Account
-from apps.tags.factories import factory_tags
-from apps.badges.factories import factory_badges
-from apps.comments.factories import Factory_Comment
-from apps.opinions.factories import Factory_Opinion
-from apps.favours.factories import Factory_Favour
+from apps.accounts.factories import accounts_factory, AccountFactory
+from apps.tags.factories import tags_factory
+from apps.badges.factories import badges_factory
+from apps.comments.factories import CommentFactory
+from apps.opinions.factories import OpinionFactory
+from apps.favours.factories import FavourFactory
 from apps.tags.models import Tag
 
-from apps.snippets.factories import Factory_Snippet
+from apps.snippets.factories import SnippetFactory
 from apps.snippets.models import Snippet
 
 
@@ -22,12 +22,12 @@ class SnippetTest(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        factory_accounts(15)
-        factory_tags(10)
-        factory_badges()
+        accounts_factory(15)
+        tags_factory(10)
+        badges_factory()
 
     def setUp(self):
-        self.snippet = Factory_Snippet()
+        self.snippet = SnippetFactory()
 
     def test_create_snippet(self):
         self.assertEqual(Snippet.objects.count(), 1)
@@ -48,11 +48,11 @@ class BaseTestClass_for_prepopulated_data(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        factory_tags(10)
-        factory_web_links(10)
-        factory_badges()
-        factory_account_level()
-        factory_accounts(10)
+        tags_factory(10)
+        web_links_factory(10)
+        badges_factory()
+        account_level_factory()
+        accounts_factory(10)
         """,
         )
         snippet = Snippet(**data)
@@ -61,9 +61,9 @@ class BaseTestClass_for_prepopulated_data(TestCase):
         #
         snippet.tags.add(*Tag.objects.random_tags(4))
         for i in range(3):
-            Factory_Comment(content_object=snippet)
-            Factory_Opinion(content_object=snippet)
-            Factory_Favour(content_object=snippet)
+            CommentFactory(content_object=snippet)
+            OpinionFactory(content_object=snippet)
+            FavourFactory(content_object=snippet)
         #
         self.assertEqual(snippet.title, data['title'])
         self.assertEqual(snippet.slug, slugify(data['title'], allow_unicode=True))
@@ -83,9 +83,9 @@ class BaseTestClass_for_prepopulated_data(TestCase):
         same_title_as_title = same_title.title()
         slug_same_title = slugify(same_title, allow_unicode=True)
         #
-        snippet1 = Factory_Snippet()
-        snippet2 = Factory_Snippet()
-        snippet3 = Factory_Snippet()
+        snippet1 = SnippetFactory()
+        snippet2 = SnippetFactory()
+        snippet3 = SnippetFactory()
         #
         snippet1.title = same_title_as_lower
         snippet2.title = same_title_as_upper
@@ -107,7 +107,7 @@ class BaseTestClass_for_prepopulated_data(TestCase):
         self.assertEqual(snippet3.slug, slug_same_title + '-3')
 
     def test_update_snippet(self):
-        account = Factory_Account()
+        account = AccountFactory()
         data_for_update = dict(
             title='Signal for keeping old value of the field, which may can using in future signals.',
             lexer='Python 3',

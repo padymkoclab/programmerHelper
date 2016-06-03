@@ -7,7 +7,7 @@ from factory import fuzzy
 from .models import Opinion
 
 
-class Factory_Opinion(factory.DjangoModelFactory):
+class OpinionFactory(factory.DjangoModelFactory):
 
     class Meta:
         model = Opinion

@@ -13,18 +13,11 @@ class ScopeFormSet(BaseGenericInlineFormSet):
 
     def clean(self):
         """Custom validation"""
+
         super(ScopeFormSet, self).clean()
-        # raise Exception('Oooops')
-        # all_numbers_of_lessons = list()
-        # for form in self.forms:
-        #     number = form.cleaned_data.get('number', None)
-        #     all_numbers_of_lessons.append(number)
-        # import pdb; pdb.set_trace()
-        # t = list()
-        # for key, value in Counter(all_numbers_of_lessons).items():
-        #     if value > 1:
-        #         t.append(key)
-        # for form in self.forms:
-        #     number = form.cleaned_data.get('number', None)
-        #     if number in t:
-        #         form.add_error('number', _('Please don`t repeat your number.'))
+        all_given_scope_users = (form.cleaned_data.get('account') for form in self.forms)
+        counter_all_given_scope_users = Counter(all_given_scope_users)
+        for form in self.forms:
+            account = form.cleaned_data.get('account')
+            if account and counter_all_given_scope_users[account] > 1:
+                form.add_error('account', _('Please, don`t repeat user.'))

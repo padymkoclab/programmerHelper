@@ -8,7 +8,7 @@ from factory import fuzzy
 from .models import Reply
 
 
-class Factory_Reply(factory.DjangoModelFactory):
+class ReplyFactory(factory.DjangoModelFactory):
 
     class Meta:
         model = Reply

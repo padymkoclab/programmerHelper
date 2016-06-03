@@ -5,7 +5,7 @@ from .models import Reply
 from .forms import ReplyFormSet
 
 
-class ReplyInline(admin.GenericTabularInline):
+class ReplyInline(admin.GenericStackedInline):
     '''
     Stacked Inline View for Reply
     '''

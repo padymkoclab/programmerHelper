@@ -2,12 +2,12 @@
 from django.test import TestCase
 
 from apps.accounts.models import Account
-from apps.accounts.factories import factory_accounts
-from apps.tags.factories import factory_tags
-from apps.badges.factories import factory_badges
+from apps.accounts.factories import accounts_factory
+from apps.tags.factories import tags_factory
+from apps.badges.factories import badges_factory
 from apps.tags.models import Tag
 
-from apps.snippets.factories import factory_snippets
+from apps.snippets.factories import snippets_factory
 from apps.snippets.models import Snippet
 
 
@@ -19,10 +19,10 @@ class SnippetQuerySetTest(TestCase):
     @classmethod
     def setUpTestData(cls):
         #
-        factory_accounts(17)
-        factory_tags(10)
-        factory_badges()
-        factory_snippets(5)
+        accounts_factory(17)
+        tags_factory(10)
+        badges_factory()
+        snippets_factory(5)
         # change snippets for testing
         cls.snippet1, cls.snippet2, cls.snippet3, cls.snippet4, cls.snippet5 = Snippet.objects.all()
         # clear all tags, opinions, comments in each of the snippet

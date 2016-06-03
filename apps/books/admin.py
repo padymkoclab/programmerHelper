@@ -29,15 +29,16 @@ class BookAdmin(admin.ModelAdmin):
         'get_rating',
         'get_count_replies',
         'is_new',
+        'get_size',
         'year_published',
     )
-    # list_filter = ('year_published',)
+    list_filter = ('year_published',)
     inlines = [
         ScopeInline,
         ReplyInline,
     ]
     search_fields = ('name', 'publishers', 'accounts__name')
-    # date_hierarchy = 'year_published'
+    date_hierarchy = 'date_added'
     filter_horizontal = ['tags', 'accounts']
     filter_vertical = ['links']
     fieldsets = [
@@ -77,41 +78,45 @@ class BookAdmin(admin.ModelAdmin):
     def get_count_links(self, obj):
         return obj.count_links
     get_count_links.admin_order_field = 'count_links'
-    get_count_links.short_description = _('Count links where download')
+    get_count_links.short_description = _('Count links')
 
-    def show_writters(self):
+    def show_writters(self, obj):
         """Listing writters separated throgh commas"""
 
-        return format_html_join(', ', '{0}', ((writter, ) for writter in self.accounts.all()))
+        return format_html_join(', ', '{0}', ((writter, ) for writter in obj.accounts.all()))
     show_writters.short_description = _('Writters')
 
 
 class WritterAdmin(admin.ModelAdmin):
     '''
-        Admin View for Writter
+    Admin View for Writter
     '''
+
     list_display = (
         'name',
         'birthyear',
         'deathyear',
         'show_books',
         'get_count_books',
-        'short_about',
+        'short_about_writter',
     )
     search_fields = ['name', 'about']
     fieldsets = [
         [
             Writter._meta.verbose_name, {
-                'fields': ['name', 'about'],
+                'fields': [
+                    'name',
+                    'birthyear',
+                    'deathyear',
+                    'about',
+                ],
             }
         ]
     ]
 
     def get_queryset(self, request):
         qs = super(WritterAdmin, self).get_queryset(request)
-        qs = qs.annotate(
-            count_books=models.Count('books', distinct=True),
-        )
+        qs = qs.writters_with_count_books()
         return qs
 
     def get_count_books(self, obj):
@@ -124,6 +129,6 @@ class WritterAdmin(admin.ModelAdmin):
     show_books.admin_order_field = 'count_books'
     show_books.short_description = _('Books')
 
-    def short_about(self, obj):
+    def short_about_writter(self, obj):
         return truncatewords(obj.about, 10)
-    short_about.short_description = _('Short about writter')
+    short_about_writter.short_description = _('Short about writter')

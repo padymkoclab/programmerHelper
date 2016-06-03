@@ -1,4 +1,5 @@
 
+from django.db.models.functions import Greatest
 from django.utils import timezone
 from django.db import models
 
@@ -29,7 +30,7 @@ class BookQuerySet(models.QuerySet):
     def books_with_rating(self):
         """Queryset with rating of each the book."""
 
-        return self.annotate(rating=models.Avg('scopes__scope'))
+        return self.annotate(rating_avg=models.Avg('scopes__scope')).annotate(rating=Greatest('rating_avg', models.Value(0)))
 
     def books_with_count_tags_links_replies_and_rating(self):
         """Complex queryset with count tags, links, replies and rating of each the book."""
@@ -63,7 +64,7 @@ class BookQuerySet(models.QuerySet):
         return self.filter(pages__lt=50)
 
     def books_with_sizes(self):
-        """ """
+        """Queryset where each the book have determined values it size."""
 
         return self.annotate(size=models.Case(
             models.When(pk__in=self.giant_books(), then=models.Value('Giant book')),
@@ -72,3 +73,33 @@ class BookQuerySet(models.QuerySet):
             models.When(pk__in=self.tiny_books(), then=models.Value('Tiny book')),
             output_field=models.CharField(),
         ))
+
+
+class WritterQuerySet(models.QuerySet):
+    """
+
+    """
+
+    def writters_with_count_books(self):
+        """Determinating count books on each writter."""
+
+        return self.annotate(
+            count_books=models.Count('books', distinct=True),
+        )
+
+    def living_writters(self):
+        return self.filter(deathyear__isnull=True)
+
+    def writters_lived_in_range_years(self, start_year, end_year=NOW_YEAR):
+        """Find writter lived in certain range years."""
+
+        z = []
+        accepted_range = frozenset(range(start_year, end_year + 1))
+        for i in self.iterator():
+            q = i.deathyear
+            if q is None:
+                q = NOW_YEAR
+            a = frozenset(range(i.birthyear, q + 1))
+            if a & accepted_range:
+                z.append(i.pk)
+        return self.filter(pk__in=z)

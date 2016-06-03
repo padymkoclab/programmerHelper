@@ -4,7 +4,7 @@ import factory
 from .models import *
 
 
-class Factory_WebLink(factory.DjangoModelFactory):
+class WebLinkFactory(factory.DjangoModelFactory):
 
     class Meta:
         model = WebLink
@@ -22,7 +22,7 @@ class Factory_WebLink(factory.DjangoModelFactory):
         return '{0} {1}'.format(name_en, name_ru)
 
 
-def factory_web_links(count):
+def web_links_factory(count):
     WebLink.objects.filter().delete()
     for i in range(count):
-        Factory_WebLink()
+        WebLinkFactory()

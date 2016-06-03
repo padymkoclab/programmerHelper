@@ -25,13 +25,13 @@ class Reply(BaseGenericModel):
         _('Andvantages'),
         max_length=100,
         validators=[MaxCountWordsValidator(10)],
-        help_text=_('Maximim 10 words.')
+        help_text=_('Maximum 10 words.')
     )
     disadvantages = models.CharField(
         _('Disandvantages'),
         max_length=100,
         validators=[MaxCountWordsValidator(10)],
-        help_text=_('Maximim 10 words.')
+        help_text=_('Maximum 10 words.')
     )
     text_reply = models.TextField(
         _('Text of reply'),
@@ -42,19 +42,19 @@ class Reply(BaseGenericModel):
         _('Scope for content'),
         default=0,
         validators=[
-            MaxValueValidator(5), _('Scope for content not possible more than %d' % MAX_SCOPE)
+            MaxValueValidator(MAX_SCOPE, _('Scope for content must from 0 to %d' % MAX_SCOPE))
         ])
     scope_for_style = models.PositiveSmallIntegerField(
         _('Scope for style'),
         default=0,
         validators=[
-            MaxValueValidator(5), _('Scope for style not possible more than %d' % MAX_SCOPE)
+            MaxValueValidator(MAX_SCOPE, _('Scope for style must from 0 to %d' % MAX_SCOPE))
         ])
     scope_for_language = models.PositiveSmallIntegerField(
         _('Scope for language'),
         default=0,
         validators=[
-            MaxValueValidator(5), _('Scope for language not possible more than %d' % MAX_SCOPE)
+            MaxValueValidator(MAX_SCOPE, _('Scope for language must from 0 to %d' % MAX_SCOPE))
         ])
     date_added = models.DateTimeField(_('Date aded'), auto_now_add=True)
 

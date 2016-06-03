@@ -17,7 +17,7 @@ from apps.tags.models import Tag
 from apps.web_links.models import WebLink
 
 from .managers import BookManager
-from .querysets import BookQuerySet
+from .querysets import BookQuerySet, WritterQuerySet
 
 
 NOW_YEAR = timezone.datetime.now().year
@@ -66,6 +66,7 @@ class Book(models.Model):
             MaxValueValidator(NOW_YEAR, _('Book doesn`t possible will published in future.')),
         ]
     )
+    date_added = models.DateTimeField(_('Date added'), auto_now_add=True)
     tags = models.ManyToManyField(
         Tag,
         verbose_name=_('Tags'),
@@ -115,7 +116,9 @@ class Book(models.Model):
     def get_size(self):
         """Getting size of books on based count pages."""
 
-        pass
+        return self.__class__.objects.books_with_sizes().get(pk=self.pk).size
+    get_size.admin_order_field = 'pages'
+    get_size.short_description = _('Size')
 
 
 class Writter(models.Model):
@@ -160,6 +163,7 @@ class Writter(models.Model):
         ordering = ['name']
 
     objects = models.Manager()
+    objects = WritterQuerySet.as_manager()
 
     def __str__(self):
         return '{0.name}'.format(self)
@@ -173,11 +177,11 @@ class Writter(models.Model):
                 raise ValidationError({
                     '__all__': [_('Year of birth can not more or equal year of dearth.')]
                 })
-            if not self.deathyear - self.birthyear > 20:
+            if self.deathyear - self.birthyear < 20:
                 raise ValidationError({
                     '__all__': [_('Very small range between year of birth and year of death.')]
                 })
-            if not self.deathyear - self.birthyear <= 150:
+            if self.deathyear - self.birthyear > 150:
                 raise ValidationError({
                     '__all__': [_('Very big range between year of birth and year of death.')]
                 })

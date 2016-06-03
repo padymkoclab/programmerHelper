@@ -2,7 +2,7 @@
 from django.db.models import Avg
 from django.contrib.contenttypes.fields import GenericRelation
 from django.core.urlresolvers import reverse
-from django.core.validators import MinLengthValidator
+from django.core.validators import MinLengthValidator, RegexValidator, MinValueValidator, MaxValueValidator
 from django.utils.translation import ugettext_lazy as _
 from django.db import models
 from django.conf import settings
@@ -16,6 +16,7 @@ from apps.comments.models import Comment
 from apps.scopes.models import Scope
 from apps.tags.models import Tag
 from apps.web_links.models import WebLink
+from mylabour.fields_db import ConfiguredAutoSlugField
 
 from .managers import ArticleManager, ArticleQuerySet
 
@@ -36,14 +37,12 @@ class Article(TimeStampedModel):
     title = models.CharField(
         _('Title'), max_length=200, validators=[MinLengthValidator(settings.MIN_LENGTH_FOR_NAME_OR_TITLE_OBJECT)]
     )
-    slug = AutoSlugField(
-        _('Slug'), populate_from='title', unique_with=['account'], always_update=True, allow_unicode=True, db_index=True
-    )
+    slug = ConfiguredAutoSlugField(_('Slug'), populate_from='title', unique_with=['account'])
     quotation = models.CharField(_('Quotation'), max_length=200)
     picture = models.URLField(_('Picture'), max_length=1000)
     header = models.TextField(_('Header'))
     conclusion = models.TextField(_('Conclusion'))
-    status = StatusField(choices_name='STATUS_ARTICLE', verbose_name=_('Status'), default=STATUS_ARTICLE.draft)
+    status = StatusField(verbose_name=_('Status'), choices_name='STATUS_ARTICLE', default=STATUS_ARTICLE.draft)
     status_changed = MonitorField(monitor='status', verbose_name=_('Status changed'))
     account = models.ForeignKey(
         settings.AUTH_USER_MODEL,

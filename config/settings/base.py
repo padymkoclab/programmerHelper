@@ -1,6 +1,8 @@
 
-from django.utils import timezone
+import datetime
+
 from django.utils.text import slugify
+from django.utils import timezone
 
 from unipath import Path
 
@@ -107,7 +109,6 @@ TEMPLATES = [
                 'apps.visits.context_processors.count_visits',
                 'apps.sessions.context_processors.users_online',
             ],
-            'string_if_invalid': 'ERROR HERE!!!',
         },
     },
 ]
@@ -291,7 +292,7 @@ MIN_COUNT_TAGS_ON_OBJECT = 1
 
 MAX_COUNT_TAGS_ON_OBJECT = 5
 
-DATE_CREATING_WEBSITE = timezone.datetime(year=2016, month=3, day=1, tzinfo=timezone.utc)
+DATE_CREATING_WEBSITE = datetime.date(year=2016, month=3, day=1)
 
 IGNORABLE_404_ENDS = ('',)
 
@@ -304,3 +305,5 @@ IGNORABLE_URLS_FOR_COUNT_VISITS = (
     r'/favicon.ico$',
     r'/(robots.txt)|(humans.txt)$',
 )
+
+AUTOSLUG_SLUGIFY_FUNCTION = lambda value: slugify(value, allow_unicode=True)

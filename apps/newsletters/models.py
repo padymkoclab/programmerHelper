@@ -16,7 +16,7 @@ class Newsletter(TimeStampedModel):
         _('Title'), max_length=200, validators=[MinLengthValidator(settings.MIN_LENGTH_FOR_NAME_OR_TITLE_OBJECT)]
     )
     slug = AutoSlugField(populate_from='title', unique_with=['account'], always_update=True)
-    content = models.TextField(_('Content'))
+    content = models.TextField(_('Content'), validators=[MinLengthValidator(100, _('Minimum 100 characters.'))])
     account = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         related_name='news',

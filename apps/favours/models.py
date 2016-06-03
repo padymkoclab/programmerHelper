@@ -28,10 +28,11 @@ class Favour(BaseGenericModel):
 
     def __str__(self):
         return _('Favour on {0} "{1}"').format(
-            self.content_object._meta.verbose_name.lower(),
+            self.content_type.model_class()._meta.verbose_name.lower(),
             self.content_object.__str__()
         )
 
     def clean(self):
-        if self.content_object.account == self.account:
-            raise ValidationError(_('Author can`t give his favour about hisself labour.'))
+        if self.content_object:
+            if self.content_object.account == self.account:
+                raise ValidationError(_('Author can`t give his favour about hisself labour.'))

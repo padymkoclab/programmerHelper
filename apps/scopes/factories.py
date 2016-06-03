@@ -9,7 +9,7 @@ import factory
 from .models import Scope
 
 
-class Factory_Scope(factory.DjangoModelFactory):
+class ScopeFactory(factory.DjangoModelFactory):
 
     class Meta:
         model = Scope

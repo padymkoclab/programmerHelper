@@ -9,12 +9,9 @@ class ReplyFormSet(forms.BaseGenericInlineFormSet):
 
     def clean(self):
         super(ReplyFormSet, self).clean()
-        if not self.total_error_count():
-            accounts = (i['account'] for i in self.cleaned_data)
-            counter_accounts = collections.Counter(accounts)
-            repeated_accounts = tuple(item[0] for item in counter_accounts.items() if item[1] > 1)
-            if repeated_accounts:
-                self.non_form_errors().append(_('On form present the repeated users.'))
-                for form in self.forms:
-                    if form.cleaned_data['account'] in repeated_accounts:
-                        form.add_error('account', _('Repeated account'))
+        all_given_reply_users = (form.cleaned_data.get('account') for form in self.forms)
+        counter_all_given_reply_users = collections.Counter(all_given_reply_users)
+        for form in self.forms:
+            account = form.cleaned_data.get('account')
+            if account and counter_all_given_reply_users[account] > 1:
+                form.add_error('account', _('Please, don`t repeat user.'))
