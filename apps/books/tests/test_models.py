@@ -120,21 +120,9 @@ Especially for something using flex-box or 100vh (full height – which you add 
         same_name_as_title = same_name.title()
         slug_same_name = slugify(same_name, allow_unicode=True)
         #
-        book1 = BookFactory()
-        book2 = BookFactory()
-        book3 = BookFactory()
-        #
-        book1.name = same_name_as_lower
-        book2.name = same_name_as_upper
-        book3.name = same_name_as_title
-        #
-        book1.full_clean()
-        book2.full_clean()
-        book3.full_clean()
-        #
-        book1.save()
-        book2.save()
-        book3.save()
+        book1 = BookFactory(name=same_name_as_lower)
+        book2 = BookFactory(name=same_name_as_upper)
+        book3 = BookFactory(name=same_name_as_title)
         #
         self.assertEqual(book1.name, same_name_as_lower)
         self.assertEqual(book1.slug, slug_same_name)
@@ -149,6 +137,7 @@ Especially for something using flex-box or 100vh (full height – which you add 
 
     def test_get_rating(self):
         self.book.scopes.clear()
+        self.assertEqual(self.book.get_rating(), 0)
         ScopeFactory(content_object=self.book, scope=3)
         ScopeFactory(content_object=self.book, scope=5)
         ScopeFactory(content_object=self.book, scope=1)

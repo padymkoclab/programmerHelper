@@ -4,7 +4,7 @@ from django.conf.urls import url
 from .views import NewsletterDetailView, NewslettersListView
 
 
-name = 'newsletters'
+app_name = 'newsletters'
 
 urlpatterns = [
     url(r'newsletters/$', NewslettersListView.as_view(), {}, 'newsletters'),

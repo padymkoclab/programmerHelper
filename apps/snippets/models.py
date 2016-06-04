@@ -25,7 +25,7 @@ class Snippet(TimeStampedModel):
     """
 
     title = models.CharField(
-        _('Title'), max_length=100, unique=True, validators=[MinLengthValidator(settings.MIN_LENGTH_FOR_NAME_OR_TITLE_OBJECT)]
+        _('Title'), max_length=200, unique=True, validators=[MinLengthValidator(settings.MIN_LENGTH_FOR_NAME_OR_TITLE_OBJECT)]
     )
     slug = ConfiguredAutoSlugField(_('Slug'), populate_from='title', unique=True)
     lexer = models.CharField(_('Lexer of code'), max_length=50, choices=CHOICES_LEXERS)

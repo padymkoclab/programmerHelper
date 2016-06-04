@@ -54,6 +54,7 @@ class Article(TimeStampedModel):
     source = models.URLField(
         _('Source'),
         null=True,
+        blank=True,
         help_text=_('If this article is taken from another a web resource, please point URL to there.')
     )
     tags = models.ManyToManyField(
@@ -92,12 +93,13 @@ class Article(TimeStampedModel):
         return reverse('articles:article', kwargs={'slug': self.slug})
 
     def get_rating(self):
-        return None
+        return self.__class__.objects.articles_with_rating().get(pk=self.pk).rating
     get_rating.admin_order_field = 'rating'
     get_rating.short_description = _('Rating')
 
-    def hide_numbers_subasections(self):
-        pass
+    def get_volume(self):
+        return self.__class__.objects.articles_with_volume().get(pk=self.pk).volume
+    get_rating.short_description = _('Volume')
 
 
 class ArticleSubsection(TimeStampedModel):
@@ -124,3 +126,7 @@ class ArticleSubsection(TimeStampedModel):
 
     def __str__(self):
         return '{0.title}'.format(self)
+
+    def clean(self):
+        # adding count subsections
+        pass

@@ -2,14 +2,13 @@
 import statistics
 from django.test import TestCase
 
-from apps.accounts.models import Account
 from apps.accounts.factories import accounts_factory
 from apps.scopes.factories import ScopeFactory
 from apps.tags.factories import tags_factory
 from apps.badges.factories import badges_factory
 from apps.web_links.factories import web_links_factory
 
-from apps.books.factories import BookFactory, WritterFactory, books_factory, writters_factory
+from apps.books.factories import WritterFactory, books_factory
 from apps.books.models import Book, Writter, NOW_YEAR
 
 
@@ -47,13 +46,13 @@ class BookQuerySetTest(TestCase):
     def test_books_with_rating(self):
         # for first book rating must be 0.0
         Book.objects.first().scopes.clear()
-        # for second book rating must be 0.33, not 0.3333333... (1 / 3)
+        # for second book rating must be 0.3333, not 0.3333333... (1 / 3)
         second_book = Book.objects.all()[1]
         second_book.scopes.clear()
         ScopeFactory(content_object=second_book, scope=1)
         ScopeFactory(content_object=second_book, scope=0)
         ScopeFactory(content_object=second_book, scope=0)
-        # for last book rating must be 0.43, not 0.42857142857142855 (3 / 7)
+        # for last book rating must be 0.4386, not 0.42857142857142855 (3 / 7)
         last_book = Book.objects.last()
         last_book.scopes.clear()
         ScopeFactory(content_object=last_book, scope=0)
@@ -65,22 +64,22 @@ class BookQuerySetTest(TestCase):
         ScopeFactory(content_object=last_book, scope=0)
         # checkup it
         books_with_rating = Book.objects.books_with_rating()
-        for book in books_with_rating.iterator():
+        for book in books_with_rating:
             scopes = book.scopes.values_list('scope', flat=True)
-            mean_scope = round(statistics.mean(scopes), 2) if scopes else .0
+            mean_scope = round(statistics.mean(scopes), 4) if scopes else .0
             self.assertEqual(mean_scope, book.rating)
 
     def test_books_with_count_tags_links_replies_and_rating(self):
         """ """
 
         books_with_count_tags_links_replies_and_rating = Book.objects.books_with_count_tags_links_replies_and_rating()
-        for book in books_with_count_tags_links_replies_and_rating.iterator():
+        for book in books_with_count_tags_links_replies_and_rating:
             self.assertEqual(book.tags.count(), book.count_tags)
             self.assertEqual(book.links.count(), book.count_links)
             self.assertEqual(book.replies.count(), book.count_replies)
             #
             scopes = book.scopes.values_list('scope', flat=True)
-            mean_scope = round(statistics.mean(scopes), 2) if scopes else .0
+            mean_scope = round(statistics.mean(scopes), 4) if scopes else .0
             self.assertEqual(mean_scope, book.rating)
 
     def test_new_books(self):
@@ -121,7 +120,28 @@ class BookQuerySetTest(TestCase):
                 self.assertEqual(book.size, 'Giant book')
 
     def test_popular_books(self):
-        pass
+        # clear all scopes in all books
+        for book in Book.objects.iterator():
+            book.scopes.clear()
+        # get books
+        book1, book2, book3, book4 = Book.objects.books_with_rating()[:4]
+        # adding scopes
+        #
+        ScopeFactory(content_object=book1, scope=0)
+        ScopeFactory(content_object=book1, scope=5)
+        ScopeFactory(content_object=book1, scope=5)
+        ScopeFactory(content_object=book1, scope=5)
+        #
+        ScopeFactory(content_object=book2, scope=5)
+        ScopeFactory(content_object=book2, scope=5)
+        ScopeFactory(content_object=book2, scope=5)
+        #
+        ScopeFactory(content_object=book3, scope=4)
+        ScopeFactory(content_object=book3, scope=5)
+        #
+        ScopeFactory(content_object=book4, scope=5)
+        #
+        self.assertCountEqual(Book.objects.popular_books(), [book2, book4])
 
 
 class WritterTest(TestCase):
@@ -154,8 +174,6 @@ class WritterTest(TestCase):
                 self.assertNotIn(writter, living_writters)
 
     def test_writters_lived_in_range_years(self):
-        for i in Writter.objects.iterator():
-            print(i, i.birthyear, i.deathyear)
         self.assertCountEqual(
             [self.writter1, self.writter2, self.writter3, self.writter6, self.writter7, self.writter8],
             Writter.objects.writters_lived_in_range_years(1957, 2011))

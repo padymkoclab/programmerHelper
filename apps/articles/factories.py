@@ -67,6 +67,18 @@ class ArticleFactory(factory.DjangoModelFactory):
         for i in range(random.randint(0, 10)):
             ScopeFactory(content_object=self)
 
+    @factory.post_generation
+    def date_added(self, created, extracted, **kwargs):
+        self.date_added = fuzzy.FuzzyDateTime(self.account.date_joined).fuzz()
+        self.save()
+        assert self.date_added >= self.account.date_joined
+
+    @factory.post_generation
+    def date_modified(self, created, extracted, **kwargs):
+        self.date_modified = fuzzy.FuzzyDateTime(self.date_added).fuzz()
+        self.save()
+        assert self.date_modified >= self.date_added
+
 
 class ArticleSubsectionFactory(factory.DjangoModelFactory):
 
@@ -88,7 +100,7 @@ class ArticleSubsectionFactory(factory.DjangoModelFactory):
         return max(using_numbers) + 1
 
 
-def factory_articles(count):
+def articles_factory(count):
     Article.objects.filter().delete()
     for i in range(count):
         article = ArticleFactory()

@@ -1,6 +1,8 @@
 
 import random
 
+from django.utils import timezone
+
 import factory
 from factory import fuzzy
 
@@ -61,6 +63,11 @@ class AccountFactory(factory.DjangoModelFactory):
     def personal_website(self):
         slug_name = self.username.lower().replace(' ', '_')
         return 'http://{0}.com'.format(slug_name)
+
+    @factory.post_generation
+    def date_joined(self, created, extracted, **kwargs):
+        self.date_joined = fuzzy.FuzzyDateTime(timezone.now() - timezone.timedelta(weeks=60)).fuzz()
+        self.save()
 
 
 def account_level_factory():

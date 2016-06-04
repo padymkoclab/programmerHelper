@@ -1,88 +1,131 @@
 
+import numbers
+
+from django.utils import timezone
 from django.db import models
 
 
 class ArticleQuerySet(models.QuerySet):
     """
-
+    Suit methods for work with queryset of artices.
     """
 
     def articles_with_rating(self):
         """Adding for each the article field with determined rating of an itself."""
 
-        pass
+        self = self.defer('subsections').annotate(rating=models.Avg('scopes__scope'))
+        self = self.annotate(rating=models.functions.Greatest('rating', .0))
+        for article in self:
+            if len(str(article.rating)) > 5:
+                article.rating = round(article.rating, 4)
+        return self
 
     def articles_with_count_comments(self):
-        """Adding for each the article field with determined rating of an itself."""
+        """Adding for each the article field with determined count comments of an itself."""
 
-        pass
+        return self.defer('subsections').annotate(count_comments=models.Count('comments', distinct=True))
 
     def articles_with_count_tags(self):
-        """Adding for each the article field with determined rating of an itself."""
+        """Adding for each the article field with determined count tags of an itself."""
 
-        pass
+        return self.defer('subsections').annotate(count_tags=models.Count('tags', distinct=True))
 
     def articles_with_count_links(self):
-        """Adding for each the article field with determined rating of an itself."""
+        """Adding for each the article field with determined count useful links, used in each article."""
 
-        pass
+        return self.defer('subsections').annotate(count_links=models.Count('links', distinct=True))
 
     def articles_with_count_subsections(self):
-        """Adding for each the article field with determined rating of an itself."""
+        """Adding for each the article field with determined count subsections of an itself."""
 
-        pass
+        return self.defer('subsections').annotate(count_subsections=models.Count('subsections', distinct=True))
 
     def articles_with_rating_and_count_comments_subsections_tags_links(self):
-        """Adding for each the article field with determined rating of an itself."""
+        """Determining for each article: count tags, comments, links, subsections and rating."""
 
-        pass
+        self = self.articles_with_rating()
+        self = self.articles_with_count_comments()
+        self = self.articles_with_count_tags()
+        self = self.articles_with_count_links()
+        self = self.articles_with_count_subsections()
+        return self
 
     def published_articles(self):
         """Articles already published."""
 
-        pass
+        return self.only('status').filter(status=self.model.STATUS_ARTICLE.published)
 
     def draft_articles(self):
         """Articles yet not published."""
 
-        pass
+        return self.only('status').filter(status=self.model.STATUS_ARTICLE.draft)
 
     def weekly_articles(self):
         """Articles published for last week."""
 
-        pass
-
-    def big_articles(self):
-        """Articles with count words 10000 and more."""
-
-        pass
-
-    def small_articles(self):
-        """Articles with count words until or equal 1000."""
-
-        pass
+        return self.only('date_added').filter(date_added__range=[timezone.now() - timezone.timedelta(weeks=1), timezone.now()])
 
     def articles_from_external_resourse(self):
         """Articles from external resourse pinted in field 'source'."""
 
-        pass
+        return self.only('sourse').filter(source__isnull=False)
 
     def own_articles(self):
         """Own articles, published from website`s authors."""
 
-        pass
+        return self.only('sourse').filter(source__isnull=True)
 
     def hot_articles(self):
-        """Articles with many comments."""
+        """Articles with 7 and more comments."""
 
-        pass
+        articles_with_count_comments = self.articles_with_count_comments()
+        return articles_with_count_comments.filter(count_comments__gte=7)
 
     def popular_articles(self):
-        """Articles with high rating."""
+        """Articles with rating 5 and more."""
 
-        pass
+        self = self.articles_with_rating()
+        return self.filter(rating__gte=5)
 
     def latest_articles(self):
-        """Articles latest added."""
+        """5 latest added articles."""
 
-        pass
+        return self.all()[:5]
+
+    def articles_by_rating(self, min_rating=None, max_rating=None):
+        """Filter articles by certain range of rating."""
+
+        if min_rating is None and max_rating is None:
+            raise AttributeError('Please point at least either min_rating or max_rating.')
+        self = self.articles_with_rating()
+        if isinstance(min_rating, numbers.Rational) and isinstance(max_rating, numbers.Rational):
+            if min_rating > max_rating:
+                raise ValueError('Don`t right values: min_rating is more than max_rating.')
+            return self.filter(rating__gte=min_rating).filter(rating__lte=max_rating)
+        elif isinstance(min_rating, numbers.Rational):
+            return self.filter(rating__gte=min_rating)
+        elif isinstance(max_rating, numbers.Rational):
+            return self.filter(rating__lte=max_rating)
+
+    def articles_with_volume(self):
+        """Adding for each the article field with determined volume of an itself.
+        Volume of article determine on count characters in
+        header, subsections and conclusion of the article."""
+
+        self = self.annotate(count_characters_in_header=models.functions.Length('header'))
+        self = self.annotate(count_characters_in_conclusion=models.functions.Length('conclusion'))
+        self = self.annotate(count_characters_in_subsections=models.Sum(
+            models.Case(
+                models.When(subsections__content__isnull=False, then=models.functions.Length('subsections__content')),
+                output_field=models.IntegerField()
+            )
+        ))
+        self = self.annotate(volume=models.F('count_characters_in_header') +
+                             models.F('count_characters_in_conclusion') +
+                             models.F('count_characters_in_subsections'))
+        return self
+
+    def big_articles(self):
+        """Articles with count characters 10000 and more."""
+
+        return self.articles_with_volume().filter(volume__gte=10000)

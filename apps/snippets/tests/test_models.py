@@ -83,21 +83,9 @@ class BaseTestClass_for_prepopulated_data(TestCase):
         same_title_as_title = same_title.title()
         slug_same_title = slugify(same_title, allow_unicode=True)
         #
-        snippet1 = SnippetFactory()
-        snippet2 = SnippetFactory()
-        snippet3 = SnippetFactory()
-        #
-        snippet1.title = same_title_as_lower
-        snippet2.title = same_title_as_upper
-        snippet3.title = same_title_as_title
-        #
-        snippet1.full_clean()
-        snippet2.full_clean()
-        snippet3.full_clean()
-        #
-        snippet1.save()
-        snippet2.save()
-        snippet3.save()
+        snippet1 = SnippetFactory(title=same_title_as_lower)
+        snippet2 = SnippetFactory(title=same_title_as_upper)
+        snippet3 = SnippetFactory(title=same_title_as_title)
         #
         self.assertEqual(snippet1.title, same_title_as_lower)
         self.assertEqual(snippet1.slug, slug_same_title)
@@ -164,6 +152,7 @@ def signal_for_keeping_old_account(sender, instance, **kwargs):
 
     def test_get_scope_of_the_snippet(self):
         self.snippet.opinions.clear()
+        self.assertEqual(self.snippet.get_scope(), 0)
         random_accounts = Account.objects.exclude(pk=self.snippet.account.pk).random_accounts(10)
         choices_for_is_useful = [True, False, True, False, True, True, True, True, False, False]
         for couple in zip(random_accounts, choices_for_is_useful):

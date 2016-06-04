@@ -30,7 +30,12 @@ class BookQuerySet(models.QuerySet):
     def books_with_rating(self):
         """Queryset with rating of each the book."""
 
-        return self.annotate(rating_avg=models.Avg('scopes__scope')).annotate(rating=Greatest('rating_avg', models.Value(0)))
+        self = self.annotate(rating=models.Avg('scopes__scope'))
+        self = self.annotate(rating=Greatest('rating', .0))
+        for book in self:
+            if len(str(book.rating)) > 5:
+                book.rating = round(book.rating, 4)
+        return self
 
     def books_with_count_tags_links_replies_and_rating(self):
         """Complex queryset with count tags, links, replies and rating of each the book."""
@@ -75,7 +80,14 @@ class BookQuerySet(models.QuerySet):
         ))
 
     def popular_books(self):
-        pass
+        """Books with rating 5 and more."""
+
+        #
+        # Rating and count views page
+        #
+
+        self = self.books_with_rating()
+        return self.filter(rating__gte=5)
 
 
 class WritterQuerySet(models.QuerySet):

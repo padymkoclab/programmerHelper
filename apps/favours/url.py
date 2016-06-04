@@ -1,7 +1,7 @@
 
 from django.conf.urls import url
 
-name = 'favours'
+app_name = 'favours'
 
 urlpatterns = [
     url(r'/$', '.as_view()', {}, ''),

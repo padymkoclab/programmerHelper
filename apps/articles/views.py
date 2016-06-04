@@ -6,4 +6,4 @@ from .models import Article
 
 class ArticleDetailView(DetailView):
     model = Article
-    template_name = "programming_tester/test_suit_detail.html"
+    template_name = "articles/detail.html"

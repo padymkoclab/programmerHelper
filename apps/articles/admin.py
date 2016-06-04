@@ -19,7 +19,7 @@ class ArticleSubsectionInline(admin.StackedInline):
     min_num = Article.MIN_COUNT_SUBSECTIONS
     max_num = Article.MAX_COUNT_SUBSECTIONS
     fk_name = 'article'
-    fields = ['title', 'content']
+    fields = [('number', 'title'), 'content']
     extra = 0
 
 
@@ -54,7 +54,7 @@ class ArticleAdmin(admin.ModelAdmin):
         CommentInline,
     ]
     fieldsets = [
-        (_('Basic'), {
+        (_('Basic info'), {
             'fields': ['title', 'picture', 'account']
         }),
         (_('Status'), {
