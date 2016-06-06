@@ -1,4 +1,5 @@
 
+from django.core.exceptions import ValidationError
 from django.contrib.contenttypes.fields import GenericRelation
 from django.core.urlresolvers import reverse
 from django.core.validators import MinLengthValidator, MinValueValidator
@@ -111,7 +112,9 @@ class ArticleSubsection(TimeStampedModel):
         verbose_name=_('Article'),
     )
     title = models.CharField(
-        _('Title'), max_length=200, validators=[MinLengthValidator(settings.MIN_LENGTH_FOR_NAME_OR_TITLE_OBJECT)]
+        _('Title'),
+        max_length=200,
+        validators=[MinLengthValidator(settings.MIN_LENGTH_FOR_NAME_OR_TITLE_OBJECT)],
     )
     slug = ConfiguredAutoSlugField(_('Slug'), populate_from='title', unique_with=['article'])
     number = models.PositiveSmallIntegerField(_('Number'), validators=[MinValueValidator(1)])
@@ -128,5 +131,17 @@ class ArticleSubsection(TimeStampedModel):
         return '{0.title}'.format(self)
 
     def clean(self):
+        # unique number of subsection for article
+        all_subsections = self.article.subsections
+        if hasattr(self, 'pk'):
+            all_subsections = all_subsections.exclude(pk=self.pk)
+        if self.number in all_subsections.values_list('number', flat=True):
+            raise ValidationError({
+                '__all__': _('Subsection with this number already exists.')
+            })
         # adding count subsections
-        pass
+        # count_subsections_now = self.article.subsections.count() if  else self.article.subsections.count() + 1
+        # if count_subsections_now > Article.MAX_COUNT_SUBSECTIONS:
+        #     raise ValidationError({
+        #         '__all__': _('Single article must be have no more than {0} subsections.').format(Article.MAX_COUNT_SUBSECTIONS),
+        #     })

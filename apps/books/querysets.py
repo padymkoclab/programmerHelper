@@ -1,7 +1,8 @@
 
-from django.db.models.functions import Greatest
 from django.utils import timezone
 from django.db import models
+
+from mylabour.functions_db import Round
 
 
 NOW_YEAR = timezone.datetime.now().year
@@ -31,10 +32,8 @@ class BookQuerySet(models.QuerySet):
         """Queryset with rating of each the book."""
 
         self = self.annotate(rating=models.Avg('scopes__scope'))
-        self = self.annotate(rating=Greatest('rating', .0))
-        for book in self:
-            if len(str(book.rating)) > 5:
-                book.rating = round(book.rating, 4)
+        self = self.annotate(rating=models.functions.Coalesce('rating', .0))
+        self = self.annotate(rating=Round('rating'))
         return self
 
     def books_with_count_tags_links_replies_and_rating(self):

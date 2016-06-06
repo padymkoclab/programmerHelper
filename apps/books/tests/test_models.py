@@ -145,8 +145,9 @@ Especially for something using flex-box or 100vh (full height – which you add 
         ScopeFactory(content_object=self.book, scope=4)
         ScopeFactory(content_object=self.book, scope=4)
         ScopeFactory(content_object=self.book, scope=1)
+        ScopeFactory(content_object=self.book, scope=0)
         ScopeFactory(content_object=self.book, scope=5)
-        self.assertEqual(self.book.get_rating(), 3.125)
+        self.assertEqual(self.book.get_rating(), 2.7778)
 
     def test_is_new(self):
         #

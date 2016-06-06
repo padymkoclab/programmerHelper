@@ -307,17 +307,10 @@ class ConfiguredAutoSlugField(AutoSlugField):
 class YearField(models.IntegerField):
     description = _("Year ")
 
-    def get_internal_type(self):
-        return "SmallIntegerField"
-
-    def formfield(self, **kwargs):
-        defaults = {'min_value': datetime.datetime.now().year}
-        defaults = {'max_value': datetime.datetime.now().year}
-        defaults.update(kwargs)
-        # defaults = {'min_value': 1900}
-        # defaults = {'min_value': 2000}
-        # defaults.update(kwargs)
-        return super(YearField, self).formfield(**defaults)
+    def __init__(self, *args, **kwargs):
+        kwargs['choices'] = ''
+        kwargs['max_length'] = 4
+        super(YearField, self).__init__(*args, **kwargs)
 
 
 class NullTrueField(NullBooleanField):

@@ -4,6 +4,8 @@ import numbers
 from django.utils import timezone
 from django.db import models
 
+from mylabour.functions_db import Round
+
 
 class ArticleQuerySet(models.QuerySet):
     """
@@ -14,10 +16,8 @@ class ArticleQuerySet(models.QuerySet):
         """Adding for each the article field with determined rating of an itself."""
 
         self = self.defer('subsections').annotate(rating=models.Avg('scopes__scope'))
-        self = self.annotate(rating=models.functions.Greatest('rating', .0))
-        for article in self:
-            if len(str(article.rating)) > 5:
-                article.rating = round(article.rating, 4)
+        self = self.annotate(rating=models.functions.Coalesce('rating', .0))
+        self = self.annotate(rating=Round('rating'))
         return self
 
     def articles_with_count_comments(self):
@@ -117,7 +117,8 @@ class ArticleQuerySet(models.QuerySet):
         self = self.annotate(count_characters_in_subsections=models.Sum(
             models.Case(
                 models.When(subsections__content__isnull=False, then=models.functions.Length('subsections__content')),
-                output_field=models.IntegerField()
+                output_field=models.IntegerField(),
+                default=0,
             )
         ))
         self = self.annotate(volume=models.F('count_characters_in_header') +

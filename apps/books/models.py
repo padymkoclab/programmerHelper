@@ -132,7 +132,7 @@ class Writter(models.Model):
         max_length=200,
         validators=[MinLengthValidator(settings.MIN_LENGTH_FOR_NAME_OR_TITLE_OBJECT)],
         unique=True,
-        error_messages={'unique': _('Such writter already exists.')}
+        error_messages={'unique': _('The such writter already exists.')}
     )
     slug = ConfiguredAutoSlugField(_('Slug'), populate_from='name', unique=True)
     about = models.TextField(

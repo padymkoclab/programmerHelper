@@ -43,7 +43,7 @@ class Comment(BaseGenericModel):
 
     def __str__(self):
         return _('Comment on {0} "{1}"').format(
-            self.content_object._meta.verbose_name.lower(),
+            self.content_type.model_class()._meta.verbose_name.lower(),
             self.content_object.__str__()
         )
 
