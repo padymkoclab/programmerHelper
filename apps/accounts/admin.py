@@ -10,7 +10,7 @@ from mylabour.admin_actions import (
     make_accounts_as_superuser,
     make_accounts_as_non_active,
     make_accounts_as_active,
-    )
+)
 
 from .forms import UserChangeForm, UserCreationForm
 from .models import AccountLevel
@@ -31,10 +31,10 @@ class AccountAdmin(BaseUserAdmin):
         'level',
         'is_active',
         'is_superuser',
-        'get_count_comments',
-        'get_count_opinions',
-        'get_count_likes',
-        'get_count_scopes',
+        # 'get_count_comments',
+        # 'get_count_opinions',
+        # 'get_count_likes',
+        # 'get_count_scopes',
         # 'get_count_questions',
         # 'get_count_snippets',
         # 'get_count_answers',
@@ -72,7 +72,7 @@ class AccountAdmin(BaseUserAdmin):
                         'password',
                         'level',
                         'picture',
-                    ]
+                ]
             },
         ),
         (
@@ -124,10 +124,10 @@ class AccountAdmin(BaseUserAdmin):
     def get_queryset(self, request):
         qs = super(AccountAdmin, self).get_queryset(request)
         qs = qs.annotate(
-            count_comments=models.Count('comments', distinct=True),
-            count_opinions=models.Count('opinions', distinct=True),
-            count_likes=models.Count('likes', distinct=True),
-            count_scopes=models.Count('scopes', distinct=True),
+            # count_comments=models.Count('comments', distinct=True),
+            # count_opinions=models.Count('opinions', distinct=True),
+            # count_likes=models.Count('likes', distinct=True),
+            # count_scopes=models.Count('scopes', distinct=True),
             # count_articles=models.Count('articles', distinct=True),
             # count_answers=models.Count('answers', distinct=True),
             # count_posts=models.Count('posts', distinct=True),

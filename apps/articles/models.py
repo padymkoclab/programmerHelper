@@ -54,6 +54,7 @@ class Article(TimeStampedModel):
     )
     source = models.URLField(
         _('Source'),
+        max_length=1000,
         null=True,
         blank=True,
         help_text=_('If this article is taken from another a web resource, please point URL to there.')

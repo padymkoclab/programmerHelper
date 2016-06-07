@@ -135,6 +135,9 @@ class Writter(models.Model):
         error_messages={'unique': _('The such writter already exists.')}
     )
     slug = ConfiguredAutoSlugField(_('Slug'), populate_from='name', unique=True)
+    #
+    # basic trends of books
+    #
     about = models.TextField(
         _('About writter'),
         validators=[MinLengthValidator(100)],
@@ -177,11 +180,11 @@ class Writter(models.Model):
                 raise ValidationError({
                     '__all__': [_('Year of birth can not more or equal year of dearth.')]
                 })
-            if self.deathyear - self.birthyear < 20:
+            if self.get_age() < 20:
                 raise ValidationError({
                     '__all__': [_('Very small range between year of birth and year of death.')]
                 })
-            if self.deathyear - self.birthyear > 150:
+            if self.get_age() > 150:
                 raise ValidationError({
                     '__all__': [_('Very big range between year of birth and year of death.')]
                 })
@@ -190,3 +193,10 @@ class Writter(models.Model):
                 raise ValidationError({
                     'birthyear': [_('Writter not possible born so early.')]
                 })
+
+    def get_age(self):
+        """Gettting age writter if it is possible."""
+
+        if self.birthyear and self.deathyear:
+            return self.deathyear - self.birthyear
+        return False

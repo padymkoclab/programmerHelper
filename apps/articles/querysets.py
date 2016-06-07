@@ -20,10 +20,34 @@ class ArticleQuerySet(models.QuerySet):
         self = self.annotate(rating=Round('rating'))
         return self
 
+    def articles_with_volume(self):
+        """Adding for each the article field with determined volume of an itself.
+        Volume of article determine on count characters in
+        header, subsections and conclusion of the article."""
+
+        self = self.annotate(count_characters_in_header=models.functions.Length('header'))
+        self = self.annotate(count_characters_in_conclusion=models.functions.Length('conclusion'))
+        self = self.annotate(count_characters_in_subsections=models.Sum(
+            models.Case(
+                models.When(subsections__content__isnull=False, then=models.functions.Length('subsections__content')),
+                output_field=models.IntegerField(),
+                default=0,
+            )
+        ))
+        self = self.annotate(volume=models.F('count_characters_in_header') +
+                             models.F('count_characters_in_conclusion') +
+                             models.F('count_characters_in_subsections'))
+        return self
+
     def articles_with_count_comments(self):
         """Adding for each the article field with determined count comments of an itself."""
 
         return self.defer('subsections').annotate(count_comments=models.Count('comments', distinct=True))
+
+    def articles_with_count_scopes(self):
+        """Adding for each the article field with determined count scopes of an itself."""
+
+        return self.defer('scopes').annotate(count_scopes=models.Count('scopes', distinct=True))
 
     def articles_with_count_tags(self):
         """Adding for each the article field with determined count tags of an itself."""
@@ -40,11 +64,12 @@ class ArticleQuerySet(models.QuerySet):
 
         return self.defer('subsections').annotate(count_subsections=models.Count('subsections', distinct=True))
 
-    def articles_with_rating_and_count_comments_subsections_tags_links(self):
-        """Determining for each article: count tags, comments, links, subsections and rating."""
+    def articles_with_rating_and_count_comments_subsections_tags_links_scopes(self):
+        """Determining for each article: count tags, comments, links, scopes, subsections and rating."""
 
         self = self.articles_with_rating()
         self = self.articles_with_count_comments()
+        self = self.articles_with_count_scopes()
         self = self.articles_with_count_tags()
         self = self.articles_with_count_links()
         self = self.articles_with_count_subsections()
@@ -82,15 +107,10 @@ class ArticleQuerySet(models.QuerySet):
         return articles_with_count_comments.filter(count_comments__gte=7)
 
     def popular_articles(self):
-        """Articles with rating 5 and more."""
+        """Articles with rating from 4 and more."""
 
         self = self.articles_with_rating()
-        return self.filter(rating__gte=5)
-
-    def latest_articles(self):
-        """5 latest added articles."""
-
-        return self.all()[:5]
+        return self.filter(rating__gte=4)
 
     def articles_by_rating(self, min_rating=None, max_rating=None):
         """Filter articles by certain range of rating."""
@@ -106,25 +126,6 @@ class ArticleQuerySet(models.QuerySet):
             return self.filter(rating__gte=min_rating)
         elif isinstance(max_rating, numbers.Rational):
             return self.filter(rating__lte=max_rating)
-
-    def articles_with_volume(self):
-        """Adding for each the article field with determined volume of an itself.
-        Volume of article determine on count characters in
-        header, subsections and conclusion of the article."""
-
-        self = self.annotate(count_characters_in_header=models.functions.Length('header'))
-        self = self.annotate(count_characters_in_conclusion=models.functions.Length('conclusion'))
-        self = self.annotate(count_characters_in_subsections=models.Sum(
-            models.Case(
-                models.When(subsections__content__isnull=False, then=models.functions.Length('subsections__content')),
-                output_field=models.IntegerField(),
-                default=0,
-            )
-        ))
-        self = self.annotate(volume=models.F('count_characters_in_header') +
-                             models.F('count_characters_in_conclusion') +
-                             models.F('count_characters_in_subsections'))
-        return self
 
     def big_articles(self):
         """Articles with count characters 10000 and more."""

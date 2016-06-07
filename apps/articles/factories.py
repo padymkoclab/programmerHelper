@@ -85,8 +85,6 @@ class ArticleSubsectionFactory(factory.DjangoModelFactory):
     class Meta:
         model = ArticleSubsection
 
-    content = factory.Faker('text', locale='ru')
-
     @factory.lazy_attribute
     def title(self):
         length_of_title_subsection_of_article = random.randint(10, 200)
@@ -98,6 +96,13 @@ class ArticleSubsectionFactory(factory.DjangoModelFactory):
         if not using_numbers:
             return 1
         return max(using_numbers) + 1
+
+    @factory.lazy_attribute
+    def content(self):
+        random_text = factory.Faker('text', locale='ru').generate([])
+        if len(random_text) < 100:
+            random_text = random_text * 2
+        return random_text
 
 
 def articles_factory(count):

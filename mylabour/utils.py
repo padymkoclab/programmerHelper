@@ -1,4 +1,5 @@
 
+import string
 import pprint
 import pip
 import pathlib
@@ -10,6 +11,7 @@ from django.utils import timezone
 from django.db import models
 from django.core.exceptions import ImproperlyConfigured
 
+import factory
 from pygments import lexers
 
 
@@ -132,3 +134,35 @@ def get_paths_all_nested_files(path, show=False):
     if show:
         pprint.pprint(all_paths, indent=8)
     return all_paths
+
+
+def generate_text_certain_length(length):
+    """Generate text certain length with full-featured sentences."""
+
+    # generate random text
+    text = factory.Faker('text').generate([])
+    # make text approximate certain length
+    while len(text) <= length:
+        text = text + ' ' + factory.Faker('text').generate([])
+    # made full-fetured ending text for last sentence
+    if len(text) != length:
+        # slice text to certain length
+        text = text[:length]
+        # find last next-to-last sentence, if is
+        next_to_last_sentence = text.rfind('.', 0, -1)
+        if next_to_last_sentence != -1:
+            # made lower ending last sentence and remove next-to-last point
+            ending = text[next_to_last_sentence:].lower()
+            text = text[:next_to_last_sentence] + ending[1:]
+        # replace last space (if is) on character
+        if text[-1] == ' ':
+            text = text[:-1] + random.choice(string.ascii_lowercase)
+        # replace next-to-last space (if is) on character
+        if text[-2] == ' ':
+            text = text[:-2] + random.choice(string.ascii_lowercase) + text[-1]
+        # replace last point (if is) on character
+        if text[-1] == '.':
+            text = text[:-1] + random.choice(string.ascii_lowercase)
+        # set point in ending of sentence
+        text += '.'
+    return text

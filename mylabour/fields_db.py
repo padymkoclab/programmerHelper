@@ -293,7 +293,7 @@ class ConfiguredAutoSlugField(AutoSlugField):
     """
 
     def __init__(self, *args, **kwargs):
-        kwargs['max_length'] = kwargs.get('max_length', 200)
+        kwargs['max_length'] = kwargs.get('max_length', 300)
         kwargs['editable'] = True
         kwargs['blank'] = True
         kwargs['always_update'] = True

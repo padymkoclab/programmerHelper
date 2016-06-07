@@ -117,7 +117,7 @@ class Account(AbstractBaseUser, PermissionsMixin):
         allow_folders=False,
         allow_files=True,
     )
-    signature = models.CharField(_('Signature'), max_length=50, default='')
+    signature = models.CharField(_('Signature'), max_length=50, default='', blank=True)
     # presents in web
     presents_on_gmail = models.URLField(_('Presents on google services'), default='')
     presents_on_github = models.URLField(_('Presents on github'), default='')
@@ -128,6 +128,7 @@ class Account(AbstractBaseUser, PermissionsMixin):
     date_birthday = models.DateField(_('Date birthday'))
     real_name = models.CharField(_('Real name'), max_length=200, default='')
     # phone = PhoneField(_('Phone'), default='')
+    # ваши направления развития верстка, программирование
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username', 'date_birthday']

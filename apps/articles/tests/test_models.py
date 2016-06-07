@@ -4,7 +4,7 @@ from django.utils.text import slugify
 from django.test import TestCase
 
 from apps.accounts.models import Account
-from apps.accounts.factories import accounts_factory
+from apps.accounts.factories import accounts_factory, AccountFactory
 from apps.tags.factories import tags_factory
 from apps.badges.factories import badges_factory
 from apps.web_links.factories import web_links_factory
@@ -91,7 +91,7 @@ I decided to share it with you in this article.
 
     def test_update_article(self):
         article = ArticleFactory()
-        new_account = Account.objects.exclude(pk=article.account.pk).random_accounts(1)
+        new_account = AccountFactory()
         data = dict(
             title='Why Python does not have operator CASE-SWITCH.',
             quotation='Важно чтобы было что показать.',

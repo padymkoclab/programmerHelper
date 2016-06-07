@@ -2,6 +2,7 @@
 import random
 
 from django.utils import timezone
+from django.utils.text import slugify
 
 import factory
 from factory import fuzzy
@@ -20,8 +21,8 @@ class AccountFactory(factory.DjangoModelFactory):
     class Meta:
         model = Account
 
-    email = factory.Faker('email', locale='ru')
-    username = factory.Faker('name', locale='ru')
+    email = factory.Faker('email', locale='en')
+    username = factory.Faker('name', locale='en')
     date_birthday = factory.Faker('date', locale='ru')
     real_name = factory.Faker('first_name', locale='ru')
     gender = fuzzy.FuzzyChoice(Account.CHOICES_GENDER._db_values)
@@ -47,22 +48,26 @@ class AccountFactory(factory.DjangoModelFactory):
     @factory.lazy_attribute
     def presents_on_gmail(self):
         slug_name = self.username.lower().replace(' ', '_')
-        return 'http://google/accounts/{0}'.format(slug_name)
+        return 'http://google.com/accounts/{0}'.format(slug_name)
 
     @factory.lazy_attribute
     def presents_on_github(self):
         slug_name = self.username.lower().replace(' ', '_')
-        return 'http://github/{0}'.format(slug_name)
+        return 'http://github.com/{0}'.format(slug_name)
 
     @factory.lazy_attribute
     def presents_on_stackoverflow(self):
         slug_name = self.username.lower().replace(' ', '_')
-        return 'http://stackoverflow/accounts/{0}'.format(slug_name)
+        return 'http://stackoverflow.com/accounts/{0}'.format(slug_name)
 
     @factory.lazy_attribute
     def personal_website(self):
-        slug_name = self.username.lower().replace(' ', '_')
+        slug_name = slugify(self.username, allow_unicode=True)
         return 'http://{0}.com'.format(slug_name)
+
+    @factory.lazy_attribute
+    def signature(self):
+        return 'Sincerely {0.username}'.format(self)
 
     @factory.post_generation
     def date_joined(self, created, extracted, **kwargs):
@@ -88,8 +93,11 @@ def account_level_factory():
     AccountLevelFactory(name=AccountLevel.CHOICES_LEVEL.regular, color='#F0F8FF', description='Regular level of account')
 
 
-def accounts_factory(count):
+def accounts_factory(count, force_active_all_users=False):
     if not AccountLevel.objects.count() and count > 0:
         account_level_factory()
     for i in range(count):
-        AccountFactory()
+        if force_active_all_users:
+            AccountFactory(is_active=force_active_all_users)
+        else:
+            AccountFactory()

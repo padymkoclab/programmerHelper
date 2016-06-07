@@ -9,7 +9,7 @@ from django.conf import settings
 
 from model_utils import Choices
 
-# from .managers import LogQuerySet
+from .managers import ActionManager
 
 
 class Action(models.Model):
@@ -43,7 +43,7 @@ class Action(models.Model):
         ordering = ['-date_action']
 
     objects = models.Manager()
-    # objects = LogQuerySet.as_manager()
+    objects = ActionManager()
 
     def __str__(self):
         return '{0.message}'.format(self)
