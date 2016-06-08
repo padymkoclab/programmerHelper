@@ -118,13 +118,13 @@ class ArticleQuerySet(models.QuerySet):
         if min_rating is None and max_rating is None:
             raise AttributeError('Please point at least either min_rating or max_rating.')
         self = self.articles_with_rating()
-        if isinstance(min_rating, numbers.Rational) and isinstance(max_rating, numbers.Rational):
+        if isinstance(min_rating, numbers.Real) and isinstance(max_rating, numbers.Real):
             if min_rating > max_rating:
                 raise ValueError('Don`t right values: min_rating is more than max_rating.')
             return self.filter(rating__gte=min_rating).filter(rating__lte=max_rating)
-        elif isinstance(min_rating, numbers.Rational):
+        elif isinstance(min_rating, numbers.Real):
             return self.filter(rating__gte=min_rating)
-        elif isinstance(max_rating, numbers.Rational):
+        elif isinstance(max_rating, numbers.Real):
             return self.filter(rating__lte=max_rating)
 
     def big_articles(self):

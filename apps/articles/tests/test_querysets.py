@@ -64,72 +64,28 @@ class ArticleQuerySetTest(TestCase):
         article2.subsections.filter().delete()
         article3.subsections.filter().delete()
         #
-        article1.header = """
-For the past year and a half or so I’ve been working full-time at Dumbwaiter Design doing Django development.
-I’ve picked up a bunch of useful tricks along the way that help me work, and I figured I’d share them.
-
-I’m sure there are better ways to do some of the things that I mention.
-If you know of any feel free to hit me up on Twitter and let me know.
-"""
-        ArticleSubsectionFactory(article=article1, number=1, title='Vagrant', content="""
-I used to develop Django sites by running them on my OS X laptop locally and deploying to a Linode VPS.
-I had a whole section of this post written up about tricks and tips for working with that setup.
-
-Then I found Vagrant.
-
-I just deleted the entire section of this post I wrote.
-
-Vagrant gives you a better way of working. You need to use it.
-        """)
-        ArticleSubsectionFactory(article=article1, number=2, title='Preventing accidents', content="""
-Deploying to test and staging servers should be quick and easy.
-Deploying to production servers should be harder to prevent people from accidentally doing it.
-
-I’ve created a little function that I call before deploying to production servers.
-It forces me to type in random words from the system word
-list before proceeding to make sure I really know what I’m doing:
-        """)
-        article1.conclusion = """
-I hope that this longer-than-expected blog entry has given you at least one or two things to think about.
-
-I’ve learned a lot while working with Django for Dumbwaiter every day,
-but I’m sure there’s still a lot I’ve missed.
-If you see something I could be doing better please let me know!
-"""
+        article1.header = generate_text_certain_length(645)
+        ArticleSubsectionFactory(article=article1, number=1, title='Virtualenv', content=generate_text_certain_length(841))
+        ArticleSubsectionFactory(article=article1, number=2, title='Virtualwrapper', content=generate_text_certain_length(751))
+        article1.conclusion = generate_text_certain_length(554)
         article1.full_clean()
         article1.save()
         #
-        article2.header = """
-In this tutorial, we will be building a Django application from the ground up
-which will allow the user to query Github data through the use of a form.
-To build our application, we’ll be using a wide array of technologies.
-We’ll use pip for Python package dependency management, bower for front-end dependency management,
-Twitter Bootstrap for design, Requests for making HTTP requests,
-the Github API as our data source, and of course, Django.
-"""
-        ArticleSubsectionFactory(article=article2, number=1, title='Vagrant', content="""
-A view is typically a visual representation of our underlying data layer (models).
-Views can update models as well as retrieve data from them through a query,
-which in turn would be passed to an HTML template.
-
-In Django, views generally consist of a combination of templates, the URL dispatcher,
-and a views.py file. When a user navigates to a URL, a callback function
-is run which maps that particular url (such as /games) to a method named games within
-views.py which may in turn query models or some external API, and finally pass that data
-to a template using methods such as render.
-        """)
-        article2.conclusion = """
-Forms are the bread and butter of web applications - every web programmer will come across them at one point or another.
-Forms essentially allow users to interact with your web application through
-various fields for input, usually for registration pages or in our case, performing a query.
-"""
+        article2.header = generate_text_certain_length(389)
+        ArticleSubsectionFactory(article=article2, number=1, title='Vagrant', content=generate_text_certain_length(789))
+        article2.conclusion = generate_text_certain_length(287)
         article2.full_clean()
         article2.save()
         #
+        article3.header = generate_text_certain_length(897)
+        article3.conclusion = generate_text_certain_length(714)
+        article3.full_clean()
+        article3.save()
+        #
         articles_with_volume = Article.objects.articles_with_volume()
-        self.assertEqual(articles_with_volume.get(pk=article1.pk).volume, 357 + 354 + 376 + 290)
-        self.assertEqual(articles_with_volume.get(pk=article2.pk).volume, 446 + 598 + 291)
-        self.assertEqual(articles_with_volume.get(pk=article3.pk).volume, len(article3.header) + len(article3.conclusion))
+        self.assertEqual(articles_with_volume.get(pk=article1.pk).volume, 2791)
+        self.assertEqual(articles_with_volume.get(pk=article2.pk).volume, 1465)
+        self.assertEqual(articles_with_volume.get(pk=article3.pk).volume, 1611)
 
     def test_articles_with_count_comments(self):
         for article in Article.objects.iterator():
@@ -372,14 +328,11 @@ various fields for input, usually for registration pages or in our case, perform
         now = timezone.now()
         for article in Article.objects.iterator():
             article.date_added = now - timezone.timedelta(days=8)
-            try:
-                article.full_clean()
-                article.save()
-            except:
-                print(article.account)
-                print(article.account.full_clean())
+            article.full_clean()
+            article.save()
         self.assertEqual(Article.objects.weekly_articles().count(), 0)
         dates = [
+            # satisfy dates
             now,
             now - timezone.timedelta(days=1),
             now - timezone.timedelta(days=2),
@@ -387,6 +340,8 @@ various fields for input, usually for registration pages or in our case, perform
             now - timezone.timedelta(days=4),
             now - timezone.timedelta(days=5),
             now - timezone.timedelta(days=6),
+            now - timezone.timedelta(days=6, hours=23, minutes=59, seconds=59),
+            # not satisfy dates
             now - timezone.timedelta(days=7),
             now - timezone.timedelta(days=8),
             now - timezone.timedelta(days=9),
@@ -517,6 +472,7 @@ various fields for input, usually for registration pages or in our case, perform
         for article in Article.objects.iterator():
             article.scopes.clear()
         article1, article2, article3, article4, article5, article6, article7 = Article.objects.all()[:7]
+        Article.objects.exclude(pk__in=Article.objects.values('pk')[:7]).delete()
         # 3
         ScopeFactory(content_object=article1, scope=2)
         ScopeFactory(content_object=article1, scope=3)
@@ -533,11 +489,11 @@ various fields for input, usually for registration pages or in our case, perform
         ScopeFactory(content_object=article4, scope=5)
         ScopeFactory(content_object=article4, scope=5)
         ScopeFactory(content_object=article4, scope=1)
-        # 2.6666
+        # 2.6667
         ScopeFactory(content_object=article5, scope=1)
         ScopeFactory(content_object=article5, scope=4)
         ScopeFactory(content_object=article5, scope=3)
-        # 1.6666
+        # 1.6667
         ScopeFactory(content_object=article6, scope=1)
         ScopeFactory(content_object=article6, scope=1)
         ScopeFactory(content_object=article6, scope=3)
@@ -547,26 +503,26 @@ various fields for input, usually for registration pages or in our case, perform
         ScopeFactory(content_object=article7, scope=1)
         # find by min rating
         self.assertCountEqual(
-            Article.objects.articles_by_rating(1),
+            Article.objects.articles_by_rating(min_rating=1),
             [article1, article2, article3, article4, article5, article6, article7]
         )
         self.assertCountEqual(
-            Article.objects.articles_by_rating(2),
+            Article.objects.articles_by_rating(min_rating=2),
             [article1, article2, article3, article4, article5],
         )
-        self.assertCountEqual(Article.objects.articles_by_rating(2.7), [article1, article2, article3, article4])
-        self.assertCountEqual(Article.objects.articles_by_rating(3.1), [article2, article3, article4])
-        self.assertCountEqual(Article.objects.articles_by_rating(3.9), [article2, article3])
+        self.assertCountEqual(Article.objects.articles_by_rating(min_rating=2.7), [article1, article2, article3, article4])
+        self.assertCountEqual(Article.objects.articles_by_rating(min_rating=3.1), [article2, article3, article4])
+        self.assertCountEqual(Article.objects.articles_by_rating(min_rating=3.9), [article2, article3])
         # find by max rating
-        self.assertCountEqual(Article.objects.articles_by_rating(1), [article7])
-        self.assertCountEqual(Article.objects.articles_by_rating(2), [article5, article6, article7])
-        self.assertCountEqual(Article.objects.articles_by_rating(3.1), [article1, article5, article6, article7])
+        self.assertCountEqual(Article.objects.articles_by_rating(max_rating=1), [article7])
+        self.assertCountEqual(Article.objects.articles_by_rating(max_rating=2), [article6, article7])
+        self.assertCountEqual(Article.objects.articles_by_rating(max_rating=3.1), [article1, article5, article6, article7])
         self.assertCountEqual(
-            Article.objects.articles_by_rating(3.9),
+            Article.objects.articles_by_rating(max_rating=3.9),
             [article1, article4, article5, article6, article7]
         )
         self.assertCountEqual(
-            Article.objects.articles_by_rating(4.7),
+            Article.objects.articles_by_rating(max_rating=4.7),
             [article1, article2, article4, article5, article6, article7]
         )
         # find by min and max limitations of rating
@@ -579,20 +535,17 @@ various fields for input, usually for registration pages or in our case, perform
             [article1, article2, article3, article4, article5],
         )
         self.assertCountEqual(Article.objects.articles_by_rating(2.7, 3.5), [article1])
-        self.assertCountEqual(Article.objects.articles_by_rating(3.1, 4.8), [article1, article2, article4])
+        self.assertCountEqual(Article.objects.articles_by_rating(3.1, 4.8), [article2, article4])
         self.assertCountEqual(Article.objects.articles_by_rating(3.9, 5), [article2, article3])
+        self.assertCountEqual(Article.objects.articles_by_rating(1.8, 1.9), [])
 
     def test_big_articles(self):
         for article in Article.objects.iterator():
             article.subsections.filter().delete()
             article.header = 'This is simple article about Python and JS.'
             article.conclusion = 'I decided what Python and JS is neccesary for each web-developer.'
-            try:
-                article.full_clean()
-                article.save()
-            except:
-                print(article.account)
-                print(article.account.full_clean())
+            article.full_clean()
+            article.save()
         article1, article2, article3, article4, article5 = Article.objects.all()[:5]
         self.assertEqual(Article.objects.big_articles().count(), 0)
         #
@@ -601,7 +554,7 @@ various fields for input, usually for registration pages or in our case, perform
         article1.save()
         self.assertCountEqual(Article.objects.big_articles(), [article1])
         #
-        article2.header = generate_text_certain_length(10000)
+        article2.conclusion = generate_text_certain_length(10000)
         article2.full_clean()
         article2.save()
         self.assertCountEqual(Article.objects.big_articles(), [article1, article2])
@@ -609,10 +562,10 @@ various fields for input, usually for registration pages or in our case, perform
         ArticleSubsectionFactory(article=article3, content=generate_text_certain_length(10000))
         self.assertCountEqual(Article.objects.big_articles(), [article1, article2, article3])
         #
-        ArticleSubsectionFactory(article=article4, content=generate_text_certain_length(4000))
-        ArticleSubsectionFactory(article=article4, content=generate_text_certain_length(4000))
+        ArticleSubsectionFactory(article=article4, content=generate_text_certain_length(3000))
+        ArticleSubsectionFactory(article=article4, content=generate_text_certain_length(3000))
         ArticleSubsectionFactory(article=article4, content=generate_text_certain_length(4000))
         self.assertCountEqual(Article.objects.big_articles(), [article1, article2, article3, article4])
         #
-        ArticleSubsectionFactory(article=article5, content=generate_text_certain_length(9850))
+        ArticleSubsectionFactory(article=article5, content=generate_text_certain_length(9000))
         self.assertCountEqual(Article.objects.big_articles(), [article1, article2, article3, article4])

@@ -101,7 +101,7 @@ class Article(TimeStampedModel):
 
     def get_volume(self):
         return self.__class__.objects.articles_with_volume().get(pk=self.pk).volume
-    get_rating.short_description = _('Volume')
+    get_volume.short_description = _('Volume')
 
 
 class ArticleSubsection(TimeStampedModel):
@@ -125,7 +125,7 @@ class ArticleSubsection(TimeStampedModel):
         db_table = 'articles_subsections'
         verbose_name = _("Subsection")
         verbose_name_plural = _("Subsections")
-        ordering = ['article', 'date_modified']
+        ordering = ['article', 'number']
         unique_together = ['article', 'title']
 
     def __str__(self):
@@ -133,13 +133,14 @@ class ArticleSubsection(TimeStampedModel):
 
     def clean(self):
         # unique number of subsection for article
-        all_subsections = self.article.subsections
-        if hasattr(self, 'pk'):
-            all_subsections = all_subsections.exclude(pk=self.pk)
-        if self.number in all_subsections.values_list('number', flat=True):
-            raise ValidationError({
-                '__all__': _('Subsection with this number already exists.')
-            })
+        if hasattr(self, 'article'):
+            all_subsections = self.article.subsections
+            if hasattr(self, 'pk'):
+                all_subsections = all_subsections.exclude(pk=self.pk)
+            if self.number in all_subsections.values_list('number', flat=True):
+                raise ValidationError({
+                    '__all__': _('Subsection with this number already exists.')
+                })
         # adding count subsections
         # count_subsections_now = self.article.subsections.count() if  else self.article.subsections.count() + 1
         # if count_subsections_now > Article.MAX_COUNT_SUBSECTIONS:

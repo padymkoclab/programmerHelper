@@ -37,6 +37,7 @@ class ArticleAdmin(admin.ModelAdmin):
         'get_count_subsections',
         'get_count_links',
         'get_count_tags',
+        'get_count_scopes',
         'get_count_comments',
         'is_new',
         'date_modified',
@@ -70,10 +71,11 @@ class ArticleAdmin(admin.ModelAdmin):
     filter_horizontal = ['tags']
     filter_vertical = ['links']
     date_hierarchy = 'date_added'
+    readonly_fields = ['status_changed']
 
     def get_queryset(self, request):
         qs = super(ArticleAdmin, self).get_queryset(request)
-        qs = qs.articles_with_rating_and_count_comments_subsections_tags_links()
+        qs = qs.articles_with_rating_and_count_comments_subsections_tags_links_scopes()
         return qs
 
     def get_count_links(self, obj):
@@ -85,6 +87,11 @@ class ArticleAdmin(admin.ModelAdmin):
         return obj.count_tags
     get_count_tags.admin_order_field = 'count_tags'
     get_count_tags.short_description = _('Count tags')
+
+    def get_count_scopes(self, obj):
+        return obj.count_scopes
+    get_count_scopes.admin_order_field = 'count_scopes'
+    get_count_scopes.short_description = _('Count scopes')
 
     def get_count_subsections(self, obj):
         return obj.count_subsections
@@ -102,7 +109,7 @@ class ArticleSubsectionAdmin(admin.ModelAdmin):
         Admin View for ArticleSubsection
     '''
 
-    list_display = ('title', 'article', 'date_modified', 'date_added')
+    list_display = ('article', 'number', 'title', 'date_modified', 'date_added')
     list_filter = (
         ('article', admin.RelatedOnlyFieldListFilter),
         'date_modified',
@@ -113,7 +120,7 @@ class ArticleSubsectionAdmin(admin.ModelAdmin):
     fieldsets = [
         [
             ArticleSubsection._meta.verbose_name, {
-                'fields': ['article', 'title', 'content'],
+                'fields': ['article', 'number', 'title', 'content'],
             }
         ]
     ]
