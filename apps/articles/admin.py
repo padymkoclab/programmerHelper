@@ -6,7 +6,7 @@ from django.contrib import admin
 from apps.scopes.admin import ScopeInline
 from apps.comments.admin import CommentInline
 
-from .forms import ArticleForm
+from .forms import ArticleForm, ArticleSubsectionFormset
 from .models import Article, ArticleSubsection
 
 
@@ -15,11 +15,13 @@ class ArticleSubsectionInline(admin.StackedInline):
     Tabular Inline View for Tag
     '''
 
+    formset = ArticleSubsectionFormset
     model = ArticleSubsection
     min_num = Article.MIN_COUNT_SUBSECTIONS
     max_num = Article.MAX_COUNT_SUBSECTIONS
     fk_name = 'article'
-    fields = [('number', 'title'), 'content']
+    # prepopulated_fields = {'slug': ['title']}
+    fields = ['number', 'title', 'slug', 'content']
     extra = 0
 
 
@@ -48,7 +50,7 @@ class ArticleAdmin(admin.ModelAdmin):
         'date_modified',
         'date_added',
     )
-    search_fields = ('title', 'web_url')
+    search_fields = ('title',)
     inlines = [
         ArticleSubsectionInline,
         ScopeInline,
@@ -56,7 +58,9 @@ class ArticleAdmin(admin.ModelAdmin):
     ]
     fieldsets = [
         (_('Basic info'), {
-            'fields': ['title', 'picture', 'account']
+            'fields': [
+                'title', 'slug', 'picture', 'account'
+            ]
         }),
         (_('Status'), {
             'fields': ['status', 'status_changed']
@@ -71,7 +75,7 @@ class ArticleAdmin(admin.ModelAdmin):
     filter_horizontal = ['tags']
     filter_vertical = ['links']
     date_hierarchy = 'date_added'
-    readonly_fields = ['status_changed']
+    readonly_fields = ['status_changed', 'slug']
 
     def get_queryset(self, request):
         qs = super(ArticleAdmin, self).get_queryset(request)
@@ -117,10 +121,11 @@ class ArticleSubsectionAdmin(admin.ModelAdmin):
     )
     search_fields = ('title', )
     date_hierarchy = 'date_modified'
+    readonly_fields = ['slug']
     fieldsets = [
         [
             ArticleSubsection._meta.verbose_name, {
-                'fields': ['article', 'number', 'title', 'content'],
+                'fields': ['article', 'number', 'title', 'slug', 'content'],
             }
         ]
     ]

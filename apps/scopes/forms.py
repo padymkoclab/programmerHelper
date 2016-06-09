@@ -20,4 +20,4 @@ class ScopeFormSet(BaseGenericInlineFormSet):
         for form in self.forms:
             account = form.cleaned_data.get('account')
             if account and counter_all_given_scope_users[account] > 1:
-                form.add_error('account', _('Please, don`t repeat user.'))
+                form.add_error('account', _('User is repeated.'))
