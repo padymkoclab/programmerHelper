@@ -1,5 +1,4 @@
 
-from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.contrib import admin
 
@@ -23,6 +22,7 @@ class ArticleSubsectionInline(admin.StackedInline):
     # prepopulated_fields = {'slug': ['title']}
     fields = ['number', 'title', 'slug', 'content']
     extra = 0
+    template = 'articles/stacked.html'
 
 
 class ArticleAdmin(admin.ModelAdmin):
@@ -33,7 +33,6 @@ class ArticleAdmin(admin.ModelAdmin):
     form = ArticleForm
     list_display = (
         'title',
-        'picture',
         'account',
         'get_rating',
         'get_count_subsections',

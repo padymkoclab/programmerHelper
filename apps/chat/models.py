@@ -9,6 +9,10 @@ from django.conf import settings
 
 from autoslug import AutoSlugField
 
+#
+# Gevent and BackboneJS
+#
+
 
 class Chat(models.Model):
     """

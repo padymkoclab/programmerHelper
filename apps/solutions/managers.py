@@ -9,17 +9,16 @@ class SolutionQuerySet(models.QuerySet):
     QuerySet for using with queryset model Solution
     """
 
-    def solutions_with_scopes(self, queryset=None):
+    def solutions_with_scopes(self):
         """Added for each solution new field 'scope' where storage her scope."""
 
         return self.annotate(scope=models.Sum(
-                models.Case(
-                    models.When(opinions__is_useful=True, then=1),
-                    models.When(opinions__is_useful=False, then=-1),
-                    output_field=models.IntegerField()
-                )
+            models.Case(
+                models.When(opinions__is_useful=True, then=1),
+                models.When(opinions__is_useful=False, then=-1),
+                output_field=models.IntegerField()
             )
-        )
+        ))
 
     def solutions_by_scopes(self, min_scope=None, max_scope=None):
         """Solutions with certain range of scopes."""
@@ -46,4 +45,3 @@ class SolutionCategoryManager(models.Manager):
     def get_random_category(self):
         random_pk = random.choice(self.values_list('pk', flat=True))
         return self.get(pk=random_pk)
-
