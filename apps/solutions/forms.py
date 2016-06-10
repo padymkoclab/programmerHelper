@@ -1,34 +1,45 @@
 
-from django.utils.translation import ungettext_lazy
 from django import forms
 
-from .models import Solution, Tag
+from apps.tags.forms import clean_tags
+from apps.web_links.forms import clean_weblinks
+
+from .models import Solution, SolutionCategory
+
+
+class SolutionCategoryForm(forms.ModelForm):
+    """
+    ModelForm for SolutionCategory.
+    """
+
+    class Meta:
+        model = SolutionCategory
+        fields = ('name', 'slug', 'description')
+
+    def __init__(self, *args, **kwargs):
+        super(SolutionCategoryForm, self).__init__(*args, **kwargs)
+        self.fields['slug'].disabled = True
 
 
 class SolutionForm(forms.ModelForm):
+    """
+    ModelForm for Solution.
+    """
+
     class Meta:
         model = Solution
-        fields = ('title',)
+        fields = ('tags', 'links', 'slug')
 
-    def clean(self):
-        count_tags = len(self.cleaned_data.get('tags', '0'))
-        if count_tags < Tag.MIN_COUNT_TAGS_ON_OBJECT:
-            raise forms.ValidationError({
-                'tags': ungettext_lazy(
-                    'Solution must be have at least %(number)d tag',
-                    'Solution must be have at least %(number)d tags',
-                    'number',
-                ) % {
-                    'number': Tag.MIN_COUNT_TAGS_ON_OBJECT,
-                }
-            })
-        if count_tags > Tag.MAX_COUNT_TAGS_ON_OBJECT:
-            raise forms.ValidationError({
-                'tags': ungettext_lazy(
-                    'Solution must be have no more %(number)d tag',
-                    'Solution must be have no more %(number)d tags',
-                    'number',
-                ) % {
-                    'number': Tag.MAX_COUNT_TAGS_ON_OBJECT,
-                }
-            })
+    def __init__(self, *args, **kwargs):
+        super(SolutionForm, self).__init__(*args, **kwargs)
+        self.fields['slug'].disabled = True
+
+    def clean_tags(self):
+        super(SolutionForm, self).clean()
+        cleaned_tags = clean_tags(self)
+        return cleaned_tags
+
+    def clean_links(self):
+        super(SolutionForm, self).clean()
+        cleaned_weblinks = clean_weblinks(self)
+        return cleaned_weblinks

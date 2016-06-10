@@ -1,5 +1,4 @@
 
-
 CHOICES_LEXERS = [
     ('Awk', 'Awk'),
     ('Base Makefile', 'Base Makefile'),

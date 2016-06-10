@@ -1,6 +1,5 @@
 
 from django.utils.html import format_html_join
-from django.db import models
 from django.template.defaultfilters import truncatewords
 from django.utils.translation import ugettext_lazy as _
 from django.contrib import admin

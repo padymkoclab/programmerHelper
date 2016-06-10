@@ -1,44 +1,44 @@
 
-from django.contrib.contenttypes.fields import GenericRelation
-from django.core.validators import MinLengthValidator
-from django.core.urlresolvers import reverse
-from django.utils.translation import ugettext_lazy as _
-from django.db import models
-from django.conf import settings
+import statistics
 
-from autoslug import AutoSlugField
+from django.conf import settings
+from django.contrib.contenttypes.fields import GenericRelation
+from django.contrib.auth import get_user_model
+from django.core.urlresolvers import reverse
+from django.core.validators import MinLengthValidator
+from django.db import models
+from django.utils.translation import ugettext_lazy as _
 
 from apps.comments.models import Comment
 from apps.opinions.models import Opinion
-from apps.web_links.models import WebLink
 from apps.tags.models import Tag
+from apps.web_links.models import WebLink
+from mylabour.fields_db import ConfiguredAutoSlugField
 from mylabour.models import TimeStampedModel
-from mylabour.constants import CHOICES_LEXERS
 
-from .managers import SolutionQuerySet, SolutionCategoryManager
+from .managers import SolutionCategoryManager
+from .querysets import SolutionQuerySet, SolutionCategoryQuerySet
+from .constants import QUALITIES_DETAILS
 
 
 class SolutionCategory(TimeStampedModel):
     """
-
+    Model for category of solution.
     """
 
-    name = models.CharField(
-        _('name'), max_length=100, unique=True, validators=[MinLengthValidator(settings.MIN_LENGTH_FOR_NAME_OR_TITLE_OBJECT)]
-    )
-    slug = AutoSlugField(_('Slug'), populate_from='name', unique=True, always_update=True, allow_unicode=True)
-    description = models.TextField(_('Description'))
-    lexer = models.CharField(_('Lexer of code'), max_length=100, choices=CHOICES_LEXERS)
+    name = models.CharField(_('name'), max_length=100, unique=True)
+    slug = ConfiguredAutoSlugField(_('Slug'), populate_from='name', unique=True)
+    description = models.TextField(_('Description'), validators=[MinLengthValidator(100)])
 
     class Meta:
         db_table = 'solutions_categories'
         verbose_name = _("Category of solutions")
         verbose_name_plural = _("Categories of solutions")
         get_latest_by = 'date_modified'
-        ordering = ['lexer', 'name']
+        ordering = ['name']
 
     objects = models.Manager()
-    objects = SolutionCategoryManager()
+    objects = SolutionCategoryManager.from_queryset(SolutionCategoryQuerySet)()
 
     def __str__(self):
         return '{0.name}'.format(self)
@@ -47,24 +47,35 @@ class SolutionCategory(TimeStampedModel):
         return reverse('solutions:category', kwargs={'slug': self.slug})
 
     def get_total_scope(self):
-        return sum(solution.get_scope() for solution in self.solutions.iterator())
-    get_total_scope.short_description = _('Scope')
+        """Getting total scope of category of solutions, on based scopes their solutions."""
 
-    def last_activity(self):
-        return self.solutions.latest().date_modified
-    last_activity.short_description = _('Last activity')
+        if not self.solutions.count():
+            return None
+        all_scopes_of_solutions = (solution.get_scope() for solution in self.solutions.iterator())
+        mean_value = statistics.mean(all_scopes_of_solutions)
+        return round(mean_value, 4)
+    get_total_scope.short_description = _('Total scope')
+    # get_total_scope.admin_order_field = 'total_scope'
+
+    def get_latest_activity(self):
+        """Determined date and time last activity in category of solution,
+        on based latest datetime chages in itself category or their solutions."""
+
+        return self.__class__.objects.categories_with_latest_activity().get(pk=self.pk).latest_activity
+    get_latest_activity.short_description = _('Latest activity')
+    get_latest_activity.admin_order_field = 'latest_activity'
 
 
 class Solution(TimeStampedModel):
     """
-
+    Model for solution.
     """
 
     title = models.CharField(
         _('Title'), max_length=100, validators=[MinLengthValidator(settings.MIN_LENGTH_FOR_NAME_OR_TITLE_OBJECT)]
     )
-    slug = AutoSlugField(_('Slug'), populate_from='title', unique_with=['category'], always_update=True, allow_unicode=True)
-    body = models.TextField(_('Text solution'))
+    slug = ConfiguredAutoSlugField(_('Slug'), populate_from='title', unique_with=['category'])
+    body = models.TextField(_('Text solution'), validators=[MinLengthValidator(100)])
     category = models.ForeignKey(
         'SolutionCategory',
         on_delete=models.CASCADE,
@@ -87,12 +98,13 @@ class Solution(TimeStampedModel):
         related_name='solutions',
         verbose_name=_('Useful links'),
     )
-    comments = GenericRelation(Comment)
-    opinions = GenericRelation(Opinion)
+
+    comments = GenericRelation(Comment, related_query_name='solutions')
+    opinions = GenericRelation(Opinion, related_query_name='solutions')
 
     # managers
     objects = models.Manager()
-    # objects = SolutionManager.from_queryset(SolutionQuerySet)()
+    objects = SolutionQuerySet.as_manager()
 
     class Meta:
         db_table = 'solutions'
@@ -101,15 +113,47 @@ class Solution(TimeStampedModel):
         ordering = ['category', 'title']
         unique_together = ['title', 'category']
         get_latest_by = 'date_modified'
+        permissions = (("can_view_opinions_about_solutions", "Can view opinions about solutions"),)
 
     def __str__(self):
-        return _('{0.title}').format(self)
+        return '{0.title}'.format(self)
 
     def get_absolute_url(self):
         return reverse('solutions:solution', kwargs={'slug': self.slug})
 
+    def unique_error_message(self, model_class, unique_check):
+        if isinstance(self, model_class) and unique_check == ('title', 'category'):
+            return _('Solution with this title already exists in this category of solutions.')
+        return super(Solution, self).unique_error_message(model_class, unique_check)
+
     def get_scope(self):
-        count_good_opinions = self.opinions.filter(is_useful=True).count()
-        count_bad_opinions = self.opinions.filter(is_useful=False).count()
-        return count_good_opinions - count_bad_opinions
+        """Getting scope of solution on based their opinions."""
+
+        return self.__class__.objects.solutions_with_scopes().get(pk=self.pk).scope
     get_scope.short_description = _('Scope')
+    get_scope.admin_order_field = 'scope'
+
+    def get_quality(self):
+        """Getting quality of solution on based its scope."""
+
+        return self.__class__.objects.solutions_with_determined_quality().get(pk=self.pk).quality
+    get_quality.short_description = _('Quality')
+    get_quality.admin_order_field = 'scope'
+
+    def get_detail_about_quality(self):
+        quality = self.get_quality()
+        quality = quality.lower()
+        quality_detail = QUALITIES_DETAILS[quality]
+        return quality_detail
+
+    def critics_of_solution(self):
+        """Determination users given negative opinions about solution."""
+
+        return get_user_model().objects.filter(pk__in=self.opinions.filter(is_useful=False).values('account__pk'))
+
+    def supporters_of_solution(self):
+        """Determination users given possitive opinions about solution."""
+
+        return get_user_model().objects.filter(pk__in=self.opinions.filter(is_useful=True).values('account__pk'))
+
+    # are you sure with this solution?

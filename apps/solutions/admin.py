@@ -1,25 +1,13 @@
 
 from django.utils.translation import ugettext_lazy as _
 from django.contrib import admin
-from django.db.models import Count
+from django.utils.html import format_html
 
+from mylabour.admin_listfilters import LatestActivityListFilter
 # from apps.generic_models.admin import OpinionGenericInline, CommentGenericInline
 
-from .forms import SolutionForm
+from .forms import SolutionCategoryForm, SolutionForm
 from .models import SolutionCategory, Solution
-
-
-class SolutionInline(admin.StackedInline):
-    '''
-    Tabular Inline View for Solution
-    '''
-
-    model = Solution
-    extra = 0
-    fk_name = 'category'
-    fields = ['title', 'body', 'tags', 'links']
-    filter_vertical = ['links']
-    filter_horizontal = ['tags']
 
 
 class SolutionCategoryAdmin(admin.ModelAdmin):
@@ -29,35 +17,31 @@ class SolutionCategoryAdmin(admin.ModelAdmin):
 
     list_display = (
         'name',
-        'lexer',
         'get_total_scope',
         'get_count_solutions',
-        'is_new',
-        'last_activity',
+        'get_latest_activity',
         'date_modified',
         'date_added',
     )
     list_filter = (
-        ('lexer', admin.AllValuesFieldListFilter),
+        LatestActivityListFilter,
         'date_modified',
         'date_added',
     )
     date_hierarchy = 'date_added'
     search_fields = ('name',)
-    inlines = [
-        SolutionInline,
-    ]
     fieldsets = [
         [
             SolutionCategory._meta.verbose_name, {
-                'fields': ['name', 'lexer', 'description']
+                'fields': ['name', 'slug', 'description']
             }
         ]
     ]
+    form = SolutionCategoryForm
 
     def get_queryset(self, request):
         qs = super(SolutionCategoryAdmin, self).get_queryset(request)
-        qs = qs.annotate(count_solutions=Count('solutions'))
+        qs = qs.categories_with_count_solutions_total_scope_and_latest_activity()
         return qs
 
     def get_count_solutions(self, obj):
@@ -75,11 +59,12 @@ class SolutionAdmin(admin.ModelAdmin):
         'title',
         'category',
         'get_scope',
+        'colored_quality',
         'account',
-        'get_count_links',
-        'get_count_opinions',
-        'get_count_comments',
-        'get_count_tags',
+        # 'get_count_links',
+        # 'get_count_opinions',
+        # 'get_count_comments',
+        # 'get_count_tags',
         'is_new',
         'date_modified',
         'date_added',
@@ -99,7 +84,7 @@ class SolutionAdmin(admin.ModelAdmin):
     fieldsets = [
         [
             Solution._meta.verbose_name, {
-                'fields': ['title', 'category', 'body', 'tags', 'links'],
+                'fields': ['title', 'slug', 'category', 'account', 'body', 'tags', 'links'],
             }
         ],
     ]
@@ -110,12 +95,7 @@ class SolutionAdmin(admin.ModelAdmin):
 
     def get_queryset(self, request):
         qs = super(SolutionAdmin, self).get_queryset(request)
-        qs = qs.annotate(
-            count_links=Count('links', distinct=True),
-            count_opinions=Count('opinions', distinct=True),
-            count_comments=Count('comments', distinct=True),
-            count_tags=Count('tags', distinct=True),
-        )
+        qs = qs.solution_with_count_tags_links_opinions_comments_quality_scopes()
         return qs
 
     def get_count_links(self, obj):
@@ -135,5 +115,12 @@ class SolutionAdmin(admin.ModelAdmin):
 
     def get_count_tags(self, obj):
         return obj.count_tags
-    get_count_tags.admin_order_field = 'count_tags'
     get_count_tags.short_description = _('Count tags')
+    get_count_tags.admin_order_field = 'count_tags'
+
+    def colored_quality(self, obj):
+        details = obj.get_detail_about_quality()
+        color = details.color
+        return format_html('<span style="color: {1};">{0}</span>', obj.quality, color)
+    colored_quality.short_description = _('Quality')
+    colored_quality.admin_order_field = 'scope'

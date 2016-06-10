@@ -94,6 +94,11 @@ class Article(TimeStampedModel):
     def get_absolute_url(self):
         return reverse('articles:article', kwargs={'slug': self.slug})
 
+    def unique_error_message(self, model_class, unique_check):
+        if isinstance(self, model_class) and unique_check == ('account', 'title'):
+            return _('This author already have article with this title.')
+        return super(ArticleSubsection, self).unique_error_message(model_class, unique_check)
+
     def get_rating(self):
         return self.__class__.objects.articles_with_rating().get(pk=self.pk).rating
     get_rating.admin_order_field = 'rating'
@@ -147,3 +152,8 @@ class ArticleSubsection(TimeStampedModel):
         #     raise ValidationError({
         #         '__all__': _('Single article must be have no more than {0} subsections.').format(Article.MAX_COUNT_SUBSECTIONS),
         #     })
+
+    def unique_error_message(self, model_class, unique_check):
+        if isinstance(self, model_class) and unique_check == ('article', 'title'):
+            return _('Subsection with this title already exists in this article.')
+        return super(ArticleSubsection, self).unique_error_message(model_class, unique_check)

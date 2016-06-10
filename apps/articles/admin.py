@@ -19,7 +19,7 @@ class ArticleSubsectionInline(admin.StackedInline):
     min_num = Article.MIN_COUNT_SUBSECTIONS
     max_num = Article.MAX_COUNT_SUBSECTIONS
     fk_name = 'article'
-    # prepopulated_fields = {'slug': ['title']}
+    prepopulated_fields = {'slug': ['title']}
     fields = ['number', 'title', 'slug', 'content']
     extra = 0
     template = 'articles/stacked.html'
@@ -74,7 +74,8 @@ class ArticleAdmin(admin.ModelAdmin):
     filter_horizontal = ['tags']
     filter_vertical = ['links']
     date_hierarchy = 'date_added'
-    readonly_fields = ['status_changed', 'slug']
+    readonly_fields = ['status_changed']
+    prepopulated_fields = {'slug': ['title']}
 
     def get_queryset(self, request):
         qs = super(ArticleAdmin, self).get_queryset(request)

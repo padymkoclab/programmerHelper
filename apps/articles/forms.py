@@ -15,14 +15,13 @@ class ArticleForm(forms.ModelForm):
 
     """
 
-    # slug = forms.CharField(disabled=True)
-
     class Meta:
         model = Article
-        fields = ('tags', 'links')
-        # widgets = {
-        #     'slug': forms.TextInput(attrs={'disabled': True}),
-        # }
+        fields = ('tags', 'links', 'slug')
+
+    def __init__(self, *args, **kwargs):
+        super(ArticleForm, self).__init__(*args, **kwargs)
+        self.fields['slug'].disabled = True
 
     def clean_tags(self):
         super(ArticleForm, self).clean()
@@ -35,7 +34,7 @@ class ArticleForm(forms.ModelForm):
         return cleaned_weblinks
 
 
-class ArticleSubsectionFormset(forms.BaseInlineFormSet):
+class ArticleSubsectionFormset(forms.models.BaseInlineFormSet):
     """
 
     """
@@ -45,11 +44,13 @@ class ArticleSubsectionFormset(forms.BaseInlineFormSet):
     class Meta:
         model = ArticleSubsection
         fields = ('number', )
-        # widgets = {
-        #     'slug': forms.TextInput(attrs={'disabled': True}),
-        # }
-        widgets={'title': forms.Textarea(attrs={'cols': 80, 'rows': 20})}
+        widgets = {
+            'slug': forms.Textarea(attrs={'disabled': True}),
+        }
 
+    def add_fields(self, form, index):
+        super(ArticleSubsectionFormset, self).add_fields(form, index)
+        form.fields['slug'].disabled = True
 
     def clean(self):
         super(ArticleSubsectionFormset, self).clean()
