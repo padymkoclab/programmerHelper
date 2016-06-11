@@ -16,6 +16,7 @@ from apps.web_links.models import WebLink
 from mylabour.fields_db import ConfiguredAutoSlugField
 from mylabour.models import TimeStampedModel
 
+from .validators import NotEndingPointValidator
 from .managers import SolutionCategoryManager
 from .querysets import SolutionQuerySet, SolutionCategoryQuerySet
 from .constants import QUALITIES_DETAILS
@@ -26,7 +27,7 @@ class SolutionCategory(TimeStampedModel):
     Model for category of solution.
     """
 
-    name = models.CharField(_('name'), max_length=100, unique=True)
+    name = models.CharField(_('name'), max_length=50, unique=True, validators=[NotEndingPointValidator])
     slug = ConfiguredAutoSlugField(_('Slug'), populate_from='name', unique=True)
     description = models.TextField(_('Description'), validators=[MinLengthValidator(100)])
 
@@ -136,11 +137,13 @@ class Solution(TimeStampedModel):
     def get_quality(self):
         """Getting quality of solution on based its scope."""
 
-        return self.__class__.objects.solutions_with_determined_quality().get(pk=self.pk).quality
+        return self.__class__.objects.solutions_with_qualities().get(pk=self.pk).quality
     get_quality.short_description = _('Quality')
     get_quality.admin_order_field = 'scope'
 
     def get_detail_about_quality(self):
+        """Get detail about quality of solution, namely: name, description and color."""
+
         quality = self.get_quality()
         quality = quality.lower()
         quality_detail = QUALITIES_DETAILS[quality]
@@ -155,5 +158,3 @@ class Solution(TimeStampedModel):
         """Determination users given possitive opinions about solution."""
 
         return get_user_model().objects.filter(pk__in=self.opinions.filter(is_useful=True).values('account__pk'))
-
-    # are you sure with this solution?

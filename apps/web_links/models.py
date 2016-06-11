@@ -1,4 +1,5 @@
 
+import urllib
 import uuid
 
 from django.core.validators import MinLengthValidator
@@ -20,7 +21,7 @@ class WebLink(models.Model):
     title = models.CharField(
         _('Title'), max_length=200, unique=True, validators=[MinLengthValidator(settings.MIN_LENGTH_FOR_NAME_OR_TITLE_OBJECT)]
     )
-    web_url = models.URLField(_('Web URL'))
+    url = models.URLField(_('URL'))
 
     objects = models.Manager()
     objects = WebLinkQuerySet.as_manager()
@@ -33,3 +34,11 @@ class WebLink(models.Model):
 
     def __str__(self):
         return '{0.title}'.format(self)
+
+    def is_broken(self):
+        try:
+            urllib.request.urlopen(self.url)
+        except Exception, e:
+            raise e
+        else:
+            pass

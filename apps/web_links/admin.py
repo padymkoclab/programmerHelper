@@ -33,11 +33,11 @@ class WebLinkAdmin(admin.ModelAdmin):
 
     list_display = (
         'title',
-        'web_url',
+        'url',
         'get_count_solutions_presents',
         'get_count_articles_presents',
     )
-    search_fields = ('title', 'web_url')
+    search_fields = ('title', 'url')
     inlines = [
         SolutionInline,
         ArticleInline,
@@ -45,7 +45,7 @@ class WebLinkAdmin(admin.ModelAdmin):
     fieldsets = [
         [
             WebLink._meta.verbose_name, {
-                'fields': ['title', 'web_url']
+                'fields': ['title', 'url']
             }
         ]
     ]

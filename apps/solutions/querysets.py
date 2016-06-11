@@ -98,7 +98,7 @@ class SolutionQuerySet(models.QuerySet):
 
         return self.solutions_by_scopes(min_scope=5)
 
-    def solutions_with_determined_quality(self):
+    def solutions_with_qualities(self):
         """Determinate quality of the each solution."""
 
         solutions_with_scopes = self.solutions_with_scopes()
@@ -111,31 +111,33 @@ class SolutionQuerySet(models.QuerySet):
             output_field=models.CharField(),
         ))
 
-    def solution_with_count_tags(self):
+    def solutions_with_count_tags(self):
         """Determinate count tags on each solution and keeping it in new field."""
 
         return self.annotate(count_tags=models.Count('tags', distinct=True))
 
-    def solution_with_count_links(self):
+    def solutions_with_count_links(self):
         """Determinate count links on each solution and keeping it in new field."""
 
         return self.annotate(count_links=models.Count('links', distinct=True))
 
-    def solution_with_count_opinions(self):
+    def solutions_with_count_opinions(self):
         """Determinate count opinions on each solution and keeping it in new field."""
 
         return self.annotate(count_opinions=models.Count('opinions', distinct=True))
 
-    def solution_with_count_comments(self):
+    def solutions_with_count_comments(self):
         """Determinate count comments on each solution and keeping it in new field."""
 
         return self.annotate(count_comments=models.Count('comments', distinct=True))
 
-    def solution_with_count_tags_links_opinions_comments_quality_scopes(self):
-        # self = self.solution_with_count_tags()
-        # self = self.solution_with_count_links()
-        # self = self.solution_with_count_opinions()
-        # self = self.solution_with_count_comments()
+    def solutions_with_count_tags_links_opinions_comments_and_quality_scopes(self):
+        """Solutions with determined: count tags, count links, count opinions, count comments, qualities, scopes."""
+
+        self = self.solutions_with_count_tags()
+        self = self.solutions_with_count_links()
+        self = self.solutions_with_count_opinions()
+        self = self.solutions_with_count_comments()
         self = self.solutions_with_scopes()
-        self = self.solutions_with_determined_quality()
+        self = self.solutions_with_qualities()
         return self

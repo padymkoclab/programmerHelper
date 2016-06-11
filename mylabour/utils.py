@@ -1,4 +1,6 @@
 
+import collections
+import re
 import string
 import pprint
 import pip
@@ -7,7 +9,8 @@ import time
 import random
 import json
 
-from django.utils import timezone
+from django.template import Template, Context
+# from django.utils import timezone
 from django.db import models
 from django.core.exceptions import ImproperlyConfigured
 
@@ -166,3 +169,72 @@ def generate_text_certain_length(length):
         # set point in ending of sentence
         text += '.'
     return text
+
+
+def generate_text_by_min_length(min_length, as_p=False):
+    """Generate random text by minumim length.
+    If parameter 'as_p' is true, at that time text will be as HTML paragraph."""
+
+    # validation input
+    if not isinstance(min_length, int):
+        raise TypeError('Min length text must positive integer, not {0}'.format(type(min_length)))
+    if min_length < 1:
+        raise ValueError('Min length text must positive integer, not {0}'.format(min_length))
+    # initialization
+    method = 'p' if as_p is True else ''
+    text = str()
+    counter_iterations = 1
+    # populate text
+    while min_length > len(text):
+        pattern = '{% lorem ' + str(counter_iterations) + ' ' + method + ' random %}'
+        block_text = Template(pattern).render(Context())
+        text = '{0}\n\n{1}'.format(text, block_text)
+        counter_iterations += 1
+    # strip space by sides text
+    text = text.strip()
+    # return random text
+    return text
+
+
+def findall_words(text):
+    """Find and return words in text."""
+
+    if not isinstance(text, str):
+        raise TypeError('Must be passed string, not {0}'.format(type(text)))
+    if text:
+        # variant 1
+        chars_punctuation = re.compile('[{0}]'.format(string.punctuation))
+        text_without_punctuation = chars_punctuation.sub(' ', text)
+        variant1 = text_without_punctuation.split()
+        # variant 2
+        variant2 = re.findall(r'\b\w+\b', text)
+        # variant 3
+        variant3 = re.split(r'\W+', text)
+        if variant1 == variant2 == variant3:
+            return variant1
+        raise ArithmeticError('Ooops. Please debug code.')
+    return 0
+
+
+def count_words(text):
+    """Return count words in text."""
+
+    if not isinstance(text, str):
+        raise TypeError('Must be passed string, not {0}'.format(type(text)))
+    if text:
+        words = findall_words(text)
+        len(words)
+    return 0
+
+
+def counter_words(text, ignorecase=False):
+    """Count words in text with register and without it."""
+
+    if not isinstance(text, str):
+        raise TypeError('Must be passed string, not {0}'.format(type(text)))
+    if text:
+        words = findall_words(text)
+        if ignorecase is True:
+            words = (word.lower() for word in words)
+        return collections.Counter(words)
+    return 0

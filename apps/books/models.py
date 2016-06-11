@@ -22,13 +22,17 @@ from .querysets import BookQuerySet, WritterQuerySet
 
 NOW_YEAR = timezone.datetime.now().year
 
-
 # announs book, soon
+
 
 class Book(models.Model):
     """
     Model for books
     """
+
+    # display language name on Site Language for user
+
+    LANGUAGES = tuple((code, _(name)) for code, name in settings.LANGUAGES)
 
     id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
     name = models.CharField(
@@ -44,6 +48,7 @@ class Book(models.Model):
         help_text=_('Minimal length 100 characters.'),
     )
     picture = models.URLField(_('Picture'), max_length=1000)
+    language = models.CharField(_('Language'), max_length=25, choices=LANGUAGES)
     pages = models.PositiveSmallIntegerField(_('Count pages'), validators=[MinValueValidator(1)])
     accounts = models.ManyToManyField(
         'Writter',

@@ -88,6 +88,16 @@ class BookQuerySet(models.QuerySet):
         self = self.books_with_rating()
         return self.filter(rating__gte=5)
 
+    def books_wrote_english(self):
+        """Book wrote on english."""
+
+        return self.filter(language__iexact='en')
+
+    def books_wrote_non_english(self):
+        """Book wrote non english."""
+
+        return self.exclude(language__iexact='en')
+
 
 class WritterQuerySet(models.QuerySet):
     """
@@ -117,3 +127,6 @@ class WritterQuerySet(models.QuerySet):
             if a & accepted_range:
                 z.append(i.pk)
         return self.filter(pk__in=z)
+
+    def writters_with_avg_scope_for_books(self):
+        pass

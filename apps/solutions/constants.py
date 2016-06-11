@@ -1,6 +1,9 @@
 
+import collections
 
 from django.utils.translation import ugettext_lazy as _
+
+# Names categories for solutions by default
 
 CATEGORIES_OF_SOLUTIONS = [
     'AngularJS',
@@ -41,30 +44,35 @@ CATEGORIES_OF_SOLUTIONS = [
     'wxPython',
 ]
 
+# Details about quality of solution
 
-class Quality:
-    """
+Quality = collections.namedtuple('Quality', ['type', 'description', 'color'])
 
-    """
-
-    def __init__(self, name, description, color):
-        super().__init__()
-        self.name = name
-        self.description = description
-        self.color = color
-
-    def __str__(self):
-        return '{0.name}'.format(self)
-
-    def __repr__(self):
-        return '{0}({1})'.format(self.__class__.__name__, self)
-
-WrongQuality = Quality(name=_('Wrong'), description=_('WrongQuality'), color='darkred')
-BadQuality = Quality(name=_('Bad'), description=_('BadQuality'), color='red')
-VagueQuality = Quality(name=_('Vague'), description=_('VagueQuality'), color='black')
-GoodQuality = Quality(name=_('Good'), description=_('GoodQuality'), color='green')
-ApprovedQuality = Quality(name=_('Approved'), description=_('ApprovedQuality'), color='darkgreen')
-
+WrongQuality = Quality(
+    type=_('Wrong'),
+    description=_('Wrong quality solution, tells about what solution is have many negative opinions of users.'),
+    color='darkred'
+)
+BadQuality = Quality(
+    type=_('Bad'),
+    description=_('Bad quality solution, tells about what solution is have more negative opinions of users, than possitive.'),
+    color='red'
+)
+VagueQuality = Quality(
+    type=_('Vague'),
+    description=_('Vague quality solution, tells about what solution is have not clear definition of quality.'),
+    color='black'
+)
+GoodQuality = Quality(
+    type=_('Good'),
+    description=_('Good quality solution, tells about what solution is have more possitive opinions of users. than negative.'),
+    color='green'
+)
+ApprovedQuality = Quality(
+    type=_('Approved'),
+    description=_('Approved quality solution, tells about what solution is have many possitive opinions os users.'),
+    color='darkgreen'
+)
 
 QUALITIES_DETAILS = {
     'wrong': WrongQuality,

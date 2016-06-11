@@ -9,10 +9,13 @@ from apps.badges.factories import badges_factory
 from apps.web_links.factories import web_links_factory
 
 from apps.books.factories import WritterFactory, books_factory
-from apps.books.models import Book, Writter, NOW_YEAR
+from apps.books.models import Book, Writter
 
 
 class BookQuerySetTest(TestCase):
+    """
+    Tests for queryset of model Book.
+    """
 
     @classmethod
     def setUpTestData(cls):
@@ -85,10 +88,11 @@ class BookQuerySetTest(TestCase):
     def test_new_books(self):
         """This book published in this year or one year ago."""
 
-        new_books = Book.objects.new_books()
-        for book in Book.objects.iterator():
-            if book.year_published in [NOW_YEAR, NOW_YEAR - 1]:
-                self.assertIn(book, new_books)
+        raise Exception('')
+        # new_books = Book.objects.new_books()
+        # for book in Book.objects.iterator():
+        #     if book.year_published in [NOW_YEAR, NOW_YEAR - 1]:
+        #         self.assertIn(book, new_books)
 
     def test_giant_book(self):
 
@@ -143,10 +147,13 @@ class BookQuerySetTest(TestCase):
         #
         self.assertCountEqual(Book.objects.popular_books(), [book2, book4])
 
+    def test_english_wrote_books(self):
+        Book.objects.made
+
 
 class WritterTest(TestCase):
     """
-
+    Tests for queryset of model Writter.
     """
 
     @classmethod

@@ -30,7 +30,6 @@ class ArticleTest(TestCase):
         self.article = ArticleFactory()
 
     def test_create_article(self):
-        account = Account.objects.random_accounts(1)
         data = dict(
             title='Кому и зачем потребовалась комната чёрной материи.',
             quotation='Страха не должно быть ни перед чем!',
@@ -52,7 +51,7 @@ I decided to share it with you in this article.
 """,
             picture='http://levashov.com/foto111.jpeg',
             status=Article.STATUS_ARTICLE.published,
-            account=account,
+            account=Account.objects.random_accounts(1),
             source='http://levashov.com/komy_boitsia_net_smerti_ratibor.html',
         )
         article = Article(**data)
@@ -70,7 +69,7 @@ I decided to share it with you in this article.
         # adding comments
         for i in range(8):
             CommentFactory(content_object=article)
-        # adding comments
+        # adding scopes
         for i in range(10):
             ScopeFactory(content_object=article)
         #

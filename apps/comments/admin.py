@@ -21,6 +21,7 @@ class CommentAdmin(admin.ModelAdmin):
     '''
         Admin View for Comment
     '''
+
     list_display = ('content_object', 'account', 'content_type', 'rating', 'is_new', 'date_modified', 'date_added')
     # list_filter = ('',)
     # search_fields = ('',)

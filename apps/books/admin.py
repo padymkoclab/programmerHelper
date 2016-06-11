@@ -22,6 +22,7 @@ class BookAdmin(admin.ModelAdmin):
         'show_writters',
         'pages',
         'publishers',
+        'language',
         'isbn',
         'get_count_links',
         'get_count_tags',
@@ -31,7 +32,7 @@ class BookAdmin(admin.ModelAdmin):
         'get_size',
         'year_published',
     )
-    list_filter = ('year_published',)
+    list_filter = ('year_published', 'language')
     inlines = [
         ScopeInline,
         ReplyInline,
@@ -49,6 +50,7 @@ class BookAdmin(admin.ModelAdmin):
                     'picture',
                     'pages',
                     'year_published',
+                    'language',
                     'isbn',
                     'publishers',
                     'accounts',

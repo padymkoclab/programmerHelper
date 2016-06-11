@@ -10,7 +10,7 @@ class WebLinkFactory(factory.DjangoModelFactory):
         model = WebLink
 
     @factory.lazy_attribute
-    def web_url(self):
+    def url(self):
         url = factory.Faker('url', locale='ru').generate([])
         slug_url = factory.Faker('slug', locale='ru').generate([])
         return url + slug_url

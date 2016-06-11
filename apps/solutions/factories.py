@@ -20,6 +20,12 @@ class SolutionCategoryFactory(factory.DjangoModelFactory):
         model = SolutionCategory
 
     @factory.lazy_attribute
+    def name(self):
+        max_length = SolutionCategory._meta.get_field('name').max_length
+        random_length = random.randint(1, max_length)
+        return factory.Faker('text', locale='ru').generate([])[:random_length]
+
+    @factory.lazy_attribute
     def description(self):
         return factory.Faker('text', locale='ru').generate([])
 

@@ -4,8 +4,10 @@ from django.contrib import admin
 from django.utils.html import format_html
 
 from mylabour.admin_listfilters import LatestActivityListFilter
-# from apps.generic_models.admin import OpinionGenericInline, CommentGenericInline
+from apps.opinions.admin import OpinionInline
+from apps.comments.admin import CommentInline
 
+from .listfilters import QualityListFilter
 from .forms import SolutionCategoryForm, SolutionForm
 from .models import SolutionCategory, Solution
 
@@ -37,6 +39,7 @@ class SolutionCategoryAdmin(admin.ModelAdmin):
             }
         ]
     ]
+    prepopulated_fields = {'slug': ['name']}
     form = SolutionCategoryForm
 
     def get_queryset(self, request):
@@ -58,13 +61,13 @@ class SolutionAdmin(admin.ModelAdmin):
     list_display = (
         'title',
         'category',
+        'account',
         'get_scope',
         'colored_quality',
-        'account',
-        # 'get_count_links',
-        # 'get_count_opinions',
-        # 'get_count_comments',
-        # 'get_count_tags',
+        'get_count_links',
+        'get_count_opinions',
+        'get_count_comments',
+        'get_count_tags',
         'is_new',
         'date_modified',
         'date_added',
@@ -72,14 +75,15 @@ class SolutionAdmin(admin.ModelAdmin):
     list_filter = (
         ('category', admin.RelatedOnlyFieldListFilter),
         ('account', admin.RelatedOnlyFieldListFilter),
+        QualityListFilter,
         'date_modified',
         'date_added',
     )
     search_fields = ('title',)
     date_hierarchy = 'date_added'
     inlines = [
-        # OpinionGenericInline,
-        # CommentGenericInline,
+        OpinionInline,
+        CommentInline,
     ]
     fieldsets = [
         [
@@ -88,14 +92,14 @@ class SolutionAdmin(admin.ModelAdmin):
             }
         ],
     ]
-
     filter_horizontal = ['tags']
     filter_vertical = ['links']
+    prepopulated_fields = {'slug': ['title']}
     form = SolutionForm
 
     def get_queryset(self, request):
         qs = super(SolutionAdmin, self).get_queryset(request)
-        qs = qs.solution_with_count_tags_links_opinions_comments_quality_scopes()
+        qs = qs.solutions_with_count_tags_links_opinions_comments_and_quality_scopes()
         return qs
 
     def get_count_links(self, obj):

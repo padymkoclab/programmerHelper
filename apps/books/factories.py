@@ -18,6 +18,7 @@ class BookFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Book
 
+    language = fuzzy.FuzzyChoice(tuple(code for code, name in Book.LANGUAGES))
     pages = fuzzy.FuzzyInteger(1, 1000)
     year_published = fuzzy.FuzzyInteger(1950, NOW_YEAR)
 

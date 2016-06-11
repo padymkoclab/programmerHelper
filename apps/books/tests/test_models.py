@@ -1,4 +1,6 @@
 
+import random
+
 from django.utils import timezone
 from django.utils.text import slugify
 from django.test import TestCase
@@ -12,6 +14,7 @@ from apps.replies.factories import ReplyFactory
 from apps.scopes.factories import ScopeFactory
 from apps.tags.models import Tag
 from apps.web_links.models import WebLink
+from mylabour.utils import generate_text_by_min_length
 
 from apps.books.factories import BookFactory, WritterFactory, books_factory, writters_factory
 from apps.books.models import Book, Writter
@@ -36,13 +39,9 @@ class BookTest(TestCase):
     def test_create_book(self):
         data = dict(
             name='Книжка о программировании на Python 3',
-            description="""
-In the past, adding page transitions on web pages has been a simple process.
-As you click on the link it redirects you to the next page as the browser loads the next page or element.
-The web has started to feel outdated if you will think about and there is plenty of room to improve.
-Wouldn’t it be great to add some smooth transitions to create a more proficient user experience the next page loads?
-""",
+            description=generate_text_by_min_length(100, as_p=True),
             picture='http://transcad.com/miranda.jpeg',
+            language='ru',
             pages=140,
             publishers='O`Reilly',
             isbn='4515-4579-45478-78129-454',
@@ -67,6 +66,7 @@ Wouldn’t it be great to add some smooth transitions to create a more proficien
         self.assertEqual(book.slug, slugify(data['name'], allow_unicode=True))
         self.assertEqual(book.description, data['description'])
         self.assertEqual(book.picture, data['picture'])
+        self.assertEqual(book.language, data['language'])
         self.assertEqual(book.pages, data['pages'])
         self.assertEqual(book.publishers, data['publishers'])
         self.assertEqual(book.isbn, data['isbn'])
@@ -78,14 +78,15 @@ Wouldn’t it be great to add some smooth transitions to create a more proficien
         self.assertEqual(book.accounts.count(), 3)
 
     def test_update_book(self):
+        # choice random language
+        languages_without_already_used = filter(lambda couple: couple[0] != self.book.language, Book.LANGUAGES)
+        another_language = random.choice(tuple(languages_without_already_used))[0]
+        #
         data = dict(
             name='Книга рецептов JS с подробными объяснениями и красивым постраничными оформлением.',
-            description="""
-Yea it’s a nifty transition and great work to be honest but there is no page reload or browser reload.
-Great onepager transition though.
-Especially for something using flex-box or 100vh (full height – which you add via jQuery) this would be awesome.
-""",
+            description=generate_text_by_min_length(100, as_p=True),
             picture='http://using.com/anaconda.png',
+            language=another_language,
             pages=440,
             publishers='Express',
             isbn='785121-4512-7515-4215-784',
@@ -95,6 +96,7 @@ Especially for something using flex-box or 100vh (full height – which you add 
         book.name = data['name']
         book.description = data['description']
         book.picture = data['picture']
+        book.language = data['language']
         book.pages = data['pages']
         book.publishers = data['publishers']
         book.isbn = data['isbn']
@@ -105,6 +107,7 @@ Especially for something using flex-box or 100vh (full height – which you add 
         self.assertEqual(book.slug, slugify(data['name'], allow_unicode=True))
         self.assertEqual(book.description, data['description'])
         self.assertEqual(book.picture, data['picture'])
+        self.assertEqual(book.language, data['language'])
         self.assertEqual(book.pages, data['pages'])
         self.assertEqual(book.publishers, data['publishers'])
         self.assertEqual(book.isbn, data['isbn'])
@@ -205,14 +208,7 @@ class WritterTest(TestCase):
     def test_create_writter(self):
         data = dict(
             name='Николай Левашов',
-            about="""
-с частицей "бы" и без нее, в начале придаточного предложения с
-инфинитивом. Вместо того, чтобы (разг.). Чем на мост нам итти, поищем
-лучше
-броду. Крылов. Чем кумушек считать трудиться, не лучше ль на себя, кума,
-оборотиться. Крылов. Чем бы помочь, он еще мешает.
-  3. В сочетании с сравн.
-""",
+            about=generate_text_by_min_length(100, as_p=True),
             birthyear=1960,
             deathyear=2012,
         )
@@ -228,21 +224,7 @@ class WritterTest(TestCase):
     def test_update_writter(self):
         data = dict(
             name='Валерий Дёмин',
-            about="""
-  1. После сравн. ст. и слов со знач. сравн. ст. присоединяет тот
-член предложения, с к-рым сравнивается что-н. лучше поздно, Чем никогда.
-Пословица.
-  2. с частицей "бы" и без нее, в начале придаточного предложения с
-инфинитивом. Вместо того, чтобы (разг.). Чем на мост нам итти, поищем
-лучше
-броду. Крылов. Чем кумушек считать трудиться, не лучше ль на себя, кума,
-оборотиться. Крылов. Чем бы помочь, он еще мешает.
-  3. В сочетании с сравн.
-ст. и при союзе "тем" в другом предложении употр. в знач. в какой
-степени,
-насколько. Чем дальше, тем лучше. Чем больше он говорил, тем больше
-краснел.
-""",
+            about=generate_text_by_min_length(100, as_p=True),
             birthyear=1950,
             deathyear=2016,
         )

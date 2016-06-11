@@ -18,3 +18,6 @@ class WebLinkQuerySet(models.QuerySet):
         """ """
 
         self.annotate()
+
+    def broken_links(self):
+        pass

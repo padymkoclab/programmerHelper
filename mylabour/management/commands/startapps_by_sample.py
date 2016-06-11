@@ -63,7 +63,7 @@ class Command(BaseCommand):
             dir_for_templates.child('base.html').write_file('\n{% extends "index.html" %}\n')
             dir_for_templates.child('detail.html').write_file('\n{% extends "' + app_name + '/base.html" %}\n')
             dir_for_templates.child('list.html').write_file('\n{% extends "' + app_name + '/base.html" %}\n')
-            logger.info('Created template`s fiels!')
+            logger.info('Created template`s files!')
             # create tests files
             dir_for_tests.child('test_models.py').write_file("""
 from django.test import TestCase
@@ -105,13 +105,13 @@ from factory import fuzzy
 
 from apps.%s.querysets import *
 """ % app_name)
-            logger.info('Created test`s fiels!')
+            logger.info('Created test`s files!')
             # create static files
             dir_for_css.child(app_name + '.css').write_file("")
             dir_for_js.child(app_name + '.js').write_file("""$(function() {
 
 });""")
-            logger.info('Created static fiels!')
+            logger.info('Created static files!')
             # create working files
             app_dir.child('__init__.py').write_file('')
             app_dir.child('signals.py').write_file("""
@@ -174,5 +174,5 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.contrib import admin
 """)
-            logger.info('Created working fiels!')
+            logger.info('Created working files!')
             logger.info('Successful finished creating app "%s"!' % app_name)
