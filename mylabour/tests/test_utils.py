@@ -1,8 +1,28 @@
 
+import re
 import unittest
 import datetime
+import sys
 
+sys.path = [
+    '',
+    '/home/wlysenko/.virtualenvs/virtual_programmerHelper/project_programmerHelper',
+    '/home/wlysenko/.virtualenvs/virtual_programmerHelper/lib/python3.4',
+    '/home/wlysenko/.virtualenvs/virtual_programmerHelper/lib/python3.4/plat-x86_64-linux-gnu',
+    '/home/wlysenko/.virtualenvs/virtual_programmerHelper/lib/python3.4/lib-dynload',
+    '/usr/lib/python3.4',
+    '/usr/lib/python3.4/plat-x86_64-linux-gnu',
+    '/home/wlysenko/.virtualenvs/virtual_programmerHelper/lib/python3.4/site-packages',
+    '/home/wlysenko/.virtualenvs/virtual_programmerHelper/lib/python3.4/site-packages/IPython/extensions',
+    '/home/wlysenko/.ipython'
+]
+
+from django.conf import settings
+import django
 from mylabour import utils
+
+settings.configure()
+django.setup()
 
 
 class TestUtils_get_different_between_elements(unittest.TestCase):
@@ -70,6 +90,596 @@ class TestUtils_show_concecutive_certain_element(unittest.TestCase):
             utils.show_concecutive_certain_element(self.sequence2, element=1),
             [[1], [1], [1, 1, 1], [1, 1, 1, 1, 1], [1, 1, 1, 1, 1], [1, 1, 1]],
         )
+
+
+class GenerateTextByMinLengthTest(unittest.TestCase):
+    """
+    Test for function utils.generate_text_by_min_length.
+    """
+
+    def test_length_returned_text(self):
+        """Length generated text must be equal or more than determined."""
+
+        for i in range(1, 1000):
+            text = utils.generate_text_by_min_length(i)
+            self.assertGreaterEqual(len(text), i)
+
+    def test_text_ending(self):
+        """Text must be ending on point, question mark or exclamation mark."""
+
+        for i in range(1, 1000):
+            text = utils.generate_text_by_min_length(i)
+            self.assertIn(text[-1], ['.', '!', '?'])
+
+    def test_text_may_contains(self):
+        """Text may constains letters, space, comma, point, question mark, exclamation mark ann double break for paragraph"""
+
+        for i in range(1, 1000):
+            text = utils.generate_text_by_min_length(i)
+            # remove !,. ?, leave only letters
+            text = re.sub('[!?., \n]', '', text)
+            if not text.isalpha():
+                print(text.__repr__())
+            self.assertTrue(text.isalpha())
+
+    def test_text_contains_not_numners(self):
+        """Text must contains not numbers."""
+
+        pattern = re.compile(r'\d+')
+        for i in range(1, 1000):
+            text = utils.generate_text_by_min_length(i)
+            self.assertFalse(re.search(pattern, text))
+
+    def test_text_as_html_paragraphs(self):
+        for i in range(1, 1000):
+            text = utils.generate_text_by_min_length(i, as_p=True)
+            self.assertEqual(text[:3], '<p>')
+            self.assertEqual(text[-4:], '</p>')
+
+
+class FindAllWordsTest(unittest.TestCase):
+    """
+    Tests for method utils.findall_words
+    """
+
+    def return_if_text_if_empty(self):
+        text = ''
+        words = utils.findall_words(text)
+        self.assertEqual(words, 0)
+
+    def test_return_word_from_single_word_text(self):
+        text = 'bytes-like'
+        words = utils.findall_words(text)
+        self.assertSequenceEqual(words, ['bytes-like'])
+
+    def test_return_words_from_tiny_text(self):
+        text = 'For locally defined plug-ins I prefer to rely on explicit conftest.py declarations:'
+        words = utils.findall_words(text)
+        self.assertSequenceEqual(words, [
+            'For', 'locally', 'defined', 'plug-ins', 'I', 'prefer', 'to',
+            'rely', 'on', 'explicit', 'conftest.py', 'declarations'
+        ])
+        text = 'For example, BufferedIOBase provides unoptimized implementations of readinto() and readline().'
+        words = utils.findall_words(text)
+        self.assertSequenceEqual(words, [
+            'For', 'example', 'BufferedIOBase', 'provides', 'unoptimized', 'implementations',
+            'of', 'readinto', 'and', 'readline',
+        ])
+
+    def test_return_words_from_small_text(self):
+        text = 'Add the option to filter by a custom date range on the admin. This allows\
+        to inputs to be used to get the custom date range filters.'
+        words = utils.findall_words(text)
+        self.assertSequenceEqual(words, [
+            'Add', 'the', 'option', 'to', 'filter', 'by', 'a', 'custom', 'date',
+            'range', 'on', 'the', 'admin', 'This', 'allows', 'to', 'inputs', 'to',
+            'be', 'used', 'to', 'get', 'the', 'custom', 'date', 'range', 'filters'
+        ])
+
+    def test_return_words_from_big_text(self):
+        text = """If you want to use pytest instead of Django's test runner and also get the \
+        power of function-based tests, fixture functions, improved test discover, and all the \
+        stuff I haven't covered, then check out and/or pip install pytest-django. My admittedly \
+        brief usage on some of my existing projects has demonstrating that my existing \
+        unittest-style tests work.
+
+        That previous tests still function means that as with a pure Python project, I can rely \
+        on existing unittests and write all my new tests as functions. I guess I could say that \
+        my existing Django projects just got much easier to maintain.
+
+        A good example of using pytest with Django can be found in django-braces tox.ini file."""
+        words = utils.findall_words(text)
+        self.assertSequenceEqual(words, [
+            'If', 'you', 'want', 'to', 'use', 'pytest', 'instead', 'of', "Django's", 'test', 'runner',
+            'and', 'also', 'get', 'the', 'power', 'of', 'function-based', 'tests', 'fixture',
+            'functions', 'improved', 'test', 'discover', 'and', 'all', 'the', 'stuff', 'I', "haven't",
+            'covered', 'then', 'check', 'out', 'and', 'or', 'pip', 'install', 'pytest-django', 'My',
+            'admittedly', 'brief', 'usage', 'on', 'some', 'of', 'my', 'existing', 'projects', 'has',
+            'demonstrating', 'that', 'my', 'existing', 'unittest-style', 'tests', 'work', 'That',
+            'previous', 'tests', 'still', 'function', 'means', 'that', 'as', 'with', 'a', 'pure',
+            'Python', 'project', 'I', 'can', 'rely', 'on', 'existing', 'unittests', 'and', 'write',
+            'all', 'my', 'new', 'tests', 'as', 'functions', 'I', 'guess', 'I', 'could', 'say', 'that',
+            'my', 'existing', 'Django', 'projects', 'just', 'got', 'much', 'easier', 'to', 'maintain',
+            'A', 'good', 'example', 'of', 'using', 'pytest', 'with', 'Django', 'can', 'be', 'found',
+            'in', "django-braces", 'tox.ini', 'file'
+        ])
+
+    def test_return_words_from_vast_text(self):
+        text = """Introduction
+
+        Django is a powerful web framework that can help you get your Python application or \
+        website off the ground. Django includes a simplified development server for testing \
+        your code locally, but for anything even slightly production related, a more secure \
+        and powerful web server is required.
+
+        In this guide, we will demonstrate how to install and configure some components on \
+        Ubuntu 14.04 to support and serve Django applications. We will be setting up a \
+        PostgreSQL database instead of using the default SQLite database. We will configure \
+        the Gunicorn application server to interface with our applications. We will then set \
+        up Nginx to reverse proxy to Gunicorn, giving us access to its security and performance \
+        features to serve our apps.
+
+        Prerequisites and Goals
+
+        In order to complete this guide, you should have a fresh Ubuntu 14.04 server instance \
+        with a non-root user with sudo privileges configured. You can learn how to set this up \
+        by running through our initial server setup guide.
+
+        We will be installing Django within a virtual environment. Installing Django into an \
+        environment specific to your project will allow your projects and their requirements \
+        to be handled separately.
+
+        Once we have our database and application up and running, we will install and configure \
+        the Gunicorn application server. This will serve as an interface to our application, \
+        translating client requests in HTTP to Python calls that our application can process. \
+        We will then set up Nginx in front of Gunicorn to take advantage of its high performance \
+        connection handling mechanisms and its easy-to-implement security features.
+
+        Let's get started.
+        Since we already have a project directory, we will tell Django to install the files \
+        here. It will create a second level directory with the actual code, which is normal, \
+        and place a management script in this directory. The key to this is the dot at the \
+        end that tells Django to create the files in the current directory:
+        Change the settings with your PostgreSQL database information. We tell Django to use \
+        the psycopg2 adaptor we installed with pip. We need to give the database name, the \
+        database username, the database username's password, and then specify that the database \
+        is located on the local computer. You can leave the PORT setting as an empty string:
+        In this guide, we've set up a Django project in its own virtual environment. We've \
+        configured Gunicorn to translate client requests so that Django can handle them. \
+        Afterwards, we set up Nginx to act as a reverse proxy to handle client connections \
+        and serve the correct project depending on the client request.
+
+        Django makes creating projects and applications simple by providing many of the common \
+        pieces, allowing you to focus on the unique elements. By leveraging the general tool \
+        chain described in this article, you can easily serve the applications you create from \
+        a single serve.
+        """
+        words = utils.findall_words(text)
+        self.assertSequenceEqual(words, [
+            'Introduction', 'Django', 'is', 'a', 'powerful', 'web', 'framework', 'that', 'can',
+            'help', 'you', 'get', 'your', 'Python', 'application', 'or', 'website', 'off', 'the',
+            'ground', 'Django', 'includes', 'a', 'simplified', 'development', 'server', 'for',
+            'testing', 'your', 'code', 'locally', 'but', 'for', 'anything', 'even', 'slightly',
+            'production', 'related', 'a', 'more', 'secure', 'and', 'powerful', 'web', 'server',
+            'is', 'required', 'In', 'this', 'guide', 'we', 'will', 'demonstrate', 'how', 'to',
+            'install', 'and', 'configure', 'some', 'components', 'on', 'Ubuntu', '14.04', 'to',
+            'support', 'and', 'serve', 'Django', 'applications', 'We', 'will', 'be',
+            'setting',
+            'up',
+            'a',
+            'PostgreSQL',
+            'database',
+            'instead',
+            'of',
+            'using',
+            'the',
+            'default',
+            'SQLite',
+            'database',
+            'We',
+            'will',
+            'configure',
+            'the',
+            'Gunicorn',
+            'application',
+            'server',
+            'to',
+            'interface',
+            'with',
+            'our',
+            'applications',
+            'We',
+            'will',
+            'then',
+            'set',
+            'up',
+            'Nginx',
+            'to',
+            'reverse',
+            'proxy',
+            'to',
+            'Gunicorn',
+            'giving',
+            'us',
+            'access',
+            'to',
+            'its',
+            'security',
+            'and',
+            'performance',
+            'features',
+            'to',
+            'serve',
+            'our',
+            'apps',
+            'Prerequisites',
+            'and',
+            'Goals',
+            'In',
+            'order',
+            'to',
+            'complete',
+            'this',
+            'guide',
+            'you',
+            'should',
+            'have',
+            'a',
+            'fresh',
+            'Ubuntu',
+            '14.04',
+            'server',
+            'instance',
+            'with',
+            'a',
+            'non-root',
+            'user',
+            'with',
+            'sudo',
+            'privileges',
+            'configured',
+            'You',
+            'can',
+            'learn',
+            'how',
+            'to',
+            'set',
+            'this',
+            'up',
+            'by',
+            'running',
+            'through',
+            'our',
+            'initial',
+            'server',
+            'setup',
+            'guide',
+            'We',
+            'will',
+            'be',
+            'installing',
+            'Django',
+            'within',
+            'a',
+            'virtual',
+            'environment',
+            'Installing',
+            'Django',
+            'into',
+            'an',
+            'environment',
+            'specific',
+            'to',
+            'your',
+            'project',
+            'will',
+            'allow',
+            'your',
+            'projects',
+            'and',
+            'their',
+            'requirements',
+            'to',
+            'be',
+            'handled',
+            'separately',
+            'Once',
+            'we',
+            'have',
+            'our',
+            'database',
+            'and',
+            'application',
+            'up',
+            'and',
+            'running',
+            'we',
+            'will',
+            'install',
+            'and',
+            'configure',
+            'the',
+            'Gunicorn',
+            'application',
+            'server',
+            'This',
+            'will',
+            'serve',
+            'as',
+            'an',
+            'interface',
+            'to',
+            'our',
+            'application',
+            'translating',
+            'client',
+            'requests',
+            'in',
+            'HTTP',
+            'to',
+            'Python',
+            'calls',
+            'that',
+            'our',
+            'application',
+            'can',
+            'process',
+            'We',
+            'will',
+            'then',
+            'set',
+            'up',
+            'Nginx',
+            'in',
+            'front',
+            'of',
+            'Gunicorn',
+            'to',
+            'take',
+            'advantage',
+            'of',
+            'its',
+            'high',
+            'performance',
+            'connection',
+            'handling',
+            'mechanisms',
+            'and',
+            'its',
+            'easy-to-implement',
+            'security',
+            'features',
+            "Let's",
+            'get',
+            'started',
+            'Since',
+            'we',
+            'already',
+            'have',
+            'a',
+            'project',
+            'directory',
+            'we',
+            'will',
+            'tell',
+            'Django',
+            'to',
+            'install',
+            'the',
+            'files',
+            'here',
+            'It',
+            'will',
+            'create',
+            'a',
+            'second',
+            'level',
+            'directory',
+            'with',
+            'the',
+            'actual',
+            'code',
+            'which',
+            'is',
+            'normal',
+            'and',
+            'place',
+            'a',
+            'management',
+            'script',
+            'in',
+            'this',
+            'directory',
+            'The',
+            'key',
+            'to',
+            'this',
+            'is',
+            'the',
+            'dot',
+            'at',
+            'the',
+            'end',
+            'that',
+            'tells',
+            'Django',
+            'to',
+            'create',
+            'the',
+            'files',
+            'in',
+            'the',
+            'current',
+            'directory',
+            'Change',
+            'the',
+            'settings',
+            'with',
+            'your',
+            'PostgreSQL',
+            'database',
+            'information',
+            'We',
+            'tell',
+            'Django',
+            'to',
+            'use',
+            'the',
+            'psycopg2',
+            'adaptor',
+            'we',
+            'installed',
+            'with',
+            'pip',
+            'We',
+            'need',
+            'to',
+            'give',
+            'the',
+            'database',
+            'name',
+            'the',
+            'database',
+            'username',
+            'the',
+            'database',
+            "username's",
+            'password',
+            'and',
+            'then',
+            'specify',
+            'that',
+            'the',
+            'database',
+            'is',
+            'located',
+            'on',
+            'the',
+            'local',
+            'computer',
+            'You',
+            'can',
+            'leave',
+            'the',
+            'PORT',
+            'setting',
+            'as',
+            'an',
+            'empty',
+            'string',
+            'In',
+            'this',
+            'guide',
+            "we've",
+            'set',
+            'up',
+            'a',
+            'Django',
+            'project',
+            'in',
+            'its',
+            'own',
+            'virtual',
+            'environment',
+            "We've",
+            'configured',
+            'Gunicorn',
+            'to',
+            'translate',
+            'client',
+            'requests',
+            'so',
+            'that',
+            'Django',
+            'can',
+            'handle',
+            'them',
+            'Afterwards',
+            'we',
+            'set',
+            'up',
+            'Nginx',
+            'to',
+            'act',
+            'as',
+            'a',
+            'reverse',
+            'proxy',
+            'to',
+            'handle',
+            'client',
+            'connections',
+            'and',
+            'serve',
+            'the',
+            'correct',
+            'project',
+            'depending',
+            'on',
+            'the',
+            'client',
+            'request',
+            'Django',
+            'makes',
+            'creating',
+            'projects',
+            'and',
+            'applications',
+            'simple',
+            'by',
+            'providing',
+            'many',
+            'of',
+            'the',
+            'common',
+            'pieces',
+            'allowing',
+            'you',
+            'to',
+            'focus',
+            'on',
+            'the',
+            'unique',
+            'elements',
+            'By',
+            'leveraging',
+            'the',
+            'general',
+            'tool',
+            'chain',
+            'described',
+            'in',
+            'this',
+            'article',
+            'you',
+            'can',
+            'easily',
+            'serve',
+            'the',
+            'applications',
+            'you',
+            'create',
+            'from',
+            'a',
+            'single',
+            'serve'
+        ])
+
+    def test_return_word_in_very_polute_text(self):
+        text = '###At***the!!end @@of#a@so-called \'age&of%-%peace\' %, \
+        two$$great^^nations??of!immortals##march (against) ++``each~|| ~other.'
+        words = utils.findall_words(text)
+        self.assertSequenceEqual(words, [
+            'At', 'the', 'end', 'of', 'a', 'so-called', 'age', 'of', 'peace', 'two',
+            'great', 'nations', 'of', 'immortals', 'march', 'against', 'each', 'other',
+        ])
+
+    def test_validation_input_as_string(self):
+        self.assertRaises(TypeError, utils.findall_words, float())
+        self.assertRaises(TypeError, utils.findall_words, int())
+        self.assertRaises(TypeError, utils.findall_words, list())
+        self.assertRaises(TypeError, utils.findall_words, set())
+        utils.findall_words('')
 
 
 if __name__ == '__main__':

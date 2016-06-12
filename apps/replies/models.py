@@ -31,7 +31,7 @@ class Reply(BaseGenericModel):
         _('Disandvantages'),
         max_length=100,
         validators=[MaxCountWordsValidator(10)],
-        help_text=_('Maximum 10 words.')
+        help_text=_('Minimum 10 words.')
     )
     text_reply = models.TextField(
         _('Text of reply'),
@@ -77,4 +77,4 @@ class Reply(BaseGenericModel):
     is_new.boolean = True
 
     def get_total_scope(self):
-        raise Exception('')
+        raise NotImplementedError

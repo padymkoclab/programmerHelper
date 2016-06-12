@@ -62,6 +62,7 @@ MY_APPS = [
 
 THIRD_PARTY_APPS = [
     'django_cleanup',
+    'daterange_filter',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + MY_APPS + THIRD_PARTY_APPS

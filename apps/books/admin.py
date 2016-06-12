@@ -4,7 +4,6 @@ from django.template.defaultfilters import truncatewords
 from django.utils.translation import ugettext_lazy as _
 from django.contrib import admin
 
-from apps.scopes.admin import ScopeInline
 from apps.replies.admin import ReplyInline
 
 from .models import Book, Writter
@@ -34,7 +33,6 @@ class BookAdmin(admin.ModelAdmin):
     )
     list_filter = ('year_published', 'language')
     inlines = [
-        ScopeInline,
         ReplyInline,
     ]
     search_fields = ('name', 'publishers', 'accounts__name')
@@ -86,6 +84,8 @@ class BookAdmin(admin.ModelAdmin):
 
         return format_html_join(', ', '{0}', ((writter, ) for writter in obj.accounts.all()))
     show_writters.short_description = _('Writters')
+
+    # color styled rating
 
 
 class WritterAdmin(admin.ModelAdmin):

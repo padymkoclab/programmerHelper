@@ -1,4 +1,5 @@
 
+import unittest
 import datetime
 
 from django.test import TestCase
@@ -15,8 +16,10 @@ from apps.web_links.models import WebLink
 
 from apps.books.factories import Factory_Book, Factory_Writter, factory_books
 from apps.books.models import Book, Writter
+from mylabour.utils import has_connect_to_internet
 
 
+@unittest.skipIf(has_connect_to_internet(), 'Problem with connect to internet.')
 class BookTestCase(TestCase):
 
     @classmethod

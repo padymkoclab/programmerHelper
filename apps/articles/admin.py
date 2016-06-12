@@ -20,7 +20,7 @@ class ArticleSubsectionInline(admin.StackedInline):
     max_num = Article.MAX_COUNT_SUBSECTIONS
     fk_name = 'article'
     prepopulated_fields = {'slug': ['title']}
-    fields = ['number', 'title', 'slug', 'content']
+    fields = ['title', 'slug', 'content']
     extra = 0
     template = 'articles/stacked.html'
 
@@ -113,7 +113,7 @@ class ArticleSubsectionAdmin(admin.ModelAdmin):
         Admin View for ArticleSubsection
     '''
 
-    list_display = ('article', 'number', 'title', 'date_modified', 'date_added')
+    list_display = ('article', 'title', 'date_modified', 'date_added')
     list_filter = (
         ('article', admin.RelatedOnlyFieldListFilter),
         'date_modified',
@@ -125,7 +125,7 @@ class ArticleSubsectionAdmin(admin.ModelAdmin):
     fieldsets = [
         [
             ArticleSubsection._meta.verbose_name, {
-                'fields': ['article', 'number', 'title', 'slug', 'content'],
+                'fields': ['article', 'title', 'slug', 'content'],
             }
         ]
     ]

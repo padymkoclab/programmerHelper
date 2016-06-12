@@ -1,4 +1,5 @@
 
+import urllib
 import collections
 import re
 import string
@@ -188,31 +189,40 @@ def generate_text_by_min_length(min_length, as_p=False):
     while min_length > len(text):
         pattern = '{% lorem ' + str(counter_iterations) + ' ' + method + ' random %}'
         block_text = Template(pattern).render(Context())
-        text = '{0}\n\n{1}'.format(text, block_text)
+        text = '{0}\n\n{1}'.format(text, block_text).strip()
         counter_iterations += 1
-    # strip space by sides text
-    text = text.strip()
-    # return random text
     return text
 
 
 def findall_words(text):
-    """Find and return words in text."""
+    """
+
+    Find and return words in text.
+    >>> 1 + 1
+    2
+    >>>
+
+    """
 
     if not isinstance(text, str):
         raise TypeError('Must be passed string, not {0}'.format(type(text)))
     if text:
-        # variant 1
-        chars_punctuation = re.compile('[{0}]'.format(string.punctuation))
-        text_without_punctuation = chars_punctuation.sub(' ', text)
-        variant1 = text_without_punctuation.split()
-        # variant 2
-        variant2 = re.findall(r'\b\w+\b', text)
-        # variant 3
-        variant3 = re.split(r'\W+', text)
-        if variant1 == variant2 == variant3:
-            return variant1
-        raise ArithmeticError('Ooops. Please debug code.')
+        # complile basic chars of punctuation for removing it from string
+        basic_chars_punctuation = re.compile('[{0}]'.format('!"#$%&\()*+,/:;<=>?@[\\]^_`{|}~'))
+        # clean basic chars of punctuation from text
+        text = basic_chars_punctuation.sub(' ', text)
+        # remove ending point (in sentence)
+        text = re.sub(r' *\. *$', '', text)
+        # remove point in endgin nested sentence, if it have
+        # or remove point in sentence break as paragraph
+        text = re.sub(r'(\. )|(\.\n)', ' ', text)
+        # remove char ' on sides words
+        text = re.sub(r'(\' )|( \')', ' ', text)
+        # remove dash
+        text = re.sub(r'\W-\W', ' ', text)
+        # getting words by split string and return it
+        words = text.split()
+        return words
     return 0
 
 
@@ -238,3 +248,20 @@ def counter_words(text, ignorecase=False):
             words = (word.lower() for word in words)
         return collections.Counter(words)
     return 0
+
+
+def has_connect_to_internet():
+    """Checkup connect to interner."""
+
+    try:
+        urllib.request.urlopen('https://www.google.com')
+    except urllib.error.URLError:
+        return False
+    else:
+        return True
+
+
+def genarete_words_separated_commas(count_words):
+    """Generate words separated commas by passed count needed words."""
+
+    raise NotImplementedError

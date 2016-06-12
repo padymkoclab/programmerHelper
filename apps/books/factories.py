@@ -9,6 +9,7 @@ from factory import fuzzy
 
 from apps.replies.factories import ReplyFactory
 from apps.scopes.factories import ScopeFactory
+from mylabour.utils import generate_text_by_min_length
 
 from .models import *
 
@@ -39,7 +40,7 @@ class BookFactory(factory.django.DjangoModelFactory):
 
     @factory.lazy_attribute
     def description(self):
-        return factory.Faker('text', locale='ru').generate([]) + factory.Faker('text', locale='ru').generate([])
+        return generate_text_by_min_length(100, as_p=True)
 
     @factory.lazy_attribute
     def isbn(self):
@@ -86,7 +87,7 @@ class WritterFactory(factory.django.DjangoModelFactory):
 
     @factory.lazy_attribute
     def about(self):
-        return factory.Faker('text', locale='ru').generate([]) + factory.Faker('text', locale='ru').generate([])
+        return generate_text_by_min_length(150, as_p=True)
 
     @factory.lazy_attribute
     def birthyear(self):

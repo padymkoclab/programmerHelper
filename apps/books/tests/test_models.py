@@ -1,4 +1,5 @@
 
+import unittest
 import random
 
 from django.utils import timezone
@@ -24,6 +25,9 @@ NOW_YEAR = timezone.datetime.now().year
 
 
 class BookTest(TestCase):
+    """
+    Test for model Book
+    """
 
     @classmethod
     def setUpTestData(cls):
@@ -182,16 +186,18 @@ class BookTest(TestCase):
         self.book.save()
         self.assertEqual(self.book.get_size(), 'Tiny book')
 
+    @unittest.skip('Have not idea how it made.')
     def test_tags_restrict(self):
         pass
 
+    @unittest.skip('Have not idea how it made.')
     def test_links_restrict(self):
         pass
 
 
 class WritterTest(TestCase):
     """
-
+    Test for model Writter
     """
 
     @classmethod
@@ -244,7 +250,7 @@ class WritterTest(TestCase):
         self.writter.delete()
 
     def test_unique_slug(self):
-        same_name = 'русский Омар Хайам'
+        same_name = 'русский Омар Хайам ибн Рахман Дулиб али Алькуманди Парандреус Кавказинидзе Агипян Младший'
         same_name_as_lower = same_name.lower()
         same_name_as_upper = same_name.upper()
         same_name_as_title = same_name.title()
@@ -323,18 +329,21 @@ class WritterTest(TestCase):
         self.assertRaisesMessage(
             ValidationError, 'Very big range between year of birth and year of death.', self.writter.full_clean
         )
-        self.writter.birthyear = 1860
+        self.writter.birthyear = 1900
         self.writter.deathyear = 2015
         self.assertRaisesMessage(
             ValidationError, 'Very big range between year of birth and year of death.', self.writter.full_clean
         )
-        self.writter.birthyear = 1830
+        self.writter.birthyear = 1889
         self.writter.deathyear = 2005
         self.assertRaisesMessage(
             ValidationError, 'Very big range between year of birth and year of death.', self.writter.full_clean
         )
-        self.writter.birthyear = 1850
+        self.writter.birthyear = 1890
         self.writter.deathyear = 2000
+        self.writter.full_clean()
+        self.writter.birthyear = 1905
+        self.writter.deathyear = 2015
         self.writter.full_clean()
 
     def test_if_very_young_writter(self):
@@ -348,3 +357,28 @@ class WritterTest(TestCase):
         self.assertRaisesMessage(ValidationError, 'Writter not possible born so early.', self.writter.full_clean)
         self.writter.birthyear = NOW_YEAR - 20
         self.writter.full_clean()
+
+    def test_get_age_of_writter(self):
+        writter1 = WritterFactory(birthyear=1950, deathyear=2013)
+        writter2 = WritterFactory(birthyear=1877, deathyear=1928)
+        writter3 = WritterFactory(birthyear=1990, deathyear=None)
+        writter4 = WritterFactory(birthyear=None, deathyear=None)
+        writter5 = WritterFactory(birthyear=None, deathyear=2016)
+        writter6 = WritterFactory(birthyear=1977, deathyear=2000)
+        #
+        self.assertEqual(writter1.get_age(), 63)
+        self.assertEqual(writter2.get_age(), 51)
+        self.assertIsNone(writter3.get_age())
+        self.assertIsNone(writter4.get_age())
+        self.assertIsNone(writter5.get_age())
+        self.assertEqual(writter6.get_age(), 23)
+
+    def test_get_avg_scope_for_books(self):
+        # without books
+        self.writter.books.filter().delete()
+        self.assertEqual(self.writter.get_avg_scope_for_books(), 0)
+        # with single book
+        book = BookFactory()
+        # book.
+        self.writter.books.set()
+        # with many books

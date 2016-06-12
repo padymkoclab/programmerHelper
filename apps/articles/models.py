@@ -123,35 +123,17 @@ class ArticleSubsection(TimeStampedModel):
         validators=[MinLengthValidator(settings.MIN_LENGTH_FOR_NAME_OR_TITLE_OBJECT)],
     )
     slug = ConfiguredAutoSlugField(_('Slug'), populate_from='title', unique_with=['article'])
-    number = models.PositiveSmallIntegerField(_('Number'), validators=[MinValueValidator(1)])
     content = models.TextField(_('Content'), validators=[MinLengthValidator(100)])
 
     class Meta:
         db_table = 'articles_subsections'
         verbose_name = _("Subsection")
         verbose_name_plural = _("Subsections")
-        ordering = ['article', 'number']
+        ordering = ['article']
         unique_together = ['article', 'title']
 
     def __str__(self):
         return '{0.title}'.format(self)
-
-    def clean(self):
-        # unique number of subsection for article
-        if hasattr(self, 'article'):
-            all_subsections = self.article.subsections
-            if hasattr(self, 'pk'):
-                all_subsections = all_subsections.exclude(pk=self.pk)
-            if self.number in all_subsections.values_list('number', flat=True):
-                raise ValidationError({
-                    '__all__': _('Subsection with this number already exists.')
-                })
-        # adding count subsections
-        # count_subsections_now = self.article.subsections.count() if  else self.article.subsections.count() + 1
-        # if count_subsections_now > Article.MAX_COUNT_SUBSECTIONS:
-        #     raise ValidationError({
-        #         '__all__': _('Single article must be have no more than {0} subsections.').format(Article.MAX_COUNT_SUBSECTIONS),
-        #     })
 
     def unique_error_message(self, model_class, unique_check):
         if isinstance(self, model_class) and unique_check == ('article', 'title'):

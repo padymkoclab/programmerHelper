@@ -10,6 +10,8 @@ from factory import fuzzy
 from apps.comments.factories import CommentFactory
 from apps.scopes.factories import ScopeFactory
 
+from mylabour.utils import generate_text_by_min_length
+
 from .models import *
 
 Accounts = get_user_model().objects.all()
@@ -91,18 +93,8 @@ class ArticleSubsectionFactory(factory.DjangoModelFactory):
         return factory.Faker('text', locale='ru').generate([])[:length_of_title_subsection_of_article]
 
     @factory.lazy_attribute
-    def number(self):
-        using_numbers = self.article.subsections.values_list('number', flat=True)
-        if not using_numbers:
-            return 1
-        return max(using_numbers) + 1
-
-    @factory.lazy_attribute
     def content(self):
-        random_text = factory.Faker('text', locale='ru').generate([])
-        if len(random_text) < 100:
-            random_text = random_text * 2
-        return random_text
+        return generate_text_by_min_length(100, as_p=True)
 
 
 def articles_factory(count):

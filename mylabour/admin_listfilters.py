@@ -3,6 +3,8 @@ from django.utils.translation import ugettext_lazy as _
 from django.contrib import admin
 from django.utils import timezone
 
+from dateutil.relativedelta import relativedelta
+
 
 class ListFilterLastLogin(admin.SimpleListFilter):
     """

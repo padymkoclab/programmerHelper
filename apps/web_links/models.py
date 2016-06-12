@@ -38,7 +38,7 @@ class WebLink(models.Model):
     def is_broken(self):
         try:
             urllib.request.urlopen(self.url)
-        except Exception, e:
-            raise e
-        else:
-            pass
+        except urllib.error.HTTPError:
+            return False
+        except urllib.error.URLError:
+            raise Exception('Ploblems with access to internet.')

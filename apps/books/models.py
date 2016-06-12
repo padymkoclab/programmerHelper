@@ -16,7 +16,7 @@ from apps.replies.models import Reply
 from apps.tags.models import Tag
 from apps.web_links.models import WebLink
 
-from .managers import BookManager
+from .managers import BookManager, WritterManager
 from .querysets import BookQuerySet, WritterQuerySet
 
 
@@ -83,7 +83,6 @@ class Book(models.Model):
         verbose_name=_('Where downloads'),
         help_text=_('Weblinks where can download this book.')
     )
-    scopes = GenericRelation(Scope, related_query_name='books')
     replies = GenericRelation(Reply, related_query_name='books')
 
     # managers
@@ -125,6 +124,10 @@ class Book(models.Model):
     get_size.admin_order_field = 'pages'
     get_size.short_description = _('Size')
 
+#
+# ages = IntegerRangeField()
+#
+
 
 class Writter(models.Model):
     """
@@ -137,7 +140,7 @@ class Writter(models.Model):
         max_length=200,
         validators=[MinLengthValidator(settings.MIN_LENGTH_FOR_NAME_OR_TITLE_OBJECT)],
         unique=True,
-        error_messages={'unique': _('The such writter already exists.')}
+        error_messages={'unique': _('The such writter already is here.')}
     )
     slug = ConfiguredAutoSlugField(_('Slug'), populate_from='name', unique=True)
     #
@@ -171,7 +174,7 @@ class Writter(models.Model):
         ordering = ['name']
 
     objects = models.Manager()
-    objects = WritterQuerySet.as_manager()
+    objects = WritterManager.from_queryset(WritterQuerySet)()
 
     def __str__(self):
         return '{0.name}'.format(self)
@@ -189,7 +192,7 @@ class Writter(models.Model):
                 raise ValidationError({
                     '__all__': [_('Very small range between year of birth and year of death.')]
                 })
-            if self.get_age() > 150:
+            if self.get_age() > 110:
                 raise ValidationError({
                     '__all__': [_('Very big range between year of birth and year of death.')]
                 })
@@ -200,8 +203,12 @@ class Writter(models.Model):
                 })
 
     def get_age(self):
-        """Gettting age writter if it is possible."""
+        """Getting age writter if it is possible."""
 
         if self.birthyear and self.deathyear:
             return self.deathyear - self.birthyear
-        return False
+        return None
+
+    def get_avg_scope_for_books(self):
+        raise NotImplementedError
+        # self.books.

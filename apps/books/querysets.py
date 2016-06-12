@@ -31,6 +31,8 @@ class BookQuerySet(models.QuerySet):
     def books_with_rating(self):
         """Queryset with rating of each the book."""
 
+        raise NotImplementedError
+
         self = self.annotate(rating=models.Avg('scopes__scope'))
         self = self.annotate(rating=models.functions.Coalesce('rating', .0))
         self = self.annotate(rating=Round('rating'))
@@ -101,7 +103,7 @@ class BookQuerySet(models.QuerySet):
 
 class WritterQuerySet(models.QuerySet):
     """
-
+    Queryset for writters
     """
 
     def writters_with_count_books(self):
@@ -112,21 +114,9 @@ class WritterQuerySet(models.QuerySet):
         )
 
     def living_writters(self):
-        return self.filter(deathyear__isnull=True)
+        """Writter living now, age what not possibly more than 110 years."""
 
-    def writters_lived_in_range_years(self, start_year, end_year=NOW_YEAR):
-        """Find writter lived in certain range years."""
+        return self.filter(deathyear__isnull=True, birthyear__gte=NOW_YEAR - 110)
 
-        z = []
-        accepted_range = frozenset(range(start_year, end_year + 1))
-        for i in self.iterator():
-            q = i.deathyear
-            if q is None:
-                q = NOW_YEAR
-            a = frozenset(range(i.birthyear, q + 1))
-            if a & accepted_range:
-                z.append(i.pk)
-        return self.filter(pk__in=z)
-
-    def writters_with_avg_scope_for_books(self):
-        pass
+    def writters_with_avg_rating_for_books(self):
+        raise NotImplementedError

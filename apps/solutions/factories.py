@@ -69,6 +69,18 @@ class SolutionFactory(factory.DjangoModelFactory):
         for i in range(random.randint(0, 5)):
             OpinionFactory(content_object=self)
 
+    @factory.post_generation
+    def date_added(self, created, extracted, **kwargs):
+        self.date_added = fuzzy.FuzzyDateTime(self.account.date_joined).fuzz()
+        self.save()
+        assert self.date_added >= self.account.date_joined
+
+    @factory.post_generation
+    def date_modified(self, created, extracted, **kwargs):
+        self.date_modified = fuzzy.FuzzyDateTime(self.date_added).fuzz()
+        self.save()
+        assert self.date_modified >= self.date_added
+
 
 def solutions_categories_factory():
     SolutionCategory.objects.filter().delete()
@@ -82,7 +94,3 @@ def solutions_factory(count_solutions):
         solutions_categories_factory()
     for i in range(count_solutions):
         SolutionFactory()
-
-
-def categories_of_solutions_and_solutions_factory(count_solutions):
-    factory_solutions(count_solutions)
