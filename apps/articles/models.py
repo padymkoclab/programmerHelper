@@ -1,8 +1,8 @@
 
-from django.core.exceptions import ValidationError
+# from django.core.exceptions import ValidationError
 from django.contrib.contenttypes.fields import GenericRelation
 from django.core.urlresolvers import reverse
-from django.core.validators import MinLengthValidator, MinValueValidator
+from django.core.validators import MinLengthValidator
 from django.utils.translation import ugettext_lazy as _
 from django.db import models
 from django.conf import settings
@@ -41,15 +41,15 @@ class Article(TimeStampedModel):
     slug = ConfiguredAutoSlugField(_('Slug'), populate_from='title', unique_with=['account'])
     quotation = models.CharField(_('Quotation'), max_length=200, validators=[MinLengthValidator(10)])
     picture = models.URLField(_('Picture'), max_length=1000)
-    header = models.TextField(_('Header'), validators=[MinCountWordsValidator(5)])
-    conclusion = models.TextField(_('Conclusion'), validators=[MinCountWordsValidator(5)])
+    header = models.TextField(_('Header'), validators=[MinCountWordsValidator(10)])
+    conclusion = models.TextField(_('Conclusion'), validators=[MinCountWordsValidator(10)])
     status = StatusField(verbose_name=_('Status'), choices_name='STATUS_ARTICLE', default=STATUS_ARTICLE.draft)
     status_changed = MonitorField(monitor='status', verbose_name=_('Status changed'))
     account = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         verbose_name=_('Author'),
         related_name='articles',
-        limit_choices_to={'is_active': True},
+        # limit_choices_to={'is_active': True},
         on_delete=models.CASCADE,
     )
     source = models.URLField(

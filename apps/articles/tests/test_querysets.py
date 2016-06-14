@@ -18,7 +18,7 @@ from apps.articles.models import Article
 
 class ArticleQuerySetTest(TestCase):
     """
-
+    Tests for queryset of articles.
     """
 
     @classmethod
@@ -26,7 +26,7 @@ class ArticleQuerySetTest(TestCase):
         tags_factory(15)
         web_links_factory(15)
         badges_factory()
-        accounts_factory(15, True)
+        accounts_factory(15)
 
     def setUp(self):
         articles_factory(10)
@@ -64,28 +64,28 @@ class ArticleQuerySetTest(TestCase):
         article2.subsections.filter().delete()
         article3.subsections.filter().delete()
         #
-        article1.header = generate_text_certain_length(645)
-        ArticleSubsectionFactory(article=article1, number=1, title='Virtualenv', content=generate_text_certain_length(841))
-        ArticleSubsectionFactory(article=article1, number=2, title='Virtualwrapper', content=generate_text_certain_length(751))
-        article1.conclusion = generate_text_certain_length(554)
+        article1.header = generate_text_certain_length(110)
+        ArticleSubsectionFactory(article=article1, title='Virtualenv', content=generate_text_certain_length(841))
+        ArticleSubsectionFactory(article=article1, title='Virtualwrapper', content=generate_text_certain_length(751))
+        article1.conclusion = generate_text_certain_length(110)
         article1.full_clean()
         article1.save()
         #
-        article2.header = generate_text_certain_length(389)
-        ArticleSubsectionFactory(article=article2, number=1, title='Vagrant', content=generate_text_certain_length(789))
-        article2.conclusion = generate_text_certain_length(287)
+        article2.header = generate_text_certain_length(110)
+        ArticleSubsectionFactory(article=article2, title='Vagrant', content=generate_text_certain_length(789))
+        article2.conclusion = generate_text_certain_length(110)
         article2.full_clean()
         article2.save()
         #
-        article3.header = generate_text_certain_length(897)
-        article3.conclusion = generate_text_certain_length(714)
+        article3.header = generate_text_certain_length(110)
+        article3.conclusion = generate_text_certain_length(110)
         article3.full_clean()
         article3.save()
         #
         articles_with_volume = Article.objects.articles_with_volume()
-        self.assertEqual(articles_with_volume.get(pk=article1.pk).volume, 2791)
-        self.assertEqual(articles_with_volume.get(pk=article2.pk).volume, 1465)
-        self.assertEqual(articles_with_volume.get(pk=article3.pk).volume, 1611)
+        self.assertEqual(articles_with_volume.get(pk=article1.pk).volume, 1812)
+        self.assertEqual(articles_with_volume.get(pk=article2.pk).volume, 1009)
+        self.assertEqual(articles_with_volume.get(pk=article3.pk).volume, 220)
 
     def test_articles_with_count_comments(self):
         for article in Article.objects.iterator():
@@ -401,8 +401,6 @@ class ArticleQuerySetTest(TestCase):
         self.assertEqual(Article.objects.own_articles().count(), 5)
 
     def test_hot_articles(self):
-        """Test what each article with count comments 7 and more enters in categories "Hot" articles."""
-
         for article in Article.objects.iterator():
             article.comments.clear()
         self.assertEqual(Article.objects.hot_articles().count(), 0)
@@ -412,8 +410,7 @@ class ArticleQuerySetTest(TestCase):
         self.assertCountEqual(Article.objects.hot_articles(), Article.objects.all()[::-1][:3])
 
     def test_popular_articles(self):
-        """Test what each article with rating 5 and more consider as popular."""
-
+        #
         for article in Article.objects.iterator():
             article.scopes.clear()
         self.assertEqual(Article.objects.popular_articles().count(), 0)
@@ -468,9 +465,10 @@ class ArticleQuerySetTest(TestCase):
         )
 
     def test_articles_by_rating(self):
-
+        #
         for article in Article.objects.iterator():
             article.scopes.clear()
+        #
         article1, article2, article3, article4, article5, article6, article7 = Article.objects.all()[:7]
         Article.objects.exclude(pk__in=Article.objects.values('pk')[:7]).delete()
         # 3
@@ -540,32 +538,86 @@ class ArticleQuerySetTest(TestCase):
         self.assertCountEqual(Article.objects.articles_by_rating(1.8, 1.9), [])
 
     def test_big_articles(self):
+        # for test need strict 15 articles
+        articles_factory(15)
+        assert Article.objects.count() == 15
+        # reset values
         for article in Article.objects.iterator():
             article.subsections.filter().delete()
-            article.header = 'This is simple article about Python and JS.'
-            article.conclusion = 'I decided what Python and JS is neccesary for each web-developer.'
+            article.header = 'This article about JS, C, C+, C#, SEO, Ruby, Java.'  # len is 50
+            article.conclusion = 'Learning Java, JS, CSS, Git, HTML, SEO, C, C+, C#.'  # len is 50
             article.full_clean()
             article.save()
-        article1, article2, article3, article4, article5 = Article.objects.all()[:5]
         self.assertEqual(Article.objects.big_articles().count(), 0)
-        #
-        article1.header = generate_text_certain_length(10000)
+        # get all artiles
+        article1, article2, article3, article4, article5, \
+            article6, article7, article8, article9, article10, \
+            article11, article12, article13, article14, article15 = Article.objects.all()
+        # + 50 conclusion = 10 000
+        article1.header = generate_text_certain_length(9950)
         article1.full_clean()
         article1.save()
-        self.assertCountEqual(Article.objects.big_articles(), [article1])
-        #
-        article2.conclusion = generate_text_certain_length(10000)
+        # + 50 conclusion = 9 999
+        article2.header = generate_text_certain_length(9949)
         article2.full_clean()
         article2.save()
-        self.assertCountEqual(Article.objects.big_articles(), [article1, article2])
+        # + 50 header = 10 000
+        article3.conclusion = generate_text_certain_length(9950)
+        article3.full_clean()
+        article3.save()
+        # + 50 header = 9 999
+        article4.conclusion = generate_text_certain_length(9949)
+        article4.full_clean()
+        article4.save()
+        # + 50 header and + 50 conclusion = 10 000
+        ArticleSubsectionFactory(article=article5, content=generate_text_certain_length(9900))
+        # + 50 header and + 50 conclusion = 10 000
+        ArticleSubsectionFactory(article=article6, content=generate_text_certain_length(3000))
+        ArticleSubsectionFactory(article=article6, content=generate_text_certain_length(2950))
+        ArticleSubsectionFactory(article=article6, content=generate_text_certain_length(3950))
+        # # + 50 header and + 50 conclusion = 9 999
+        ArticleSubsectionFactory(article=article7, content=generate_text_certain_length(9899))
+        # + 50 header and + 50 conclusion = 9 999
+        ArticleSubsectionFactory(article=article8, content=generate_text_certain_length(6566))
+        ArticleSubsectionFactory(article=article8, content=generate_text_certain_length(3333))
+        # + 50 header = 10 000
+        article9.conclusion = generate_text_certain_length(4950)
+        article9.full_clean()
+        article9.save()
+        ArticleSubsectionFactory(article=article9, content=generate_text_certain_length(5000))
+        # + 50 header = 9 999
+        article10.conclusion = generate_text_certain_length(4949)
+        article10.full_clean()
+        article10.save()
+        ArticleSubsectionFactory(article=article10, content=generate_text_certain_length(5000))
+        # + 50 conclusion = 10 000
+        article11.header = generate_text_certain_length(2000)
+        article11.full_clean()
+        article11.save()
+        ArticleSubsectionFactory(article=article11, content=generate_text_certain_length(7950))
+        # + 50 conclusion = 9 999
+        article12.header = generate_text_certain_length(9000)
+        article12.full_clean()
+        article12.save()
+        ArticleSubsectionFactory(article=article12, content=generate_text_certain_length(949))
+        # 10 000
+        article13.header = generate_text_certain_length(1000)
+        article13.conclusion = generate_text_certain_length(4000)
+        article13.full_clean()
+        article13.save()
+        ArticleSubsectionFactory(article=article13, content=generate_text_certain_length(5000))
+        # 9 999
+        article14.header = generate_text_certain_length(8000)
+        article14.conclusion = generate_text_certain_length(1000)
+        article14.full_clean()
+        article14.save()
+        ArticleSubsectionFactory(article=article14, content=generate_text_certain_length(999))
+        # 9 999
+        article15.header = generate_text_certain_length(499)
+        article15.conclusion = generate_text_certain_length(4000)
+        article15.full_clean()
+        article15.save()
+        ArticleSubsectionFactory(article=article15, content=generate_text_certain_length(5500))
         #
-        ArticleSubsectionFactory(article=article3, content=generate_text_certain_length(10000))
-        self.assertCountEqual(Article.objects.big_articles(), [article1, article2, article3])
-        #
-        ArticleSubsectionFactory(article=article4, content=generate_text_certain_length(3000))
-        ArticleSubsectionFactory(article=article4, content=generate_text_certain_length(3000))
-        ArticleSubsectionFactory(article=article4, content=generate_text_certain_length(4000))
-        self.assertCountEqual(Article.objects.big_articles(), [article1, article2, article3, article4])
-        #
-        ArticleSubsectionFactory(article=article5, content=generate_text_certain_length(9000))
-        self.assertCountEqual(Article.objects.big_articles(), [article1, article2, article3, article4])
+        self.assertCountEqual(Article.objects.big_articles(), [
+            article1, article3, article5, article6, article9, article11, article13])

@@ -21,8 +21,10 @@ from .querysets import SnippetQuerySet
 
 class Snippet(TimeStampedModel):
     """
-
+    Model for snippet.
     """
+
+    CHOICES_LEXERS = CHOICES_LEXERS
 
     title = models.CharField(
         _('Title'), max_length=200, unique=True, validators=[MinLengthValidator(settings.MIN_LENGTH_FOR_NAME_OR_TITLE_OBJECT)]

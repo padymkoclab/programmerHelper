@@ -140,13 +140,38 @@ def get_paths_all_nested_files(path, show=False):
     return all_paths
 
 
+def generate_text_by_min_length(min_length, as_p=False):
+    """Generate random text by minumim length.
+    If parameter 'as_p' is true, at that time text will be as HTML paragraph."""
+
+    # validation input
+    if not isinstance(min_length, int):
+        raise TypeError('Min length text must positive integer, not {0}'.format(type(min_length)))
+    if min_length < 1:
+        raise ValueError('Min length text must positive integer, not {0}'.format(min_length))
+    # initialization
+    method = 'p' if as_p is True else ''
+    text = str()
+    counter_iterations = 1
+    # populate text
+    while min_length > len(text):
+        pattern = '{% lorem ' + str(counter_iterations) + ' ' + method + ' random %}'
+        block_text = Template(pattern).render(Context())
+        text = '{0}\n\n{1}'.format(text, block_text).strip()
+        counter_iterations += 1
+    return text
+
+
 def generate_text_certain_length(length, locale='en'):
     """Generate text certain length with full-featured sentences."""
 
     # generate random text
-    text = factory.Faker('text', locale=locale).generate([])
+    text = generate_text_by_min_length(length)
+    assert len(text) >= length
+    if len(text) == length:
+        return text
     # make text approximate certain length
-    while len(text) <= length:
+    while len(text) < length:
         text = text + ' ' + factory.Faker('text', locale=locale).generate([])
     # made full-fetured ending text for last sentence
     if len(text) != length:
@@ -167,30 +192,10 @@ def generate_text_certain_length(length, locale='en'):
         # replace last point (if is) on character
         if text[-1] == '.':
             text = text[:-1] + random.choice(string.ascii_lowercase)
-        # set point in ending of sentence
-        text += '.'
-    return text
-
-
-def generate_text_by_min_length(min_length, as_p=False):
-    """Generate random text by minumim length.
-    If parameter 'as_p' is true, at that time text will be as HTML paragraph."""
-
-    # validation input
-    if not isinstance(min_length, int):
-        raise TypeError('Min length text must positive integer, not {0}'.format(type(min_length)))
-    if min_length < 1:
-        raise ValueError('Min length text must positive integer, not {0}'.format(min_length))
-    # initialization
-    method = 'p' if as_p is True else ''
-    text = str()
-    counter_iterations = 1
-    # populate text
-    while min_length > len(text):
-        pattern = '{% lorem ' + str(counter_iterations) + ' ' + method + ' random %}'
-        block_text = Template(pattern).render(Context())
-        text = '{0}\n\n{1}'.format(text, block_text).strip()
-        counter_iterations += 1
+    if len(text) == length:
+        text = text[:-1]
+    # set point in ending of sentence
+    text += '.'
     return text
 
 

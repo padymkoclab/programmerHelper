@@ -11,7 +11,7 @@ from mylabour.models import BaseGenericModel
 
 class Scope(BaseGenericModel):
     """
-
+    Model for keeping scope of other objects.
     """
 
     MIN_SCOPE = 1

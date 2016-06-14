@@ -21,12 +21,7 @@ class ScopeFactory(factory.DjangoModelFactory):
     @factory.lazy_attribute
     def account(self):
         users_already_given_their_scopes = self.content_object.scopes.values('account')
-        if hasattr(self.content_object, 'account'):
-            authors_labour_pk = [self.content_object.account.pk]
-        elif hasattr(self.content_object, 'accounts'):
-            authors_labour_pk = self.content_object.accounts.values('pk')
-        else:
-            raise AttributeError('Object doesn`t have attribute \'account\' or \'accounts\'')
+        authors_labour_pk = [self.content_object.account.pk]
         users_given_not_scope_yet = get_user_model().objects.exclude(pk__in=users_already_given_their_scopes)
         users_given_not_scope_yet_and_no_authors = users_given_not_scope_yet.exclude(pk__in=authors_labour_pk)
         if not users_given_not_scope_yet_and_no_authors.count():

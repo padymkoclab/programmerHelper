@@ -1,5 +1,4 @@
 
-from django.core.exceptions import ValidationError
 from django.utils.text import slugify
 from django.test import TestCase
 
@@ -12,13 +11,16 @@ from apps.comments.factories import CommentFactory
 from apps.scopes.factories import ScopeFactory
 from apps.tags.models import Tag
 from apps.web_links.models import WebLink
-from mylabour.utils import generate_text_by_min_length
+from mylabour.utils import generate_text_by_min_length, generate_text_certain_length
 
 from apps.articles.factories import ArticleFactory, ArticleSubsectionFactory
 from apps.articles.models import Article, ArticleSubsection
 
 
 class ArticleTest(TestCase):
+    """
+    Tests for articles.
+    """
 
     @classmethod
     def setUpTestData(cls):
@@ -28,7 +30,7 @@ class ArticleTest(TestCase):
         accounts_factory(15)
 
     def setUp(self):
-        self.article = ArticleFactory()
+        self.article = ArticleFactory(account=Account.objects.last())
 
     def test_create_article(self):
         data = dict(
@@ -76,7 +78,6 @@ class ArticleTest(TestCase):
         self.assertEqual(article.comments.count(), 8)
 
     def test_update_article(self):
-        article = ArticleFactory()
         new_account = AccountFactory()
         data = dict(
             title='Why Python does not have operator CASE-SWITCH.',
@@ -88,25 +89,25 @@ class ArticleTest(TestCase):
             account=new_account,
             source='http://pydanny.com/django/why_python_does_not_have_operator_case_switch.html',
         )
-        article.title = data['title']
-        article.quotation = data['quotation']
-        article.header = data['header']
-        article.conclusion = data['conclusion']
-        article.picture = data['picture']
-        article.status = data['status']
-        article.account = data['account']
-        article.source = data['source']
-        article.full_clean()
-        article.save()
-        self.assertEqual(article.title, data['title'])
-        self.assertEqual(article.slug, slugify(data['title'], allow_unicode=True))
-        self.assertEqual(article.quotation, data['quotation'])
-        self.assertEqual(article.header, data['header'])
-        self.assertEqual(article.conclusion, data['conclusion'])
-        self.assertEqual(article.picture, data['picture'])
-        self.assertEqual(article.status, data['status'])
-        self.assertEqual(article.account, data['account'])
-        self.assertEqual(article.source, data['source'])
+        self.article.title = data['title']
+        self.article.quotation = data['quotation']
+        self.article.header = data['header']
+        self.article.conclusion = data['conclusion']
+        self.article.picture = data['picture']
+        self.article.status = data['status']
+        self.article.account = data['account']
+        self.article.source = data['source']
+        self.article.full_clean()
+        self.article.save()
+        self.assertEqual(self.article.title, data['title'])
+        self.assertEqual(self.article.slug, slugify(data['title'], allow_unicode=True))
+        self.assertEqual(self.article.quotation, data['quotation'])
+        self.assertEqual(self.article.header, data['header'])
+        self.assertEqual(self.article.conclusion, data['conclusion'])
+        self.assertEqual(self.article.picture, data['picture'])
+        self.assertEqual(self.article.status, data['status'])
+        self.assertEqual(self.article.account, data['account'])
+        self.assertEqual(self.article.source, data['source'])
 
     def test_delete_article(self):
         self.article.delete()
@@ -157,24 +158,27 @@ class ArticleTest(TestCase):
         self.assertEqual(self.article.get_rating(), 2.4286)
 
     def test_get_volume(self):
-        all_items = list()
+
         # length header and conclusion
-        len_header = len(self.article.header)
-        len_conclusion = len(self.article.conclusion)
-        # add lengths
-        all_items.extend([len_header, len_conclusion])
-        for subsection in self.article.subsections.iterator():
-            len_content = len(subsection.content)
-            all_items.append(len_content)
-        self.assertEqual(self.article.get_volume(), sum(all_items))
+        self.article.header = generate_text_certain_length(300)
+        self.article.conclusion = generate_text_certain_length(541)
+        self.article.full_clean()
+        self.article.save()
+
+        # clear and a anew adding the subsections
+        ArticleSubsectionFactory(article=self.article, content=generate_text_certain_length(300))
+        ArticleSubsectionFactory(article=self.article, content=generate_text_certain_length(258))
+        ArticleSubsectionFactory(article=self.article, content=generate_text_certain_length(941))
+        self.assertEqual(self.article.get_volume(), 2340)
+
         # checkup with without subsections
         self.article.subsections.filter().delete()
-        self.assertEqual(self.article.get_volume(), len_header + len_conclusion)
+        self.assertEqual(self.article.get_volume(), 841)
 
 
 class ArticleSubsectionTest(TestCase):
     """
-
+    Tests for subsections of articles.
     """
 
     @classmethod

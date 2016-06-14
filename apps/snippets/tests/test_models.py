@@ -1,4 +1,6 @@
 
+import unittest
+
 from django.utils.text import slugify
 from django.test import TestCase
 
@@ -10,6 +12,7 @@ from apps.comments.factories import CommentFactory
 from apps.opinions.factories import OpinionFactory
 from apps.favours.factories import FavourFactory
 from apps.tags.models import Tag
+from mylabour.utils import generate_text_certain_length
 
 from apps.snippets.factories import SnippetFactory
 from apps.snippets.models import Snippet
@@ -33,27 +36,10 @@ class SnippetTest(TestCase):
         self.assertEqual(Snippet.objects.count(), 1)
         data = dict(
             title='Base class while testing, using for don`t DRY, but have many magic solutions for resolving problems.',
-            lexer='Python 3',
+            lexer='javascript',
             account=Account.objects.last(),
-            description="""
-Base class for using as base-abstract class for children classes.
-It is simple realization previously populating the database for testing.
-It is became possible by using method setUpTestData().
-            """,
-            code="""
-class BaseTestClass_for_prepopulated_data(TestCase):
-    \"\"\"
-
-    \"\"\"
-
-    @classmethod
-    def setUpTestData(cls):
-        tags_factory(10)
-        web_links_factory(10)
-        badges_factory()
-        account_level_factory()
-        accounts_factory(10)
-        """,
+            description=generate_text_certain_length(100),
+            code=generate_text_certain_length(300),
         )
         snippet = Snippet(**data)
         snippet.full_clean()
@@ -98,36 +84,10 @@ class BaseTestClass_for_prepopulated_data(TestCase):
         account = AccountFactory()
         data_for_update = dict(
             title='Signal for keeping old value of the field, which may can using in future signals.',
-            lexer='Python 3',
+            lexer='python3',
             account=account,
-            description="""
-This is may be the trivial approach for resolving keeping old value of the field.
-May be who known better solutions for this problem, but if no. Using this snippet.
-            """,
-            code="""
-
-OLD_ACCOUNT = None
-
-
-@receiver(pre_save)
-def signal_for_keeping_old_account(sender, instance, **kwargs):
-    \"\"\"Write action in log.\"\"\"
-
-    if sender in MODELS_WITH_FK_ACCOUNT:
-        try:
-            obj = sender.objects.get(pk=instance.pk)
-        except sender.DoesNotExist:
-            pass
-        else:
-            if hasattr(instance, 'account'):
-                account = instance.account
-                old_account = obj.account
-            global OLD_ACCOUNT
-            if account != old_account:
-                OLD_ACCOUNT = old_account
-            else:
-                OLD_ACCOUNT = None
-        """,
+            description=generate_text_certain_length(100),
+            code=generate_text_certain_length(200),
         )
         self.snippet.title = data_for_update['title']
         self.snippet.lexer = data_for_update['lexer']
@@ -171,10 +131,7 @@ def signal_for_keeping_old_account(sender, instance, **kwargs):
             self.snippet.opinions.create(account=couple[0], is_useful=couple[1])
         self.assertEqual(self.snippet.get_scope(), -4)
 
-    def test_processing_tags(self):
-        # restrict on max count tags and clear method
-        pass
-
+    @unittest.skip('Don`t made views counter.')
     def test_get_count_views(self):
         pass
 

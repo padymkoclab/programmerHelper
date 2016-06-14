@@ -23,8 +23,6 @@ class ArticleFactory(factory.DjangoModelFactory):
         model = Article
 
     quotation = factory.Faker('text', locale='ru')
-    header = factory.Faker('text', locale='ru')
-    conclusion = factory.Faker('text', locale='ru')
     status = fuzzy.FuzzyChoice(tuple(item[0] for item in Article.STATUS_ARTICLE))
     account = fuzzy.FuzzyChoice(Accounts)
 
@@ -32,6 +30,14 @@ class ArticleFactory(factory.DjangoModelFactory):
     def title(self):
         length_article_title = random.randint(10, 200)
         return factory.Faker('text', locale='ru').generate([])[:length_article_title]
+
+    @factory.lazy_attribute
+    def header(self):
+        return generate_text_by_min_length(200)
+
+    @factory.lazy_attribute
+    def conclusion(self):
+        return generate_text_by_min_length(200)
 
     @factory.lazy_attribute
     def picture(self):

@@ -1,23 +1,43 @@
 
+import urllib
+
 from django.db import models
 
 
 class ArticleManager(models.Manager):
     """
-    Model manager for working with articles
+    Model manager for articles.
     """
 
     def publish_articles_if_yet_not(self, article):
         """Publish article if it yet not."""
 
-        return self.get_queryset().function()
+        self.filter(pk=article.pk).update(status=self.model.STATUS_ARTICLE.published)
 
-    def send_articles_on_rework(self, article):
-        """Mark article as draft and send it on rework."""
+    def made_articles_as_draft_if_yet_not(self, article):
+        """Mark article as draft if yet not."""
 
-        return self.get_queryset().function()
+        self.filter(pk=article.pk).update(status=self.model.STATUS_ARTICLE.draft)
 
     def check_exists_external_resourses_in_non_own_articles(self):
         """Check exists external resourses in non own articles."""
 
-        pass
+        # get all non-own articles
+        articles_from_external_resourse = self.articles_from_external_resourse()
+
+        # return true if it not
+        if not articles_from_external_resourse.count():
+            return True
+
+        # if found broken link
+        # keep all the articles with broken links and return false,
+        # otherwise return true
+        article_with_broken_links = list()
+        for article in articles_from_external_resourse:
+            try:
+                urllib.request.urlopen(article.source)
+            except:
+                article_with_broken_links.append(article)
+        if article_with_broken_links:
+            return (False, article_with_broken_links)
+        return True

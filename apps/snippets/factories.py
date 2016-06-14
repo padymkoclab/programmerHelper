@@ -52,6 +52,18 @@ class SnippetFactory(factory.DjangoModelFactory):
         for i in range(random.randrange(5)):
             FavourFactory(content_object=self)
 
+    @factory.post_generation
+    def date_added(self, created, extracted, **kwargs):
+        self.date_added = fuzzy.FuzzyDateTime(self.account.date_joined).fuzz()
+        self.save()
+        assert self.date_added >= self.account.date_joined
+
+    @factory.post_generation
+    def date_modified(self, created, extracted, **kwargs):
+        self.date_modified = fuzzy.FuzzyDateTime(self.date_added).fuzz()
+        self.save()
+        assert self.date_modified >= self.date_added
+
 
 def snippets_factory(count):
     Snippet.objects.filter().delete()

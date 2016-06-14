@@ -1,4 +1,7 @@
 
+import uuid
+import pathlib
+import shutil
 import random
 import string
 
@@ -16,10 +19,36 @@ def make_translation():
     run('./manage.py makemesages')
 
 
+def make_backup_project():
+    dst = '/media/wlysenko/66ABF2AC3D03BAAA/Web/Projects/django/'
+    path_to_project = pathlib.Path(__file__).parent
+    project_name = path_to_project.name
+    path_to_backup = dst + project_name
+    try:
+        shutil.copytree(str(path_to_project), path_to_backup)
+    except FileExistsError:
+        temp_name_project = str(uuid.uuid1())
+        temp_path_to_backup = dst + temp_name_project
+        try:
+            shutil.copytree(str(path_to_project), temp_path_to_backup)
+        except:
+            raise RuntimeError('Не удалось сделать backup of project.')
+        else:
+            shutil.rmtree(path_to_backup)
+            shutil.os.rename(temp_path_to_backup, path_to_backup)
+    except:
+        raise RuntimeError('Не удалось сделать backup of project.')
+    else:
+        return True
+
+
 @task
 def git_push(text_commit):
-    # raise NotImplementedError
+
     # made copy project to another disk
+    make_backup_project()
+
+    # execute pushing with Git
     run('git add -u')
     run('git add .')
     run('git commit -m \"{0}\"'.format(text_commit))

@@ -93,12 +93,12 @@ class ArticleQuerySet(models.QuerySet):
     def articles_from_external_resourse(self):
         """Articles from external resourse pinted in field 'source'."""
 
-        return self.only('sourse').filter(source__isnull=False)
+        return self.only('source').filter(source__isnull=False)
 
     def own_articles(self):
         """Own articles, published from website`s authors."""
 
-        return self.only('sourse').filter(source__isnull=True)
+        return self.only('source').filter(source__isnull=True)
 
     def hot_articles(self):
         """Articles with 7 and more comments."""
