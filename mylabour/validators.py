@@ -13,6 +13,7 @@ def UserNameValidator(username):
     if not all(char in string.ascii_lowercase + string.digits for char in username):
         raise ValidationError(_('Name of account must be contains only latin chars in lowercase and digits.'))
     if all(char in string.digits for char in username):
+        # rewrite to str.isdigit() or str.isnumeric()
         raise ValidationError(_('Name of account can\'t be entirely numeric.'))
 
 
@@ -80,6 +81,12 @@ class MinCountWordsValidator(object):
         return len(tuple(chars.strip() for chars in text.split(' ')))
 
 
-def phone_validator(self):
+def PhoneValidator(value):
     pass
-    # phone_regex = RegexValidator(regex=r'^\+?1?\d{9,15}$', message="Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed.")
+    # phone_regex = RegexValidator(regex=r'^\+?1?\d{9,15}$',
+    # message="Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed.")
+
+
+def OnlyLettersValidator(value):
+    if not str(value).isalpha():
+        raise ValidationError(_('Word may contains only letters.'))

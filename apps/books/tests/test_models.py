@@ -7,12 +7,13 @@ from django.utils.text import slugify
 from django.test import TestCase
 from django.core.exceptions import ValidationError
 
+from psycopg2.extras import NumericRange
+
 from apps.accounts.factories import accounts_factory
 from apps.tags.factories import tags_factory
 from apps.badges.factories import badges_factory
 from apps.web_links.factories import web_links_factory
 from apps.replies.factories import ReplyFactory
-from apps.scopes.factories import ScopeFactory
 from apps.tags.models import Tag
 from apps.web_links.models import WebLink
 from mylabour.utils import generate_text_by_min_length
@@ -62,8 +63,6 @@ class BookTest(TestCase):
         ReplyFactory(content_object=book)
         ReplyFactory(content_object=book)
         ReplyFactory(content_object=book)
-        for i in range(10):
-            ScopeFactory(content_object=book)
         #
         book.refresh_from_db()
         self.assertEqual(book.name, data['name'])
@@ -75,7 +74,6 @@ class BookTest(TestCase):
         self.assertEqual(book.publishers, data['publishers'])
         self.assertEqual(book.isbn, data['isbn'])
         self.assertEqual(book.year_published, data['year_published'])
-        self.assertEqual(book.scopes.count(), 10)
         self.assertEqual(book.replies.count(), 3)
         self.assertEqual(book.tags.count(), 3)
         self.assertEqual(book.links.count(), 4)
@@ -143,18 +141,14 @@ class BookTest(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_get_rating(self):
-        self.book.scopes.clear()
+        self.book.replies.clear()
         self.assertEqual(self.book.get_rating(), 0)
-        ScopeFactory(content_object=self.book, scope=3)
-        ScopeFactory(content_object=self.book, scope=5)
-        ScopeFactory(content_object=self.book, scope=1)
-        ScopeFactory(content_object=self.book, scope=2)
-        ScopeFactory(content_object=self.book, scope=4)
-        ScopeFactory(content_object=self.book, scope=4)
-        ScopeFactory(content_object=self.book, scope=1)
-        ScopeFactory(content_object=self.book, scope=0)
-        ScopeFactory(content_object=self.book, scope=5)
-        self.assertEqual(self.book.get_rating(), 2.7778)
+        ReplyFactory(content_object=self.book, scope_for_content=3, scope_for_style=1, scope_for_language=2)  # 2
+        self.assertEqual(self.book.get_rating(), 2.0)
+        ReplyFactory(content_object=self.book, scope_for_content=4, scope_for_style=5, scope_for_language=1)  # 3.3333
+        ReplyFactory(content_object=self.book, scope_for_content=5, scope_for_style=4, scope_for_language=5)  # 4.6667
+        ReplyFactory(content_object=self.book, scope_for_content=2, scope_for_style=5, scope_for_language=4)  # 3.6667
+        self.assertEqual(self.book.get_rating(), 3.4167)
 
     def test_is_new(self):
         #
@@ -186,13 +180,38 @@ class BookTest(TestCase):
         self.book.save()
         self.assertEqual(self.book.get_size(), 'Tiny book')
 
-    @unittest.skip('Have not idea how it made.')
-    def test_tags_restrict(self):
-        pass
-
-    @unittest.skip('Have not idea how it made.')
-    def test_links_restrict(self):
-        pass
+    def test_most_common_words_from_replies(self):
+        self.book.replies.clear()
+        self.assertEqual(self.book.most_common_words_from_replies(), [])
+        ReplyFactory(
+            content_object=self.book,
+            advantages=['Perfect', 'Good', 'Nice', 'Interesting', 'Amazing', 'Fantastic', 'Alluring'],
+            disadvantages=['Small', 'Strange']
+        )
+        ReplyFactory(
+            content_object=self.book,
+            advantages=['Nice', 'Strange', 'Amazing', 'Fantastic'],
+            disadvantages=['Bad', 'Obvious', 'Fuzzy', 'Non-interesting']
+        )
+        ReplyFactory(
+            content_object=self.book,
+            advantages=['Perfect', 'Good', 'Nice', 'Strange', 'Amazing', 'Dizzy'],
+            disadvantages=['Small', 'Blurred']
+        )
+        ReplyFactory(
+            content_object=self.book,
+            advantages=['Perfect', 'Good', 'Nice', 'Strange', 'Amazing', 'Fantastic'],
+            disadvantages=['Small', 'Bad', 'Fuzzy', 'Strange', 'Non-interesting']
+        )
+        most_common_words_from_replies = self.book.most_common_words_from_replies()
+        self.assertCountEqual(most_common_words_from_replies, [
+            ('Fantastic', 3), ('Perfect', 3), ('Good', 3), ('Amazing', 4), ('Nice', 4),
+            ('Small', 3), ('Strange', 5), ('Fuzzy', 2), ('Bad', 2), ('Non-interesting', 2)
+        ])
+        self.assertCountEqual(most_common_words_from_replies[-3:], [('Fuzzy', 2), ('Bad', 2), ('Non-interesting', 2)])
+        self.assertCountEqual(most_common_words_from_replies[1:3], [('Amazing', 4), ('Nice', 4)])
+        self.assertCountEqual(most_common_words_from_replies[3:-3], [('Fantastic', 3), ('Perfect', 3), ('Good', 3), ('Small', 3)])
+        self.assertEqual(most_common_words_from_replies[0], ('Strange', 5))
 
 
 class WritterTest(TestCase):
@@ -215,8 +234,7 @@ class WritterTest(TestCase):
         data = dict(
             name='Николай Левашов',
             about=generate_text_by_min_length(100, as_p=True),
-            birthyear=1960,
-            deathyear=2012,
+            years_life=NumericRange(1960, 2012),
         )
         writter = Writter(**data)
         writter.full_clean()
@@ -224,27 +242,23 @@ class WritterTest(TestCase):
         self.assertEqual(writter.name, data['name'])
         self.assertEqual(writter.slug, slugify(data['name'], allow_unicode=True))
         self.assertEqual(writter.about, data['about'])
-        self.assertEqual(writter.birthyear, data['birthyear'])
-        self.assertEqual(writter.deathyear, data['deathyear'])
+        self.assertEqual(writter.years_life, data['years_life'])
 
     def test_update_writter(self):
         data = dict(
             name='Валерий Дёмин',
             about=generate_text_by_min_length(100, as_p=True),
-            birthyear=1950,
-            deathyear=2016,
+            years_life=NumericRange(1950, 2016),
         )
         self.writter.name = data['name']
         self.writter.about = data['about']
-        self.writter.birthyear = data['birthyear']
-        self.writter.deathyear = data['deathyear']
+        self.writter.years_life = data['years_life']
         self.writter.full_clean()
         self.writter.save()
         self.assertEqual(self.writter.name, data['name'])
         self.assertEqual(self.writter.slug, slugify(data['name'], allow_unicode=True))
         self.assertEqual(self.writter.about, data['about'])
-        self.assertEqual(self.writter.birthyear, data['birthyear'])
-        self.assertEqual(self.writter.deathyear, data['deathyear'])
+        self.assertEqual(self.writter.years_life, data['years_life'])
 
     def test_delete_writter(self):
         self.writter.delete()
@@ -283,102 +297,154 @@ class WritterTest(TestCase):
         response = self.client.get(self.writter.get_absolute_url())
         self.assertEqual(response.status_code, 200)
 
-    def test_if_birthyear_is_in_future(self):
-        self.writter.birthyear = NOW_YEAR + 1
-        self.assertRaisesMessage(ValidationError, 'Year of birth can not in future.', self.writter.full_clean)
+    def test_accept_only_None_or_integer_as_values_for_field_years_life(self):
+        # non accepted values
+        self.writter.years_life = NumericRange('text', 1.1)
+        self.assertRaisesMessage(ValidationError, 'Year birth and death must be integer or skiped.', self.writter.full_clean)
+        self.writter.years_life = NumericRange(None, 'string')
+        self.assertRaisesMessage(ValidationError, 'Year birth and death must be integer or skiped.', self.writter.full_clean)
+        self.writter.years_life = NumericRange('string', None)
+        self.assertRaisesMessage(ValidationError, 'Year birth and death must be integer or skiped.', self.writter.full_clean)
+        self.writter.years_life = NumericRange('string', 1111)
+        self.assertRaisesMessage(ValidationError, 'Year birth and death must be integer or skiped.', self.writter.full_clean)
+        self.writter.years_life = NumericRange(1111, 1.1)
+        self.assertRaisesMessage(ValidationError, 'Year birth and death must be integer or skiped.', self.writter.full_clean)
+        self.writter.years_life = NumericRange(True, None)
+        self.assertRaisesMessage(ValidationError, 'Year birth and death must be integer or skiped.', self.writter.full_clean)
+        self.writter.years_life = NumericRange(None, False)
+        self.assertRaisesMessage(ValidationError, 'Year birth and death must be integer or skiped.', self.writter.full_clean)
+        # accepted values
+        self.writter.years_life = NumericRange(None, None)
+        self.writter.full_clean()
+        self.writter.years_life = NumericRange(None, 1000)
+        self.writter.full_clean()
+        self.writter.years_life = NumericRange(1000, None)
+        self.writter.full_clean()
+        self.writter.years_life = NumericRange(1000, 1050)
 
-    def test_if_deathyear_is_in_future(self):
-        self.writter.deathyear = NOW_YEAR + 1
-        self.assertRaisesMessage(ValidationError, 'Year of death can not in future.', self.writter.full_clean)
+    def test_restrict_year_birth(self):
+        # look over range years from -100 A.D. to now + 1 year
+        for year_birth in range(-100, NOW_YEAR + 2):
+            self.writter.years_life = NumericRange(year_birth, None)
+            # look over birth year from 1000 to 20 years ago
+            if year_birth in range(1000, NOW_YEAR - 19):
+                self.writter.full_clean()
+            else:
+                self.assertRaisesMessage(
+                    ValidationError, 'Writter may can bithed only from 1000 A. D. to {0} year.'.format(NOW_YEAR - 20),
+                    self.writter.full_clean
+                )
 
-    def test_if_deathyear_is_more_or_equal_birthyear(self):
-        self.writter.deathyear = 1990
-        self.writter.birthyear = 2015
+    def test_restrict_year_death(self):
+        # look over range years from -100 A.D. to now + 1 year
+        for year_death in range(-100, NOW_YEAR + 2):
+            self.writter.years_life = NumericRange(None, year_death)
+            if year_death in range(1000, NOW_YEAR + 1):
+                self.writter.full_clean()
+            else:
+                self.assertRaisesMessage(
+                    ValidationError, 'Writter may can dead only from 1000 A. D. to now year.',
+                    self.writter.full_clean
+                )
+
+    def test_if_birth_year_is_more_or_equal_year_dead(self):
+        self.writter.years_life = NumericRange(1990, 1950)
         self.assertRaisesMessage(
             ValidationError, 'Year of birth can not more or equal year of dearth.', self.writter.full_clean
         )
-        self.writter.deathyear = 2014
-        self.writter.birthyear = 2014
+        self.writter.years_life = NumericRange(1988, 1988)
         self.assertRaisesMessage(
             ValidationError, 'Year of birth can not more or equal year of dearth.', self.writter.full_clean
         )
 
-    def test_if_small_range_beetween_deathyear_and_birthyear(self):
-        self.writter.birthyear = 1990
-        self.writter.deathyear = 1999
+    def test_if_small_range_beetween_death_year_and_year_birth(self):
+        self.writter.years_life = NumericRange(1990, 1991)
         self.assertRaisesMessage(
             ValidationError, 'Very small range between year of birth and year of death.', self.writter.full_clean
         )
-        self.writter.birthyear = 1990
-        self.writter.deathyear = 2008
+        self.writter.years_life = NumericRange(1990, 2009)
         self.assertRaisesMessage(
             ValidationError, 'Very small range between year of birth and year of death.', self.writter.full_clean
         )
-        self.writter.birthyear = 1991
-        self.writter.deathyear = 2010
-        self.assertRaisesMessage(
-            ValidationError, 'Very small range between year of birth and year of death.', self.writter.full_clean
-        )
-        self.writter.birthyear = 1960
-        self.writter.deathyear = 1980
+        # difference must be 20 and more
+        self.writter.years_life = NumericRange(1960, 1980)
+        self.writter.full_clean()
+        self.writter.years_life = NumericRange(1960, 1981)
         self.writter.full_clean()
 
-    def test_if_big_range_beetween_deathyear_and_birthyear(self):
-        self.writter.birthyear = 1800
-        self.writter.deathyear = 2000
+    def test_if_big_range_beetween_death_year_and_year_birth(self):
+        self.writter.years_life = NumericRange(1800, 2000)
         self.assertRaisesMessage(
             ValidationError, 'Very big range between year of birth and year of death.', self.writter.full_clean
         )
-        self.writter.birthyear = 1900
-        self.writter.deathyear = 2015
+        self.writter.years_life = NumericRange(1800, 1901)
         self.assertRaisesMessage(
             ValidationError, 'Very big range between year of birth and year of death.', self.writter.full_clean
         )
-        self.writter.birthyear = 1889
-        self.writter.deathyear = 2005
-        self.assertRaisesMessage(
-            ValidationError, 'Very big range between year of birth and year of death.', self.writter.full_clean
-        )
-        self.writter.birthyear = 1890
-        self.writter.deathyear = 2000
+        # diffence must be less or equal 100
+        self.writter.years_life = NumericRange(1800, 1900)
         self.writter.full_clean()
-        self.writter.birthyear = 1905
-        self.writter.deathyear = 2015
+        self.writter.years_life = NumericRange(1800, 1899)
         self.writter.full_clean()
 
     def test_if_very_young_writter(self):
-        self.writter.deathyear = None
-        #
-        self.writter.birthyear = NOW_YEAR
-        self.assertRaisesMessage(ValidationError, 'Writter not possible born so early.', self.writter.full_clean)
-        self.writter.birthyear = NOW_YEAR - 5
-        self.assertRaisesMessage(ValidationError, 'Writter not possible born so early.', self.writter.full_clean)
-        self.writter.birthyear = NOW_YEAR - 15
-        self.assertRaisesMessage(ValidationError, 'Writter not possible born so early.', self.writter.full_clean)
-        self.writter.birthyear = NOW_YEAR - 20
+        self.writter.years_life = NumericRange(NOW_YEAR - 1, None)
+        self.assertRaisesMessage(
+            ValidationError, 'Writter may can bithed only from 1000 A. D. to 1996 year.', self.writter.full_clean
+        )
+        self.writter.years_life = NumericRange(NOW_YEAR - 19, None)
+        self.assertRaisesMessage(
+            ValidationError, 'Writter may can bithed only from 1000 A. D. to 1996 year.', self.writter.full_clean
+        )
+        # wrriter may can born only 20 years ago or more
+        self.writter.years_life = NumericRange(NOW_YEAR - 20, None)
         self.writter.full_clean()
 
     def test_get_age_of_writter(self):
-        writter1 = WritterFactory(birthyear=1950, deathyear=2013)
-        writter2 = WritterFactory(birthyear=1877, deathyear=1928)
-        writter3 = WritterFactory(birthyear=1990, deathyear=None)
-        writter4 = WritterFactory(birthyear=None, deathyear=None)
-        writter5 = WritterFactory(birthyear=None, deathyear=2016)
-        writter6 = WritterFactory(birthyear=1977, deathyear=2000)
+        writter1 = WritterFactory(years_life=NumericRange(1950, 2013))
+        writter2 = WritterFactory(years_life=NumericRange(1990, None))
+        writter3 = WritterFactory(years_life=NumericRange(None, None))
+        writter4 = WritterFactory(years_life=NumericRange(None, 2016))
         #
         self.assertEqual(writter1.get_age(), 63)
-        self.assertEqual(writter2.get_age(), 51)
+        self.assertIsNone(writter2.get_age())
         self.assertIsNone(writter3.get_age())
         self.assertIsNone(writter4.get_age())
-        self.assertIsNone(writter5.get_age())
-        self.assertEqual(writter6.get_age(), 23)
+
+    def test_show_years_life(self):
+        writter1 = WritterFactory(years_life=NumericRange(1877, 1928))
+        writter2 = WritterFactory(years_life=NumericRange(1990, None))
+        writter3 = WritterFactory(years_life=NumericRange(None, None))
+        writter4 = WritterFactory(years_life=NumericRange(None, 2016))
+        #
+        self.assertEqual(writter1.show_years_life(), '1877 - 1928')
+        self.assertEqual(writter2.show_years_life(), '1990 - ????')
+        self.assertEqual(writter3.show_years_life(), '???? - ????')
+        self.assertEqual(writter4.show_years_life(), '???? - 2016')
 
     def test_get_avg_scope_for_books(self):
         # without books
-        self.writter.books.filter().delete()
+        self.writter.books.clear()
         self.assertEqual(self.writter.get_avg_scope_for_books(), 0)
-        # with single book
-        book = BookFactory()
-        # book.
-        self.writter.books.set()
-        # with many books
+        # books
+        # rating first book 4.0
+        book1 = BookFactory()
+        book1.accounts.set([self.writter])
+        book1.replies.clear()
+        ReplyFactory(content_object=book1, scope_for_content=3, scope_for_style=5, scope_for_language=4)  # 4
+        self.assertEqual(self.writter.get_avg_scope_for_books(), 4.0)
+        # rating second book 3
+        book2 = BookFactory()
+        book2.accounts.set([self.writter])
+        book2.replies.clear()
+        ReplyFactory(content_object=book2, scope_for_content=3, scope_for_style=1, scope_for_language=5)  # 3
+        ReplyFactory(content_object=book2, scope_for_content=1, scope_for_style=1, scope_for_language=1)  # 1
+        ReplyFactory(content_object=book2, scope_for_content=5, scope_for_style=5, scope_for_language=5)  # 5
+        self.assertEqual(self.writter.get_avg_scope_for_books(), 3.5)
+        # rating third book 3.6667
+        book3 = BookFactory()
+        book3.accounts.set([self.writter])
+        book3.replies.clear()
+        ReplyFactory(content_object=book3, scope_for_content=4, scope_for_style=5, scope_for_language=5)  # 4.6667
+        ReplyFactory(content_object=book3, scope_for_content=1, scope_for_style=5, scope_for_language=2)  # 2.6667
+        self.assertEqual(self.writter.get_avg_scope_for_books(), 3.5556)

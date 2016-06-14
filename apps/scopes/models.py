@@ -47,13 +47,6 @@ class Scope(BaseGenericModel):
         if hasattr(self.content_object, 'account'):
             if self.content_object.account == self.account:
                 raise ValidationError(_('User not allowed give scope about hisself labour.'))
-        elif hasattr(self.content_object, 'accounts'):
-            if self.account in self.content_object.accounts.all():
-                raise ValidationError(_('Authors not allowed give scope about hisself labour.'))
-
-    def save(self, *args, **kwargs):
-        self.clean()
-        super(Scope, self).save(*args, **kwargs)
 
     def is_new(self):
         return self.date_modified > timezone.now() - timezone.timedelta(days=settings.COUNT_DAYS_DISTINGUISH_ELEMENTS_AS_NEW)

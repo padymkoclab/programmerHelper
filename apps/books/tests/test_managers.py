@@ -6,6 +6,8 @@ import re
 from django.test import TestCase
 from django.core.exceptions import ValidationError
 
+from psycopg2.extras import NumericRange
+
 from apps.accounts.factories import accounts_factory
 from apps.tags.factories import tags_factory
 from apps.badges.factories import badges_factory
@@ -48,14 +50,14 @@ class WritterManagerTest(TestCase):
     """
 
     def test_mark_writter_dead_in_this_year(self):
-        writter = WritterFactory(deathyear=None)
-        self.assertIsNone(writter.deathyear)
+        writter = WritterFactory(years_life=NumericRange(1990, None))
+        self.assertIsNone(writter.years_life.upper)
         Writter.objects.mark_writter_dead_in_this_year(writter)
-        self.assertEqual(writter.deathyear, datetime.datetime.now().year)
+        self.assertEqual(writter.years_life.upper, datetime.datetime.now().year)
 
     def test_attempt_mark_writter_dead_in_this_year_if_he_dead_early(self):
-        writter = WritterFactory(deathyear=datetime.datetime.now().year)
-        self.assertIsNotNone(writter.deathyear)
+        writter = WritterFactory(years_life=NumericRange(1930, datetime.datetime.now().year))
+        self.assertIsNotNone(writter.years_life.upper)
         self.assertRaisesMessage(
             ValidationError, 'This writter already dead.', Writter.objects.mark_writter_dead_in_this_year, writter
         )

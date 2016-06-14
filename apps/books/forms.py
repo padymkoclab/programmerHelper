@@ -4,15 +4,12 @@ from django import forms
 from django.conf import settings
 
 from apps.tags.forms import clean_tags
+from apps.web_links.forms import clean_weblinks
 
-from .models import Book
+from .models import Book, Writter
 
 
 class BookForm(forms.ModelForm):
-    """
-    Form based on model Book
-    """
-
     class Meta:
         model = Book
         fields = ['name']
@@ -24,10 +21,14 @@ class BookForm(forms.ModelForm):
 
     def clean_links(self):
         super(BookForm, self).clean()
-        # validation restrict count weblinks where downloads
-        links = self.cleaned_data.get('links', tuple())
-        if len(links) > settings.MAX_COUNT_WEBLINKS_ON_OBJECT:
-            self.add_error('links', _('Count links must be not more than {0}').format(
-                settings.MAX_COUNT_WEBLINKS_ON_OBJECT
-            ))
-        return links
+        cleaned_links = clean_weblinks(self)
+        return cleaned_links
+
+
+class WritterForm(forms.ModelForm):
+    class Meta:
+        model = Writter
+        fields = ('name',)
+
+    def clean(self):
+        super(WritterForm, self).clean()

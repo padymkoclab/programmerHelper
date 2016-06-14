@@ -140,14 +140,14 @@ def get_paths_all_nested_files(path, show=False):
     return all_paths
 
 
-def generate_text_certain_length(length):
+def generate_text_certain_length(length, locale='en'):
     """Generate text certain length with full-featured sentences."""
 
     # generate random text
-    text = factory.Faker('text').generate([])
+    text = factory.Faker('text', locale=locale).generate([])
     # make text approximate certain length
     while len(text) <= length:
-        text = text + ' ' + factory.Faker('text').generate([])
+        text = text + ' ' + factory.Faker('text', locale=locale).generate([])
     # made full-fetured ending text for last sentence
     if len(text) != length:
         # slice text to certain length
@@ -196,12 +196,16 @@ def generate_text_by_min_length(min_length, as_p=False):
 
 def findall_words(text):
     """
-
     Find and return words in text.
-    >>> 1 + 1
-    2
-    >>>
 
+    >>> findall_words('')
+    []
+    >>> findall_words('text')
+    ['text']
+    >>> findall_words('No problem, provided that the traceback is the only output.')
+    ['No', 'problem', 'provided', 'that', 'the', 'traceback', 'is', 'the', 'only', 'output']
+    >>> findall_words('A number of option flags control various aspects of doctest’s behavior.')
+    ['A', 'number', 'of', 'option', 'flags', 'control', 'various', 'aspects', 'of', 'doctest’s', 'behavior']
     """
 
     if not isinstance(text, str):
@@ -223,7 +227,7 @@ def findall_words(text):
         # getting words by split string and return it
         words = text.split()
         return words
-    return 0
+    return []
 
 
 def count_words(text):
@@ -261,7 +265,68 @@ def has_connect_to_internet():
         return True
 
 
-def genarete_words_separated_commas(count_words):
-    """Generate words separated commas by passed count needed words."""
+def generate_words(min_count_words, max_count_words, to_register='capitalize', locale='en'):
+    """
+    Generate words separated commas by passed count min and max needed words.
+    Returned words may be as capitalize, upper, lower or title of each.
+    Word may can contains unicode or ascii letters and controling with parameter 'locale'.
 
-    raise NotImplementedError
+    >>> words = generate_words(1, 3)
+    >>> len(words) in [1, 2, 3]
+    True
+    >>> words = generate_words(60, 60)
+    >>> len(words) == 60
+    True
+    """
+
+    #
+    # Validation of input
+    #
+
+    # limiters must be integer
+    if not (isinstance(min_count_words, int) and isinstance(max_count_words, int)):
+        raise ValueError('Values \'min_count_words\' and \'max_count_words\' must be integer.')
+
+    # min limiter must not great max limiter
+    if min_count_words > max_count_words:
+        raise ValueError('Min limiter count of the words must be not great than max limiter count of a words.')
+
+    # limiters must be more than 0
+    if not (min_count_words > 0 and max_count_words > 0):
+        raise ValueError('Values \'min_count_words\' and \'max_count_words\' must be 1 or more.')
+
+    # validate values of parameter 'to_register'
+    if to_register not in ['capitalize', 'lower', 'title', 'upper']:
+        raise ValueError("Values register of words must be 'capitalize', 'lower', 'title' or 'upper'.")
+
+    # validate values of parameter 'locale'
+    if locale not in ['ru', 'en']:
+        raise ValueError("Words may can generated only on English or Russian ('en' or 'ru'). Set 'locale' to 'ru' or 'en'.")
+
+    #
+    # Generate words
+    #
+
+    # generate random text with regards locale and getting words more or equal max needed
+    random_words = list()
+    while len(random_words) < max_count_words:
+        text = factory.Faker('text', locale=locale).generate(())
+        detected_words = findall_words(text)
+        random_words.extend(detected_words)
+
+    # slice determined count random_words
+    number_for_slice = random.randint(min_count_words, max_count_words)
+    slices_random_words = random_words[:number_for_slice]
+
+    # applying function 'to_register' for each word
+    words = list()
+    for i, word in enumerate(slices_random_words):
+        word = eval('"{word}".{function}()'.format(word=word, function=to_register))
+        if to_register == 'capitalize' and i > 0:
+            word = word.lower()
+        words.append(word)
+    return words
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()

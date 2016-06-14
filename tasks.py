@@ -13,11 +13,13 @@ from invoke import run, task
 
 @task
 def make_translation():
-    run('./manage.py  makemesages')
+    run('./manage.py makemesages')
 
 
 @task
 def git_push(text_commit):
+    # raise NotImplementedError
+    # made copy project to another disk
     run('git add -u')
     run('git add .')
     run('git commit -m \"{0}\"'.format(text_commit))

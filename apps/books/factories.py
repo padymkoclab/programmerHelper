@@ -4,11 +4,11 @@ import random
 
 from django.conf import settings
 
+from psycopg2.extras import NumericRange
 import factory
 from factory import fuzzy
 
 from apps.replies.factories import ReplyFactory
-from apps.scopes.factories import ScopeFactory
 from mylabour.utils import generate_text_by_min_length
 
 from .models import *
@@ -51,7 +51,7 @@ class BookFactory(factory.django.DjangoModelFactory):
 
     @factory.post_generation
     def replies(self, created, extracted, **kwargs):
-        for i in range(random.randint(0, 3)):
+        for i in range(random.randint(0, 5)):
             ReplyFactory(content_object=self)
 
     @factory.post_generation
@@ -65,11 +65,6 @@ class BookFactory(factory.django.DjangoModelFactory):
         count_links = random.randrange(0, settings.MAX_COUNT_WEBLINKS_ON_OBJECT)
         weblinks = random.sample(tuple(WebLink.objects.all()), count_links)
         self.links.set(weblinks)
-
-    @factory.post_generation
-    def scopes(self, created, extracted, **kwargs):
-        for i in range(random.randint(0, 7)):
-            ScopeFactory(content_object=self)
 
     @factory.post_generation
     def accounts(self, created, extracted, **kwargs):
@@ -90,17 +85,28 @@ class WritterFactory(factory.django.DjangoModelFactory):
         return generate_text_by_min_length(150, as_p=True)
 
     @factory.lazy_attribute
-    def birthyear(self):
+    def years_life(self):
         now_year = datetime.datetime.now().year
-        return fuzzy.FuzzyInteger(1950, now_year - 20).fuzz()
-
-    @factory.lazy_attribute
-    def deathyear(self):
-        now_year = datetime.datetime.now().year
-        age_writter = now_year - self.birthyear
-        if random.random() > .5 and age_writter >= 50:
-            return
-        return fuzzy.FuzzyInteger(self.birthyear + 20, now_year).fuzz()
+        # year_birth
+        if random.random() > .5:
+            year_birth = None
+        else:
+            year_birth = fuzzy.FuzzyInteger(1000, now_year - 20).fuzz()
+        # year_death
+        if year_birth is None:
+            if random.random() > .5:
+                year_death = fuzzy.FuzzyInteger(1000, now_year).fuzz()
+            else:
+                year_death = None
+        else:
+            if now_year - year_birth < 100:
+                if random.random() > .5:
+                    year_death = fuzzy.FuzzyInteger(year_birth + 20, now_year).fuzz()
+                else:
+                    year_death = None
+            else:
+                year_death = fuzzy.FuzzyInteger(year_birth + 20, year_birth + 100).fuzz()
+        return NumericRange(year_birth, year_death)
 
 
 def writters_factory(count):

@@ -1,4 +1,6 @@
 
+RUSSIAN_LETTERS = 'АБВГДЕЁЖЗИЙКЛМНОПРТУФХЦЧШЩЫЭЮЯабвгдеёжзийклмнопрстуфхцчшщыьэюя'
+
 CHOICES_LEXERS = [
     ('Awk', 'Awk'),
     ('Base Makefile', 'Base Makefile'),

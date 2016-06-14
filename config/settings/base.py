@@ -2,7 +2,7 @@
 import datetime
 
 from django.utils.text import slugify
-from django.utils import timezone
+# from django.utils import timezone
 
 from unipath import Path
 

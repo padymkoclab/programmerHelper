@@ -7,7 +7,7 @@ from django.contrib import admin
 from apps.replies.admin import ReplyInline
 
 from .models import Book, Writter
-from .forms import BookForm
+from .forms import BookForm, WritterForm
 
 
 class BookAdmin(admin.ModelAdmin):
@@ -85,7 +85,8 @@ class BookAdmin(admin.ModelAdmin):
         return format_html_join(', ', '{0}', ((writter, ) for writter in obj.accounts.all()))
     show_writters.short_description = _('Writters')
 
-    # color styled rating
+    def color_styled_rating(self, obj):
+        raise NotImplementedError
 
 
 class WritterAdmin(admin.ModelAdmin):
@@ -93,10 +94,10 @@ class WritterAdmin(admin.ModelAdmin):
     Admin View for Writter
     '''
 
+    form = WritterForm
     list_display = (
         'name',
-        'birthyear',
-        'deathyear',
+        'show_years_life',
         'show_books',
         'get_count_books',
         'short_about_writter',
@@ -107,9 +108,8 @@ class WritterAdmin(admin.ModelAdmin):
             Writter._meta.verbose_name, {
                 'fields': [
                     'name',
-                    'birthyear',
-                    'deathyear',
                     'about',
+                    'years_life',
                 ],
             }
         ]

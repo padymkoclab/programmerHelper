@@ -1,62 +1,83 @@
 
 from django.utils import timezone
-from django.core.exceptions import ValidationError
+# from django.core.exceptions import ValidationError
+from django.contrib.postgres.fields import ArrayField
 from django.core.validators import MinLengthValidator, MaxValueValidator
 from django.utils.translation import ugettext_lazy as _
 from django.db import models
 from django.conf import settings
 
 from mylabour.models import BaseGenericModel
-from mylabour.validators import MaxCountWordsValidator
+from mylabour.validators import MaxCountWordsValidator, MinCountWordsValidator, OnlyLettersValidator
+
+from .querysets import ReplyQuerySet
 
 
 class Reply(BaseGenericModel):
 
     MAX_SCOPE = 5
+    MIN_SCOPE = 1
 
     account = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name='replies',
-        verbose_name=_('User'),
+        verbose_name=_('user'),
     )
-    impress = models.CharField(_('Impress (brief).'), max_length=50, validators=[MinLengthValidator(10)])
-    advantages = models.CharField(
-        _('Andvantages'),
-        max_length=100,
-        validators=[MaxCountWordsValidator(10)],
-        help_text=_('Maximum 10 words.')
+    impress = models.CharField(
+        _('impress (brief)'),
+        max_length=50,
+        validators=[MinLengthValidator(10)],
+        help_text=_('From 10 to 50 characters.'),
     )
-    disadvantages = models.CharField(
-        _('Disandvantages'),
-        max_length=100,
-        validators=[MaxCountWordsValidator(10)],
-        help_text=_('Minimum 10 words.')
+    advantages = ArrayField(
+        models.CharField(max_length=20, validators=[OnlyLettersValidator]),
+        size=10,
+        verbose_name=_('advantages'),
+        help_text=_('Listing from 1 to 10 words separated commas.'),
+        error_messages={
+            'blank': 'Enter at least one word.',
+            # 'item_invalid': 'Word is not correct.',
+        }
+    )
+    disadvantages = ArrayField(
+        models.CharField(max_length=20, validators=[OnlyLettersValidator]),
+        help_text=_('Listing from 1 to 10 words separated commas.'),
+        verbose_name=_('disadvantages'),
+        size=10,
+        error_messages={
+            'blank': 'Enter at least one word.',
+            'item_invalid': 'Word is not correct.',
+        }
     )
     text_reply = models.TextField(
-        _('Text of reply'),
-        validators=[MinLengthValidator(20), MaxCountWordsValidator(100)],
-        help_text=_('Maximum 100 words.'),
+        _('text of reply'),
+        validators=[MinCountWordsValidator(10), MaxCountWordsValidator(100)],
+        help_text=_('From 10 to 100 words.'),
     )
     scope_for_content = models.PositiveSmallIntegerField(
-        _('Scope for content'),
-        default=0,
+        _('scope for content'),
+        default=MIN_SCOPE,
         validators=[
-            MaxValueValidator(MAX_SCOPE, _('Scope for content must from 0 to %d' % MAX_SCOPE))
+            MaxValueValidator(MAX_SCOPE, _('The scope for content must be from 1 to %d' % MAX_SCOPE))
         ])
     scope_for_style = models.PositiveSmallIntegerField(
-        _('Scope for style'),
-        default=0,
+        _('scope for style'),
+        default=MIN_SCOPE,
         validators=[
-            MaxValueValidator(MAX_SCOPE, _('Scope for style must from 0 to %d' % MAX_SCOPE))
+            MaxValueValidator(MAX_SCOPE, _('The scope for style must be from 1 to %d' % MAX_SCOPE))
         ])
     scope_for_language = models.PositiveSmallIntegerField(
-        _('Scope for language'),
-        default=0,
+        _('scope for language'),
+        default=MIN_SCOPE,
         validators=[
-            MaxValueValidator(MAX_SCOPE, _('Scope for language must from 0 to %d' % MAX_SCOPE))
+            MaxValueValidator(MAX_SCOPE, _('The scope for language must be from 1 to %d' % MAX_SCOPE))
         ])
     date_added = models.DateTimeField(_('Date aded'), auto_now_add=True)
+
+    # managers
+    objects = models.Manager()
+    objects = ReplyQuerySet.as_manager()
 
     class Meta:
         db_table = 'replies'
@@ -70,6 +91,13 @@ class Reply(BaseGenericModel):
         type_instance = self.content_object._meta.verbose_name.lower()
         return _('Reply on {0} "{1.content_object}" from {1.account}').format(type_instance, self)
 
+    def save(self, *args, **kwargs):
+        # each word must saved as capitalize
+        self.disadvantages = tuple(word.capitalize() for word in self.disadvantages)
+        self.advantages = tuple(word.capitalize() for word in self.advantages)
+        # call save
+        super(Reply, self).save(*args, **kwargs)
+
     def is_new(self):
         return self.date_added > timezone.now() - timezone.timedelta(days=settings.COUNT_DAYS_DISTINGUISH_ELEMENTS_AS_NEW)
     is_new.admin_order_field = 'date_added'
@@ -77,4 +105,6 @@ class Reply(BaseGenericModel):
     is_new.boolean = True
 
     def get_total_scope(self):
-        raise NotImplementedError
+        return self.__class__.objects.replies_with_total_scope().get(pk=self.pk).total_scope
+    get_total_scope.admin_order_field = 'total_scope'
+    get_total_scope.short_description = _('Total scope')

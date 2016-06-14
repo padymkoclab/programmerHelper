@@ -25,8 +25,8 @@ class WritterManager(models.Manager):
     def mark_writter_dead_in_this_year(self, writter):
         """Mark writter as dead in this year if he don`t deed early."""
 
-        if writter.deathyear is not None:
+        if writter.years_life.upper is not None:
             raise ValidationError(_('This writter already dead.'))
-        writter.deathyear = datetime.datetime.now().year
+        writter.years_life = (writter.years_life.lower, datetime.datetime.now().year)
         writter.full_clean()
         writter.save()

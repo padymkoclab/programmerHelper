@@ -1,9 +1,13 @@
 
+import random
+
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth import get_user_model
 
 import factory
 from factory import fuzzy
+
+from mylabour.utils import generate_words
 
 from .models import Reply
 
@@ -22,24 +26,23 @@ class ReplyFactory(factory.DjangoModelFactory):
     def account(self):
         users_given_their_replies = self.content_object.replies.values('account')
         users_given_not_their_replies = get_user_model().objects.exclude(pk__in=users_given_their_replies)
-        if not users_given_not_their_replies.count():
-            type_instance = self.content_object._meta.verbose_name.lower()
-            msg = _('All users given their reply about {0} "{1.content_object}"').format(type_instance, self)
-            raise ValueError(msg)
+        assert users_given_not_their_replies.count() > 0
         return users_given_not_their_replies.random_accounts(1)
 
     @factory.lazy_attribute
     def impress(self):
-        return factory.Faker('text', locale='ru').generate([])[:50]
+        return factory.Faker('text', locale='ru').generate([])[:random.randint(10, 50)]
 
     @factory.lazy_attribute
     def advantages(self):
-        words = factory.Faker('text', locale='ru').generate([]).split(' ')
-        words = words[:8]
-        return ', '.join(word.strip().title() for word in words)
+        return generate_words(1, 10, 'title')
 
     @factory.lazy_attribute
     def disadvantages(self):
-        words = factory.Faker('text', locale='ru').generate([]).split(' ')
-        words = words[:8]
-        return ', '.join(word.strip().title() for word in words)
+        return generate_words(1, 10, 'title')
+
+    @factory.post_generation
+    def date_added(self, created, extracted, **kwargs):
+        self.date_added = fuzzy.FuzzyDateTime(self.account.date_joined).fuzz()
+        self.save()
+        assert self.date_added >= self.account.date_joined

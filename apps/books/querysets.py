@@ -10,7 +10,7 @@ NOW_YEAR = timezone.datetime.now().year
 
 class BookQuerySet(models.QuerySet):
     """
-    Queryset for books
+    Queryset for books.
     """
 
     def books_with_count_tags(self):
@@ -33,7 +33,7 @@ class BookQuerySet(models.QuerySet):
 
         raise NotImplementedError
 
-        self = self.annotate(rating=models.Avg('scopes__scope'))
+        self = self.annotate(rating=models.Avg('replies__scope_for_content'))
         self = self.annotate(rating=models.functions.Coalesce('rating', .0))
         self = self.annotate(rating=Round('rating'))
         return self
@@ -41,8 +41,7 @@ class BookQuerySet(models.QuerySet):
     def books_with_count_tags_links_replies_and_rating(self):
         """Complex queryset with count tags, links, replies and rating of each the book."""
 
-        return self.books_with_count_tags().books_with_count_links().\
-            books_with_count_replies().books_with_rating()
+        return self.books_with_count_tags().books_with_count_links().books_with_count_replies().books_with_rating()
 
     def new_books(self):
         """Books published no later in this and past year."""
@@ -88,7 +87,7 @@ class BookQuerySet(models.QuerySet):
         #
 
         self = self.books_with_rating()
-        return self.filter(rating__gte=5)
+        return self.filter(rating__range=[4, 5])
 
     def books_wrote_english(self):
         """Book wrote on english."""
@@ -109,14 +108,19 @@ class WritterQuerySet(models.QuerySet):
     def writters_with_count_books(self):
         """Determinating count books on each writter."""
 
-        return self.annotate(
-            count_books=models.Count('books', distinct=True),
-        )
+        return self.annotate(count_books=models.Count('books', distinct=True))
 
     def living_writters(self):
         """Writter living now, age what not possibly more than 110 years."""
 
-        return self.filter(deathyear__isnull=True, birthyear__gte=NOW_YEAR - 110)
+        return self.filter(deathyear__isnull=True, birthyear__gte=NOW_YEAR - 100)
 
-    def writters_with_avg_rating_for_books(self):
+    def writters_with_avg_scope_by_rating_of_books(self):
+        """ """
+
+        raise NotImplementedError
+
+    def writters_with_count_books_and_avg_scope_by_rating_of_books(self):
+        """ """
+
         raise NotImplementedError

@@ -12,6 +12,7 @@ from apps.comments.factories import CommentFactory
 from apps.scopes.factories import ScopeFactory
 from apps.tags.models import Tag
 from apps.web_links.models import WebLink
+from mylabour.utils import generate_text_by_min_length
 
 from apps.articles.factories import ArticleFactory, ArticleSubsectionFactory
 from apps.articles.models import Article, ArticleSubsection
@@ -33,22 +34,8 @@ class ArticleTest(TestCase):
         data = dict(
             title='Кому и зачем потребовалась комната чёрной материи.',
             quotation='Страха не должно быть ни перед чем!',
-            header="""
-The table is a great way to show information about various prices for its products or services, especially,
-some hosting company, they need to present the price of each plan clearly on table to easy
-for users to looking. Those table should content text and features description easy users reading
-information of each level has to offer in a table format. Depending on the contents,
-the tables can be good for organizing many other types of data for deep clarity other than price.
-""",
-            conclusion="""
-Today we’ll take a look to select some of beautiful css css3 tables.
-These come from a variety of different sites.
-If you’re interested in learning how to do this yourself, do not forget to take a look at some of our CSS3 tutorials!
-I love css table design with shadows, rounded corners, gradients and all the CSS3 features.
-That’s why, there are some days when I find myself designing in CSS3 more than in Photoshop.
-The idea of building a features table just by using CSS/CSS3 came to me a while ago and
-I decided to share it with you in this article.
-""",
+            header=generate_text_by_min_length(100, as_p=True),
+            conclusion=generate_text_by_min_length(100, as_p=True),
             picture='http://levashov.com/foto111.jpeg',
             status=Article.STATUS_ARTICLE.published,
             account=Account.objects.random_accounts(1),
@@ -94,19 +81,8 @@ I decided to share it with you in this article.
         data = dict(
             title='Why Python does not have operator CASE-SWITCH.',
             quotation='Важно чтобы было что показать.',
-            header="""
-Getting the message across – in style. That’s what typography is all about.
-It greatly affects the mood of the reader. Like when you’re reading a manuscript,
-most of the time, its on a yellow (ocher)-ish background.
-When you’re reading stuff related to food, you’re going to find a lot of red color use.
-That’s because the color read triggers the brain cells that relate to food.
-For example, Burger King, KFC,McDonald’s – they all have the color red in common.
-""",
-            conclusion="""
-In today’s article, I’m going to cover some really cool
-typography effects you can use in your projects – or just play around with them!
-I’ll be sharing the CSS code – so just paste them in your stylesheet and you’re good to go!
-""",
+            header=generate_text_by_min_length(100, as_p=True),
+            conclusion=generate_text_by_min_length(100, as_p=True),
             picture='http://python.org/foto211.jpeg',
             status=Article.STATUS_ARTICLE.draft,
             account=new_account,
@@ -195,12 +171,6 @@ I’ll be sharing the CSS code – so just paste them in your stylesheet and you
         self.article.subsections.filter().delete()
         self.assertEqual(self.article.get_volume(), len_header + len_conclusion)
 
-    def test_tags_restrict(self):
-        pass
-
-    def test_links_restrict(self):
-        pass
-
 
 class ArticleSubsectionTest(TestCase):
     """
@@ -221,17 +191,7 @@ class ArticleSubsectionTest(TestCase):
     def test_create_subsection(self):
         data = dict(
             title='How to white obfusted python.',
-            content="""
-ɔbfʌskeɪt гл.; книж. 1) затемнять (тж. перен.) Syn : darken, obscure
-2) а) озадачивать, сбивать с толку, ставить в тупик
-б) загонять в угол в) затуманивать рассудок Syn : stupefy, bewilder
-(книжное) путать, сбивать (с толку); туманить рассудок (американизм)
-(умышленно) запутывать вопрос; напускать туман - to * a problem with
-extraneous information осложнять задачу из-за несущественной информации
-(специальное) затемнять, затенять obfuscate книжн. затемнять (свет,
-вопрос и т. п.) ~ книжн. сбивать с толку; туманить рассудок
-""",
-            number=2,
+            content=generate_text_by_min_length(1000, as_p=True),
             article=self.article,
         )
         subsection = ArticleSubsection(**data)
@@ -240,30 +200,17 @@ extraneous information осложнять задачу из-за несущес�
         self.assertEqual(subsection.title, data['title'])
         self.assertEqual(subsection.slug, slugify(data['title'], allow_unicode=True))
         self.assertEqual(subsection.article, data['article'])
-        self.assertEqual(subsection.number, data['number'])
         self.assertEqual(subsection.content, data['content'])
 
     def test_update_subsection(self):
         data = dict(
             title='I never Meta model I didn`t like.',
-            content="""
-1) а) зрелый, спелый (о фрукте, злаке и т. п.) Syn : full-blown б) зрелый, выдержанный (о вине и т. п.)
-Syn : ripe II в) созревший (о зародыше и т. п.), доношенный (о ребенке)
-2) взрослый, возмужавший (о человеке) mature age/years ≈ зрелый возраст/зрелые годы mature wisdom
-≈ приходящая с возрастом мудрость mature student ≈ взрослый студент (довольно взрослый
-для обычного студенческого возраста) Syn : adult, ripe, full-grown, grown-up, of age
-3) сложившийся, сформировавшийся (об экономической ситуации и т. п.), ставший прибыльным
-(об отрасли чего-л., сфере деятельности и т. п.) show-business is a mature industry ≈ шоу-бизнес
-- процветающий теперь вид производства 4) продуманный (о мнении, поступке и т. п.);
-зрелый, разумный (о решении и т. п.)
-""",
-            number=3,
+            content=generate_text_by_min_length(1000, as_p=True),
             article=self.article,
         )
         #
         self.subsection.title = data['title']
         self.subsection.article = data['article']
-        self.subsection.number = data['number']
         self.subsection.content = data['content']
         self.subsection.full_clean()
         self.subsection.save()
@@ -271,7 +218,6 @@ Syn : ripe II в) созревший (о зародыше и т. п.), доно�
         self.assertEqual(self.subsection.title, data['title'])
         self.assertEqual(self.subsection.slug, slugify(data['title'], allow_unicode=True))
         self.assertEqual(self.subsection.article, data['article'])
-        self.assertEqual(self.subsection.number, data['number'])
         self.assertEqual(self.subsection.content, data['content'])
 
     def test_delete_subsection(self):
@@ -305,16 +251,3 @@ Syn : ripe II в) созревший (о зародыше и т. п.), доно�
         self.assertEqual(subsection22.slug, slug_same_title + '-2')
         self.assertEqual(subsection23.title, same_title_as_title)
         self.assertEqual(subsection23.slug, slug_same_title + '-3')
-
-    def test_unique_number_of_subsection_of_article(self):
-        article = ArticleFactory()
-        ArticleSubsectionFactory(article=article, number=1)
-        ArticleSubsectionFactory(article=article, number=2)
-        subsection = ArticleSubsectionFactory(article=article, number=3)
-        subsection.number = 1
-        self.assertRaisesMessage(ValidationError, 'Subsection with this number already exists.', subsection.full_clean)
-        subsection.number = 2
-        self.assertRaisesMessage(ValidationError, 'Subsection with this number already exists.', subsection.full_clean)
-        subsection.number = 3
-        subsection.full_clean()
-        subsection.save()

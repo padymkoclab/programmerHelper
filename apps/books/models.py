@@ -1,6 +1,11 @@
 
+import statistics
+import itertools
+import collections
 import uuid
 
+from psycopg2.extras import NumericRange
+from django.contrib.postgres.fields import IntegerRangeField
 from django.core.exceptions import ValidationError
 from django.contrib.contenttypes.fields import GenericRelation
 from django.core.validators import MinLengthValidator, RegexValidator, MinValueValidator, MaxValueValidator
@@ -11,7 +16,6 @@ from django.db import models
 from django.conf import settings
 
 from mylabour.fields_db import ConfiguredAutoSlugField
-from apps.scopes.models import Scope
 from apps.replies.models import Reply
 from apps.tags.models import Tag
 from apps.web_links.models import WebLink
@@ -105,7 +109,11 @@ class Book(models.Model):
     def get_rating(self):
         """Getting rating of book on based scopes."""
 
-        return self.__class__.objects.books_with_rating().get(pk=self.pk).rating
+        # return self.__class__.objects.books_with_rating().get(pk=self.pk).rating
+        replies_with_total_scope = self.replies.replies_with_total_scope()
+        rating = replies_with_total_scope.aggregate(rating=models.Avg('total_scope'))['rating']
+        rating = rating or 0
+        return round(rating, 4)
     get_rating.admin_order_field = 'rating'
     get_rating.short_description = _('Rating')
 
@@ -124,9 +132,23 @@ class Book(models.Model):
     get_size.admin_order_field = 'pages'
     get_size.short_description = _('Size')
 
-#
-# ages = IntegerRangeField()
-#
+    # Whar often tell about this book
+    # Display return words by font size: h1 h2 h3 and so.
+    def most_common_words_from_replies(self):
+        """Determining most common words presents in replies."""
+
+        # get all words in advantages and disadvantages of reply as two-nested list
+        all_words_in_two_nested_list_words = self.replies.values_list('advantages', 'disadvantages')
+
+        # flat two-nested list to single list
+        two_nested_list_words = itertools.chain.from_iterable(all_words_in_two_nested_list_words)
+        single_nested_list_words = itertools.chain.from_iterable(two_nested_list_words)
+
+        # exceute count words
+        counter_words = collections.Counter(single_nested_list_words)
+
+        # return 10 most common words
+        return counter_words.most_common(10)
 
 
 class Writter(models.Model):
@@ -151,20 +173,11 @@ class Writter(models.Model):
         validators=[MinLengthValidator(100)],
         help_text=_('Give brief character of the writter and his books.')
     )
-    birthyear = models.SmallIntegerField(
-        _('Birthyear'),
+    years_life = IntegerRangeField(
+        _('years life'),
         null=True,
         blank=True,
-        validators=[
-            MaxValueValidator(NOW_YEAR, _('Year of birth can not in future.')),
-        ])
-    deathyear = models.SmallIntegerField(
-        _('Deathyear'),
-        null=True,
-        blank=True,
-        validators=[
-            MaxValueValidator(NOW_YEAR, _('Year of death can not in future.')),
-        ]
+        help_text='Enter year birth and year death, if have.'
     )
 
     class Meta:
@@ -183,32 +196,75 @@ class Writter(models.Model):
         return reverse('books:writter', kwargs={'slug': self.slug})
 
     def clean(self):
-        if isinstance(self.birthyear, int) and isinstance(self.deathyear, int):
-            if self.birthyear >= self.deathyear:
-                raise ValidationError({
-                    '__all__': [_('Year of birth can not more or equal year of dearth.')]
-                })
-            if self.get_age() < 20:
-                raise ValidationError({
-                    '__all__': [_('Very small range between year of birth and year of death.')]
-                })
-            if self.get_age() > 110:
-                raise ValidationError({
-                    '__all__': [_('Very big range between year of birth and year of death.')]
-                })
-        if isinstance(self.birthyear, int):
-            if self.birthyear > NOW_YEAR - 20:
-                raise ValidationError({
-                    'birthyear': [_('Writter not possible born so early.')]
-                })
+        if self.years_life is not None:
+            if not isinstance(self.years_life, NumericRange):
+                raise ValidationError(
+                    {'years_life': _('Years life of writter must be passed as not empty sequence with two values.')}
+                )
+
+            # accept only None or integer
+            year_birth = self.years_life.lower
+            year_death = self.years_life.upper
+            if not (type(year_birth) == int or year_birth is None) or \
+                    not (type(year_death) == int or year_death is None):
+                raise ValidationError(
+                    {'years_life': _('Year birth and death must be integer or skiped.')}
+                )
+
+            #
+            if year_birth is not None:
+                if not 1000 <= year_birth <= NOW_YEAR - 20:
+                    raise ValidationError(
+                        {'years_life': _('Writter may can bithed only from 1000 A. D. to {0} year.').format(NOW_YEAR - 20)}
+                    )
+            if year_death is not None:
+                if not 1000 <= year_death <= NOW_YEAR:
+                    raise ValidationError(
+                        {'years_life': _('Writter may can dead only from 1000 A. D. to now year.')}
+                    )
+            if year_death is not None and year_birth is not None:
+                if year_birth >= year_death:
+                    raise ValidationError({
+                        'years_life': [_('Year of birth can not more or equal year of dearth.')]
+                    })
+                elif self.get_age() < 20:
+                    raise ValidationError({
+                        'years_life': [_('Very small range between year of birth and year of death.')]
+                    })
+                elif self.get_age() > 100:
+                    raise ValidationError({
+                        'years_life': [_('Very big range between year of birth and year of death.')]
+                    })
 
     def get_age(self):
         """Getting age writter if it is possible."""
 
-        if self.birthyear and self.deathyear:
-            return self.deathyear - self.birthyear
-        return None
+        try:
+            age = self.years_life.upper - self.years_life.lower
+            assert age > 0
+            return age
+        except:
+            return None
+
+    def show_years_life(self):
+        """Show age`s writter in human view."""
+
+        birth_year = self.years_life.lower
+        death_year = self.years_life.upper
+
+        # chage value None on ????
+        if birth_year is None:
+            birth_year = '????'
+        if death_year is None:
+            death_year = '????'
+
+        return '{0} - {1}'.format(birth_year, death_year)
+    show_years_life.short_description = _('Year life')
 
     def get_avg_scope_for_books(self):
-        raise NotImplementedError
-        # self.books.
+        """Getting avarage scope for books`s writter, on based average rating it books."""
+
+        all_scopes_books = tuple((book.get_rating() for book in self.books.iterator()))
+        if all_scopes_books:
+            return round(statistics.mean(all_scopes_books), 4)
+        return 0.0
