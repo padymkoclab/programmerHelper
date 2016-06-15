@@ -2,6 +2,8 @@
 from django.utils import timezone
 from django.db import models
 
+from psycopg2.extras import NumericRange
+
 from mylabour.functions_db import Round
 
 
@@ -110,10 +112,24 @@ class WritterQuerySet(models.QuerySet):
 
         return self.annotate(count_books=models.Count('books', distinct=True))
 
-    def living_writters(self):
-        """Writter living now, age what not possibly more than 110 years."""
+    def writters_last_century(self):
+        """Writters livig in the last century.
+        If writter born early than 110 year ago, he must be have without fail year of death."""
 
-        return self.filter(deathyear__isnull=True, birthyear__gte=NOW_YEAR - 100)
+        # find writter without year of death and
+        # either without year of birth or if year of birth is early than 100 year ago.
+        pks = list()
+        for i in self.iterator():
+            if i.years_life.upper is None:
+                if i.years_life.lower is None or i.years_life.lower < NOW_YEAR - 100:
+                    pks.append(i.pk)
+
+        # exclude unsatisfied writters
+        self = self.exclude(pk__in=pks)
+
+        # filter only writters with living from 100 years ago to now
+        self = self.filter(years_life__overlap=NumericRange(NOW_YEAR - 101, NOW_YEAR))
+        return self
 
     def writters_with_avg_scope_by_rating_of_books(self):
         """ """

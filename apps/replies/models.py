@@ -14,6 +14,9 @@ from .querysets import ReplyQuerySet
 
 
 class Reply(BaseGenericModel):
+    """
+    Model for reply about other objects.
+    """
 
     MAX_SCOPE = 5
     MIN_SCOPE = 1

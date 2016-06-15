@@ -23,11 +23,14 @@ class SnippetManager(models.Manager):
         self.change_lexer_of_snippet(snippet=snippet, lexer='python3')
 
     def give_statistics_by_lexers(self):
+        # found and count used lexers
         used_lexers = self.values_list('lexer', flat=True)
         counter_used_lexers = collections.Counter(used_lexers).most_common()
-        do_not_used_lexers = tuple((code, 0) for code, name in self.model.CHOICES_LEXERS if code not in itertools.chain.from_iterable(counter_used_lexers))
+
+        # got codes of used lexer to find non used lexers
+        codes_used_lexers = tuple(itertools.chain.from_iterable(counter_used_lexers))
+        do_not_used_lexers = ((code, 0) for code, name in self.model.CHOICES_LEXERS if code not in codes_used_lexers)
+
+        # contate adn return counters used and don`t used lexers
         counter_lexers = list(counter_used_lexers) + list(do_not_used_lexers)
         return counter_lexers
-
-    # tuple(filter(lambda x: x[0] == 'yaml', Snippet.CHOICES_LEXERS))
-    #  may be need flat list counter_used_lexers for chech IN

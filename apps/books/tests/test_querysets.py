@@ -3,8 +3,6 @@ import unittest
 
 from django.test import TestCase
 
-from psycopg2.extras import NumericRange
-
 from apps.accounts.factories import accounts_factory
 from apps.replies.factories import ReplyFactory
 from apps.tags.factories import tags_factory
@@ -324,7 +322,7 @@ class BookQuerySetTest(TestCase):
         self.assertCountEqual(Book.objects.books_wrote_non_english(), [first_book, last_book])
 
 
-class WritterTest(TestCase):
+class WritterQuerySetTest(TestCase):
     """
     Tests for queryset of model Writter.
     """
@@ -337,15 +335,15 @@ class WritterTest(TestCase):
         accounts_factory(15)
 
     def setUp(self):
-        self.writter1 = WritterFactory(years_life=NumericRange(1958, 2000))
-        self.writter2 = WritterFactory(years_life=NumericRange(1941, 2015))
-        self.writter3 = WritterFactory(years_life=NumericRange(1937, 1987))
-        self.writter4 = WritterFactory(years_life=NumericRange(None, 1947))
-        self.writter5 = WritterFactory(years_life=NumericRange(1880, 1937))
-        self.writter6 = WritterFactory(years_life=NumericRange(1977, None))
-        self.writter7 = WritterFactory(years_life=NumericRange(1950, None))
-        self.writter8 = WritterFactory(years_life=NumericRange(1911, 1990))
-        self.writter9 = WritterFactory(years_life=NumericRange(None, 1899))
+        self.writter1 = WritterFactory(years_life=(1958, 2000))
+        self.writter2 = WritterFactory(years_life=(1941, 2015))
+        self.writter3 = WritterFactory(years_life=(1937, 1987))
+        self.writter4 = WritterFactory(years_life=(None, 1947))
+        self.writter5 = WritterFactory(years_life=(1880, 1937))
+        self.writter6 = WritterFactory(years_life=(1977, None))
+        self.writter7 = WritterFactory(years_life=(1950, None))
+        self.writter8 = WritterFactory(years_life=(1911, 1990))
+        self.writter9 = WritterFactory(years_life=(None, 1899))
         #
         books_factory(15)
 
@@ -362,39 +360,41 @@ class WritterTest(TestCase):
         self.assertEqual(writters_with_count_books.get(pk=self.writter3.pk).count_books, 0)
         self.assertEqual(writters_with_count_books.get(pk=self.writter4.pk).count_books, 10)
 
-    @unittest.skip('Uncheked')
-    def test_living_writters(self):
-        #
-        self.writter1.years_life = NumericRange(NOW_YEAR - 100, NOW_YEAR)
+    def test_writters_last_century(self):
+        # change years life of writter
+        self.writter1.years_life = (NOW_YEAR - 150, NOW_YEAR - 100)
         self.writter1.full_clean()
         self.writter1.save()
-        self.writter2.years_life = NumericRange(NOW_YEAR - 50, NOW_YEAR - 1)
+        self.writter2.years_life = (NOW_YEAR - 150, NOW_YEAR - 101)
         self.writter2.full_clean()
         self.writter2.save()
-        self.writter3.years_life = NumericRange(NOW_YEAR - 80, None)
+        self.writter3.years_life = (NOW_YEAR - 100, None)
         self.writter3.full_clean()
         self.writter3.save()
-        self.writter4.years_life = NumericRange(None, None)
+        self.writter4.years_life = (NOW_YEAR - 101, None)
         self.writter4.full_clean()
         self.writter4.save()
-        self.writter5.years_life = NumericRange(None, NOW_YEAR - 10)
+        self.writter5.years_life = (None, NOW_YEAR - 100)
         self.writter5.full_clean()
         self.writter5.save()
-        self.writter6.years_life = NumericRange(NOW_YEAR - 30, None)
+        self.writter6.years_life = (None, NOW_YEAR - 101)
         self.writter6.full_clean()
         self.writter6.save()
-        self.writter7.years_life = NumericRange(NOW_YEAR - 110, None)
+        self.writter7.years_life = (None, NOW_YEAR)
         self.writter7.full_clean()
         self.writter7.save()
-        self.writter8.years_life = NumericRange(NOW_YEAR - 111, None)
+        self.writter8.years_life = (NOW_YEAR - 100, NOW_YEAR)
         self.writter8.full_clean()
         self.writter8.save()
-        self.writter9.years_life = NumericRange(None, NOW_YEAR)
+        self.writter9.years_life = (None, None)
         self.writter9.full_clean()
         self.writter9.save()
         #
-        living_writters = Writter.objects.living_writters()
-        self.assertCountEqual([self.writter3, self.writter6, self.writter7], living_writters)
+        writters_last_century = Writter.objects.writters_last_century()
+        self.assertCountEqual(
+            [self.writter1, self.writter3, self.writter5, self.writter7, self.writter8],
+            writters_last_century
+        )
 
     @unittest.skip('How made annotation on related field and using foward?')
     def test_writters_lived_in_range_years(self):

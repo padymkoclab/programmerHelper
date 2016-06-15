@@ -1,5 +1,4 @@
 
-import unittest
 import random
 
 from django.utils import timezone
@@ -375,11 +374,11 @@ class WritterTest(TestCase):
     def test_if_big_range_beetween_death_year_and_year_birth(self):
         self.writter.years_life = NumericRange(1800, 2000)
         self.assertRaisesMessage(
-            ValidationError, 'Very big range between year of birth and year of death.', self.writter.full_clean
+            ValidationError, 'Very big range between year of birth and year of death (200 years).', self.writter.full_clean
         )
         self.writter.years_life = NumericRange(1800, 1901)
         self.assertRaisesMessage(
-            ValidationError, 'Very big range between year of birth and year of death.', self.writter.full_clean
+            ValidationError, 'Very big range between year of birth and year of death (101 years).', self.writter.full_clean
         )
         # diffence must be less or equal 100
         self.writter.years_life = NumericRange(1800, 1900)

@@ -177,7 +177,7 @@ class Writter(models.Model):
         _('years life'),
         null=True,
         blank=True,
-        help_text='Enter year birth and year death, if have.'
+        help_text='Enter year birth and year death, if aware.'
     )
 
     class Meta:
@@ -233,7 +233,9 @@ class Writter(models.Model):
                     })
                 elif self.get_age() > 100:
                     raise ValidationError({
-                        'years_life': [_('Very big range between year of birth and year of death.')]
+                        'years_life': [
+                            _('Very big range between year of birth and year of death ({0} years).').format(self.get_age())
+                        ]
                     })
 
     def get_age(self):
