@@ -46,7 +46,7 @@ def make_backup_project():
 def git_push(text_commit):
 
     # made copy project to another disk
-    make_backup_project()
+    # make_backup_project()
 
     # execute pushing with Git
     run('git add -u')

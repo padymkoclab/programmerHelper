@@ -24,7 +24,8 @@ from apps.sessions.models import ExpandedSession
 from mylabour import utils
 # from mylabour.fields_db import PhoneField
 
-from .managers import AccountManager, AccountQuerySet
+from .managers import AccountManager
+from .querysets import AccountQuerySet
 
 
 class AccountLevel(models.Model):

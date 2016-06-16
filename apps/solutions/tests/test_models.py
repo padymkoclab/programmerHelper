@@ -1,4 +1,6 @@
 
+import unittest
+
 from django.core.exceptions import ValidationError
 from django.utils.text import slugify
 from django.test import TestCase
@@ -9,10 +11,10 @@ from apps.tags.factories import tags_factory
 from apps.badges.factories import badges_factory
 from apps.web_links.factories import web_links_factory
 from apps.comments.factories import CommentFactory
-from apps.scopes.factories import ScopeFactory
+from apps.opinions.factories import OpinionFactory
 from apps.tags.models import Tag
 from apps.web_links.models import WebLink
-from mylabour.utils import generate_text_certain_length
+from mylabour.utils import generate_text_by_min_length
 
 from apps.solutions.factories import SolutionFactory, SolutionCategoryFactory, solutions_categories_factory
 from apps.solutions.models import Solution, SolutionCategory
@@ -20,7 +22,7 @@ from apps.solutions.models import Solution, SolutionCategory
 
 class SolutionCategoryTest(TestCase):
     """
-    TestCase for teting model 'SolutionCategory'.
+    Tests for categories of solutions.
     """
 
     @classmethod
@@ -36,7 +38,7 @@ class SolutionCategoryTest(TestCase):
     def test_create_category(self):
         data = dict(
             name='Русские переменные в коде Python',
-            description=generate_text_certain_length(300),
+            description=generate_text_by_min_length(300),
         )
         category = SolutionCategory(**data)
         category.full_clean()
@@ -48,7 +50,7 @@ class SolutionCategoryTest(TestCase):
     def test_update_category(self):
         data = dict(
             name='Валидаторы Django',
-            description=generate_text_certain_length(300),
+            description=generate_text_by_min_length(300),
         )
         #
         self.category.name = data['name']
@@ -66,13 +68,6 @@ class SolutionCategoryTest(TestCase):
     def test_get_absolute_url(self):
         response = self.client.get(self.category.get_absolute_url())
         self.assertEqual(response.status_code, 200)
-
-    def test_deny_using_point_in_end_name_of_category(self):
-        category = SolutionCategory(name='Deploy django-project.', description=generate_text_certain_length(100))
-        self.assertRaisesMessage(ValidationError, 'Don`t use point in end name of category of solution.', category.full_clean)
-        category.name = category.name.rstrip('.')
-        category.full_clean()
-        category.save()
 
     def test_unique_slug(self):
         same_name = 'Тестирование Python с использованием Mock.'
@@ -92,14 +87,69 @@ class SolutionCategoryTest(TestCase):
         self.assertEqual(category13.name, same_name_as_title)
         self.assertEqual(category13.slug, slug_same_name + '-3')
 
-    def test_total_scope(self):
-        pass
+    @unittest.skip('Not implemented')
+    def test_get_total_scope(self):
+        self.category.solutions.filter().delete()
+        self.assertEqual(self.category.get_total_scope(), .0)
+        #
+        solution = SolutionFactory(category=self.category)
+        solution.opinions.clear()
+        self.assertEqual(self.category.get_total_scope(), .0)
+        OpinionFactory(content_object=solution, is_useful=True)
+        self.assertEqual(self.category.get_total_scope(), 1)
 
-    def test_latest_activity(self):
+    def test_get_latest_activity(self):
+        # create new category
+        category = SolutionCategoryFactory()
+
+        # without solutions
+        self.assertEqual(category.get_latest_activity(), category.date_modified)
+
+        # change date_modified but still without solutions
+        category.save()
+        self.assertEqual(category.get_latest_activity(), category.date_modified)
+
+        # added first solution
+        solution1 = SolutionFactory(category=category)
+        self.assertEqual(category.get_latest_activity(), solution1.date_modified)
+
+        # added second solution
+        solution2 = SolutionFactory(category=category)
+        self.assertEqual(category.get_latest_activity(), solution2.date_modified)
+
+        # added third solution
+        solution3 = SolutionFactory(category=category)
+        self.assertEqual(category.get_latest_activity(), solution3.date_modified)
+
+        # change first solution
+        solution1.save()
+        self.assertEqual(category.get_latest_activity(), solution1.date_modified)
+
+        # change third solution
+        solution3.save()
+        self.assertEqual(category.get_latest_activity(), solution3.date_modified)
+
+        # change category
+        category.save()
+        self.assertEqual(category.get_latest_activity(), category.date_modified)
+
+        # change second solution
+        solution2.save()
+        self.assertEqual(category.get_latest_activity(), solution2.date_modified)
+
+        # clear all solutions
+        category.solutions.filter().delete()
+        self.assertEqual(category.get_latest_activity(), category.date_modified)
+
+    @unittest.skip('Not implemented')
+    def test_categories_with_count_solutions_total_scope_and_latest_activity(self):
         pass
 
 
 class SolutionTest(TestCase):
+    """
+    Test for solutions.
+    """
 
     @classmethod
     def setUpTestData(cls):
@@ -111,13 +161,14 @@ class SolutionTest(TestCase):
 
     def setUp(self):
         self.solution = SolutionFactory()
+        self.solution.full_clean()
 
     def test_create_solution(self):
         data = dict(
             title='Создание PostgreSlq БД для django application.',
-            body=generate_text_certain_length(1000),
-            account=Account.objects.random_accounts(1),
-            category=Solution.objects.first(),
+            body=generate_text_by_min_length(1000),
+            account=Account.objects.active_accounts().random_accounts(1),
+            category=SolutionCategory.objects.first(),
         )
         solution = Solution(**data)
         solution.full_clean()
@@ -128,26 +179,26 @@ class SolutionTest(TestCase):
         # adding comments
         for i in range(4):
             CommentFactory(content_object=solution)
-        # adding scopes
+        # adding opinions
         for i in range(2):
-            ScopeFactory(content_object=solution)
+            OpinionFactory(content_object=solution)
         #
         self.assertEqual(solution.title, data['title'])
         self.assertEqual(solution.slug, slugify(data['title'], allow_unicode=True))
         self.assertEqual(solution.body, data['body'])
         self.assertEqual(solution.account, data['account'])
         self.assertEqual(solution.category, data['category'])
-        self.assertEqual(solution.scopes.count(), 2)
+        self.assertEqual(solution.opinions.count(), 2)
         self.assertEqual(solution.tags.count(), 4)
         self.assertEqual(solution.links.count(), 3)
         self.assertEqual(solution.comments.count(), 4)
 
     def test_update_solution(self):
         new_category = SolutionCategoryFactory()
-        new_account = AccountFactory()
+        new_account = AccountFactory(is_active=True)
         data = dict(
             title='Встраивание Python debuger (pdb) в Django Template Language(DTL).',
-            body=generate_text_certain_length(1000),
+            body=generate_text_by_min_length(1000),
             account=new_account,
             category=new_category,
         )
@@ -199,35 +250,216 @@ class SolutionTest(TestCase):
         response = self.client.get(self.solution.get_absolute_url())
         self.assertEqual(response.status_code, 200)
 
-#     def test_get_rating(self):
-#         self.solution.scopes.clear()
-#         self.assertEqual(self.solution.get_rating(), .0)
-#         ScopeFactory(content_object=self.solution, scope=2)
-#         ScopeFactory(content_object=self.solution, scope=1)
-#         ScopeFactory(content_object=self.solution, scope=0)
-#         ScopeFactory(content_object=self.solution, scope=4)
-#         ScopeFactory(content_object=self.solution, scope=5)
-#         ScopeFactory(content_object=self.solution, scope=1)
-#         ScopeFactory(content_object=self.solution, scope=4)
-#         self.assertEqual(self.solution.get_rating(), 2.4286)
+    def test_change_unique_error_message(self):
+        solution = Solution(title=self.solution.title, category=self.solution.category)
+        self.assertRaisesMessage(
+            ValidationError,
+            'Solution with this title already exists in this category of solutions.',
+            solution.full_clean
+        )
 
-#     def test_get_volume(self):
-#         all_items = list()
-#         # length body and conclusion
-#         len_body = len(self.solution.body)
-#         len_conclusion = len(self.solution.conclusion)
-#         # add lengths
-#         all_items.extend([len_body, len_conclusion])
-#         for category in self.solution.categories.iterator():
-#             len_content = len(category.content)
-#             all_items.append(len_content)
-#         self.assertEqual(self.solution.get_volume(), sum(all_items))
-#         # checkup with without categories
-#         self.solution.categories.filter().delete()
-#         self.assertEqual(self.solution.get_volume(), len_body + len_conclusion)
+    @unittest.skip('Not implemented')
+    def test_get_scope(self):
+        #
+        self.solution.opinions.clear()
+        self.assertEqual(self.solution.get_scope(), '0')
+        #
+        OpinionFactory(content_object=self.solution, is_useful=True)
+        self.assertEqual(self.solution.get_scope(), '+1')
+        #
+        OpinionFactory(content_object=self.solution, is_useful=False)
+        OpinionFactory(content_object=self.solution, is_useful=False)
+        self.assertEqual(self.solution.get_scope(), '-1')
+        #
+        OpinionFactory(content_object=self.solution, is_useful=True)
+        OpinionFactory(content_object=self.solution, is_useful=True)
+        OpinionFactory(content_object=self.solution, is_useful=True)
+        OpinionFactory(content_object=self.solution, is_useful=True)
+        self.assertEqual(self.solution.get_scope(), '+3')
+        #
+        self.solution.opinions.clear()
+        self.assertEqual(self.solution.get_scope(), '0')
 
-#     def test_tags_restrict(self):
-#         pass
+    def test_get_quality(self):
+        # get 7 accounts (exclude author of solution)
+        accounts = Account.objects.exclude(pk=self.solution.account.pk).active_accounts().random_accounts(7)
+        # scope 0
+        self.solution.opinions.clear()
+        self.assertEqual(self.solution.get_quality(), 'Vague')
+        # scope +1
+        opinion0 = OpinionFactory(content_object=self.solution, is_useful=True, account=accounts[0])
+        self.assertEqual(self.solution.get_quality(), 'Vague')
+        # scope +2
+        opinion1 = OpinionFactory(content_object=self.solution, is_useful=True, account=accounts[1])
+        self.assertEqual(self.solution.get_quality(), 'Good')
+        # scope +3
+        opinion2 = OpinionFactory(content_object=self.solution, is_useful=True, account=accounts[2])
+        self.assertEqual(self.solution.get_quality(), 'Good')
+        # scope +4
+        opinion3 = OpinionFactory(content_object=self.solution, is_useful=True, account=accounts[3])
+        self.assertEqual(self.solution.get_quality(), 'Good')
+        # scope +5
+        opinion4 = OpinionFactory(content_object=self.solution, is_useful=True, account=accounts[4])
+        self.assertEqual(self.solution.get_quality(), 'Approved')
+        # scope +6
+        opinion5 = OpinionFactory(content_object=self.solution, is_useful=True, account=accounts[5])
+        self.assertEqual(self.solution.get_quality(), 'Approved')
+        # scope +7
+        opinion6 = OpinionFactory(content_object=self.solution, is_useful=True, account=accounts[6])
+        self.assertEqual(self.solution.get_quality(), 'Approved')
+        # scope -1
+        opinion0.is_useful = False
+        opinion0.full_clean()
+        opinion0.save()
+        opinion1.is_useful = False
+        opinion1.full_clean()
+        opinion1.save()
+        opinion2.is_useful = False
+        opinion2.full_clean()
+        opinion2.save()
+        opinion3.is_useful = False
+        opinion3.full_clean()
+        opinion3.save()
+        self.assertEqual(self.solution.get_quality(), 'Vague')
+        # scope -3
+        opinion4.is_useful = False
+        opinion4.full_clean()
+        opinion4.save()
+        self.assertEqual(self.solution.get_quality(), 'Bad')
+        # scope -5
+        opinion5.is_useful = False
+        opinion5.full_clean()
+        opinion5.save()
+        self.assertEqual(self.solution.get_quality(), 'Heinously')
+        # scope -7
+        opinion6.is_useful = False
+        opinion6.full_clean()
+        opinion6.save()
+        self.assertEqual(self.solution.get_quality(), 'Heinously')
+        # scope -6
+        opinion6.delete()
+        self.assertEqual(self.solution.get_quality(), 'Heinously')
+        # scope -4
+        opinion5.delete()
+        opinion4.delete()
+        self.assertEqual(self.solution.get_quality(), 'Bad')
+        # scope -2
+        opinion3.delete()
+        opinion2.delete()
+        self.assertEqual(self.solution.get_quality(), 'Bad')
+        # scope 0
+        self.solution.opinions.clear()
+        self.assertEqual(self.solution.get_quality(), 'Vague')
 
-#     def test_links_restrict(self):
-#         pass
+    def test_get_quality_detail(self):
+        # get 5 accounts (exclude author of solution)
+        accounts = Account.objects.exclude(pk=self.solution.account.pk).active_accounts().random_accounts(5)
+        # Vague quality
+        self.solution.opinions.clear()
+        self.assertEqual(
+            self.solution.get_quality_detail(),
+            'Vague quality solution, tells about what solution is have not clear definition of quality.'
+        )
+        # Good quality
+        opinion0 = OpinionFactory(content_object=self.solution, is_useful=True, account=accounts[0])
+        opinion1 = OpinionFactory(content_object=self.solution, is_useful=True, account=accounts[1])
+        opinion2 = OpinionFactory(content_object=self.solution, is_useful=True, account=accounts[2])
+        opinion3 = OpinionFactory(content_object=self.solution, is_useful=True, account=accounts[3])
+        self.assertEqual(
+            self.solution.get_quality_detail(),
+            'Good quality solution, tells about what solution is have more possitive opinions of users. than negative.'
+        )
+        # Approved quality
+        opinion4 = OpinionFactory(content_object=self.solution, is_useful=True, account=accounts[4])
+        self.assertEqual(
+            self.solution.get_quality_detail(),
+            'Approved quality solution, tells about what solution is have many possitive opinions from users.'
+        )
+        # Bad quality
+        opinion0.is_useful = False
+        opinion0.full_clean()
+        opinion0.save()
+        opinion1.is_useful = False
+        opinion1.full_clean()
+        opinion1.save()
+        opinion2.is_useful = False
+        opinion2.full_clean()
+        opinion2.save()
+        opinion3.is_useful = False
+        opinion3.full_clean()
+        opinion3.save()
+        self.assertEqual(
+            self.solution.get_quality_detail(),
+            'Bad quality solution, tells about what solution is have more negative opinions of users, than possitive.'
+        )
+        # Heinously quality
+        opinion4.is_useful = False
+        opinion4.full_clean()
+        opinion4.save()
+        self.assertEqual(
+            self.solution.get_quality_detail(),
+            'Heinously quality solution, tells about what solution is have many negative opinions from users.'
+        )
+
+    def test_critics_of_solution(self):
+        # nothing given their opinions
+        self.solution.opinions.clear()
+        self.assertSequenceEqual(self.solution.critics_of_solution(), [])
+        # got distinct users
+        accounts = Account.objects.exclude(pk=self.solution.account.pk).active_accounts().random_accounts(5)
+        # not critics
+        opinion1 = OpinionFactory(content_object=self.solution, is_useful=True, account=accounts[0])
+        opinion2 = OpinionFactory(content_object=self.solution, is_useful=True, account=accounts[1])
+        self.assertSequenceEqual(self.solution.critics_of_solution(), [])
+        # presents critics
+        opinion3 = OpinionFactory(content_object=self.solution, is_useful=True, account=accounts[2])
+        opinion4 = OpinionFactory(content_object=self.solution, is_useful=False, account=accounts[3])
+        opinion5 = OpinionFactory(content_object=self.solution, is_useful=False, account=accounts[4])
+        self.assertCountEqual(self.solution.critics_of_solution(), [accounts[3], accounts[4]])
+        # some users change their opinions
+        opinion1.is_useful = False
+        opinion1.full_clean()
+        opinion1.save()
+        opinion2.is_useful = False
+        opinion2.full_clean()
+        opinion2.save()
+        opinion3.is_useful = False
+        opinion3.full_clean()
+        opinion3.save()
+        opinion4.is_useful = True
+        opinion4.full_clean()
+        opinion4.save()
+        opinion5.is_useful = True
+        opinion5.full_clean()
+        opinion5.save()
+        self.assertSequenceEqual(self.solution.critics_of_solution(), [accounts[0], accounts[1], accounts[2]])
+
+    def test_supporters_of_solution(self):
+        # nothing given their opinions
+        self.solution.opinions.clear()
+        self.assertSequenceEqual(self.solution.supporters_of_solution(), [])
+        # got distinct users
+        accounts = Account.objects.exclude(pk=self.solution.account.pk).active_accounts().random_accounts(5)
+        # not supporters
+        opinion1 = OpinionFactory(content_object=self.solution, is_useful=False, account=accounts[0])
+        opinion2 = OpinionFactory(content_object=self.solution, is_useful=False, account=accounts[1])
+        self.assertSequenceEqual(self.solution.supporters_of_solution(), [])
+        # presents supporters
+        opinion3 = OpinionFactory(content_object=self.solution, is_useful=True, account=accounts[2])
+        opinion4 = OpinionFactory(content_object=self.solution, is_useful=False, account=accounts[3])
+        OpinionFactory(content_object=self.solution, is_useful=True, account=accounts[4])
+        self.assertCountEqual(self.solution.supporters_of_solution(), [accounts[2], accounts[4]])
+        # some users change their opinions
+        opinion1.is_useful = True
+        opinion1.full_clean()
+        opinion1.save()
+        opinion2.is_useful = True
+        opinion2.full_clean()
+        opinion2.save()
+        opinion3.is_useful = False
+        opinion3.full_clean()
+        opinion3.save()
+        opinion4.is_useful = True
+        opinion4.full_clean()
+        opinion4.save()
+        self.assertSequenceEqual(self.solution.supporters_of_solution(), [accounts[0], accounts[1], accounts[3], accounts[4]])

@@ -1,4 +1,6 @@
 
+import logging
+import warnings
 import urllib
 import collections
 import re
@@ -48,24 +50,41 @@ def get_choice_lexers():
 
 
 def get_random_objects(queryset, count=1):
-    """Getting certain count random objects from queryset and return as queryset.
+    """Return certain count random objects from queryset.
     If 'count' is great than queryset, then return all avaibled objects.
     If queryset is empty - raise error."""
-    # checkout type queryset
-    if isinstance(queryset, models.QuerySet):
-        all_primary_keys = tuple(queryset.values_list('pk', flat=True))
-        count_primary_keys = len(all_primary_keys)
-        if count_primary_keys == 0:
-            raise ValueError('QuerySet is empty.')
-        if count > count_primary_keys:
-            count = count_primary_keys
-        random_pks = random.sample(all_primary_keys, count)
-        random_objects = queryset.filter(pk__in=random_pks)
-        if count == 1:
-            return random_objects.first()
-        return random_objects
-    else:
-        raise TypeError('Type queryset must be \'django.db.models.query\'.')
+
+    # preluminary restrictions
+    assert isinstance(queryset, models.QuerySet) is True, 'Passed queryset is not subclass models.QuerySet'
+    assert count > 0, 'Count random objects must be more 0'
+
+    #
+    if not queryset.count():
+        raise queryset.model.DoesNotExist('Passed queryset is empty.')
+
+    #
+    if queryset.count() == 1:
+        warnings.warn('In queryset only 1 object, thus returned it.', Warning)
+        return queryset.first()
+
+    #
+    all_primary_keys = list(queryset.values_list('pk', flat=True))
+    if len(all_primary_keys) < count:
+        raise ValueError('Deficiently objects for choice.')
+
+    #
+    random.shuffle(all_primary_keys)
+    choiced_primary_keys = all_primary_keys[:count]
+    random_objects = queryset.filter(pk__in=choiced_primary_keys)
+
+    #
+    if count == 1:
+        return random_objects.first()
+
+    # prevent dublicates through SQL
+    random_objects = random_objects.distinct()
+
+    return random_objects
 
 
 def attempt_get_value_attribute_or_return_default(object, attribute, default):
@@ -331,6 +350,22 @@ def generate_words(min_count_words, max_count_words, to_register='capitalize', l
             word = word.lower()
         words.append(word)
     return words
+
+
+def create_log_for_terminal(name='DefaultLog'):
+    """Configure log for using in terminal."""
+
+    logger = logging.getLogger(name)
+    logger.setLevel(logging.DEBUG)
+    formatter = logging.Formatter('%(asctime)s %(name)-12s %(levelname)-8s %(message)s')
+
+    console = logging.StreamHandler()
+    console.setLevel(logging.DEBUG)
+    console.setFormatter(formatter)
+
+    logger.addHandler(console)
+    return logger
+
 
 if __name__ == "__main__":
     import doctest

@@ -14,8 +14,6 @@ from mylabour.utils import generate_text_by_min_length
 
 from .models import *
 
-Accounts = get_user_model().objects.all()
-
 
 class ArticleFactory(factory.DjangoModelFactory):
 
@@ -24,7 +22,10 @@ class ArticleFactory(factory.DjangoModelFactory):
 
     quotation = factory.Faker('text', locale='ru')
     status = fuzzy.FuzzyChoice(tuple(item[0] for item in Article.STATUS_ARTICLE))
-    account = fuzzy.FuzzyChoice(Accounts)
+
+    @factory.lazy_attribute
+    def account(self):
+        return fuzzy.FuzzyChoice(get_user_model().objects.active_accounts()).fuzz()
 
     @factory.lazy_attribute
     def title(self):

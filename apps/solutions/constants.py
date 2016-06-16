@@ -70,7 +70,7 @@ GoodQuality = Quality(
 )
 ApprovedQuality = Quality(
     type=_('Approved'),
-    description=_('Approved quality solution, tells about what solution is have many possitive opinions os users.'),
+    description=_('Approved quality solution, tells about what solution is have many possitive opinions from users.'),
     color='darkgreen'
 )
 

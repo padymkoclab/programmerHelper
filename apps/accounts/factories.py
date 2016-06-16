@@ -93,11 +93,8 @@ def account_level_factory():
     AccountLevelFactory(name=AccountLevel.CHOICES_LEVEL.regular, color='#F0F8FF', description='Regular level of account')
 
 
-def accounts_factory(count, force_active_all_users=False):
+def accounts_factory(count):
     if not AccountLevel.objects.count() and count > 0:
         account_level_factory()
     for i in range(count):
-        if force_active_all_users:
-            AccountFactory(is_active=force_active_all_users)
-        else:
-            AccountFactory()
+        AccountFactory()

@@ -32,6 +32,7 @@ class Tag(TimeStampedModel):
         verbose_name_plural = _("Tags")
         get_latest_by = 'date_modified'
         ordering = ['name']
+        permissions = (('create_new_tags', _('You can create new tags.')),)
 
     # managers
     objects = models.Manager()

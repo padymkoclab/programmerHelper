@@ -49,7 +49,7 @@ class Article(TimeStampedModel):
         settings.AUTH_USER_MODEL,
         verbose_name=_('Author'),
         related_name='articles',
-        # limit_choices_to={'is_active': True},
+        limit_choices_to={'is_active': True},
         on_delete=models.CASCADE,
     )
     source = models.URLField(

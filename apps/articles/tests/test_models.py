@@ -30,7 +30,8 @@ class ArticleTest(TestCase):
         accounts_factory(15)
 
     def setUp(self):
-        self.article = ArticleFactory(account=Account.objects.last())
+        self.article = ArticleFactory()
+        self.article.full_clean()
 
     def test_create_article(self):
         data = dict(
@@ -190,7 +191,9 @@ class ArticleSubsectionTest(TestCase):
 
     def setUp(self):
         self.article = ArticleFactory()
+        self.article.full_clean()
         self.subsection = ArticleSubsectionFactory(article=self.article)
+        self.subsection.full_clean()
 
     def test_create_subsection(self):
         data = dict(

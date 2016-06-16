@@ -9,3 +9,45 @@ class Round(Func):
 
     function = 'ROUND'
     template = '%(function)s(%(expressions)s, 4)'
+
+
+class ToStr(Func):
+    """
+
+    """
+
+    function = 'CAST'
+    template = '%(function)s(%(expressions)s as VARCHAR)'
+
+
+class Degrees(Func):
+    """
+    Returns numeric expression converted from radians to degrees.
+    """
+
+    function = 'DEGREES'
+
+
+class Power(Func):
+    """
+    These two functions return the value of X raised to the power of Y.
+    """
+
+    function = 'POWER(X, Y)'
+
+
+class Radians(Func):
+    """
+    This function returns the value of X, converted from degrees to radians.
+
+    """
+
+    function = 'RADIANS'
+
+
+class Sqrt(Func):
+    """
+    This function returns the non-negative square root of X.
+    """
+
+    function = 'SQRT'

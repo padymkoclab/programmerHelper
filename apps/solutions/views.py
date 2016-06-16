@@ -6,9 +6,9 @@ from .models import SolutionCategory, Solution
 
 class CategoryDetailView(DetailView):
     model = SolutionCategory
-    template_name = "TEMPLATE_NAME"
+    template_name = "solutions/category_detail.html"
 
 
 class SolutionDetailView(DetailView):
     model = Solution
-    template_name = "TEMPLATE_NAME"
+    template_name = "solutions/solution_detail.html"

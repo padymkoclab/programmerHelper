@@ -18,9 +18,12 @@ class SnippetFactory(factory.DjangoModelFactory):
     class Meta:
         model = Snippet
 
-    account = fuzzy.FuzzyChoice(get_user_model().objects.all())
     description = factory.Faker('text', locale='ru')
     code = factory.Faker('text', locale='en')
+
+    @factory.lazy_attribute
+    def account(self):
+        return fuzzy.FuzzyChoice(get_user_model().objects.active_accounts()).fuzz()
 
     @factory.lazy_attribute
     def title(self):

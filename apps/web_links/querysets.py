@@ -16,8 +16,7 @@ class WebLinkQuerySet(models.QuerySet):
 
     def weblinks_with_count_usage(self):
         """ """
-
-        self.annotate()
+        raise NotImplementedError
 
     def broken_links(self):
-        pass
+        raise NotImplementedError

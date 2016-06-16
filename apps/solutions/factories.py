@@ -36,7 +36,10 @@ class SolutionFactory(factory.DjangoModelFactory):
         model = Solution
 
     category = fuzzy.FuzzyChoice(SolutionCategory.objects.all())
-    account = fuzzy.FuzzyChoice(get_user_model().objects.all())
+
+    @factory.lazy_attribute
+    def account(self):
+        return fuzzy.FuzzyChoice(get_user_model().objects.active_accounts()).fuzz()
 
     @factory.lazy_attribute
     def title(self):
