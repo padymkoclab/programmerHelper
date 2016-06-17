@@ -1,4 +1,5 @@
 
+from django.utils import timezone
 from django.db import models
 
 from mylabour.functions_db import ToStr
@@ -60,7 +61,8 @@ class SolutionQuerySet(models.QuerySet):
         return self
 
     def solutions_with_displayed_scopes(self):
-        """ """
+        """Convert scope of solution to string and return with sign of number:
+        if 0 return 0, if 1 return +1, if -1 return -1."""
 
         raise NotImplementedError
         self = self.solutions_with_scopes()
@@ -78,17 +80,19 @@ class SolutionQuerySet(models.QuerySet):
 
         # annotated solutions with scopes
         solutions_with_scopes = self.solutions_with_scopes()
-        # conditional branches
-        if isinstance(min_scope, int) and max_scope is None:
+        #
+        if isinstance(min_scope, int) and isinstance(max_scope, int):
+            if min_scope > max_scope:
+                raise ValueError('min_scope must not great than max_scope.')
+            return solutions_with_scopes.filter(scope__gte=min_scope, scope__lte=max_scope)
+        elif isinstance(min_scope, int) and max_scope is None:
             return solutions_with_scopes.filter(scope__gte=min_scope)
         elif min_scope is None and isinstance(max_scope, int):
             return solutions_with_scopes.filter(scope__lte=max_scope)
-        elif min_scope is not None and max_scope is not None:
-            if isinstance(min_scope, int) and isinstance(max_scope, int):
-                return solutions_with_scopes.filter(scope__gte=min_scope).filter(scope__lte=max_scope)
-            raise ValueError('min_scope or max_scope is not integer number.')
+        elif min_scope is None and max_scope is None:
+            raise TypeError('Please give min_scope or max_scope.')
         else:
-            raise TypeError('Missing 1 required argument: min_scope or max_scope.')
+            raise ValueError('min_scope or max_scope is not integer.')
 
     def heinously_solutions(self):
         """Solution determined users as heinously by given their opinions."""
@@ -158,3 +162,19 @@ class SolutionQuerySet(models.QuerySet):
         self = self.solutions_with_scopes()
         self = self.solutions_with_qualities()
         return self
+
+    def solutions_by_month(self):
+        """Filter solutions added in this month."""
+
+        return self.filter(date_added__month=timezone.now().month)
+
+    def top_solutions_this_month(self):
+        """Determined three solutions the best in this month.
+        Determination the best solutions based on scope, count views solution and reputation of account."""
+
+        # top for scopes
+        self.solutions_with_scopes().order_by('-scope')
+
+        # top for visits
+
+        raise NotImplementedError

@@ -1,7 +1,7 @@
 
 import re
-import datetime
 
+from django.utils import timezone
 from django.utils.encoding import uri_to_iri
 from django.conf import settings
 
@@ -15,13 +15,13 @@ class RegistratorVisitAccountMiddleware(object):
 
     def process_response(self, request, response):
         if request.user.is_authenticated() and response.status_code == 200:
-            DayAttendance.objects.get_or_create(user=request.user, day_attendance=datetime.date.today())
+            DayAttendance.objects.get_or_create(user=request.user, day_attendance=timezone.datetime.today())
         return response
 
 
-class CountVisitsPagesMiddleware(object):
+class CountVisitsPageMiddleware(object):
     """
-    Count visits pages by authenticated users.
+    Count visits pages by users. Counter will be increase even if the same user again visited page.
     """
 
     SETTING_NAME_FOR_IGNORABLE_URLS = 'IGNORABLE_URLS_FOR_COUNT_VISITS'
@@ -62,4 +62,15 @@ class CountVisitsPagesMiddleware(object):
             # get value variable stored in session or create new as list()
             visit = Visit.objects.get_or_create(url__exact=url_path)[0]
             visit.users.add(request.user)
+        return response
+
+
+class LastSeenAccountMiddleware(object):
+    """
+    Middleware for trake down time last seen on website.
+    """
+
+    def process_response(self, request, response):
+        if request.user.is_authenticated() and response.status_code == 200:
+            request.session['last_seen'] = timezone.now()
         return response

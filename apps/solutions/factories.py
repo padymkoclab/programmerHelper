@@ -35,7 +35,9 @@ class SolutionFactory(factory.DjangoModelFactory):
     class Meta:
         model = Solution
 
-    category = fuzzy.FuzzyChoice(SolutionCategory.objects.all())
+    @factory.lazy_attribute
+    def category(self):
+        return fuzzy.FuzzyChoice(SolutionCategory.objects.all()).fuzz()
 
     @factory.lazy_attribute
     def account(self):

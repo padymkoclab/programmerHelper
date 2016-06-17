@@ -451,7 +451,7 @@ class ArticleQuerySetTest(TestCase):
     def test_validate_input_articles_by_rating(self):
         # if not nothing limitation
         self.assertRaisesMessage(
-            AttributeError,
+            TypeError,
             'Please point at least either min_rating or max_rating.',
             Article.objects.articles_by_rating
         )

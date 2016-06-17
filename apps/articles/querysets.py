@@ -116,7 +116,7 @@ class ArticleQuerySet(models.QuerySet):
         """Filter articles by certain range of rating."""
 
         if min_rating is None and max_rating is None:
-            raise AttributeError('Please point at least either min_rating or max_rating.')
+            raise TypeError('Please point at least either min_rating or max_rating.')
         self = self.articles_with_rating()
         if isinstance(min_rating, numbers.Real) and isinstance(max_rating, numbers.Real):
             if min_rating > max_rating:

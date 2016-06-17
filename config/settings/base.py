@@ -83,7 +83,7 @@ DJANGO_MIDDLEWARE_CLASSES = [
 
 MY_MIDDLEWARE_CLASSES = [
     'apps.accounts.middleware.LastSeenAccountMiddleware',
-    'apps.visits.middleware.CountVisitsPagesMiddleware',
+    'apps.visits.middleware.CountVisitsPageMiddleware',
     'apps.visits.middleware.RegistratorVisitAccountMiddleware',
 ]
 

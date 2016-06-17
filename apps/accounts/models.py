@@ -352,3 +352,7 @@ class Account(AbstractBaseUser, PermissionsMixin):
             reputation_for_test_suits,
             reputation_for_courses,
         ])
+
+    def get_top_tags(self):
+        """Return dict as couple: 'tag': percent_usage % """
+        return NotImplementedError
