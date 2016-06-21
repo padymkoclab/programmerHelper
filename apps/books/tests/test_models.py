@@ -139,6 +139,9 @@ class BookTest(TestCase):
         response = self.client.get(self.book.get_absolute_url())
         self.assertEqual(response.status_code, 200)
 
+    def test_get_admin_page_url(self):
+        raise NotImplementedError
+
     def test_get_rating(self):
         self.book.replies.clear()
         self.assertEqual(self.book.get_rating(), 0)

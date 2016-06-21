@@ -61,12 +61,6 @@ class BookFactory(factory.django.DjangoModelFactory):
         self.tags.set(tags)
 
     @factory.post_generation
-    def links(self, created, extracted, **kwargs):
-        count_links = random.randrange(0, settings.MAX_COUNT_WEBLINKS_ON_OBJECT)
-        weblinks = random.sample(tuple(WebLink.objects.all()), count_links)
-        self.links.set(weblinks)
-
-    @factory.post_generation
     def accounts(self, created, extracted, **kwargs):
         count_authors = random.randint(1, 4)
         authors = random.sample(tuple(Writter.objects.all()), count_authors)

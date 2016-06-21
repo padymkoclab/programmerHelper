@@ -1,0 +1,22 @@
+
+{% load i18n %}
+{% load nvd3_tags %}
+
+<div class="table-responsive">
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>{% trans "Total count usage in articles" %}</th>
+                <th>{% trans "Total count usage in solutions" %}</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>{{ statistics.count_usage_in_articles }}</td>
+                <td>{{ statistics.count_usage_in_solutions }}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+{% include "admin/web_links/chart_usage_weblinks.html" %}

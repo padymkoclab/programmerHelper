@@ -14,8 +14,9 @@ class RegistratorVisitAccountMiddleware(object):
     """
 
     def process_response(self, request, response):
-        if request.user.is_authenticated() and response.status_code == 200:
-            DayAttendance.objects.get_or_create(user=request.user, day_attendance=timezone.datetime.today())
+        if response.status_code == 200:
+            if request.user.is_authenticated():
+                DayAttendance.objects.get_or_create(user=request.user, day_attendance=timezone.datetime.today())
         return response
 
 
@@ -51,17 +52,19 @@ class CountVisitsPageMiddleware(object):
             return list_igno_urls if list_igno_urls else False
 
     def process_response(self, request, response):
-        if request.user.is_authenticated() and response.status_code == 200:
-            # correct displaying unicode in URL
-            url_path = uri_to_iri(request.path)
-            # check_url_as_ignorabled if defined corresponding setting
-            list_igno_urls = self._check_present_setting_for_restriction_urls_for_count()
-            if list_igno_urls:
-                if self._is_ignorable_URL(url_path, list_igno_urls):
-                    return response
-            # get value variable stored in session or create new as list()
-            visit = Visit.objects.get_or_create(url__exact=url_path)[0]
-            visit.users.add(request.user)
+        if response.status_code == 200:
+            if request.user.is_authenticated():
+                pass
+                # # correct displaying unicode in URL
+                # url_path = uri_to_iri(request.path)
+                # # check_url_as_ignorabled if defined corresponding setting
+                # list_igno_urls = self._check_present_setting_for_restriction_urls_for_count()
+                # if list_igno_urls:
+                #     if self._is_ignorable_URL(url_path, list_igno_urls):
+                #         return response
+                # # get value variable stored in session or create new as list()
+                # visit = Visit.objects.get_or_create(url__exact=url_path)[0]
+                # visit.users.add(request.user)
         return response
 
 
@@ -71,6 +74,7 @@ class LastSeenAccountMiddleware(object):
     """
 
     def process_response(self, request, response):
-        if request.user.is_authenticated() and response.status_code == 200:
-            request.session['last_seen'] = timezone.now()
+        if response.status_code == 200:
+            if request.user.is_authenticated():
+                request.session['last_seen'] = timezone.now()
         return response

@@ -1,5 +1,9 @@
 
+import random
+
 import factory
+
+from mylabour.utils import generate_text_by_min_length
 
 from .models import *
 
@@ -17,9 +21,9 @@ class WebLinkFactory(factory.DjangoModelFactory):
 
     @factory.lazy_attribute
     def title(self):
-        name_ru = factory.Faker('text', locale='ru').generate([])[:25]
-        name_en = factory.Faker('text', locale='en').generate([])[:25]
-        return '{0} {1}'.format(name_en, name_ru)
+        if random.random() > .5:
+            return ''
+        return generate_text_by_min_length(10)[:50]
 
 
 def web_links_factory(count):

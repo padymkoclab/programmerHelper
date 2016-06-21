@@ -250,6 +250,9 @@ class SolutionTest(TestCase):
         response = self.client.get(self.solution.get_absolute_url())
         self.assertEqual(response.status_code, 200)
 
+    def test_get_admin_page_url(self):
+        raise NotImplementedError
+
     def test_change_unique_error_message(self):
         solution = Solution(title=self.solution.title, category=self.solution.category)
         self.assertRaisesMessage(
@@ -463,3 +466,6 @@ class SolutionTest(TestCase):
         opinion4.full_clean()
         opinion4.save()
         self.assertSequenceEqual(self.solution.supporters_of_solution(), [accounts[0], accounts[1], accounts[3], accounts[4]])
+
+    def test_related_solutions(self):
+        raise NotImplementedError

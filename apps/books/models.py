@@ -18,7 +18,6 @@ from django.conf import settings
 from mylabour.fields_db import ConfiguredAutoSlugField
 from apps.replies.models import Reply
 from apps.tags.models import Tag
-from apps.web_links.models import WebLink
 
 from .managers import BookManager, WritterManager
 from .querysets import BookQuerySet, WritterQuerySet
@@ -81,12 +80,6 @@ class Book(models.Model):
         verbose_name=_('Tags'),
         related_name='books',
     )
-    links = models.ManyToManyField(
-        WebLink,
-        related_name='books',
-        verbose_name=_('Where downloads'),
-        help_text=_('Weblinks where can download this book.')
-    )
     replies = GenericRelation(Reply, related_query_name='books')
 
     # managers
@@ -105,6 +98,12 @@ class Book(models.Model):
 
     def get_absolute_url(self):
         return reverse('books:book', kwargs={'slug': self.slug})
+
+    def get_admin_page_url(self):
+        return reverse(
+            'admin:{0}_{1}_change'.format(self._meta.app_label, self._meta.model_name),
+            args=(self.pk,)
+        )
 
     def get_rating(self):
         """Getting rating of book on based scopes."""

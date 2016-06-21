@@ -133,6 +133,12 @@ class Solution(TimeStampedModel):
     def get_absolute_url(self):
         return reverse('solutions:solution', kwargs={'pk': self.pk, 'slug': self.slug})
 
+    def get_admin_page_url(self):
+        return reverse(
+            'admin:{0}_{1}_change'.format(self._meta.app_label, self._meta.model_name),
+            args=(self.pk,)
+        )
+
     def unique_error_message(self, model_class, unique_check):
         if isinstance(self, model_class) and unique_check == ('title', 'category'):
             return _('Solution with this title already exists in this category of solutions.')
@@ -177,3 +183,10 @@ class Solution(TimeStampedModel):
         """Determination users given possitive opinions about solution."""
 
         return get_user_model().objects.filter(pk__in=self.opinions.filter(is_useful=True).values('account__pk'))
+
+    def related_solutions(self):
+        """ """
+
+        raise NotImplementedError
+        # analysis tags
+        # analysis title

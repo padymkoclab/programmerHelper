@@ -1,5 +1,5 @@
 
-# from django.utils.safestring import mark_safe
+from django.utils.safestring import mark_safe
 
 from .base import *
 
@@ -24,6 +24,6 @@ DATABASES = {
     }
 }
 
-# TEMPLATES[0]['OPTIONS']['string_if_invalid'] = mark_safe('<i style="color: red; font-weight: bold;">ERROR HERE!!!</i>')
+TEMPLATES[0]['OPTIONS']['string_if_invalid'] = mark_safe('<i style="color: red; font-weight: bold;">ERROR HERE!!!</i>')
 
 INSTALLED_APPS += ['django_extensions', 'debug_toolbar']

@@ -123,8 +123,17 @@ class SolutionAdmin(admin.ModelAdmin):
     get_count_tags.admin_order_field = 'count_tags'
 
     def colored_quality(self, obj):
-        details = obj.get_detail_about_quality()
-        color = details.color
+        quality = obj.get_quality()
+        if quality == 'Approved':
+            color = 'darkgreen'
+        elif quality == 'Good':
+            color = 'lightgreen'
+        elif quality == 'Vague':
+            color = 'black'
+        elif quality == 'Bad':
+            color = 'red'
+        elif quality == 'Heinously':
+            color = 'darkred'
         return format_html('<span style="color: {1};">{0}</span>', obj.quality, color)
     colored_quality.short_description = _('Quality')
     colored_quality.admin_order_field = 'scope'

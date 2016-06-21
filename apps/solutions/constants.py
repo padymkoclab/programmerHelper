@@ -11,6 +11,7 @@ CATEGORIES_OF_SOLUTIONS = [
     'Bootstrap',
     'Bower',
     'CSS',
+    'Coffescript',
     'Django',
     'Gevent',
     'Git',

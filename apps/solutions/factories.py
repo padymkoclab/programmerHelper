@@ -8,7 +8,7 @@ from factory import fuzzy
 
 from apps.comments.factories import CommentFactory
 from apps.opinions.factories import OpinionFactory
-from mylabour.utils import generate_text_certain_length
+from mylabour.utils import generate_text_certain_length, generate_text_by_min_length
 
 from .constants import CATEGORIES_OF_SOLUTIONS
 from .models import *
@@ -45,7 +45,10 @@ class SolutionFactory(factory.DjangoModelFactory):
 
     @factory.lazy_attribute
     def title(self):
-        return factory.Faker('text', locale='ru').generate([])[:50]
+        max_length = Solution._meta.get_field('title').max_length
+        min_length = 10
+        length = random.randint(min_length, max_length)
+        return generate_text_by_min_length(min_length)[:length]
 
     @factory.lazy_attribute
     def body(self):

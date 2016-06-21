@@ -3,6 +3,7 @@ import datetime
 
 from django.utils.text import slugify
 # from django.utils import timezone
+from django.conf import global_settings
 
 from unipath import Path
 
@@ -63,6 +64,8 @@ MY_APPS = [
 THIRD_PARTY_APPS = [
     'django_cleanup',
     'daterange_filter',
+    'djangobower',
+    'django_nvd3',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + MY_APPS + THIRD_PARTY_APPS
@@ -82,7 +85,6 @@ DJANGO_MIDDLEWARE_CLASSES = [
 ]
 
 MY_MIDDLEWARE_CLASSES = [
-    'apps.accounts.middleware.LastSeenAccountMiddleware',
     'apps.visits.middleware.CountVisitsPageMiddleware',
     'apps.visits.middleware.RegistratorVisitAccountMiddleware',
 ]
@@ -105,6 +107,7 @@ TEMPLATES = [
                 'django.template.context_processors.i18n',
                 'django.template.context_processors.media',
                 'django.template.context_processors.static',
+                'django.core.context_processors.request',
                 # 'django.template.context_processors.tz',
                 'mylabour.context_processors.date_creating_website',
                 'apps.visits.context_processors.count_visits',
@@ -211,6 +214,7 @@ STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
 STATICFILES_FINDERS = [
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'djangobower.finders.BowerFinder',
 ]
 
 MEDIA_URL = '/media/'
@@ -309,4 +313,122 @@ IGNORABLE_URLS_FOR_COUNT_VISITS = (
     r'/(robots.txt)|(humans.txt)$',
 )
 
+# AUTOSLUGFIELD
+
 AUTOSLUG_SLUGIFY_FUNCTION = lambda value: slugify(value, allow_unicode=True)
+
+# DJANGO-BOWER
+# Require Bower, Nmp, NodeJS
+
+BOWER_COMPONENTS_ROOT = str(BASE_DIR.child('static', 'project', 'js'))
+
+# try !which bower
+BOWER_PATH = '/usr/local/bin/bower'
+
+BOWER_INSTALLED_APPS = (
+    'jquery',
+    'underscore',
+    'highlightjs',
+    'd3',
+    'bootstrap',
+    'select2',
+    'nvd3',
+)
+
+# Suit (admin theme)
+
+SUIT_CONFIG = {
+    'ADMIN_NAME': 'ProgramerHelperAdmin',
+    'CONFIRM_UNSAVED_CHANGES': True,
+    'HEADER_DATE_FORMAT': global_settings.DATE_FORMAT,
+    'HEADER_TIME_FORMAT': global_settings.TIME_FORMAT,
+    'LIST_PER_PAGE': 20,
+    'MENU': (
+        {
+            'app': 'accounts',
+            'icon': 'icon-user',
+            'models': ('account', 'accountlevel', 'auth.group'),
+        },
+        {
+            'app': 'actions',
+            'icon': 'icon-signal',
+        },
+        {
+            'app': 'articles',
+            'icon': 'icon-pencil',
+        },
+        {
+            'app': 'badges',
+            'icon': 'icon-star',
+        },
+        {
+            'app': 'books',
+            'icon': 'icon-book',
+        },
+        {
+            'app': 'comments',
+            'icon': 'icon-comment',
+        },
+        {
+            'app': 'courses',
+            'icon': 'icon-certificate',
+        },
+        {
+            'app': 'forum',
+            'icon': 'icon-th',
+        },
+        {
+            'app': 'inboxes',
+            'icon': 'icon-envelope',
+        },
+        {
+            'app': 'newsletters',
+            'icon': 'icon-info-sign',
+        },
+        {
+            'app': 'opinions',
+            'icon': 'icon-thumbs-up',
+        },
+        {
+            'app': 'polls',
+            'icon': 'icon-flag',
+        },
+        {
+            'app': 'questions',
+            'icon': 'icon-question-sign',
+        },
+        {
+            'app': 'scopes',
+            'icon': 'icon-ok',
+        },
+        {
+            'app': 'snippets',
+            'icon': 'icon-tasks',
+        },
+        {
+            'app': 'solutions',
+            'icon': 'icon-file',
+        },
+        {
+            'app': 'tags',
+            'icon': 'icon-tags',
+        },
+        {
+            'app': 'testing',
+            'icon': 'icon-repeat',
+        },
+        {
+            'app': 'utilities',
+            'icon': 'icon-gift',
+        },
+        {
+            'app': 'web_links',
+            'icon': 'icon-download-alt',
+        },
+    ),
+    'MENU_OPEN_FIRST_CHILD': True,
+    # 'SEARCH_URL': 'admin:account_account_changelist',
+    'SEARCH_URL': '',
+    'SHOW_REQUIRED_ASTERISK': True,
+    'VERSION': ''
+}

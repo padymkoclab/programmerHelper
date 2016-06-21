@@ -101,6 +101,11 @@ class Question(TimeStampedModel):
         return self.opinions.filter(is_favorite=False).count()
     get_count_unfavorites.short_description = _('Count unfavorites')
 
+    def related_questions(self):
+        raise NotImplementedError
+        # analysis tags
+        # analysis title
+
 
 class Answer(TimeStampedModel):
     """

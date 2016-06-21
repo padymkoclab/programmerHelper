@@ -146,6 +146,9 @@ class ArticleTest(TestCase):
         response = self.client.get(self.article.get_absolute_url())
         self.assertEqual(response.status_code, 200)
 
+    def test_get_admin_page_url(self):
+        raise NotImplementedError
+
     def test_get_rating(self):
         self.article.scopes.clear()
         self.assertEqual(self.article.get_rating(), .0)
@@ -175,6 +178,9 @@ class ArticleTest(TestCase):
         # checkup with without subsections
         self.article.subsections.filter().delete()
         self.assertEqual(self.article.get_volume(), 841)
+
+    def test_related_articles(self):
+        raise NotImplementedError
 
 
 class ArticleSubsectionTest(TestCase):

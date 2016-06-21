@@ -86,3 +86,9 @@ class Snippet(TimeStampedModel):
         """Return the users determined this snippet as useful."""
 
         return self.opinions.filter(is_useful=True).values_list('account__username', flat=True)
+
+    def related_snippets(self):
+        """ """
+        raise NotImplementedError
+        # analysis tags
+        # analysis title

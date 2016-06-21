@@ -162,3 +162,6 @@ class SnippetTest(TestCase):
         #
         show_users_given_good_opinions = self.snippet.show_users_given_good_opinions()
         self.assertCountEqual([account3.username, account5.username], show_users_given_good_opinions)
+
+    def test_related_snippets(self):
+        raise NotImplementedError

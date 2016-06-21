@@ -356,3 +356,15 @@ class Account(AbstractBaseUser, PermissionsMixin):
     def get_top_tags(self):
         """Return dict as couple: 'tag': percent_usage % """
         return NotImplementedError
+
+    def comments(self):
+        pass
+
+    def count_comments(self):
+        pass
+
+    def count_comments(self):
+        pass
+
+    # https://www.digitalocean.com/community/users/jellingwood?primary_filter=upvotes_given
+    # answer, queations, hearts, opinons and more

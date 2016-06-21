@@ -23,7 +23,6 @@ class BookAdmin(admin.ModelAdmin):
         'publishers',
         'language',
         'isbn',
-        'get_count_links',
         'get_count_tags',
         'get_rating',
         'get_count_replies',
@@ -37,8 +36,8 @@ class BookAdmin(admin.ModelAdmin):
     ]
     search_fields = ('name', 'publishers', 'accounts__name')
     date_hierarchy = 'date_added'
-    filter_horizontal = ['tags', 'accounts']
-    filter_vertical = ['links']
+    filter_horizontal = ['tags']
+    filter_vertical = ['accounts']
     fieldsets = [
         [
             Book._meta.verbose_name, {
@@ -52,7 +51,6 @@ class BookAdmin(admin.ModelAdmin):
                     'isbn',
                     'publishers',
                     'accounts',
-                    'links',
                     'tags',
                 ]
             }
@@ -73,11 +71,6 @@ class BookAdmin(admin.ModelAdmin):
         return obj.count_replies
     get_count_replies.admin_order_field = 'count_replies'
     get_count_replies.short_description = _('Count replies')
-
-    def get_count_links(self, obj):
-        return obj.count_links
-    get_count_links.admin_order_field = 'count_links'
-    get_count_links.short_description = _('Count links')
 
     def show_writters(self, obj):
         """Listing writters separated throgh commas"""

@@ -17,4 +17,4 @@ class OpinionFormSet(forms.BaseGenericInlineFormSet):
                 self.non_form_errors().append(_('On form present the repeated users.'))
                 for form in self.forms:
                     if form.cleaned_data['account'] in repeated_accounts:
-                        form.add_error('account', _('Repeated account'))
+                        form.add_error('account', _('A same account now allowed to have more that one opinions.'))

@@ -2,7 +2,7 @@
 from django.utils import timezone
 from django.db import models
 
-from mylabour.functions_db import ToStr
+from mylabour.functions_db import ToStr, ToChar
 
 
 class SolutionCategoryQuerySet(models.QuerySet):
@@ -64,11 +64,11 @@ class SolutionQuerySet(models.QuerySet):
         """Convert scope of solution to string and return with sign of number:
         if 0 return 0, if 1 return +1, if -1 return -1."""
 
-        raise NotImplementedError
         self = self.solutions_with_scopes()
+        self = self.annotate(scope=ToStr('scope'))
+        self = self.annotate(s1=ToChar('scope'))
         # self = self.annotate(displayed_scope=models.Case(
-        #     models.When(scope__exact=0, then=models.ExpressionWrapper(
-        #         models.Value('0') + models.F('scope'), output_field=models.CharField())),
+        #     models.When(scope__exact=0, then=models.Value('0')),
         #     models.When(scope__lt=0, then=models.Value('-')),
         #     models.When(scope__gt=0, then=models.Value('+')),
         #     output_field=models.CharField(),

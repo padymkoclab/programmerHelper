@@ -94,6 +94,12 @@ class Article(TimeStampedModel):
     def get_absolute_url(self):
         return reverse('articles:article', kwargs={'slug': self.slug})
 
+    def get_admin_page_url(self):
+        return reverse(
+            'admin:{0}_{1}_change'.format(self._meta.app_label, self._meta.model_name),
+            args=(self.pk,)
+        )
+
     def unique_error_message(self, model_class, unique_check):
         if isinstance(self, model_class) and unique_check == ('account', 'title'):
             return _('This author already have article with this title.')
@@ -107,6 +113,11 @@ class Article(TimeStampedModel):
     def get_volume(self):
         return self.__class__.objects.articles_with_volume().get(pk=self.pk).volume
     get_volume.short_description = _('Volume')
+
+    def related_articles(self):
+        raise NotImplementedError
+        # analysis tags
+        # analysis title
 
 
 class ArticleSubsection(TimeStampedModel):
