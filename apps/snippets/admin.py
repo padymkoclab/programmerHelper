@@ -1,18 +1,21 @@
 
+from django.template.response import TemplateResponse
+from django.conf.urls import url
 from django.utils.translation import ugettext_lazy as _
 from django.contrib import admin
 
 from apps.comments.admin import CommentInline
 from apps.opinions.admin import OpinionInline
+from apps.opinions.admin_mixins import ScopeMixin
 from apps.favours.admin import FavourInline
 
 from .models import Snippet
 from .forms import SnippetForm
 
 
-class SnippetAdmin(admin.ModelAdmin):
+class SnippetAdmin(ScopeMixin, admin.ModelAdmin):
     '''
-    Admin View for Snippet
+    Admin View for Snippet.
     '''
 
     form = SnippetForm
@@ -21,19 +24,18 @@ class SnippetAdmin(admin.ModelAdmin):
         'account',
         'lexer',
         # 'views',
-        'get_scope',
+        'colored_scope',
         'get_count_comments',
         'get_count_tags',
-        'get_count_good_opinions',
-        'get_count_bad_opinions',
         'get_count_opinions',
+        'get_count_favours',
         'is_new',
         'date_modified',
         'date_added',
     )
     list_filter = (
         ('account', admin.RelatedOnlyFieldListFilter),
-        'lexer',
+        ('lexer', admin.AllValuesFieldListFilter),
         'date_modified',
         'date_added',
     )
@@ -42,9 +44,9 @@ class SnippetAdmin(admin.ModelAdmin):
         FavourInline,
         CommentInline,
     ]
-    search_fields = ('title',)
+    search_fields = ('title', 'account__username')
     filter_horizontal = ['tags']
-    date_hierarchy = 'date_modified'
+    date_hierarchy = 'date_added'
     fieldsets = [
         [
             Snippet._meta.verbose_name, {
@@ -57,6 +59,61 @@ class SnippetAdmin(admin.ModelAdmin):
         qs = super(SnippetAdmin, self).get_queryset(request)
         qs = qs.snippets_with_total_counters_on_related_fields()
         return qs
+
+    def get_urls(self):
+        urls = super(SnippetAdmin, self).get_urls()
+
+        # a url name must be as 'snippets_snippet_statistics'
+        url_name = 'statistics'
+        name_for_url = '{0}_{1}_{2}'.format(self.model._meta.app_label, self.model._meta.model_name, url_name)
+
+        # adding new url
+        additional_urls = [
+            url(r'^{0}/$'.format(url_name), self.admin_site.admin_view(self.statistics_view), {}, name_for_url),
+        ]
+        return additional_urls + urls
+
+    def statistics_view(self, request):
+        """ """
+
+        # get data for charts
+        statistics_by_usage_lexers = Snippet.objects.get_statistics_by_usage_all_lexers()
+        only_used_lexers = tuple(couple[0] for couple in statistics_by_usage_lexers if couple[1] > 0)
+        only_values_of_used_lexers = tuple(couple[1] for couple in statistics_by_usage_lexers if couple[1] > 0)
+        # make charts
+        xdata = only_used_lexers
+        ydata = only_values_of_used_lexers
+        extra_serie = {"tooltip": {"y_start": "", "y_end": " cal"}}
+        usage_lexers_chartdata = {'x': xdata, 'y1': ydata, 'extra1': extra_serie}
+        usage_lexers_charttype = "pieChart"
+        piechart_usage_lexers_container = 'piechart_usage_lexers_container'
+        data = {
+            'usage_lexers_charttype': usage_lexers_charttype,
+            'usage_lexers_chartdata': usage_lexers_chartdata,
+            'piechart_usage_lexers_container': piechart_usage_lexers_container,
+        }
+        # adding variables to context
+        context = dict(
+            # Include common variables for rendering the admin template
+            self.admin_site.each_context(request),
+            title=_('Statistics by tags'),
+            opts=self.model._meta,
+            # root_path=self.admin_site.root_path,
+        )
+        context.update(data)
+        context['statistics_by_usage_all_lexers'] = Snippet.objects.get_statistics_by_usage_all_lexers()
+        context['statistics_by_usage_tags'] = Snippet.tags_manager.get_statistics_by_count_used_tags()
+
+        #
+        #
+        #
+
+        return TemplateResponse(request, 'admin/snippets/statistics.html', context)
+
+    def preview_snippet(self):
+        """ """
+
+        raise NotImplementedError
 
     def get_count_comments(self, obj):
         return obj.count_comments
@@ -73,12 +130,7 @@ class SnippetAdmin(admin.ModelAdmin):
     get_count_tags.admin_order_field = 'count_tags'
     get_count_tags.short_description = _('Count tags')
 
-    def get_count_good_opinions(self, obj):
-        return obj.count_good_opinions
-    get_count_good_opinions.admin_order_field = 'count_good_opinions'
-    get_count_good_opinions.short_description = _('Count good opinions')
-
-    def get_count_bad_opinions(self, obj):
-        return obj.count_bad_opinions
-    get_count_bad_opinions.admin_order_field = 'count_bad_opinions'
-    get_count_bad_opinions.short_description = _('Count bad opinions')
+    def get_count_favours(self, obj):
+        return obj.count_favours
+    get_count_favours.admin_order_field = 'count_favours'
+    get_count_favours.short_description = _('Count favours')

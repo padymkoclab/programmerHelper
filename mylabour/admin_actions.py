@@ -173,3 +173,5 @@ export_as_csv.short_description = _('Export in CSV format')
 
 def made_report(self, request, queryset):
     """Create report in PDF."""
+
+    raise NotImplementedError

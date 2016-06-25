@@ -80,7 +80,7 @@ class WebLinkTest(TestCase):
         self.assertEqual(url3.url, 'http://stackoverflow.com/search?q=cast+convert+sql')
 
     @unittest.skipIf(not has_connect_to_internet(), 'Problem with connect to internet.')
-    def test_get_status(self):
+    def test_get_status_if_is_connect_internet(self):
 
         # untested at all
 
@@ -94,6 +94,19 @@ class WebLinkTest(TestCase):
         self.weblink.full_clean()
         self.weblink.save()
         self.assertFalse(self.weblink.get_status())
+
+    @unittest.skipIf(has_connect_to_internet(), 'Test executed because not connect to internet.')
+    def test_get_status_if_not_connect_internet(self):
+
+        self.weblink.url = 'https://google.com/'
+        self.weblink.full_clean()
+        self.weblink.save()
+        self.assertIsNone(self.weblink.get_status())
+        #
+        self.weblink.url = 'https://www.this-web-site-does-not-exist.com/it-is-page-does-not-exist.html'
+        self.weblink.full_clean()
+        self.weblink.save()
+        self.assertIsNone(self.weblink.get_status())
 
     def test_where_used(self):
         #

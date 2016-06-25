@@ -7,7 +7,7 @@ class SnippetQuerySet(models.QuerySet):
     QuerySet for using with queryset model Snippet
     """
 
-    def snippets_with_scopes(self):
+    def objects_with_scopes(self):
         """Added to each snippet new field 'scope' where storage her scope."""
 
         return self.annotate(scope=models.Sum(
@@ -37,37 +37,15 @@ class SnippetQuerySet(models.QuerySet):
     def snippets_by_scopes(self, min_scope=None, max_scope=None):
         """Snippets with certain range of scopes."""
 
-        snippets_with_scopes = self.snippets_with_scopes()
+        objects_with_scopes = self.objects_with_scopes()
         if min_scope is not None and max_scope is None:
-            return snippets_with_scopes.filter(scope__gte=min_scope)
+            return objects_with_scopes.filter(scope__gte=min_scope)
         elif min_scope is None and max_scope is not None:
-            return snippets_with_scopes.filter(scope__lte=max_scope)
+            return objects_with_scopes.filter(scope__lte=max_scope)
         elif min_scope is not None and max_scope is not None:
-            return snippets_with_scopes.filter(scope__gte=min_scope).filter(scope__lte=max_scope)
+            return objects_with_scopes.filter(scope__gte=min_scope).filter(scope__lte=max_scope)
         else:
             raise TypeError('Missing 1 required argument: "min_scope" or "max_scope".')
-
-    def snippets_with_count_good_opinions(self):
-        """ """
-
-        return self.annotate(count_good_opinions=models.Sum(
-            models.Case(
-                models.When(opinions__is_useful=True, then=1),
-                default=0,
-                output_field=models.IntegerField()
-            )
-        ))
-
-    def snippets_with_count_bad_opinions(self):
-        """ """
-
-        return self.annotate(count_bad_opinions=models.Sum(
-            models.Case(
-                models.When(opinions__is_useful=False, then=1),
-                default=0,
-                output_field=models.IntegerField()
-            )
-        ))
 
     def snippets_with_count_favours(self):
         """Added to each snippet new field with count of favours of the each snippet."""
@@ -100,9 +78,7 @@ class SnippetQuerySet(models.QuerySet):
         """Determinating for each snippet count_tags, opinions, favours, comments,
         getting scope, count good/bad opinions, and count likes/dislikes favours."""
 
-        self = self.snippets_with_count_good_opinions()
-        self = self.snippets_with_count_bad_opinions()
-        self = self.snippets_with_scopes()
+        self = self.objects_with_scopes()
         self = self.snippets_with_count_tags()
         self = self.snippets_with_count_comments()
         self = self.snippets_with_count_opinions()

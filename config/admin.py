@@ -11,8 +11,8 @@ from django.contrib.auth.models import Group
 from mylabour.admin_actions import export_as_csv, export_as_json, export_as_xml, export_as_yaml, export_as_xlsx
 
 # apps
-from apps.actions.admin import ActionAdmin
-from apps.actions.models import Action
+from apps.activity.admin import ActivityAdmin
+from apps.activity.models import Activity
 from apps.articles.admin import ArticleAdmin, ArticleSubsectionAdmin
 from apps.articles.models import Article, ArticleSubsection
 from apps.badges.admin import BadgeAdmin, GettingBadgeAdmin
@@ -25,8 +25,8 @@ from apps.courses.admin import CourseAdmin, LessonAdmin, SublessonAdmin
 from apps.courses.models import Course, Lesson, Sublesson
 from apps.forum.admin import ForumSectionAdmin, ForumTopicAdmin, ForumPostAdmin
 from apps.forum.models import ForumSection, ForumTopic, ForumPost
-from apps.inboxes.admin import InboxAdmin
-from apps.inboxes.models import Inbox
+from apps.notifications.admin import NotificationAdmin
+from apps.notifications.models import Notification
 from apps.newsletters.admin import NewsletterAdmin
 from apps.newsletters.models import Newsletter
 from apps.opinions.admin import OpinionAdmin
@@ -119,9 +119,9 @@ ProgrammerHelper_AdminSite.register(VoteInPoll, VoteInPollAdmin)
 ProgrammerHelper_AdminSite.register(Comment, CommentAdmin)
 ProgrammerHelper_AdminSite.register(Opinion, OpinionAdmin)
 ProgrammerHelper_AdminSite.register(Scope, ScopeAdmin)
-# actions
-ProgrammerHelper_AdminSite.register(Action, ActionAdmin)
-# inboxes
-ProgrammerHelper_AdminSite.register(Inbox, InboxAdmin)
+# activity
+ProgrammerHelper_AdminSite.register(Activity, ActivityAdmin)
+# notifications
+ProgrammerHelper_AdminSite.register(Notification, NotificationAdmin)
 # sessions
 ProgrammerHelper_AdminSite.register(ExpandedSession, ExpandedSessionAdmin)

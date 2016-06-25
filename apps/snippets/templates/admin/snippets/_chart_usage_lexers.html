@@ -1,0 +1,27 @@
+
+{% load i18n %}
+{% load nvd3_tags %}
+
+<div style="width: 30%">
+    <table class="table table-hover table-bordered">
+        <thead>
+            <tr>
+                <th>{% trans "Lexer" %}</th>
+                <th>{% trans "Count usage" %}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for lexer, count_usage in statistics_by_usage_all_lexers %}
+            <tr>
+                <td>{{ lexer }}</td>
+                <td>{{ count_usage }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div>
+    <h3>Chart usage a lexers</h3>
+    {% include_container "piechart_usage_lexers_container" 400 1000 %}
+</div>

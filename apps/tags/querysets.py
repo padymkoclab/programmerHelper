@@ -49,3 +49,8 @@ class TagQuerySet(models.QuerySet):
             models.F('count_usage_in_questions') + models.F('count_usage_in_books') +
             models.F('count_usage_in_snippets')
         )
+
+    def less_used_tags(self):
+        """Tags used very seldom (from 0 to 3)."""
+
+        raise NotImplementedError

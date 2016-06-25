@@ -17,7 +17,7 @@ from model_utils import Choices
 from model_utils.managers import QueryManager
 
 from apps.articles.models import Article
-from apps.actions.models import Action
+from apps.activity.models import Activity
 from apps.forum.models import ForumTopic
 from apps.badges.managers import BadgeManager
 from apps.sessions.models import ExpandedSession
@@ -130,6 +130,7 @@ class Account(AbstractBaseUser, PermissionsMixin):
     real_name = models.CharField(_('Real name'), max_length=200, default='')
     # phone = PhoneField(_('Phone'), default='')
     # ваши направления развития верстка, программирование
+    # biography (date birth not mention)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username', 'date_birthday']
@@ -213,8 +214,8 @@ class Account(AbstractBaseUser, PermissionsMixin):
             return False
         raise ValueError('Count consecutive days must be 1 or more,')
 
-    def actions_with_accounts(self):
-        return self.actions.filter(flag=Action.CHOICES_FLAGS.profiling).all()
+    def activity_with_accounts(self):
+        return self.activity.filter(flag=Activity.CHOICES_FLAGS.profiling).all()
 
     def check_badge(self, badge_name):
         instance = self._as_queryset()
@@ -224,10 +225,10 @@ class Account(AbstractBaseUser, PermissionsMixin):
         return self.__class__.badges_manager.has_badge(account=self, badge_name=badge_name)
 
     def get_reputation(self):
-        """Getting reputation 1of account based on his activity, actions, badges."""
+        """Getting reputation 1of account based on his activity, activity, badges."""
         return sum([
             self.get_reputation_for_badges(),
-            self.get_reputation_for_actions(),
+            self.get_reputation_for_activity(),
         ])
 
     def get_reputation_for_badges(self):
@@ -310,13 +311,13 @@ class Account(AbstractBaseUser, PermissionsMixin):
         """In creating, how many testSuit involved account."""
         return self.courses.count()
 
-    def get_reputation_for_actions(self):
+    def get_reputation_for_activity(self):
         """
-        Getting reputation of account for actions on website:
+        Getting reputation of account for activity on website:
         scopes of published snippets, answers, questions and rating of articles,
         participate in polls.
         ---------------------------------------
-            Evaluate reputation for actions
+            Evaluate reputation for activity
         ---------------------------------------
         Scope answers                   = *2
         Scope questions                 = *1

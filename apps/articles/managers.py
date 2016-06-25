@@ -41,3 +41,16 @@ class ArticleManager(models.Manager):
         if article_with_broken_links:
             return (False, article_with_broken_links)
         return True
+
+
+class PublishedArticleManager(models.Manager):
+    """
+    Model manager for only published articles.
+    """
+
+
+class DraftArticleManager(models.Manager):
+    """
+    Model manager for only published articles.
+    """
+# file:///media/wlysenko/66ABF2AC3D03BAAA/Web/Docs/Django_docs1.9/topics/db/managers.html?highlight=manager#calling-custom-queryset-methods-from-the-manager

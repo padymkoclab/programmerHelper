@@ -13,7 +13,7 @@ from apps.snippets.models import Snippet
 
 class SnippetQuerySetTest(TestCase):
     """
-
+    Tests for snippets`s queryset.
     """
 
     @classmethod
@@ -89,15 +89,15 @@ class SnippetQuerySetTest(TestCase):
         for couple in zip(accounts, favours_for_snippet6):
             cls.snippet6.favours.create(account=couple[0], is_favour=couple[1])
 
-    def test_snippets_with_scopes(self):
-        snippets_with_scopes = Snippet.objects.snippets_with_scopes()
-        self.assertEqual(snippets_with_scopes.get(pk=self.snippet1.pk).scope, -4)
-        self.assertEqual(snippets_with_scopes.get(pk=self.snippet2.pk).scope, 6)
-        self.assertEqual(snippets_with_scopes.get(pk=self.snippet3.pk).scope, 2)
-        self.assertEqual(snippets_with_scopes.get(pk=self.snippet4.pk).scope, 3)
-        self.assertEqual(snippets_with_scopes.get(pk=self.snippet5.pk).scope, 0)
-        self.assertEqual(snippets_with_scopes.get(pk=self.snippet6.pk).scope, -3)
-        self.assertEqual(snippets_with_scopes.get(pk=self.snippet7.pk).scope, 0)
+    def test_objects_with_scopes(self):
+        objects_with_scopes = Snippet.objects.objects_with_scopes()
+        self.assertEqual(objects_with_scopes.get(pk=self.snippet1.pk).scope, -4)
+        self.assertEqual(objects_with_scopes.get(pk=self.snippet2.pk).scope, 6)
+        self.assertEqual(objects_with_scopes.get(pk=self.snippet3.pk).scope, 2)
+        self.assertEqual(objects_with_scopes.get(pk=self.snippet4.pk).scope, 3)
+        self.assertEqual(objects_with_scopes.get(pk=self.snippet5.pk).scope, 0)
+        self.assertEqual(objects_with_scopes.get(pk=self.snippet6.pk).scope, -3)
+        self.assertEqual(objects_with_scopes.get(pk=self.snippet7.pk).scope, 0)
 
     def test_snippets_with_count_tags(self):
         snippets_with_count_tags = Snippet.objects.snippets_with_count_tags()
@@ -108,26 +108,6 @@ class SnippetQuerySetTest(TestCase):
         self.assertEqual(snippets_with_count_tags.get(pk=self.snippet5.pk).count_tags, 1)
         self.assertEqual(snippets_with_count_tags.get(pk=self.snippet6.pk).count_tags, 0)
         self.assertEqual(snippets_with_count_tags.get(pk=self.snippet7.pk).count_tags, 0)
-
-    def test_snippets_with_count_good_opinions(self):
-        snippets_with_count_good_opinions = Snippet.objects.snippets_with_count_good_opinions()
-        self.assertEqual(snippets_with_count_good_opinions.get(pk=self.snippet1.pk).count_good_opinions, 3)
-        self.assertEqual(snippets_with_count_good_opinions.get(pk=self.snippet2.pk).count_good_opinions, 9)
-        self.assertEqual(snippets_with_count_good_opinions.get(pk=self.snippet3.pk).count_good_opinions, 5)
-        self.assertEqual(snippets_with_count_good_opinions.get(pk=self.snippet4.pk).count_good_opinions, 3)
-        self.assertEqual(snippets_with_count_good_opinions.get(pk=self.snippet5.pk).count_good_opinions, 4)
-        self.assertEqual(snippets_with_count_good_opinions.get(pk=self.snippet6.pk).count_good_opinions, 0)
-        self.assertEqual(snippets_with_count_good_opinions.get(pk=self.snippet7.pk).count_good_opinions, 0)
-
-    def test_snippets_with_count_bad_opinions(self):
-        snippets_with_count_bad_opinions = Snippet.objects.snippets_with_count_bad_opinions()
-        self.assertEqual(snippets_with_count_bad_opinions.get(pk=self.snippet1.pk).count_bad_opinions, 7)
-        self.assertEqual(snippets_with_count_bad_opinions.get(pk=self.snippet2.pk).count_bad_opinions, 3)
-        self.assertEqual(snippets_with_count_bad_opinions.get(pk=self.snippet3.pk).count_bad_opinions, 3)
-        self.assertEqual(snippets_with_count_bad_opinions.get(pk=self.snippet4.pk).count_bad_opinions, 0)
-        self.assertEqual(snippets_with_count_bad_opinions.get(pk=self.snippet5.pk).count_bad_opinions, 4)
-        self.assertEqual(snippets_with_count_bad_opinions.get(pk=self.snippet6.pk).count_bad_opinions, 3)
-        self.assertEqual(snippets_with_count_bad_opinions.get(pk=self.snippet7.pk).count_bad_opinions, 0)
 
     def test_snippets_with_count_opinions(self):
         snippets_with_count_opinions = Snippet.objects.snippets_with_count_opinions()

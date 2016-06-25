@@ -16,15 +16,14 @@ urlpatterns = [
     url(r'^i18n/', include('django.conf.urls.i18n')),
     # main
     url(r'^$', IndexView.as_view(), {}, 'index'),
-    # url(r'^$', IndexView.as_view(), {}, 'index'),
     # apps
     url(r'^accounts/', include('apps.accounts.urls')),
-    url(r'^actions/', include('apps.actions.urls')),
+    url(r'^activity/', include('apps.activity.urls')),
     url(r'^articles/', include('apps.articles.urls')),
     url(r'^books/', include('apps.books.urls')),
     url(r'^courses/', include('apps.courses.urls')),
     url(r'^forum/', include('apps.forum.urls')),
-    url(r'^inboxes/', include('apps.inboxes.urls')),
+    url(r'^notifications/', include('apps.notifications.urls')),
     url(r'^news/', include('apps.newsletters.urls')),
     url(r'^polls/', include('apps.polls.urls')),
     url(r'^questions/', include('apps.questions.urls')),

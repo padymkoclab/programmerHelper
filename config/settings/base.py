@@ -36,7 +36,7 @@ DJANGO_APPS = [
 MY_APPS = [
     'mylabour',
     'apps.accounts.apps.AccountsConfig',
-    'apps.actions.apps.ActionsConfig',
+    'apps.activity.apps.ActivityConfig',
     'apps.articles.apps.ArticlesConfig',
     'apps.badges.apps.BadgesConfig',
     'apps.books.apps.BooksConfig',
@@ -44,8 +44,8 @@ MY_APPS = [
     'apps.courses.apps.CoursesConfig',
     'apps.favours.apps.FavoursConfig',
     'apps.forum.apps.ForumConfig',
-    'apps.inboxes.apps.InboxesConfig',
     'apps.newsletters.apps.NewslettersConfig',
+    'apps.notifications.apps.NotificationsConfig',
     'apps.opinions.apps.OpinionsConfig',
     'apps.polls.apps.PollsConfig',
     'apps.questions.apps.QuestionsConfig',
@@ -378,7 +378,7 @@ SUIT_CONFIG = {
             'icon': 'icon-th',
         },
         {
-            'app': 'inboxes',
+            'app': 'notifications',
             'icon': 'icon-envelope',
         },
         {

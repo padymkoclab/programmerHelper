@@ -367,6 +367,22 @@ def create_log_for_terminal(name='DefaultLog'):
     return logger
 
 
+def configured_logging():
+    # create logger
+    logger = logging.getLogger(__name__)
+    logger.setLevel(logging.DEBUG)
+    # create console handler and set level to debug
+    console = logging.StreamHandler()
+    console.setLevel(logging.DEBUG)
+    # create formatter
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    # add formatter to console
+    console.setFormatter(formatter)
+    # add console to logger
+    logger.addHandler(console)
+    return logger
+
+
 if __name__ == "__main__":
     import doctest
     doctest.testmod()

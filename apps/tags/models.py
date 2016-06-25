@@ -5,7 +5,7 @@ from django.db import models
 
 from mylabour.models import TimeStampedModel
 
-from .managers import TagManager
+from .managers import PurelyTagManager
 from .querysets import TagQuerySet
 
 
@@ -36,7 +36,7 @@ class Tag(TimeStampedModel):
 
     # managers
     objects = models.Manager()
-    objects = TagManager.from_queryset(TagQuerySet)()
+    objects = PurelyTagManager.from_queryset(TagQuerySet)()
 
     def __str__(self):
         return '{0.name}'.format(self)

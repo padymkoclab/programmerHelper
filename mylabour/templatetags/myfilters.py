@@ -20,7 +20,7 @@ def UpDownChars(value):
     even_chars = value[0::2].upper()
     odd_chars = value[1::2].lower()
     sequence = itertools.zip_longest(odd_chars, even_chars, fillvalue='')
-    return ''.join(map(lambda el: el[1]+el[0], sequence))
+    return ''.join(map(lambda el: el[1] + el[0], sequence))
 
 
 @register.filter(name='formatting_big_number')

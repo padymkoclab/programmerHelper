@@ -1,0 +1,28 @@
+
+<style>
+    .custom_calendar_by_month table{
+        margin: 10px;
+        padding: 5px;
+        border-right: 50px;
+    }
+    .custom_calendar_by_month table td{
+        text-align: center;
+    }
+    .this_is_now_day{
+        color: red;
+        font-weight: bold;
+    }
+    .dark_theme{
+        color: #fff;
+        background: #222;
+    }
+    .light_theme{
+        color: #222;
+        background: #fff;
+    }
+</style>
+
+<div class="custom_calendar_by_month">
+    {{ weeks_current_month }}
+</div>
+

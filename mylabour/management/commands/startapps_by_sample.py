@@ -1,27 +1,10 @@
 
-import logging
-
 from django.core.management.base import BaseCommand
-
 from django.conf import settings
 
 from unipath import Path
 
-
-def configured_logging():
-    # create logger
-    logger = logging.getLogger(__name__)
-    logger.setLevel(logging.DEBUG)
-    # create console handler and set level to debug
-    console = logging.StreamHandler()
-    console.setLevel(logging.DEBUG)
-    # create formatter
-    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-    # add formatter to console
-    console.setFormatter(formatter)
-    # add console to logger
-    logger.addHandler(console)
-    return logger
+from mylabour.utils import configured_logging
 
 
 class Command(BaseCommand):
@@ -39,7 +22,7 @@ class Command(BaseCommand):
             apps_dir.mkdir()
         #
         for app_name_plural in app_names_plural:
-            app_name = 'app_{0}'.format(app_name_plural)
+            app_name = '{0}'.format(app_name_plural)
             app_dir = apps_dir.child(app_name)
             if app_dir.exists():
                 logger.warning('App with name "%s" already exists.' % app_name)
@@ -68,40 +51,25 @@ class Command(BaseCommand):
             dir_for_tests.child('test_models.py').write_file("""
 from django.test import TestCase
 
-import factory
-from factory import fuzzy
-
 from apps.%s.models import *
 """ % app_name)
             dir_for_tests.child('test_views.py').write_file("""
 from django.test import TestCase
-
-import factory
-from factory import fuzzy
 
 from apps.%s.views import *
 """ % app_name)
             dir_for_tests.child('test_forms.py').write_file("""
 from django.test import TestCase
 
-import factory
-from factory import fuzzy
-
 from apps.%s.forms import *
 """ % app_name)
             dir_for_tests.child('test_managers.py').write_file("""
 from django.test import TestCase
 
-import factory
-from factory import fuzzy
-
 from apps.%s.managers import *
 """ % app_name)
             dir_for_tests.child('test_querysets.py').write_file("""
 from django.test import TestCase
-
-import factory
-from factory import fuzzy
 
 from apps.%s.querysets import *
 """ % app_name)
@@ -145,7 +113,7 @@ from django.conf.urls import url
 app_name = '%s'
 
 urlpatterns = [
-    url(r'/$', '.as_view()', {}, ''),
+    #  url(r'/$', '.as_view()', {}, ''),
 ]
 """ % app_name)
             app_dir.child('apps.py').write_file("""
@@ -168,6 +136,7 @@ class %sConfig(AppConfig):
             app_dir.child('factories.py').write_file("""
 import factory
 from factory import fuzzy
+
 """)
             app_dir.child('admin.py').write_file("""
 from django.db import models
