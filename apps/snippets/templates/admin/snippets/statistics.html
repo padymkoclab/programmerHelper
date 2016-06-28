@@ -7,16 +7,48 @@
 {% block extrastyle %}
     {{ block.super }}
     {% include_chart_jscss %}
+    {% comment %}
     {% load_chart usage_lexers_charttype usage_lexers_chartdata piechart_usage_lexers_container %}
+    {% endcomment %}
+    {% load_chart charttype chartdata "cumulativelinechart_container" %}
 {% endblock %}
 
 {% block content %}
     {{ block.super }}
+    <style type="text/css" media="screen">
+  ul {
+    margin: 0;
+    padding: 0;
+    width: 190px;
+    background-color: #fff;
+  }
+
+  ul li {
+    font-size: 11px;
+    line-height: 20px;
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+    border-bottom: 1px solid #ebeff2;
+    background-color: #fff;
+  }
+
+ ul li span {
+    background-color: #a9d2f2;
+    display: block;
+    color: #125a95;
+    font-weight: bold;
+    padding: 0 0 0 5px;
+    white-space: nowrap;
+  }
+</style>
+
+    {% comment %}
     {% calendar 2016 1 'dark_theme' %}
     {% calendar 2016 2 'light_theme' %}
     {% calendar %}
-    {% comment %}
-    {% include "admin/snippets/_chart_usage_lexers.html" %}
-    {% include "admin/snippets/_chart_usage_tags.html" %}
     {% endcomment %}
+    {% include "admin/snippets/_chart_usage_lexers.html" %}
+    {% include "admin/snippets/_cloud_usage_tags.html" %}
+    {% include_container "cumulativelinechart_container" 400 600 %}
 {% endblock content %}

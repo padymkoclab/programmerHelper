@@ -2,7 +2,7 @@
 from django.utils.translation import ugettext_lazy as _
 from django.contrib import admin
 
-from apps.scopes.admin import ScopeInline
+from apps.marks.admin import MarkInline
 from apps.comments.admin import CommentInline
 
 from .forms import ArticleForm, ArticleSubsectionFormset
@@ -38,7 +38,7 @@ class ArticleAdmin(admin.ModelAdmin):
         'get_count_subsections',
         'get_count_links',
         'get_count_tags',
-        'get_count_scopes',
+        'get_count_marks',
         'get_count_comments',
         'is_new',
         'date_modified',
@@ -52,7 +52,7 @@ class ArticleAdmin(admin.ModelAdmin):
     search_fields = ('title',)
     inlines = [
         ArticleSubsectionInline,
-        ScopeInline,
+        MarkInline,
         CommentInline,
     ]
     fieldsets = [
@@ -79,7 +79,7 @@ class ArticleAdmin(admin.ModelAdmin):
 
     def get_queryset(self, request):
         qs = super(ArticleAdmin, self).get_queryset(request)
-        qs = qs.articles_with_rating_and_count_comments_subsections_tags_links_scopes()
+        qs = qs.articles_with_rating_and_count_comments_subsections_tags_links_marks()
         return qs
 
     def get_count_links(self, obj):
@@ -92,10 +92,10 @@ class ArticleAdmin(admin.ModelAdmin):
     get_count_tags.admin_order_field = 'count_tags'
     get_count_tags.short_description = _('Count tags')
 
-    def get_count_scopes(self, obj):
-        return obj.count_scopes
-    get_count_scopes.admin_order_field = 'count_scopes'
-    get_count_scopes.short_description = _('Count scopes')
+    def get_count_marks(self, obj):
+        return obj.count_marks
+    get_count_marks.admin_order_field = 'count_marks'
+    get_count_marks.short_description = _('Count marks')
 
     def get_count_subsections(self, obj):
         return obj.count_subsections

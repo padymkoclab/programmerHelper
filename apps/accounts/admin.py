@@ -34,7 +34,7 @@ class AccountAdmin(BaseUserAdmin):
         # 'get_count_comments',
         # 'get_count_opinions',
         # 'get_count_likes',
-        # 'get_count_scopes',
+        # 'get_count_marks',
         # 'get_count_questions',
         # 'get_count_snippets',
         # 'get_count_answers',
@@ -127,7 +127,7 @@ class AccountAdmin(BaseUserAdmin):
             # count_comments=models.Count('comments', distinct=True),
             # count_opinions=models.Count('opinions', distinct=True),
             # count_likes=models.Count('likes', distinct=True),
-            # count_scopes=models.Count('scopes', distinct=True),
+            # count_marks=models.Count('marks', distinct=True),
             # count_articles=models.Count('articles', distinct=True),
             # count_answers=models.Count('answers', distinct=True),
             # count_posts=models.Count('posts', distinct=True),
@@ -156,10 +156,10 @@ class AccountAdmin(BaseUserAdmin):
     get_count_likes.admin_order_field = 'count_likes'
     get_count_likes.short_description = _('Count likes')
 
-    def get_count_scopes(self, obj):
-        return obj.count_scopes
-    get_count_scopes.admin_order_field = 'count_scopes'
-    get_count_scopes.short_description = _('Count scopes')
+    def get_count_marks(self, obj):
+        return obj.count_marks
+    get_count_marks.admin_order_field = 'count_marks'
+    get_count_marks.short_description = _('Count marks')
 
     def get_count_questions(self, obj):
         return obj.count_questions

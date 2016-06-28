@@ -50,7 +50,7 @@ MY_APPS = [
     'apps.polls.apps.PollsConfig',
     'apps.questions.apps.QuestionsConfig',
     'apps.replies.apps.RepliesConfig',
-    'apps.scopes.apps.ScopesConfig',
+    'apps.marks.apps.MarksConfig',
     'apps.sessions.apps.SessionsConfig',
     'apps.snippets.apps.SnippetsConfig',
     'apps.solutions.apps.SolutionsConfig',
@@ -85,8 +85,8 @@ DJANGO_MIDDLEWARE_CLASSES = [
 ]
 
 MY_MIDDLEWARE_CLASSES = [
-    'apps.visits.middleware.CountVisitsPageMiddleware',
-    'apps.visits.middleware.RegistratorVisitAccountMiddleware',
+    # 'apps.visits.middleware.CountVisitsPageMiddleware',
+    # 'apps.visits.middleware.RegistratorVisitAccountMiddleware',
 ]
 
 MIDDLEWARE_CLASSES = DJANGO_MIDDLEWARE_CLASSES + MY_MIDDLEWARE_CLASSES
@@ -109,8 +109,8 @@ TEMPLATES = [
                 'django.template.context_processors.static',
                 'django.core.context_processors.request',
                 # 'django.template.context_processors.tz',
-                'mylabour.context_processors.date_creating_website',
-                'apps.visits.context_processors.count_visits',
+                # 'mylabour.context_processors.date_creating_website',
+                # 'apps.visits.context_processors.count_visits',
                 'apps.sessions.context_processors.users_online',
             ],
         },
@@ -398,7 +398,7 @@ SUIT_CONFIG = {
             'icon': 'icon-question-sign',
         },
         {
-            'app': 'scopes',
+            'app': 'marks',
             'icon': 'icon-ok',
         },
         {

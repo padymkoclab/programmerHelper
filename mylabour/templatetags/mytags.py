@@ -3,7 +3,7 @@ import warnings
 import random
 from calendar import LocaleHTMLCalendar
 
-from django.utils.translation import get_language, activate
+from django.utils.translation import get_language, activate, to_locale
 from django.utils import timezone
 from django.utils.safestring import mark_safe
 from django.utils.html import format_html_join, format_html, remove_tags
@@ -192,8 +192,7 @@ class CalendarNode(template.Node):
         try:
             activate('ru-ru')
             current_locale_name = get_language()
-            current_locale_name = current_locale_name.split('-')
-            current_locale_name = '{0}_{1}'.format(current_locale_name[0], current_locale_name[1].upper())
+            current_locale_name = to_locale(current_locale_name)
             charset = settings.DEFAULT_CHARSET.upper()
             calendar = LocaleHTMLCalendar(firstweekday=settings.FIRST_DAY_OF_WEEK, locale=(current_locale_name, charset))
             weeks_current_month = calendar.formatmonth(self.year, self.month)

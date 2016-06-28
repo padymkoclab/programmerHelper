@@ -2,7 +2,10 @@
 import itertools
 import collections
 
+from django.utils import timezone
 from django.db import models
+
+from dateutil.relativedelta import relativedelta
 
 from apps.tags.models import Tag
 
@@ -62,6 +65,20 @@ class SnippetManager(models.Manager):
         )
 
         return counter_used_tags
+
+    def get_statistics_count_snippets_by_months_for_past_year(self):
+        """Get statistics by count snippets for past year."""
+
+        now = timezone.now()
+        result = list()
+        for month in range(13, 0, -1):
+            datetime_ago = now - relativedelta(months=month)
+            count_snippets = self.filter(
+                date_added__month__lte=datetime_ago.month,
+                date_added__year__lte=datetime_ago.year
+            ).count()
+            result.append(((datetime_ago.year, datetime_ago.month), count_snippets))
+        return result
 
 
 class PythonSnippetManager(models.Manager):

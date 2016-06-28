@@ -79,10 +79,10 @@ class Snippet(RelatedObjectsByTags, TimeStampedModel):
     def get_absolute_url(self):
         return reverse('snippets:detail', kwargs={'slug': self.slug})
 
-    def get_scope(self):
-        """Get scope of snippet, on based opinions of users about it."""
+    def get_mark(self):
+        """Get mark of snippet, on based opinions of users about it."""
 
-        return self.__class__.objects.objects_with_scopes().get(pk=self.pk).scope
+        return self.__class__.objects.objects_with_marks().get(pk=self.pk).mark
 
     def get_count_views(self):
         return Visit.objects.get_count_visits_by_url(self.get_absolute_url)

@@ -7,7 +7,7 @@ from apps.tags.factories import tags_factory
 from apps.badges.factories import badges_factory
 from apps.web_links.factories import web_links_factory
 from apps.comments.factories import CommentFactory
-from apps.scopes.factories import ScopeFactory
+from apps.marks.factories import MarkFactory
 from apps.tags.models import Tag
 from apps.web_links.models import WebLink
 from mylabour.utils import generate_text_certain_length
@@ -33,24 +33,24 @@ class ArticleQuerySetTest(TestCase):
 
     def test_articles_with_rating(self):
         article1, article2, article3, article4 = Article.objects.all()[:4]
-        article1.scopes.clear()
-        article2.scopes.clear()
-        article3.scopes.clear()
-        article4.scopes.clear()
+        article1.marks.clear()
+        article2.marks.clear()
+        article3.marks.clear()
+        article4.marks.clear()
         #
-        ScopeFactory(content_object=article1, scope=2)
-        ScopeFactory(content_object=article1, scope=3)
-        ScopeFactory(content_object=article1, scope=1)
-        ScopeFactory(content_object=article1, scope=5)
-        ScopeFactory(content_object=article1, scope=4)
-        ScopeFactory(content_object=article1, scope=3)
-        ScopeFactory(content_object=article1, scope=2)
+        MarkFactory(content_object=article1, mark=2)
+        MarkFactory(content_object=article1, mark=3)
+        MarkFactory(content_object=article1, mark=1)
+        MarkFactory(content_object=article1, mark=5)
+        MarkFactory(content_object=article1, mark=4)
+        MarkFactory(content_object=article1, mark=3)
+        MarkFactory(content_object=article1, mark=2)
         #
-        ScopeFactory(content_object=article2, scope=1)
-        ScopeFactory(content_object=article2, scope=4)
-        ScopeFactory(content_object=article2, scope=2)
+        MarkFactory(content_object=article2, mark=1)
+        MarkFactory(content_object=article2, mark=4)
+        MarkFactory(content_object=article2, mark=2)
         #
-        ScopeFactory(content_object=article3, scope=1)
+        MarkFactory(content_object=article3, mark=1)
         #
         articles_with_rating = Article.objects.articles_with_rating()
         self.assertEqual(articles_with_rating.get(pk=article1.pk).rating, 2.8571)
@@ -130,29 +130,29 @@ class ArticleQuerySetTest(TestCase):
         self.assertEqual(articles_with_count_tags.get(pk=article3.pk).count_tags, 1)
         self.assertEqual(articles_with_count_tags.get(pk=article4.pk).count_tags, 0)
 
-    def test_articles_with_count_scopes(self):
+    def test_articles_with_count_marks(self):
         article1, article2, article3, article4 = Article.objects.all()[:4]
-        article1.scopes.clear()
-        article2.scopes.clear()
-        article3.scopes.clear()
-        article4.scopes.clear()
+        article1.marks.clear()
+        article2.marks.clear()
+        article3.marks.clear()
+        article4.marks.clear()
         #
-        ScopeFactory(content_object=article1, scope=1)
-        ScopeFactory(content_object=article1, scope=1)
-        ScopeFactory(content_object=article1, scope=1)
-        ScopeFactory(content_object=article2, scope=1)
-        ScopeFactory(content_object=article2, scope=1)
-        ScopeFactory(content_object=article3, scope=1)
-        ScopeFactory(content_object=article3, scope=1)
-        ScopeFactory(content_object=article3, scope=1)
-        ScopeFactory(content_object=article3, scope=1)
-        ScopeFactory(content_object=article3, scope=1)
+        MarkFactory(content_object=article1, mark=1)
+        MarkFactory(content_object=article1, mark=1)
+        MarkFactory(content_object=article1, mark=1)
+        MarkFactory(content_object=article2, mark=1)
+        MarkFactory(content_object=article2, mark=1)
+        MarkFactory(content_object=article3, mark=1)
+        MarkFactory(content_object=article3, mark=1)
+        MarkFactory(content_object=article3, mark=1)
+        MarkFactory(content_object=article3, mark=1)
+        MarkFactory(content_object=article3, mark=1)
         #
-        articles_with_count_scopes = Article.objects.articles_with_count_scopes()
-        self.assertEqual(articles_with_count_scopes.get(pk=article1.pk).count_scopes, 3)
-        self.assertEqual(articles_with_count_scopes.get(pk=article2.pk).count_scopes, 2)
-        self.assertEqual(articles_with_count_scopes.get(pk=article3.pk).count_scopes, 5)
-        self.assertEqual(articles_with_count_scopes.get(pk=article4.pk).count_scopes, 0)
+        articles_with_count_marks = Article.objects.articles_with_count_marks()
+        self.assertEqual(articles_with_count_marks.get(pk=article1.pk).count_marks, 3)
+        self.assertEqual(articles_with_count_marks.get(pk=article2.pk).count_marks, 2)
+        self.assertEqual(articles_with_count_marks.get(pk=article3.pk).count_marks, 5)
+        self.assertEqual(articles_with_count_marks.get(pk=article4.pk).count_marks, 0)
 
     def test_articles_with_count_links(self):
         article1, article2, article3, article4 = Article.objects.all()[:4]
@@ -191,12 +191,12 @@ class ArticleQuerySetTest(TestCase):
         self.assertEqual(articles_with_count_subsections.get(pk=article3.pk).count_subsections, 1)
         self.assertEqual(articles_with_count_subsections.get(pk=article4.pk).count_subsections, 0)
 
-    def test_articles_with_rating_and_count_comments_subsections_tags_links_scopes(self):
+    def test_articles_with_rating_and_count_comments_subsections_tags_links_marks(self):
         articles = Article.objects.all()[:4]
         for article in articles:
             article.subsections.filter().delete()
             article.comments.clear()
-            article.scopes.clear()
+            article.marks.clear()
             article.tags.clear()
             article.links.clear()
         article1, article2, article3, article4 = articles
@@ -213,25 +213,25 @@ class ArticleQuerySetTest(TestCase):
         CommentFactory(content_object=article1)
         CommentFactory(content_object=article1)
         CommentFactory(content_object=article1)
-        ScopeFactory(content_object=article1, scope=3)
-        ScopeFactory(content_object=article1, scope=4)
-        ScopeFactory(content_object=article1, scope=1)
-        ScopeFactory(content_object=article1, scope=1)
-        ScopeFactory(content_object=article1, scope=2)
-        ScopeFactory(content_object=article1, scope=3)
-        ScopeFactory(content_object=article1, scope=3)
-        ScopeFactory(content_object=article1, scope=4)
-        ScopeFactory(content_object=article1, scope=5)
-        ScopeFactory(content_object=article1, scope=1)
-        ScopeFactory(content_object=article1, scope=3)
-        ScopeFactory(content_object=article1, scope=2)
-        ScopeFactory(content_object=article1, scope=1)
+        MarkFactory(content_object=article1, mark=3)
+        MarkFactory(content_object=article1, mark=4)
+        MarkFactory(content_object=article1, mark=1)
+        MarkFactory(content_object=article1, mark=1)
+        MarkFactory(content_object=article1, mark=2)
+        MarkFactory(content_object=article1, mark=3)
+        MarkFactory(content_object=article1, mark=3)
+        MarkFactory(content_object=article1, mark=4)
+        MarkFactory(content_object=article1, mark=5)
+        MarkFactory(content_object=article1, mark=1)
+        MarkFactory(content_object=article1, mark=3)
+        MarkFactory(content_object=article1, mark=2)
+        MarkFactory(content_object=article1, mark=1)
         #
         article2.tags.set([Tag.objects.random_tags(1)])
         article2.links.set([WebLink.objects.random_weblinks(1)])
         ArticleSubsectionFactory(article=article2)
         CommentFactory(content_object=article2)
-        ScopeFactory(content_object=article2, scope=2)
+        MarkFactory(content_object=article2, mark=2)
         #
         article3.tags.set(Tag.objects.random_tags(2))
         article3.links.set(WebLink.objects.random_weblinks(4))
@@ -242,38 +242,38 @@ class ArticleQuerySetTest(TestCase):
         CommentFactory(content_object=article3)
         CommentFactory(content_object=article3)
         CommentFactory(content_object=article3)
-        ScopeFactory(content_object=article3, scope=1)
-        ScopeFactory(content_object=article3, scope=4)
-        ScopeFactory(content_object=article3, scope=2)
-        ScopeFactory(content_object=article3, scope=2)
-        ScopeFactory(content_object=article3, scope=1)
-        ScopeFactory(content_object=article3, scope=3)
-        ScopeFactory(content_object=article3, scope=4)
-        ScopeFactory(content_object=article3, scope=2)
+        MarkFactory(content_object=article3, mark=1)
+        MarkFactory(content_object=article3, mark=4)
+        MarkFactory(content_object=article3, mark=2)
+        MarkFactory(content_object=article3, mark=2)
+        MarkFactory(content_object=article3, mark=1)
+        MarkFactory(content_object=article3, mark=3)
+        MarkFactory(content_object=article3, mark=4)
+        MarkFactory(content_object=article3, mark=2)
         #
-        articles = Article.objects.articles_with_rating_and_count_comments_subsections_tags_links_scopes()
+        articles = Article.objects.articles_with_rating_and_count_comments_subsections_tags_links_marks()
         self.assertEqual(articles.get(pk=article1.pk).rating, 2.5385)
         self.assertEqual(articles.get(pk=article1.pk).count_comments, 5)
         self.assertEqual(articles.get(pk=article1.pk).count_subsections, 5)
-        self.assertEqual(articles.get(pk=article1.pk).count_scopes, 13)
+        self.assertEqual(articles.get(pk=article1.pk).count_marks, 13)
         self.assertEqual(articles.get(pk=article1.pk).count_tags, 5)
         self.assertEqual(articles.get(pk=article1.pk).count_links, 5)
         self.assertEqual(articles.get(pk=article2.pk).rating, 2.0)
         self.assertEqual(articles.get(pk=article2.pk).count_comments, 1)
         self.assertEqual(articles.get(pk=article2.pk).count_subsections, 1)
-        self.assertEqual(articles.get(pk=article2.pk).count_scopes, 1)
+        self.assertEqual(articles.get(pk=article2.pk).count_marks, 1)
         self.assertEqual(articles.get(pk=article2.pk).count_tags, 1)
         self.assertEqual(articles.get(pk=article2.pk).count_links, 1)
         self.assertEqual(articles.get(pk=article3.pk).rating, 2.375)
         self.assertEqual(articles.get(pk=article3.pk).count_comments, 4)
         self.assertEqual(articles.get(pk=article3.pk).count_subsections, 3)
-        self.assertEqual(articles.get(pk=article3.pk).count_scopes, 8)
+        self.assertEqual(articles.get(pk=article3.pk).count_marks, 8)
         self.assertEqual(articles.get(pk=article3.pk).count_tags, 2)
         self.assertEqual(articles.get(pk=article3.pk).count_links, 4)
         self.assertEqual(articles.get(pk=article4.pk).rating, 0)
         self.assertEqual(articles.get(pk=article4.pk).count_comments, 0)
         self.assertEqual(articles.get(pk=article4.pk).count_subsections, 0)
-        self.assertEqual(articles.get(pk=article4.pk).count_scopes, 0)
+        self.assertEqual(articles.get(pk=article4.pk).count_marks, 0)
         self.assertEqual(articles.get(pk=article4.pk).count_tags, 0)
         self.assertEqual(articles.get(pk=article4.pk).count_links, 0)
 
@@ -412,38 +412,38 @@ class ArticleQuerySetTest(TestCase):
     def test_popular_articles(self):
         #
         for article in Article.objects.iterator():
-            article.scopes.clear()
+            article.marks.clear()
         self.assertEqual(Article.objects.popular_articles().count(), 0)
         article1, article2, article3, article4, article5 = Article.objects.all()[:5]
         # 4
-        ScopeFactory(content_object=article1, scope=4)
+        MarkFactory(content_object=article1, mark=4)
         # 54 / 11
-        ScopeFactory(content_object=article2, scope=5)
-        ScopeFactory(content_object=article2, scope=5)
-        ScopeFactory(content_object=article2, scope=5)
-        ScopeFactory(content_object=article2, scope=5)
-        ScopeFactory(content_object=article2, scope=5)
-        ScopeFactory(content_object=article2, scope=5)
-        ScopeFactory(content_object=article2, scope=5)
-        ScopeFactory(content_object=article2, scope=5)
-        ScopeFactory(content_object=article2, scope=5)
-        ScopeFactory(content_object=article2, scope=5)
-        ScopeFactory(content_object=article2, scope=4)
+        MarkFactory(content_object=article2, mark=5)
+        MarkFactory(content_object=article2, mark=5)
+        MarkFactory(content_object=article2, mark=5)
+        MarkFactory(content_object=article2, mark=5)
+        MarkFactory(content_object=article2, mark=5)
+        MarkFactory(content_object=article2, mark=5)
+        MarkFactory(content_object=article2, mark=5)
+        MarkFactory(content_object=article2, mark=5)
+        MarkFactory(content_object=article2, mark=5)
+        MarkFactory(content_object=article2, mark=5)
+        MarkFactory(content_object=article2, mark=4)
         self.assertEqual(article2.get_rating(), 4.9091)
         # 5
-        ScopeFactory(content_object=article3, scope=5)
+        MarkFactory(content_object=article3, mark=5)
         # 45 / 11
-        ScopeFactory(content_object=article4, scope=5)
-        ScopeFactory(content_object=article4, scope=5)
-        ScopeFactory(content_object=article4, scope=5)
-        ScopeFactory(content_object=article4, scope=5)
-        ScopeFactory(content_object=article4, scope=5)
-        ScopeFactory(content_object=article4, scope=5)
-        ScopeFactory(content_object=article4, scope=5)
-        ScopeFactory(content_object=article4, scope=5)
-        ScopeFactory(content_object=article4, scope=2)
-        ScopeFactory(content_object=article4, scope=2)
-        ScopeFactory(content_object=article4, scope=1)
+        MarkFactory(content_object=article4, mark=5)
+        MarkFactory(content_object=article4, mark=5)
+        MarkFactory(content_object=article4, mark=5)
+        MarkFactory(content_object=article4, mark=5)
+        MarkFactory(content_object=article4, mark=5)
+        MarkFactory(content_object=article4, mark=5)
+        MarkFactory(content_object=article4, mark=5)
+        MarkFactory(content_object=article4, mark=5)
+        MarkFactory(content_object=article4, mark=2)
+        MarkFactory(content_object=article4, mark=2)
+        MarkFactory(content_object=article4, mark=1)
         self.assertEqual(article4.get_rating(), 4.0909)
         #
         self.assertCountEqual(Article.objects.popular_articles(), [article1, article2, article3, article4])
@@ -467,38 +467,38 @@ class ArticleQuerySetTest(TestCase):
     def test_articles_by_rating(self):
         #
         for article in Article.objects.iterator():
-            article.scopes.clear()
+            article.marks.clear()
         #
         article1, article2, article3, article4, article5, article6, article7 = Article.objects.all()[:7]
         Article.objects.exclude(pk__in=Article.objects.values('pk')[:7]).delete()
         # 3
-        ScopeFactory(content_object=article1, scope=2)
-        ScopeFactory(content_object=article1, scope=3)
-        ScopeFactory(content_object=article1, scope=4)
+        MarkFactory(content_object=article1, mark=2)
+        MarkFactory(content_object=article1, mark=3)
+        MarkFactory(content_object=article1, mark=4)
         # 4.3333
-        ScopeFactory(content_object=article2, scope=4)
-        ScopeFactory(content_object=article2, scope=4)
-        ScopeFactory(content_object=article2, scope=5)
+        MarkFactory(content_object=article2, mark=4)
+        MarkFactory(content_object=article2, mark=4)
+        MarkFactory(content_object=article2, mark=5)
         # 5
-        ScopeFactory(content_object=article3, scope=5)
-        ScopeFactory(content_object=article3, scope=5)
-        ScopeFactory(content_object=article3, scope=5)
+        MarkFactory(content_object=article3, mark=5)
+        MarkFactory(content_object=article3, mark=5)
+        MarkFactory(content_object=article3, mark=5)
         # 3.6666
-        ScopeFactory(content_object=article4, scope=5)
-        ScopeFactory(content_object=article4, scope=5)
-        ScopeFactory(content_object=article4, scope=1)
+        MarkFactory(content_object=article4, mark=5)
+        MarkFactory(content_object=article4, mark=5)
+        MarkFactory(content_object=article4, mark=1)
         # 2.6667
-        ScopeFactory(content_object=article5, scope=1)
-        ScopeFactory(content_object=article5, scope=4)
-        ScopeFactory(content_object=article5, scope=3)
+        MarkFactory(content_object=article5, mark=1)
+        MarkFactory(content_object=article5, mark=4)
+        MarkFactory(content_object=article5, mark=3)
         # 1.6667
-        ScopeFactory(content_object=article6, scope=1)
-        ScopeFactory(content_object=article6, scope=1)
-        ScopeFactory(content_object=article6, scope=3)
+        MarkFactory(content_object=article6, mark=1)
+        MarkFactory(content_object=article6, mark=1)
+        MarkFactory(content_object=article6, mark=3)
         # 1
-        ScopeFactory(content_object=article7, scope=1)
-        ScopeFactory(content_object=article7, scope=1)
-        ScopeFactory(content_object=article7, scope=1)
+        MarkFactory(content_object=article7, mark=1)
+        MarkFactory(content_object=article7, mark=1)
+        MarkFactory(content_object=article7, mark=1)
         # find by min rating
         self.assertCountEqual(
             Article.objects.articles_by_rating(min_rating=1),

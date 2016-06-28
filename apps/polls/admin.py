@@ -1,4 +1,5 @@
 
+from django.template.defaultfilters import truncatewords
 from django.db.models import Count
 from django.utils.translation import ugettext_lazy as _
 from django.contrib import admin
@@ -32,8 +33,8 @@ class PollAdmin(admin.ModelAdmin):
     Admin View for Poll
     '''
 
-    list_display = ('title', 'get_count_votes', 'get_count_choices', 'accessability', 'status', 'status_changed')
-    list_filter = ('accessability', 'status', 'date_modified', 'date_added')
+    list_display = ('title', 'get_count_votes', 'get_count_choices', 'status', 'status_changed')
+    list_filter = ('status', 'date_modified', 'date_added')
     inlines = [
         ChoiceInline,
         VoteInPollInline,
@@ -42,7 +43,7 @@ class PollAdmin(admin.ModelAdmin):
     fieldsets = [
         [
             Poll._meta.verbose_name, {
-                'fields': ['title', 'accessability', 'status', 'status_changed']
+                'fields': ['title', 'status', 'status_changed']
             }
         ]
     ]
@@ -70,6 +71,7 @@ class ChoiceAdmin(admin.ModelAdmin):
     '''
     Admin View for Choice
     '''
+
     list_display = ('__str__', 'poll', 'get_count_votes')
     list_filter = (
         ('poll', admin.RelatedOnlyFieldListFilter),
@@ -95,11 +97,17 @@ class ChoiceAdmin(admin.ModelAdmin):
     get_count_votes.short_description = _('Count votes')
     get_count_votes.admin_order_field = 'count_votes'
 
+    def shorted_text_choice(self, obj):
+        """Display long text choice as truncated."""
+
+        return truncatewords(obj, 5)
+
 
 class VoteInPollAdmin(admin.ModelAdmin):
     '''
         Admin View for VoteInPoll
     '''
+
     list_display = ('poll', 'account', 'choice', 'date_voting')
     list_filter = (
         ('poll', admin.RelatedOnlyFieldListFilter),

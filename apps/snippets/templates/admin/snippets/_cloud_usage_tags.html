@@ -1,0 +1,14 @@
+
+{% load i18n %}
+{% load mytags %}
+
+{% comment %}
+    tag cloud
+        is_colored
+        is_shuffled
+{% endcomment %}
+
+<div>
+    <h3 class="text-center">Usage tags</h3>
+    {% tag_cloud_as_listing statistics_by_usage_tags show_url='None' colors='Black' %}
+</div>

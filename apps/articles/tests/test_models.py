@@ -8,7 +8,7 @@ from apps.tags.factories import tags_factory
 from apps.badges.factories import badges_factory
 from apps.web_links.factories import web_links_factory
 from apps.comments.factories import CommentFactory
-from apps.scopes.factories import ScopeFactory
+from apps.marks.factories import MarkFactory
 from apps.tags.models import Tag
 from apps.web_links.models import WebLink
 from mylabour.utils import generate_text_by_min_length, generate_text_certain_length
@@ -59,9 +59,9 @@ class ArticleTest(TestCase):
         # adding comments
         for i in range(8):
             CommentFactory(content_object=article)
-        # adding scopes
+        # adding marks
         for i in range(10):
-            ScopeFactory(content_object=article)
+            MarkFactory(content_object=article)
         #
         self.assertEqual(article.title, data['title'])
         self.assertEqual(article.slug, slugify(data['title'], allow_unicode=True))
@@ -72,14 +72,13 @@ class ArticleTest(TestCase):
         self.assertEqual(article.quotation, data['quotation'])
         self.assertEqual(article.source, data['source'])
         self.assertEqual(article.account, data['account'])
-        self.assertEqual(article.scopes.count(), 10)
+        self.assertEqual(article.marks.count(), 10)
         self.assertEqual(article.subsections.count(), 5)
         self.assertEqual(article.tags.count(), 4)
         self.assertEqual(article.links.count(), 3)
         self.assertEqual(article.comments.count(), 8)
 
     def test_update_article(self):
-        new_account = AccountFactory()
         data = dict(
             title='Why Python does not have operator CASE-SWITCH.',
             quotation='Важно чтобы было что показать.',
@@ -87,7 +86,7 @@ class ArticleTest(TestCase):
             conclusion=generate_text_by_min_length(100, as_p=True),
             picture='http://python.org/foto211.jpeg',
             status=Article.STATUS_ARTICLE.draft,
-            account=new_account,
+            account=AccountFactory(is_active=True),
             source='http://pydanny.com/django/why_python_does_not_have_operator_case_switch.html',
         )
         self.article.title = data['title']
@@ -150,15 +149,15 @@ class ArticleTest(TestCase):
         raise NotImplementedError
 
     def test_get_rating(self):
-        self.article.scopes.clear()
+        self.article.marks.clear()
         self.assertEqual(self.article.get_rating(), .0)
-        ScopeFactory(content_object=self.article, scope=2)
-        ScopeFactory(content_object=self.article, scope=1)
-        ScopeFactory(content_object=self.article, scope=0)
-        ScopeFactory(content_object=self.article, scope=4)
-        ScopeFactory(content_object=self.article, scope=5)
-        ScopeFactory(content_object=self.article, scope=1)
-        ScopeFactory(content_object=self.article, scope=4)
+        MarkFactory(content_object=self.article, mark=2)
+        MarkFactory(content_object=self.article, mark=1)
+        MarkFactory(content_object=self.article, mark=0)
+        MarkFactory(content_object=self.article, mark=4)
+        MarkFactory(content_object=self.article, mark=5)
+        MarkFactory(content_object=self.article, mark=1)
+        MarkFactory(content_object=self.article, mark=4)
         self.assertEqual(self.article.get_rating(), 2.4286)
 
     def test_get_volume(self):

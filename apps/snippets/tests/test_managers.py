@@ -1,5 +1,8 @@
 
 from django.test import TestCase
+from django.utils import timezone
+
+from dateutil.relativedelta import relativedelta
 
 from apps.accounts.factories import accounts_factory
 from apps.tags.factories import tags_factory
@@ -202,3 +205,16 @@ class SnippetManagerTest(TestCase):
             statistics_by_usage_tags[-1],
             (tag_html, 1)
         )
+
+    def test_get_statistics_count_snippets_by_months_for_past_year(self):
+        """ """
+
+        raise NotImplementedError
+        # now = timezone.now()
+        # dates_added = (
+        #     now - relativedelta(months=1),
+        #     now - relativedelta(months=7),
+        #     now - relativedelta(months=10),
+        #     now - relativedelta(months=11),
+        # )
+        # snippet = SnippetFactory()

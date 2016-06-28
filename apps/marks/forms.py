@@ -6,7 +6,7 @@ from django.utils.translation import ugettext_lazy as _
 from django import forms
 
 
-class ScopeFormSet(BaseGenericInlineFormSet):
+class MarkFormSet(BaseGenericInlineFormSet):
     """
     Special inline form for relationship between TestQuestion and Varian models.
     """
@@ -14,7 +14,7 @@ class ScopeFormSet(BaseGenericInlineFormSet):
     def clean(self):
         """Custom validation"""
 
-        super(ScopeFormSet, self).clean()
+        super(MarkFormSet, self).clean()
         all_given_scope_users = (form.cleaned_data.get('account') for form in self.forms)
         counter_all_given_scope_users = Counter(all_given_scope_users)
         for form in self.forms:

@@ -110,29 +110,29 @@ class SnippetTest(TestCase):
         response = self.client.get(self.snippet.get_absolute_url())
         self.assertEqual(response.status_code, 200)
 
-    def test_get_scope_of_the_snippet(self):
+    def test_get_mark_of_the_snippet(self):
         self.snippet.opinions.clear()
-        self.assertEqual(self.snippet.get_scope(), 0)
+        self.assertEqual(self.snippet.get_mark(), 0)
         #
         random_accounts = Account.objects.exclude(pk=self.snippet.account.pk).random_accounts(10)
         choices_for_is_useful = [True, False, True, False, True, True, True, True, False, False]
         for couple in zip(random_accounts, choices_for_is_useful):
             self.snippet.opinions.create(account=couple[0], is_useful=couple[1])
-        self.assertEqual(self.snippet.get_scope(), 2)
+        self.assertEqual(self.snippet.get_mark(), 2)
         #
         self.snippet.opinions.clear()
         random_accounts = Account.objects.exclude(pk=self.snippet.account.pk).random_accounts(10)
         choices_for_is_useful = [False, False, True, False, True, True, True, True, False, False]
         for couple in zip(random_accounts, choices_for_is_useful):
             self.snippet.opinions.create(account=couple[0], is_useful=couple[1])
-        self.assertEqual(self.snippet.get_scope(), 0)
+        self.assertEqual(self.snippet.get_mark(), 0)
         #
         self.snippet.opinions.clear()
         random_accounts = Account.objects.exclude(pk=self.snippet.account.pk).random_accounts(10)
         choices_for_is_useful = [True, False, False, False, True, False, True, False, False, False]
         for couple in zip(random_accounts, choices_for_is_useful):
             self.snippet.opinions.create(account=couple[0], is_useful=couple[1])
-        self.assertEqual(self.snippet.get_scope(), -4)
+        self.assertEqual(self.snippet.get_mark(), -4)
 
     @unittest.skip('Don`t made views counter.')
     def test_get_count_views(self):

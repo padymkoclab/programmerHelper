@@ -15,7 +15,7 @@ class ArticleQuerySet(models.QuerySet):
     def articles_with_rating(self):
         """Adding for each the article field with determined rating of an itself."""
 
-        self = self.defer('subsections').annotate(rating=models.Avg('scopes__scope'))
+        self = self.defer('subsections').annotate(rating=models.Avg('marks__mark'))
         self = self.annotate(rating=models.functions.Coalesce('rating', .0))
         self = self.annotate(rating=Round('rating'))
         return self
@@ -44,10 +44,10 @@ class ArticleQuerySet(models.QuerySet):
 
         return self.defer('subsections').annotate(count_comments=models.Count('comments', distinct=True))
 
-    def articles_with_count_scopes(self):
-        """Adding for each the article field with determined count scopes of an itself."""
+    def articles_with_count_marks(self):
+        """Adding for each the article field with determined count marks of an itself."""
 
-        return self.defer('scopes').annotate(count_scopes=models.Count('scopes', distinct=True))
+        return self.defer('marks').annotate(count_marks=models.Count('marks', distinct=True))
 
     def articles_with_count_tags(self):
         """Adding for each the article field with determined count tags of an itself."""
@@ -64,12 +64,12 @@ class ArticleQuerySet(models.QuerySet):
 
         return self.defer('subsections').annotate(count_subsections=models.Count('subsections', distinct=True))
 
-    def articles_with_rating_and_count_comments_subsections_tags_links_scopes(self):
-        """Determining for each article: count tags, comments, links, scopes, subsections and rating."""
+    def articles_with_rating_and_count_comments_subsections_tags_links_marks(self):
+        """Determining for each article: count tags, comments, links, marks, subsections and rating."""
 
         self = self.articles_with_rating()
         self = self.articles_with_count_comments()
-        self = self.articles_with_count_scopes()
+        self = self.articles_with_count_marks()
         self = self.articles_with_count_tags()
         self = self.articles_with_count_links()
         self = self.articles_with_count_subsections()

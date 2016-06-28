@@ -1,26 +1,26 @@
 
 import uuid
 
-from django.template.defaultfilters import truncatewords
 from django.core.urlresolvers import reverse
 from django.core.validators import MinLengthValidator
 from django.utils.translation import ugettext_lazy as _
 from django.db import models
 from django.conf import settings
 
-from autoslug import AutoSlugField
 from model_utils.fields import MonitorField, StatusField
 from model_utils import Choices
-from model_utils.managers import QueryManager
 
+from mylabour.fields_db import ConfiguredAutoSlugField
 from mylabour.models import TimeStampedModel
+from mylabour.validators import MinCountWordsValidator
 
-from .managers import VoteInPollManager
+from .managers import PollManager, OpendedPollManager, VoteInPollManager
+from .querysets import PollQuerySet
 
 
 class Poll(TimeStampedModel):
     """
-
+    Model for poll.
     """
 
     MIN_COUNT_CHOICES_IN_POLL = 2
@@ -28,25 +28,23 @@ class Poll(TimeStampedModel):
 
     CHOICES_STATUS = Choices(
         ('draft', _('Draft')),
-        ('open', _('Open')),
+        ('opened', _('Opened')),
         ('closed', _('Closed')),
     )
 
-    CHOICES_ACCESSABILITY = Choices(
-        ('protect', _('Protect')),
-        ('public', _('Public')),
-    )
-
     title = models.CharField(
-        _('Title'), max_length=200, unique=True, validators=[MinLengthValidator(settings.MIN_LENGTH_FOR_NAME_OR_TITLE_OBJECT)]
+        _('Title'),
+        max_length=200,
+        unique=True,
+        validators=[MinLengthValidator(settings.MIN_LENGTH_FOR_NAME_OR_TITLE_OBJECT)]
     )
-    slug = AutoSlugField(_('Slug'), populate_from='title', always_update=True, unique=True, allow_unicode=True, db_index=True)
-    accessability = models.CharField(
-        _('accessability'),
-        max_length=20,
-        choices=CHOICES_ACCESSABILITY,
-        default=CHOICES_ACCESSABILITY.public,
+    description = models.CharField(
+        _('Short description'),
+        validators=[MinCountWordsValidator(5)],
+        help_text=_('Enter at least 5 words.'),
+        max_length=100,
     )
+    slug = ConfiguredAutoSlugField(_('Slug'), populate_from='title', unique=True)
     status = StatusField(verbose_name=_('status'), choices_name='CHOICES_STATUS', default=CHOICES_STATUS.draft)
     status_changed = MonitorField(_('Status changed'), monitor='status')
     votes = models.ManyToManyField(
@@ -58,25 +56,34 @@ class Poll(TimeStampedModel):
     )
 
     objects = models.Manager()
-    public = QueryManager(accessability=CHOICES_ACCESSABILITY.public)
+    objects = PollManager.from_queryset(PollQuerySet)()
+    draft = models.Manager()
+    opened = OpendedPollManager()
+    closed = models.Manager()
 
     class Meta:
         db_table = 'polls'
         verbose_name = _("Poll")
         verbose_name_plural = _("Polls")
-        ordering = ['date_added', 'title']
-        get_latest_by = 'date_modified'
+        ordering = ['date_added']
+        get_latest_by = 'date_added'
 
     def __str__(self):
         return '{0.title}'.format(self)
 
     def get_absolute_url(self):
-        return reverse('polls:poll', kwargs={'slug': self.slug})
+        return reverse('polls:poll', kwargs={'pk': self.pk, 'slug': self.slug})
+
+    def get_admin_url(self):
+        return reverse(
+            'admin:{0}_{1}_change'.format(self._meta.app_label, self._meta.model_name),
+            args=(self.pk,)
+        )
 
 
 class Choice(models.Model):
     """
-
+    Model for choice of poll.
     """
 
     id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
@@ -85,6 +92,7 @@ class Choice(models.Model):
         verbose_name=_('Poll'),
         on_delete=models.CASCADE,
         related_name='choices',
+        limit_choices_to={'status': Poll.CHOICES_STATUS.opened},
     )
     text_choice = models.TextField(_('Text choice'))
 
@@ -96,10 +104,13 @@ class Choice(models.Model):
         unique_together = ['poll', 'text_choice']
 
     def __str__(self):
-        return truncatewords('{0.text_choice}'.format(self), 8)
+        return '{0.text_choice}'.format(self)
 
 
 class VoteInPoll(models.Model):
+    """
+    A intermediate model for keeping a choice of a account in certain poll.
+    """
 
     id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
     poll = models.ForeignKey(
@@ -111,7 +122,8 @@ class VoteInPoll(models.Model):
         settings.AUTH_USER_MODEL,
         verbose_name=_('User'),
         on_delete=models.CASCADE,
-        related_name='votes_in_polls'
+        related_name='votes_in_polls',
+        limit_choices_to={'is_active': True},
     )
     choice = models.ForeignKey(
         'Choice',
@@ -130,7 +142,7 @@ class VoteInPoll(models.Model):
         verbose_name_plural = "Votes in poll"
         ordering = ['poll', 'date_voting']
         get_latest_by = 'date_voting'
-        unique_together = ['poll', 'account']
+        unique_together = ('poll', 'account')
 
     def __str__(self):
-        return 'Vote of user "{0.account}" in poll "{0.poll}"'.format(self)
+        return _('Vote of a user "{0.account}" in a poll "{0.poll}"').format(self)

@@ -8,7 +8,7 @@ import factory
 from factory import fuzzy
 
 from apps.comments.factories import CommentFactory
-from apps.scopes.factories import ScopeFactory
+from apps.marks.factories import MarkFactory
 
 from mylabour.utils import generate_text_by_min_length
 
@@ -72,9 +72,9 @@ class ArticleFactory(factory.DjangoModelFactory):
         self.links.set(weblinks)
 
     @factory.post_generation
-    def scopes(self, created, extracted, **kwargs):
+    def marks(self, created, extracted, **kwargs):
         for i in range(random.randint(0, 10)):
-            ScopeFactory(content_object=self)
+            MarkFactory(content_object=self)
 
     @factory.post_generation
     def date_added(self, created, extracted, **kwargs):

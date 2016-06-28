@@ -20,9 +20,26 @@
         color: #222;
         background: #fff;
     }
+    .prev_month{
+
+    }
 </style>
 
 <div class="custom_calendar_by_month">
     {{ weeks_current_month }}
+    <div class="controll_btn">
+        <button class="prev_month">{{ '< '}}</button>
+        <button class="next_month">{{ '>' }}</button>
+    </div>
 </div>
 
+<script type="text/javascript">
+    var btns_prev_month = document.getElementsByClassName("prev_month");
+    for (var i = 0; i < btns_prev_month.length; i++) {
+        btn_prev_month = btns_prev_month[i];
+        btn_prev_month.addEventListener('click', function(){
+            calendar_wrapper = btn_prev_month.parentElement.parentElement
+            calendar_wrapper.remove();
+        });
+    }
+</script>

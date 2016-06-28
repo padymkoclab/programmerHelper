@@ -138,7 +138,7 @@ class Account(AbstractBaseUser, PermissionsMixin):
     # managers
     objects = models.Manager()
     objects = AccountManager.from_queryset(AccountQuerySet)()
-    badges_manager = BadgeManager()
+    # badges_manager = BadgeManager().
 
     # simple managers
     actives = QueryManager(is_active=True)
@@ -235,49 +235,49 @@ class Account(AbstractBaseUser, PermissionsMixin):
         """Getting reputation of account for badges."""
         return self.badges.count() * 10
 
-    def get_total_scope_for_answers(self):
-        """Getting total scope for answers of account."""
+    def get_total_mark_for_answers(self):
+        """Getting total mark for answers of account."""
         # getting instance as queryset
         queryset = self.__class__.objects.filter(email=self.email)
         # pass single queryset for execution once iteration in method of manager
-        account_with_total_scope_for_answers = self.__class__.objects.accounts_with_total_scope_for_answers(queryset=queryset)
+        account_with_total_mark_for_answers = self.__class__.objects.accounts_with_total_mark_for_answers(queryset=queryset)
         # getting back instance after processing
-        account_with_total_scope_for_answers = account_with_total_scope_for_answers.get()
-        # return total_scope_for_answers of instance
-        return account_with_total_scope_for_answers.total_scope_for_answers
+        account_with_total_mark_for_answers = account_with_total_mark_for_answers.get()
+        # return total_mark_for_answers of instance
+        return account_with_total_mark_for_answers.total_mark_for_answers
 
-    def get_total_scope_for_questions(self):
-        """Getting total scope for questions of account."""
+    def get_total_mark_for_questions(self):
+        """Getting total mark for questions of account."""
         # getting instance as queryset
         queryset = self.__class__.objects.filter(email=self.email)
         # pass single queryset for execution once iteration in method of manager
-        account_with_total_scope_for_questions = self.__class__.objects.accounts_with_total_scope_for_questions(queryset=queryset)
+        account_with_total_mark_for_questions = self.__class__.objects.accounts_with_total_mark_for_questions(queryset=queryset)
         # getting back instance after processing
-        account_with_total_scope_for_questions = account_with_total_scope_for_questions.get()
-        # return total_scope_for_questions of instance
-        return account_with_total_scope_for_questions.total_scope_for_questions
+        account_with_total_mark_for_questions = account_with_total_mark_for_questions.get()
+        # return total_mark_for_questions of instance
+        return account_with_total_mark_for_questions.total_mark_for_questions
 
-    def get_total_scope_for_solutions(self):
-        """Getting total scope for solutions of account."""
+    def get_total_mark_for_solutions(self):
+        """Getting total mark for solutions of account."""
         # getting instance as queryset
         queryset = self.__class__.objects.filter(email=self.email)
         # pass single queryset for execution once iteration in method of manager
-        account_with_total_scope_for_solutions = self.__class__.objects.accounts_with_total_scope_for_solutions(queryset=queryset)
+        account_with_total_mark_for_solutions = self.__class__.objects.accounts_with_total_mark_for_solutions(queryset=queryset)
         # getting back instance after processing
-        account_with_total_scope_for_solutions = account_with_total_scope_for_solutions.get()
-        # return total_scope_for_solutions of instance
-        return account_with_total_scope_for_solutions.total_scope_for_solutions
+        account_with_total_mark_for_solutions = account_with_total_mark_for_solutions.get()
+        # return total_mark_for_solutions of instance
+        return account_with_total_mark_for_solutions.total_mark_for_solutions
 
-    def get_total_scope_for_snippets(self):
-        """Getting total scope for snippets of account."""
+    def get_total_mark_for_snippets(self):
+        """Getting total mark for snippets of account."""
         # getting instance as queryset
         queryset = self.__class__.objects.filter(email=self.email)
         # pass single queryset for execution once iteration in method of manager
-        account_with_total_scope_for_snippets = self.__class__.objects.accounts_with_total_scope_for_snippets(queryset=queryset)
+        account_with_total_mark_for_snippets = self.__class__.objects.accounts_with_total_mark_for_snippets(queryset=queryset)
         # getting back instance after processing
-        account_with_total_scope_for_snippets = account_with_total_scope_for_snippets.get()
-        # return total_scope_for_snippets of instance
-        return account_with_total_scope_for_snippets.total_scope_for_snippets
+        account_with_total_mark_for_snippets = account_with_total_mark_for_snippets.get()
+        # return total_mark_for_snippets of instance
+        return account_with_total_mark_for_snippets.total_mark_for_snippets
 
     def get_count_participate_in_polls(self):
         """Getting how many polls of account participated."""
@@ -314,16 +314,16 @@ class Account(AbstractBaseUser, PermissionsMixin):
     def get_reputation_for_activity(self):
         """
         Getting reputation of account for activity on website:
-        scopes of published snippets, answers, questions and rating of articles,
+        marks of published snippets, answers, questions and rating of articles,
         participate in polls.
         ---------------------------------------
             Evaluate reputation for activity
         ---------------------------------------
-        Scope answers                   = *2
-        Scope questions                 = *1
-        Scope solutions                 = *3
+        Mark answers                   = *2
+        Mark questions                 = *1
+        Mark solutions                 = *3
         Rating articles                 = *4
-        Scope snippets                  = *2
+        Mark snippets                  = *2
         Filled profile                  = *1
         Participate in poll             = *1
         Popular topic                   = *100
@@ -331,10 +331,10 @@ class Account(AbstractBaseUser, PermissionsMixin):
         Participate in creating courses = *200
         ---------------------------------------
         """
-        reputation_for_snippets = (self.get_total_scope_for_snippets() or 0) * 2
-        reputation_for_solutions = (self.get_total_scope_for_solutions() or 0) * 3
-        reputation_for_questions = (self.get_total_scope_for_questions() or 0) * 1
-        reputation_for_answers = (self.get_total_scope_for_answers() or 0) * 2
+        reputation_for_snippets = (self.get_total_mark_for_snippets() or 0) * 2
+        reputation_for_solutions = (self.get_total_mark_for_solutions() or 0) * 3
+        reputation_for_questions = (self.get_total_mark_for_questions() or 0) * 1
+        reputation_for_answers = (self.get_total_mark_for_answers() or 0) * 2
         reputation_for_polls = self.get_count_participate_in_polls() or 0
         reputation_for_filled_account_profile = self.get_percent_filled_account_profile() or 0
         reputation_for_polls = (self.get_total_rating_for_articles() or 0) * 4

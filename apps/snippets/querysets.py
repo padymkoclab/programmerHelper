@@ -7,10 +7,10 @@ class SnippetQuerySet(models.QuerySet):
     QuerySet for using with queryset model Snippet
     """
 
-    def objects_with_scopes(self):
-        """Added to each snippet new field 'scope' where storage her scope."""
+    def objects_with_marks(self):
+        """Added to each snippet new field 'mark' where storage her mark."""
 
-        return self.annotate(scope=models.Sum(
+        return self.annotate(mark=models.Sum(
             models.Case(
                 models.When(opinions__is_useful=True, then=1),
                 models.When(opinions__is_useful=False, then=-1),
@@ -34,18 +34,18 @@ class SnippetQuerySet(models.QuerySet):
 
         return self.annotate(count_comments=models.Count('comments', distinct=True))
 
-    def snippets_by_scopes(self, min_scope=None, max_scope=None):
-        """Snippets with certain range of scopes."""
+    def snippets_by_marks(self, min_mark=None, max_mark=None):
+        """Snippets with certain range of marks."""
 
-        objects_with_scopes = self.objects_with_scopes()
-        if min_scope is not None and max_scope is None:
-            return objects_with_scopes.filter(scope__gte=min_scope)
-        elif min_scope is None and max_scope is not None:
-            return objects_with_scopes.filter(scope__lte=max_scope)
-        elif min_scope is not None and max_scope is not None:
-            return objects_with_scopes.filter(scope__gte=min_scope).filter(scope__lte=max_scope)
+        objects_with_marks = self.objects_with_marks()
+        if min_mark is not None and max_mark is None:
+            return objects_with_marks.filter(mark__gte=min_mark)
+        elif min_mark is None and max_mark is not None:
+            return objects_with_marks.filter(mark__lte=max_mark)
+        elif min_mark is not None and max_mark is not None:
+            return objects_with_marks.filter(mark__gte=min_mark).filter(mark__lte=max_mark)
         else:
-            raise TypeError('Missing 1 required argument: "min_scope" or "max_scope".')
+            raise TypeError('Missing 1 required argument: "min_mark" or "max_mark".')
 
     def snippets_with_count_favours(self):
         """Added to each snippet new field with count of favours of the each snippet."""
@@ -76,9 +76,9 @@ class SnippetQuerySet(models.QuerySet):
 
     def snippets_with_total_counters_on_related_fields(self):
         """Determinating for each snippet count_tags, opinions, favours, comments,
-        getting scope, count good/bad opinions, and count likes/dislikes favours."""
+        getting mark, count good/bad opinions, and count likes/dislikes favours."""
 
-        self = self.objects_with_scopes()
+        self = self.objects_with_marks()
         self = self.snippets_with_count_tags()
         self = self.snippets_with_count_comments()
         self = self.snippets_with_count_opinions()

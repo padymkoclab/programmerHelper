@@ -1,7 +1,7 @@
 
 from django.conf.urls import url
 
-name = 'scopes'
+name = 'marks'
 
 urlpatterns = [
     url(r'/$', '.as_view()', {}, ''),

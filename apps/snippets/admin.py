@@ -1,4 +1,8 @@
 
+import random
+import datetime
+import time
+
 from django.template.response import TemplateResponse
 from django.conf.urls import url
 from django.utils.translation import ugettext_lazy as _
@@ -77,21 +81,21 @@ class SnippetAdmin(ScopeMixin, admin.ModelAdmin):
         """ """
 
         # get data for charts
-        statistics_by_usage_lexers = Snippet.objects.get_statistics_by_usage_all_lexers()
-        only_used_lexers = tuple(couple[0] for couple in statistics_by_usage_lexers if couple[1] > 0)
-        only_values_of_used_lexers = tuple(couple[1] for couple in statistics_by_usage_lexers if couple[1] > 0)
-        # make charts
-        xdata = only_used_lexers
-        ydata = only_values_of_used_lexers
-        extra_serie = {"tooltip": {"y_start": "", "y_end": " cal"}}
-        usage_lexers_chartdata = {'x': xdata, 'y1': ydata, 'extra1': extra_serie}
-        usage_lexers_charttype = "pieChart"
-        piechart_usage_lexers_container = 'piechart_usage_lexers_container'
-        data = {
-            'usage_lexers_charttype': usage_lexers_charttype,
-            'usage_lexers_chartdata': usage_lexers_chartdata,
-            'piechart_usage_lexers_container': piechart_usage_lexers_container,
-        }
+        # statistics_by_usage_lexers = Snippet.objects.get_statistics_by_usage_all_lexers()
+        # only_used_lexers = tuple(couple[0] for couple in statistics_by_usage_lexers if couple[1] > 0)
+        # only_values_of_used_lexers = tuple(couple[1] for couple in statistics_by_usage_lexers if couple[1] > 0)
+        # # make charts
+        # xdata = only_used_lexers
+        # ydata = only_values_of_used_lexers
+        # extra_serie = {"tooltip": {"y_start": "", "y_end": " cal"}}
+        # usage_lexers_chartdata = {'x': xdata, 'y1': ydata, 'extra1': extra_serie}
+        # usage_lexers_charttype = "pieChart"
+        # piechart_usage_lexers_container = 'piechart_usage_lexers_container'
+        # data = {
+        #     'usage_lexers_charttype': usage_lexers_charttype,
+        #     'usage_lexers_chartdata': usage_lexers_chartdata,
+        #     'piechart_usage_lexers_container': piechart_usage_lexers_container,
+        # }
         # adding variables to context
         context = dict(
             # Include common variables for rendering the admin template
@@ -100,13 +104,28 @@ class SnippetAdmin(ScopeMixin, admin.ModelAdmin):
             opts=self.model._meta,
             # root_path=self.admin_site.root_path,
         )
-        context.update(data)
-        context['statistics_by_usage_all_lexers'] = Snippet.objects.get_statistics_by_usage_all_lexers()
-        context['statistics_by_usage_tags'] = Snippet.tags_manager.get_statistics_by_count_used_tags()
+        # context.update(data)
+        # context['statistics_by_usage_all_lexers'] = Snippet.objects.get_statistics_by_usage_all_lexers()
+        # context['statistics_by_usage_tags'] = Snippet.tags_manager.get_statistics_by_count_used_tags()
 
         #
         #
         #
+
+        xdata = [datetime.date(11, 11, 11), datetime.date(11, 11, 12), datetime.date(11, 11, 13), datetime.date(11, 11, 14)]
+        ydata = [4, 2, 2, 1]
+        tooltip_date = "%d %b %Y %H:%M:%S %p"
+        extra_serie1 = {"tooltip": {"y_start": "", "y_end": " calls"}, "date_format": tooltip_date}
+        chartdata = {
+            'x': xdata,
+            'name1': 'series 1', 'y1': ydata, 'extra1': extra_serie1,
+        }
+        charttype = "cumulativeLineChart"
+        data = {
+            'charttype': charttype,
+            'chartdata': chartdata,
+        }
+        context.update(data)
 
         return TemplateResponse(request, 'admin/snippets/statistics.html', context)
 

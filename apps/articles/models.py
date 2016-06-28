@@ -11,7 +11,7 @@ from model_utils.fields import StatusField, MonitorField
 from model_utils import Choices
 
 from apps.comments.models import Comment
-from apps.scopes.models import Scope
+from apps.marks.models import Mark
 from apps.tags.models import Tag
 from apps.web_links.models import WebLink
 from mylabour.fields_db import ConfiguredAutoSlugField
@@ -71,7 +71,7 @@ class Article(TimeStampedModel):
         help_text=_('Useful links'),
     )
     comments = GenericRelation(Comment, related_query_name='articles')
-    scopes = GenericRelation(Scope, related_query_name='articles')
+    marks = GenericRelation(Mark, related_query_name='articles')
 
     # managers
     objects = models.Manager()

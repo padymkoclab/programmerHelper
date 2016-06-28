@@ -89,15 +89,15 @@ class SnippetQuerySetTest(TestCase):
         for couple in zip(accounts, favours_for_snippet6):
             cls.snippet6.favours.create(account=couple[0], is_favour=couple[1])
 
-    def test_objects_with_scopes(self):
-        objects_with_scopes = Snippet.objects.objects_with_scopes()
-        self.assertEqual(objects_with_scopes.get(pk=self.snippet1.pk).scope, -4)
-        self.assertEqual(objects_with_scopes.get(pk=self.snippet2.pk).scope, 6)
-        self.assertEqual(objects_with_scopes.get(pk=self.snippet3.pk).scope, 2)
-        self.assertEqual(objects_with_scopes.get(pk=self.snippet4.pk).scope, 3)
-        self.assertEqual(objects_with_scopes.get(pk=self.snippet5.pk).scope, 0)
-        self.assertEqual(objects_with_scopes.get(pk=self.snippet6.pk).scope, -3)
-        self.assertEqual(objects_with_scopes.get(pk=self.snippet7.pk).scope, 0)
+    def test_objects_with_marks(self):
+        objects_with_marks = Snippet.objects.objects_with_marks()
+        self.assertEqual(objects_with_marks.get(pk=self.snippet1.pk).mark, -4)
+        self.assertEqual(objects_with_marks.get(pk=self.snippet2.pk).mark, 6)
+        self.assertEqual(objects_with_marks.get(pk=self.snippet3.pk).mark, 2)
+        self.assertEqual(objects_with_marks.get(pk=self.snippet4.pk).mark, 3)
+        self.assertEqual(objects_with_marks.get(pk=self.snippet5.pk).mark, 0)
+        self.assertEqual(objects_with_marks.get(pk=self.snippet6.pk).mark, -3)
+        self.assertEqual(objects_with_marks.get(pk=self.snippet7.pk).mark, 0)
 
     def test_snippets_with_count_tags(self):
         snippets_with_count_tags = Snippet.objects.snippets_with_count_tags()
@@ -159,23 +159,23 @@ class SnippetQuerySetTest(TestCase):
         self.assertEqual(snippets_with_count_dislike_favours.get(pk=self.snippet6.pk).count_dislike_favours, 4)
         self.assertEqual(snippets_with_count_dislike_favours.get(pk=self.snippet7.pk).count_dislike_favours, 0)
 
-    def test_snippets_by_scopes_without_required_arguments(self):
+    def test_snippets_by_marks_without_required_arguments(self):
         self.assertRaisesMessage(
             TypeError,
-            'Missing 1 required argument: "min_scope" or "max_scope".',
-            Snippet.objects.snippets_by_scopes,
+            'Missing 1 required argument: "min_mark" or "max_mark".',
+            Snippet.objects.snippets_by_marks,
         )
 
-    def test_snippets_by_scopes_with_only_max_scope(self):
-        snippets = Snippet.objects.snippets_by_scopes(max_scope=1)
+    def test_snippets_by_marks_with_only_max_mark(self):
+        snippets = Snippet.objects.snippets_by_marks(max_mark=1)
         self.assertCountEqual(snippets, [self.snippet1, self.snippet5, self.snippet6, self.snippet7])
 
-    def test_snippets_by_scopes_with_only_min_scope(self):
-        snippets = Snippet.objects.snippets_by_scopes(min_scope=1)
+    def test_snippets_by_marks_with_only_min_mark(self):
+        snippets = Snippet.objects.snippets_by_marks(min_mark=1)
         self.assertCountEqual(snippets, [self.snippet2, self.snippet4, self.snippet3])
 
-    def test_snippets_by_scopes_with_min_and_max_scope(self):
-        snippets = Snippet.objects.snippets_by_scopes(min_scope=-1, max_scope=1)
+    def test_snippets_by_marks_with_min_and_max_mark(self):
+        snippets = Snippet.objects.snippets_by_marks(min_mark=-1, max_mark=1)
         self.assertCountEqual(snippets, [self.snippet5, self.snippet7])
 
     def test_snippets_with_total_counters_on_related_fields(self):
@@ -184,7 +184,7 @@ class SnippetQuerySetTest(TestCase):
         self.assertEqual(snippets.get(pk=self.snippet1.pk).count_comments, 3)
         self.assertEqual(snippets.get(pk=self.snippet1.pk).count_opinions, 10)
         self.assertEqual(snippets.get(pk=self.snippet1.pk).count_tags, 4)
-        self.assertEqual(snippets.get(pk=self.snippet1.pk).scope, -4)
+        self.assertEqual(snippets.get(pk=self.snippet1.pk).mark, -4)
         self.assertEqual(snippets.get(pk=self.snippet1.pk).count_good_opinions, 3)
         self.assertEqual(snippets.get(pk=self.snippet1.pk).count_bad_opinions, 7)
         self.assertEqual(snippets.get(pk=self.snippet1.pk).count_favours, 15)
@@ -194,7 +194,7 @@ class SnippetQuerySetTest(TestCase):
         self.assertEqual(snippets.get(pk=self.snippet2.pk).count_comments, 4)
         self.assertEqual(snippets.get(pk=self.snippet2.pk).count_opinions, 12)
         self.assertEqual(snippets.get(pk=self.snippet2.pk).count_tags, 5)
-        self.assertEqual(snippets.get(pk=self.snippet2.pk).scope, 6)
+        self.assertEqual(snippets.get(pk=self.snippet2.pk).mark, 6)
         self.assertEqual(snippets.get(pk=self.snippet2.pk).count_good_opinions, 9)
         self.assertEqual(snippets.get(pk=self.snippet2.pk).count_bad_opinions, 3)
         self.assertEqual(snippets.get(pk=self.snippet2.pk).count_favours, 5)
@@ -204,7 +204,7 @@ class SnippetQuerySetTest(TestCase):
         self.assertEqual(snippets.get(pk=self.snippet3.pk).count_comments, 1)
         self.assertEqual(snippets.get(pk=self.snippet3.pk).count_opinions, 8)
         self.assertEqual(snippets.get(pk=self.snippet3.pk).count_tags, 2)
-        self.assertEqual(snippets.get(pk=self.snippet3.pk).scope, 2)
+        self.assertEqual(snippets.get(pk=self.snippet3.pk).mark, 2)
         self.assertEqual(snippets.get(pk=self.snippet3.pk).count_good_opinions, 5)
         self.assertEqual(snippets.get(pk=self.snippet3.pk).count_bad_opinions, 3)
         self.assertEqual(snippets.get(pk=self.snippet3.pk).count_favours, 8)
@@ -214,7 +214,7 @@ class SnippetQuerySetTest(TestCase):
         self.assertEqual(snippets.get(pk=self.snippet4.pk).count_comments, 2)
         self.assertEqual(snippets.get(pk=self.snippet4.pk).count_opinions, 3)
         self.assertEqual(snippets.get(pk=self.snippet4.pk).count_tags, 3)
-        self.assertEqual(snippets.get(pk=self.snippet4.pk).scope, 1)
+        self.assertEqual(snippets.get(pk=self.snippet4.pk).mark, 1)
         self.assertEqual(snippets.get(pk=self.snippet4.pk).count_good_opinions, 2)
         self.assertEqual(snippets.get(pk=self.snippet4.pk).count_bad_opinions, 1)
         self.assertEqual(snippets.get(pk=self.snippet4.pk).count_favours, 2)
@@ -224,7 +224,7 @@ class SnippetQuerySetTest(TestCase):
         self.assertEqual(snippets.get(pk=self.snippet5.pk).count_comments, 1)
         self.assertEqual(snippets.get(pk=self.snippet5.pk).count_opinions, 8)
         self.assertEqual(snippets.get(pk=self.snippet5.pk).count_tags, 1)
-        self.assertEqual(snippets.get(pk=self.snippet5.pk).scope, 0)
+        self.assertEqual(snippets.get(pk=self.snippet5.pk).mark, 0)
         self.assertEqual(snippets.get(pk=self.snippet5.pk).count_good_opinions, 4)
         self.assertEqual(snippets.get(pk=self.snippet5.pk).count_bad_opinions, 4)
         self.assertEqual(snippets.get(pk=self.snippet5.pk).count_favours, 2)
@@ -234,7 +234,7 @@ class SnippetQuerySetTest(TestCase):
         self.assertEqual(snippets.get(pk=self.snippet6.pk).count_comments, 0)
         self.assertEqual(snippets.get(pk=self.snippet6.pk).count_opinions, 3)
         self.assertEqual(snippets.get(pk=self.snippet6.pk).count_tags, 0)
-        self.assertEqual(snippets.get(pk=self.snippet6.pk).scope, -3)
+        self.assertEqual(snippets.get(pk=self.snippet6.pk).mark, -3)
         self.assertEqual(snippets.get(pk=self.snippet6.pk).count_good_opinions, 0)
         self.assertEqual(snippets.get(pk=self.snippet6.pk).count_bad_opinions, 3)
         self.assertEqual(snippets.get(pk=self.snippet6.pk).count_favours, 4)
@@ -244,7 +244,7 @@ class SnippetQuerySetTest(TestCase):
         self.assertEqual(snippets.get(pk=self.snippet7.pk).count_comments, 0)
         self.assertEqual(snippets.get(pk=self.snippet7.pk).count_opinions, 0)
         self.assertEqual(snippets.get(pk=self.snippet7.pk).count_tags, 0)
-        self.assertEqual(snippets.get(pk=self.snippet7.pk).scope, 0)
+        self.assertEqual(snippets.get(pk=self.snippet7.pk).mark, 0)
         self.assertEqual(snippets.get(pk=self.snippet7.pk).count_good_opinions, 0)
         self.assertEqual(snippets.get(pk=self.snippet7.pk).count_bad_opinions, 0)
         self.assertEqual(snippets.get(pk=self.snippet7.pk).count_favours, 0)

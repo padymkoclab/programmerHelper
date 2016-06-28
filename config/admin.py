@@ -6,7 +6,6 @@ from django.contrib import admin
 from apps.accounts.admin import AccountAdmin, AccountLevelAdmin
 from apps.accounts.models import Account, AccountLevel
 from django.contrib.auth.models import Group
-# from django.contrib.sessions.models import Session
 
 from mylabour.admin_actions import export_as_csv, export_as_json, export_as_xml, export_as_yaml, export_as_xlsx
 
@@ -35,8 +34,8 @@ from apps.polls.admin import PollAdmin, VoteInPollAdmin, ChoiceAdmin
 from apps.polls.models import Poll, Choice, VoteInPoll
 from apps.questions.admin import QuestionAdmin, AnswerAdmin
 from apps.questions.models import Question, Answer
-from apps.scopes.admin import ScopeAdmin
-from apps.scopes.models import Scope
+from apps.marks.admin import MarkAdmin
+from apps.marks.models import Mark
 from apps.sessions.admin import ExpandedSessionAdmin
 from apps.sessions.models import ExpandedSession
 from apps.snippets.admin import SnippetAdmin
@@ -118,7 +117,7 @@ ProgrammerHelper_AdminSite.register(VoteInPoll, VoteInPollAdmin)
 # Apps with generic models
 ProgrammerHelper_AdminSite.register(Comment, CommentAdmin)
 ProgrammerHelper_AdminSite.register(Opinion, OpinionAdmin)
-ProgrammerHelper_AdminSite.register(Scope, ScopeAdmin)
+ProgrammerHelper_AdminSite.register(Mark, MarkAdmin)
 # activity
 ProgrammerHelper_AdminSite.register(Activity, ActivityAdmin)
 # notifications
