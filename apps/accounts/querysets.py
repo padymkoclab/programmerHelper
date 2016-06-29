@@ -181,3 +181,8 @@ class AccountQuerySet(models.QuerySet):
             if not obj.has_badge(badge_name):
                 result = result.exclude(pk=obj.pk)
         return result
+
+    def accounts_with_count_votes(self):
+        """Return queryset where to determined count votes for each account."""
+
+        return self.annotate(count_votes=models.Count('votes', distinct=True))

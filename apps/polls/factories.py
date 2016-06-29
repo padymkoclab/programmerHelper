@@ -36,7 +36,7 @@ class ChoiceFactory(factory.django.DjangoModelFactory):
     text_choice = factory.Faker('text', locale='ru')
 
 
-def factory_polls(count):
+def polls_factory(count):
     Accounts = get_user_model().objects.all()
     Poll.objects.filter().delete()
     # create polls

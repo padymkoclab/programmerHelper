@@ -35,6 +35,7 @@ class PollAdmin(admin.ModelAdmin):
 
     list_display = ('title', 'get_count_votes', 'get_count_choices', 'status', 'status_changed')
     list_filter = ('status', 'date_modified', 'date_added')
+    list_select_related = ('choices', )
     inlines = [
         ChoiceInline,
         VoteInPollInline,
@@ -50,10 +51,7 @@ class PollAdmin(admin.ModelAdmin):
 
     def get_queryset(self, request):
         qs = super(PollAdmin, self).get_queryset(request)
-        qs = qs.annotate(
-            count_votes=Count('votes', distinct=True),
-            count_choices=Count('choices', distinct=True),
-        )
+        qs = qs.polls_with_count_choices_and_votes()
         return qs
 
     def get_count_votes(self, obj):

@@ -1,7 +1,7 @@
 
 from django.db import models
 
-from .querysets import PollQuerySet
+from apps.accounts.models import Account
 
 
 class PollManager(models.Manager):
@@ -18,27 +18,13 @@ class PollManager(models.Manager):
     def make_poll_as_draft(self, poll):
         raise NotImplementedError
 
+    def most_activity_voters(self):
+        """A users participated in more than haft from all count polls."""
 
-class OpendedPollManager(models.Manager):
-    """
-    Manager for opened polls
-    """
+        half_count_polls = self.count() // 2
+        accounts_with_count_votes = Account.objects.accounts_with_count_votes()
+        return accounts_with_count_votes.filter(count_votes__gt=half_count_polls)
 
-    def get_queryset(self):
-        return PollQuerySet(self.model, using=self._db)
-
-    def working_with_only_opened_polls(self):
-        return self.get_queryset().opened_polls()
-        raise NotImplementedError
-
-    def make_poll_as_draft(self, poll):
-        raise NotImplementedError
-
-
-class VoteInPollManager(models.Manager):
-    """
-    Model manager
-    """
-
-    def all_voters(self):
-        return self.values_list('user', flat=True).distinct()
+    def get_all_voters(self):
+        accounts_with_count_votes = Account.objects.accounts_with_count_votes()
+        return accounts_with_count_votes.filter(count_votes__gt=0)

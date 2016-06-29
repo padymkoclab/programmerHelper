@@ -75,7 +75,7 @@ class AccountFactory(factory.DjangoModelFactory):
         self.save()
 
 
-def account_level_factory():
+def levels_accounts_factory():
     AccountLevel.objects.filter().delete()
     AccountLevelFactory(name=AccountLevel.CHOICES_LEVEL.platinum, color='#D8BFD8', description='Regular level of account')
     AccountLevelFactory(name=AccountLevel.CHOICES_LEVEL.golden, color='#FFD700', description='Golder level of account')

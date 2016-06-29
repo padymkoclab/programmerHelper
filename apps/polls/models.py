@@ -14,8 +14,8 @@ from mylabour.fields_db import ConfiguredAutoSlugField
 from mylabour.models import TimeStampedModel
 from mylabour.validators import MinCountWordsValidator
 
-from .managers import PollManager, OpendedPollManager, VoteInPollManager
-from .querysets import PollQuerySet
+from .managers import PollManager
+from .querysets import PollQuerySet, ChoiceQuerySet
 
 
 class Poll(TimeStampedModel):
@@ -57,9 +57,6 @@ class Poll(TimeStampedModel):
 
     objects = models.Manager()
     objects = PollManager.from_queryset(PollQuerySet)()
-    draft = models.Manager()
-    opened = OpendedPollManager()
-    closed = models.Manager()
 
     class Meta:
         db_table = 'polls'
@@ -80,6 +77,33 @@ class Poll(TimeStampedModel):
             args=(self.pk,)
         )
 
+    def get_most_popular_choice_or_choices(self):
+        """Return most popular choice/choices as queryset."""
+
+        # determining count voter for each a choice in queryset
+        all_choices_with_count_votes = Choice.objects.choices_with_count_votes()
+        # filter only a choices related with this poll
+        need_choices = all_choices_with_count_votes.filter(pk__in=self.choices.values('pk'))
+        # get max_count_votes_from_only_need_choices
+        max_count_votes = need_choices.aggregate(max_count_votes=models.Max('count_votes'))['max_count_votes']
+        return need_choices.filter(count_votes=max_count_votes)
+
+    def get_detail_about_choices(self):
+        """Return as a sequnce details about result poll: (Choice, count choiced)."""
+
+        # determining count voter for each a choice in queryset
+        all_choices_with_count_votes = Choice.objects.choices_with_count_votes()
+        # filter only a choices related with this poll
+        need_choices = all_choices_with_count_votes.filter(pk__in=self.choices.values('pk'))
+        # list with pk and count votes for all need choices
+        pks_and_count_votes_need_choices = need_choices.values_list('id', 'count_votes')
+        # replace pk on itself object and return it as tuple
+        objects_and_count_votes_need_choices = (
+            (Choice.objects.get(pk=choice_pk), count_votes)
+            for choice_pk, count_votes in pks_and_count_votes_need_choices
+        )
+        return tuple(objects_and_count_votes_need_choices)
+
 
 class Choice(models.Model):
     """
@@ -89,12 +113,15 @@ class Choice(models.Model):
     id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
     poll = models.ForeignKey(
         'Poll',
+        models.CASCADE,
         verbose_name=_('Poll'),
-        on_delete=models.CASCADE,
         related_name='choices',
         limit_choices_to={'status': Poll.CHOICES_STATUS.opened},
     )
     text_choice = models.TextField(_('Text choice'))
+
+    objects = models.Manager()
+    objects = ChoiceQuerySet.as_manager()
 
     class Meta:
         db_table = 'choices'
@@ -106,6 +133,9 @@ class Choice(models.Model):
     def __str__(self):
         return '{0.text_choice}'.format(self)
 
+    def get_count_votes(self):
+        return self.__class__.objects.choices_with_count_votes().get(pk=self.pk).count_votes
+
 
 class VoteInPoll(models.Model):
     """
@@ -115,26 +145,25 @@ class VoteInPoll(models.Model):
     id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
     poll = models.ForeignKey(
         'Poll',
+        models.CASCADE,
         verbose_name=_('Poll'),
-        on_delete=models.CASCADE,
     )
     account = models.ForeignKey(
         settings.AUTH_USER_MODEL,
+        models.CASCADE,
         verbose_name=_('User'),
-        on_delete=models.CASCADE,
-        related_name='votes_in_polls',
+        related_name='votes',
         limit_choices_to={'is_active': True},
     )
     choice = models.ForeignKey(
         'Choice',
+        models.CASCADE,
         verbose_name=_('Choice'),
-        on_delete=models.CASCADE,
         related_name='votes',
     )
     date_voting = models.DateTimeField(_('Date voting'), auto_now=True)
 
     objects = models.Manager()
-    objects = VoteInPollManager()
 
     class Meta:
         db_table = 'votes_in_polls'
@@ -146,3 +175,8 @@ class VoteInPoll(models.Model):
 
     def __str__(self):
         return _('Vote of a user "{0.account}" in a poll "{0.poll}"').format(self)
+
+    def unique_error_message(self, model_class, unique_check):
+        if model_class == type(self) and unique_check == ('poll', 'account'):
+            return _('This user already participated in that poll.')
+        return super(VoteInPoll, self).unique_error_message(model_class, unique_check)
