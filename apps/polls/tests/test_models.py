@@ -265,6 +265,54 @@ class PollTest(TestCase):
             ((choice3, 3), (choice1, 2), (choice2, 1))
         )
 
+    def test_get_count_votes_if_not_choices(self):
+        self.assertEqual(self.poll.choices.count(), 0)
+        self.assertEqual(self.poll.get_count_votes(), 0)
+
+    def test_get_count_votes_with_choices_but_without_votes(self):
+        ChoiceFactory(poll=self.poll)
+        ChoiceFactory(poll=self.poll)
+        ChoiceFactory(poll=self.poll)
+        self.assertEqual(self.poll.choices.count(), 3)
+        self.assertEqual(self.poll.get_count_votes(), 0)
+
+    def test_get_count_votes_with_choices_where_single_choice_have_votes(self):
+        ChoiceFactory(poll=self.poll)
+        ChoiceFactory(poll=self.poll)
+        choice = ChoiceFactory(poll=self.poll)
+        #
+        accounts = Account.objects.random_accounts(2)
+        VoteInPoll.objects.create(account=accounts[0], poll=self.poll, choice=choice)
+        VoteInPoll.objects.create(account=accounts[1], poll=self.poll, choice=choice)
+        #
+        self.assertEqual(self.poll.choices.count(), 3)
+        self.assertEqual(self.poll.get_count_votes(), 2)
+
+    def test_get_count_votes_with_choices_where_all_choices_have_votes(self):
+        choice1 = ChoiceFactory(poll=self.poll)
+        choice2 = ChoiceFactory(poll=self.poll)
+        choice3 = ChoiceFactory(poll=self.poll)
+        #
+        accounts = Account.objects.random_accounts(7)
+        VoteInPoll.objects.create(account=accounts[0], poll=self.poll, choice=choice1)
+        VoteInPoll.objects.create(account=accounts[1], poll=self.poll, choice=choice2)
+        VoteInPoll.objects.create(account=accounts[2], poll=self.poll, choice=choice3)
+        VoteInPoll.objects.create(account=accounts[3], poll=self.poll, choice=choice2)
+        VoteInPoll.objects.create(account=accounts[4], poll=self.poll, choice=choice3)
+        VoteInPoll.objects.create(account=accounts[5], poll=self.poll, choice=choice1)
+        VoteInPoll.objects.create(account=accounts[6], poll=self.poll, choice=choice2)
+        #
+        self.assertEqual(self.poll.choices.count(), 3)
+        self.assertEqual(self.poll.get_count_votes(), 7)
+
+    def test_get_count_choices_if_choices_is_not_presents(self):
+        self.assertEqual(self.poll.get_count_choices(), 0)
+
+    def test_get_count_choices_if_choices_presents(self):
+        ChoiceFactory(poll=self.poll)
+        ChoiceFactory(poll=self.poll)
+        self.assertEqual(self.poll.get_count_choices(), 2)
+
 
 class ChoiceTest(TestCase):
     """
@@ -309,6 +357,13 @@ class ChoiceTest(TestCase):
 
     def test_delete_choice(self):
         self.choice.delete()
+
+    def test_unique_error_message_for_text_choice_and_poll(self):
+        text_choice = 'Same text as in all'
+        choice2 = ChoiceFactory(poll=self.poll, text_choice=text_choice)
+        choice2.full_clean()
+        choice3 = Choice(poll=self.poll, text_choice=text_choice)
+        self.assertRaisesMessage(ValidationError, 'Poll does not have more than one choice with this text', choice3.full_clean)
 
     def test_get_count_votes(self):
         # no votes

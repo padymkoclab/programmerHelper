@@ -1,6 +1,7 @@
 
 import uuid
 
+from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
 from django.core.validators import MinLengthValidator
 from django.utils.translation import ugettext_lazy as _
@@ -36,7 +37,8 @@ class Poll(TimeStampedModel):
         _('Title'),
         max_length=200,
         unique=True,
-        validators=[MinLengthValidator(settings.MIN_LENGTH_FOR_NAME_OR_TITLE_OBJECT)]
+        validators=[MinLengthValidator(settings.MIN_LENGTH_FOR_NAME_OR_TITLE_OBJECT)],
+        help_text=_('Allowed from {0} to 200 characters.').format(settings.MIN_LENGTH_FOR_NAME_OR_TITLE_OBJECT)
     )
     description = models.CharField(
         _('Short description'),
@@ -46,7 +48,7 @@ class Poll(TimeStampedModel):
     )
     slug = ConfiguredAutoSlugField(_('Slug'), populate_from='title', unique=True)
     status = StatusField(verbose_name=_('status'), choices_name='CHOICES_STATUS', default=CHOICES_STATUS.draft)
-    status_changed = MonitorField(_('Status changed'), monitor='status')
+    status_changed = MonitorField(_('Lastest status changed'), monitor='status')
     votes = models.ManyToManyField(
         settings.AUTH_USER_MODEL,
         related_name='+',
@@ -104,11 +106,27 @@ class Poll(TimeStampedModel):
         )
         return tuple(objects_and_count_votes_need_choices)
 
+    def get_count_votes(self):
+        """Return count total votes in poll."""
+
+        return self.votes.count()
+    get_count_votes.admin_order_field = 'count_votes'
+    get_count_votes.short_description = _('Count votes')
+
+    def get_count_choices(self):
+        """Return count choices in poll."""
+
+        return self.choices.count()
+    get_count_choices.admin_order_field = 'count_choices'
+    get_count_choices.short_description = _('Count choices')
+
 
 class Choice(models.Model):
     """
     Model for choice of poll.
     """
+
+    UNIQUE_ERROR_MESSAGE_FOR_TEXT_CHOICE_AND_POLL = _('Poll does not have more than one choice with this text')
 
     id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
     poll = models.ForeignKey(
@@ -128,10 +146,15 @@ class Choice(models.Model):
         verbose_name = _("Choice")
         verbose_name_plural = _("Choices")
         ordering = ['poll']
-        unique_together = ['poll', 'text_choice']
+        unique_together = ('poll', 'text_choice')
 
     def __str__(self):
         return '{0.text_choice}'.format(self)
+
+    def unique_error_message(self, model_class, unique_check):
+        if model_class == type(self) and unique_check == ('poll', 'text_choice'):
+            raise ValidationError(self.UNIQUE_ERROR_MESSAGE_FOR_TEXT_CHOICE_AND_POLL)
+        return super(Choice, self).unique_error_message(model_class, unique_check)
 
     def get_count_votes(self):
         return self.__class__.objects.choices_with_count_votes().get(pk=self.pk).count_votes
@@ -168,7 +191,7 @@ class VoteInPoll(models.Model):
     class Meta:
         db_table = 'votes_in_polls'
         verbose_name = "Vote in poll"
-        verbose_name_plural = "Votes in poll"
+        verbose_name_plural = "Votes in polls"
         ordering = ['poll', 'date_voting']
         get_latest_by = 'date_voting'
         unique_together = ('poll', 'account')

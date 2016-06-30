@@ -24,6 +24,7 @@ django-nose==1.4.3
 django-passwords==0.3.10
 django-simple-captcha==0.5.1
 django-suit==0.2.18
+pygal==2.2.3
 factory-boy==2.7.0
 fake-factory==0.5.7
 gunicorn==19.4.5

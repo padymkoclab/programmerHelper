@@ -6,6 +6,7 @@ from django.utils.text import slugify
 from django.conf import global_settings
 
 from unipath import Path
+import pygal
 
 from mylabour.utils import get_secret_value_for_setting_from_file
 
@@ -65,7 +66,6 @@ THIRD_PARTY_APPS = [
     'django_cleanup',
     'daterange_filter',
     'djangobower',
-    'django_nvd3',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + MY_APPS + THIRD_PARTY_APPS
@@ -73,6 +73,7 @@ INSTALLED_APPS = DJANGO_APPS + MY_APPS + THIRD_PARTY_APPS
 # Project settings
 
 DJANGO_MIDDLEWARE_CLASSES = [
+    'mylabour.middleware.TimeLoadPageMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.locale.LocaleMiddleware',
@@ -85,6 +86,8 @@ DJANGO_MIDDLEWARE_CLASSES = [
 ]
 
 MY_MIDDLEWARE_CLASSES = [
+    'mylabour.middleware.TimeLoadPageMiddleware',
+    'mylabour.middleware.CountQueriesMiddleware',
     # 'apps.visits.middleware.CountVisitsPageMiddleware',
     # 'apps.visits.middleware.RegistratorVisitAccountMiddleware',
 ]
@@ -109,7 +112,7 @@ TEMPLATES = [
                 'django.template.context_processors.static',
                 'django.core.context_processors.request',
                 # 'django.template.context_processors.tz',
-                # 'mylabour.context_processors.date_creating_website',
+                'mylabour.context_processors.date_creating_website',
                 # 'apps.visits.context_processors.count_visits',
                 'apps.sessions.context_processors.users_online',
             ],
@@ -328,11 +331,9 @@ BOWER_PATH = '/usr/local/bin/bower'
 BOWER_INSTALLED_APPS = (
     'jquery',
     'underscore',
-    'highlightjs',
-    'd3',
+    'pygal-tooltips.min.js',
     'bootstrap',
     'select2',
-    'nvd3',
 )
 
 # Suit (admin theme)
@@ -432,3 +433,9 @@ SUIT_CONFIG = {
     'SHOW_REQUIRED_ASTERISK': True,
     'VERSION': ''
 }
+
+# Pygal - grafic lib
+PYGAL_CONFIG = pygal.Config()
+PYGAL_CONFIG.js = [
+    '//kozea.github.io/pygal.js/2.0.x/pygal-tooltips.min.js',
+]
