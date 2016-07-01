@@ -82,28 +82,29 @@ class Poll(TimeStampedModel):
     def get_most_popular_choice_or_choices(self):
         """Return most popular choice/choices as queryset."""
 
-        # determining count voter for each a choice in queryset
-        all_choices_with_count_votes = Choice.objects.choices_with_count_votes()
-        # filter only a choices related with this poll
-        need_choices = all_choices_with_count_votes.filter(pk__in=self.choices.values('pk'))
-        # get max_count_votes_from_only_need_choices
-        max_count_votes = need_choices.aggregate(max_count_votes=models.Max('count_votes'))['max_count_votes']
-        return need_choices.filter(count_votes=max_count_votes)
+        # determinating a count votes for choices this poll
+        choices_with_count_votes = self.choices.choices_with_count_votes()
 
-    def get_detail_about_choices(self):
-        """Return as a sequnce details about result poll: (Choice, count choiced)."""
+        # get max count votes from all choices
+        max_count_votes = choices_with_count_votes.aggregate(max_count_votes=models.Max('count_votes'))['max_count_votes']
 
-        # determining count voter for each a choice in queryset
-        all_choices_with_count_votes = Choice.objects.choices_with_count_votes()
-        # filter only a choices related with this poll
-        need_choices = all_choices_with_count_votes.filter(pk__in=self.choices.values('pk'))
-        # list with pk and count votes for all need choices
-        pks_and_count_votes_need_choices = need_choices.values_list('id', 'count_votes')
+        # filter choice or choices with max count votes
+        choices_with_max_count_votes = choices_with_count_votes.filter(count_votes=max_count_votes)
+
+        return choices_with_max_count_votes
+
+    def get_result_poll(self):
+        """Return as a sequnce details about result poll: (Choice, count votes)."""
+
+        # list with pk and count votes
+        pks_and_count_votes_need_choices = self.choices.choices_with_count_votes().values_list('id', 'count_votes')
+
         # replace pk on itself object and return it as tuple
         objects_and_count_votes_need_choices = (
             (Choice.objects.get(pk=choice_pk), count_votes)
             for choice_pk, count_votes in pks_and_count_votes_need_choices
         )
+
         return tuple(objects_and_count_votes_need_choices)
 
     def get_count_votes(self):

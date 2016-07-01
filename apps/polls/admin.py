@@ -1,5 +1,5 @@
 
-
+from django.utils import timezone
 from django.utils.safestring import mark_safe
 from django.template.defaultfilters import truncatechars
 from django.utils.html import format_html_join, format_html
@@ -7,7 +7,6 @@ from django.template.defaultfilters import truncatewords
 from django.db.models import Count
 from django.utils.translation import ugettext_lazy as _
 from django.contrib import admin
-# from django.conf import settings
 
 import pygal
 
@@ -42,15 +41,19 @@ class VoteInPollInline(admin.TabularInline):
     fields = ['choice', 'account']
     # max_num = Account.objects,active_accounts()
 
+    def __init__(self, *args, **kwargs):
+        super(VoteInPollInline, self).__init__(*args, **kwargs)
+
     def get_queryset(self, request):
         qs = super(VoteInPollInline, self).get_queryset(request)
         return qs.select_related('poll', 'account', 'choice')
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name == 'choice':
-            # kwargs['queryset'] = Choice.objects.filter(poll=Poll.objects.last())
-            # import ipdb; ipdb.set_trace()
-            kwargs['queryset'] = Choice.objects.filter()
+            args = request.resolver_match.args
+            if args:
+                pk = args[0]
+                kwargs['queryset'] = Choice.objects.filter(poll__pk=pk)
         return super(VoteInPollInline, self).formfield_for_foreignkey(db_field, request, **kwargs)
 
 
@@ -71,48 +74,99 @@ class PollAdmin(admin.ModelAdmin):
     form = PollModelForm
     readonly_fields = ('status_changed', 'display_most_popular_choice_or_choices', 'get_count_votes', 'get_count_choices')
     prepopulated_fields = {'slug': ('title', )}
-    inlines = [
-        ChoiceInline,
-        VoteInPollInline,
-    ]
-    fieldsets = [
-        [
-            Poll._meta.verbose_name, {
-                'fields': [
-                    'title',
-                    'slug',
-                    'status',
-                    'status_changed',
-                    'display_most_popular_choice_or_choices',
-                    'get_count_votes',
-                    'get_count_choices',
-                ]
-            }
-        ]
-    ]
 
     def get_queryset(self, request):
+        """Override method for getting queryset of polls."""
+
         qs = super(PollAdmin, self).get_queryset(request)
+
+        # add addition annotation for determination count choice and votes for each poll
         qs = qs.polls_with_count_choices_and_votes()
+
         return qs
 
     def change_view(self, request, object_id, form_url='', extra_context=None):
+        """Override default method of admin view Change_View for poll."""
+
         extra_context = extra_context or {}
-        extra_context['chart_poll_result'] = self.build_chart_poll_result()
+
+        # add addition context
+        extra_context['chart_poll_result'] = self._build_chart_poll_result(object_id)
+
         return super(PollAdmin, self).change_view(request, object_id, form_url, extra_context=extra_context)
 
-    def build_chart_poll_result(self):
-        # line_chart = settings.PYGAL_CONFIG.Bar()
-        pie_chart = pygal.Pie()
-        pie_chart.title = 'Browser usage in February 2012 (in %)'
-        pie_chart.add('IE', 19.5)
-        pie_chart.add('Firefox', 36.6)
-        pie_chart.add('Chrome, Chrome, Chrome, Chrome, Chrome, Chrome, Chrome, Chrome, Chrome, Chrome, Chrome, Chrome, ', 36.3)
-        pie_chart.add('Safari', 4.5)
-        pie_chart.add('Opera', 2.3)
+    def get_inline_instances(self, request, obj=None):
+        """Override attribute inlines for AdminView."""
+
+        self.inlines = [ChoiceInline]
+
+        # add ability CRUD with votes if poll exists and yet not added early
+        if obj is not None:
+            self.inlines = [ChoiceInline, VoteInPollInline]
+
+        return [inline(self.model, self.admin_site) for inline in self.inlines]
+
+    def get_fieldsets(self, request, obj=None):
+        fields = ['title', 'slug', 'status']
+
+        # add additional fields if object already exists
+        if obj is not None:
+            additional_fields = [
+                'status_changed',
+                'display_most_popular_choice_or_choices',
+                'get_count_votes',
+                'get_count_choices',
+            ]
+            fields.extend(additional_fields)
+        return [
+            [
+                Poll._meta.verbose_name, {'fields': fields}
+            ]
+        ]
+
+    def _build_chart_poll_result(self, object_id):
+        """Return chart as SVG , what reveal result a poll."""
+
+        # chart = pygal.Pie(js=['//kozea.github.io/pygal.js/2.0.x/pygal-tooltips.min.js'])
+
+        # preliminary configuration for chart
+        config = pygal.Config()
+        config.half_pie = True
+        config.legend_at_bottom = True
+        config.legend_at_bottom_columns = True
+        config.humen_readable = True
+        config.half_pie = True
+        config.truncate_legend = 65
+        config.height = 400
+        config.margin_right = 100
+        config.margin_left = 100
+        config.dynamic_print_values = True
+        config.no_data_text = _('Poll does not have votes at all.').format()
+        config.style = pygal.style.DefaultStyle(
+            value_font_family='googlefont:Raleway',
+            value_font_size=5,
+            value_label_font_size=5,
+            value_colors=('white',),
+            no_data_font_size=11,
+        )
+        config.tooltip_border_radius = 10
+
+        # create chart
+        pie_chart = pygal.Pie(config)
+        pie_chart.title = _('Results of the poll').format()
+
+        # add data for chart
+        result_poll = Poll.objects.get(pk=object_id).get_result_poll()
+        for choice, count_votes in result_poll:
+            pie_chart.add(choice.text_choice, count_votes)
+
+        # return chart as SVG
         return pie_chart.render()
 
     def display_most_popular_choice_or_choices(self, obj):
+        """Method-wrapper for method get_most_popular_choice_or_choices() of model Poll.
+        Return result of the method get_most_popular_choice_or_choices() as humen-readable view HTML."""
+
         most_popular_choice_or_choices = obj.get_most_popular_choice_or_choices()
         if len(most_popular_choice_or_choices) > 1:
             return format_html_join(

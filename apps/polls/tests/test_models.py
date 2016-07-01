@@ -167,26 +167,26 @@ class PollTest(TestCase):
         VoteInPoll.objects.create(account=accounts[5], poll=self.poll, choice=choice3)
         self.assertCountEqual(self.poll.get_most_popular_choice_or_choices(), [choice2])
 
-    def test_get_detail_about_choices_if_poll_does_not_have_choices(self):
+    def test_get_result_poll_if_poll_does_not_have_choices(self):
         self.assertEqual(self.poll.choices.count(), 0)
-        self.assertCountEqual(self.poll.get_detail_about_choices(), ())
+        self.assertCountEqual(self.poll.get_result_poll(), ())
 
-    def test_get_detail_about_choices_if_poll_have_single_choice(self):
+    def test_get_result_poll_if_poll_have_single_choice(self):
         choice = ChoiceFactory(poll=self.poll)
         self.assertEqual(self.poll.choices.count(), 1)
-        self.assertCountEqual(self.poll.get_detail_about_choices(), ((choice, 0),))
+        self.assertCountEqual(self.poll.get_result_poll(), ((choice, 0),))
         #
         accounts = Account.objects.random_accounts(2)
         VoteInPoll.objects.create(account=accounts[0], poll=self.poll, choice=choice)
         VoteInPoll.objects.create(account=accounts[1], poll=self.poll, choice=choice)
-        self.assertCountEqual(self.poll.get_detail_about_choices(), ((choice, 2),))
+        self.assertCountEqual(self.poll.get_result_poll(), ((choice, 2),))
 
-    def test_get_detail_about_choices_if_poll_have_two_choices_with_equal_count_votes(self):
+    def test_get_result_poll_if_poll_have_two_choices_with_equal_count_votes(self):
         choice1 = ChoiceFactory(poll=self.poll)
         choice2 = ChoiceFactory(poll=self.poll)
         self.assertEqual(self.poll.choices.count(), 2)
         self.assertCountEqual(
-            self.poll.get_detail_about_choices(),
+            self.poll.get_result_poll(),
             ((choice1, 0), (choice2, 0))
         )
         #
@@ -196,16 +196,16 @@ class PollTest(TestCase):
         VoteInPoll.objects.create(account=accounts[2], poll=self.poll, choice=choice2)
         VoteInPoll.objects.create(account=accounts[3], poll=self.poll, choice=choice2)
         self.assertCountEqual(
-            self.poll.get_detail_about_choices(),
+            self.poll.get_result_poll(),
             ((choice1, 2), (choice2, 2))
         )
 
-    def test_get_detail_about_choices_if_poll_have_two_choices_with_different_count_votes(self):
+    def test_get_result_poll_if_poll_have_two_choices_with_different_count_votes(self):
         choice1 = ChoiceFactory(poll=self.poll)
         choice2 = ChoiceFactory(poll=self.poll)
         self.assertEqual(self.poll.choices.count(), 2)
         self.assertCountEqual(
-            self.poll.get_detail_about_choices(),
+            self.poll.get_result_poll(),
             ((choice1, 0), (choice2, 0))
         )
         #
@@ -214,17 +214,17 @@ class PollTest(TestCase):
         VoteInPoll.objects.create(account=accounts[1], poll=self.poll, choice=choice1)
         VoteInPoll.objects.create(account=accounts[2], poll=self.poll, choice=choice2)
         self.assertCountEqual(
-            self.poll.get_detail_about_choices(),
+            self.poll.get_result_poll(),
             ((choice1, 2), (choice2, 1))
         )
 
-    def test_get_detail_about_choices_if_poll_have_three_choices_with_equal_count_votes(self):
+    def test_get_result_poll_if_poll_have_three_choices_with_equal_count_votes(self):
         choice1 = ChoiceFactory(poll=self.poll)
         choice2 = ChoiceFactory(poll=self.poll)
         choice3 = ChoiceFactory(poll=self.poll)
         self.assertEqual(self.poll.choices.count(), 3)
         self.assertCountEqual(
-            self.poll.get_detail_about_choices(),
+            self.poll.get_result_poll(),
             ((choice1, 0), (choice3, 0), (choice2, 0))
         )
         #
@@ -239,17 +239,17 @@ class PollTest(TestCase):
         VoteInPoll.objects.create(account=accounts[7], poll=self.poll, choice=choice3)
         VoteInPoll.objects.create(account=accounts[8], poll=self.poll, choice=choice3)
         self.assertCountEqual(
-            self.poll.get_detail_about_choices(),
+            self.poll.get_result_poll(),
             ((choice3, 3), (choice1, 3), (choice2, 3))
         )
 
-    def test_get_detail_about_choices_if_poll_have_three_choices_with_different_count_votes(self):
+    def test_get_result_poll_if_poll_have_three_choices_with_different_count_votes(self):
         choice1 = ChoiceFactory(poll=self.poll)
         choice2 = ChoiceFactory(poll=self.poll)
         choice3 = ChoiceFactory(poll=self.poll)
         self.assertEqual(self.poll.choices.count(), 3)
         self.assertCountEqual(
-            self.poll.get_detail_about_choices(),
+            self.poll.get_result_poll(),
             ((choice1, 0), (choice3, 0), (choice2, 0))
         )
         #
@@ -261,7 +261,7 @@ class PollTest(TestCase):
         VoteInPoll.objects.create(account=accounts[4], poll=self.poll, choice=choice3)
         VoteInPoll.objects.create(account=accounts[5], poll=self.poll, choice=choice3)
         self.assertCountEqual(
-            self.poll.get_detail_about_choices(),
+            self.poll.get_result_poll(),
             ((choice3, 3), (choice1, 2), (choice2, 1))
         )
 

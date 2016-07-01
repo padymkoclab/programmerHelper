@@ -334,6 +334,7 @@ BOWER_INSTALLED_APPS = (
     'pygal-tooltips.min.js',
     'bootstrap',
     'select2',
+    'pygal.js',
 )
 
 # Suit (admin theme)
@@ -435,7 +436,7 @@ SUIT_CONFIG = {
 }
 
 # Pygal - grafic lib
-PYGAL_CONFIG = pygal.Config()
-PYGAL_CONFIG.js = [
-    '//kozea.github.io/pygal.js/2.0.x/pygal-tooltips.min.js',
-]
+# PYGAL_CONFIG = pygal.Config()
+# PYGAL_CONFIG.js = [
+#     '//kozea.github.io/pygal.js/2.0.x/pygal-tooltips.min.js',
+# ]
