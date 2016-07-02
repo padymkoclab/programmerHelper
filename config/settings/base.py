@@ -6,7 +6,6 @@ from django.utils.text import slugify
 from django.conf import global_settings
 
 from unipath import Path
-import pygal
 
 from mylabour.utils import get_secret_value_for_setting_from_file
 
@@ -64,8 +63,8 @@ MY_APPS = [
 
 THIRD_PARTY_APPS = [
     'django_cleanup',
-    'daterange_filter',
     'djangobower',
+    'django_gravatar',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + MY_APPS + THIRD_PARTY_APPS
@@ -207,7 +206,7 @@ LAMGUAGES = (
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = [
-    str(BASE_DIR.child('static'))
+    BASE_DIR.child('static'),
 ]
 
 STATIC_ROOT = str(BASE_DIR.child('assets'))
@@ -434,9 +433,3 @@ SUIT_CONFIG = {
     'SHOW_REQUIRED_ASTERISK': True,
     'VERSION': ''
 }
-
-# Pygal - grafic lib
-# PYGAL_CONFIG = pygal.Config()
-# PYGAL_CONFIG.js = [
-#     '//kozea.github.io/pygal.js/2.0.x/pygal-tooltips.min.js',
-# ]

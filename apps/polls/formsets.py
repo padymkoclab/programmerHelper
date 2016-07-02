@@ -1,6 +1,7 @@
 
 import collections
 
+from django.utils.translation import ugettext_lazy as _
 from django.forms import BaseInlineFormSet
 
 from .models import Choice
@@ -31,3 +32,8 @@ class ChoiceInlineFormSet(BaseInlineFormSet):
             for form in self.forms:
                 if form.cleaned_data['text_choice'] in duplicated_text:
                     form.add_error('text_choice', Choice.UNIQUE_ERROR_MESSAGE_FOR_TEXT_CHOICE_AND_POLL)
+        if self.deleted_forms:
+            # import ipdb; ipdb.set_trace()
+            for form in self.deleted_forms:
+                form.add_error('__all__', _('You don`t have delete choices when to try add new votes.'))
+            # self.can_delete = False

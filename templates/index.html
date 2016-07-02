@@ -2,25 +2,23 @@
 
 {% load i18n %}
 {% load l10n %}
+{% load humanize %}
+
+{% load gravatar %}
+
 {% load myfilters %}
 {% load mytags %}
-{% load humanize %}
-{% load nvd3_tags %}
+
 
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>{% block block_title %}{% trans "Index" %}{% endblock block_title %}</title>
-    {% block block_css %}
-        {% include_chart_jscss %}
-        {% load_chart charttype chartdata chartcontainer extra %}
-    {% endblock block_css %}
 </head>
 <body>
 {% get_current_language as LL %}
 <p>{{ LL }}</p>
 <h1>Fruits vs Calories</h1>
-{% include_container chartcontainer 400 600 %}
 {% block block_body %}
     {% block block_header %}
     <p>Hi {{ user }}.</p>
@@ -46,39 +44,17 @@
     {% endblock block_js %}
 {% endblock block_body %}
 
-{% block new %}
-    <div id="pieChart"><svg style="width:450px;height:450px;"></svg></div>
-<script>
-data_pieChart=[{"values": [
-               {"value": 3, "label": "2016, 12"},
-               {"value": 4, "label": "Banana"},
-               {"value": 0, "label": "Pear"},
-               {"value": 1, "label": "Kiwi"},
-               {"value": 5, "label": "Apple"},
-               {"value": 7, "label": "Strawberry"},
-               {"value": 3, "label": "Pineapple"}], "key": "Serie 1"}];
+{% gravatar_url user.email 150 %}
+# https://secure.gravatar.com/avatar/hash.jpg?size=150
 
-nv.addGraph(function() {
-    var chart = nv.models.pieChart();
-    chart.margin({top: 30, right: 60, bottom: 20, left: 60});
-    var datum = data_pieChart[0].values;
+{% gravatar user.email 150 %}
+# <img class="gravatar" src="https://secure.gravatar.com/avatar/hash.jpg?size=150" width="150" height="150" alt="" />
 
-        chart.showLegend(true);
-        chart.showLabels(true);
-        chart.donut(false);
-    chart
-        .x(function(d) { return d.label })
-        .y(function(d) { return d.value });
-    chart.width(450);
-    chart.height(450);
-    d3.select('#pieChart svg')
-        .datum(datum)
-        .transition().duration(500)
-        .attr('width', 450)
-        .attr('height', 450)
-        .call(chart);
-});
-</script>
-{% endblock new %}
+{% gravatar user.email 150 "user@example.com" %}
+# <img class="gravatar" src="https://secure.gravatar.com/avatar/hash.jpg?size=150" width="150" height="150" alt="user@example.com" />
+
+{% gravatar_profile_url user.email %}
+# https://secure.gravatar.com/hash
+
 </body>
 </html>

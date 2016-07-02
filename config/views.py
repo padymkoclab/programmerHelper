@@ -17,21 +17,18 @@ class IndexView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(IndexView, self).get_context_data(**kwargs)
-        xdata = ["Apple", "Apricot", "Avocado", "Banana", "Boysenberries", "Blueberries", "Dates", "Grapefruit", "Kiwi", "Lemon"]
-        ydata = [52, 48, 160, 94, 75, 70, 49, 82, 46, 17]
-        data = {
-            'charttype': "pieChart",
-            'chartdata': {'x': xdata, 'y': ydata},
-            'chartcontainer': 'piechart_container',
-            'extra': {
-            }
-        }
-        context.update(data)
         return context
 
     def get(self, request, *args, **kwargs):
 
         return super(IndexView, self).get(request, *args, **kwargs)
+
+        from django_gravatar.helpers import get_gravatar_url, has_gravatar, get_gravatar_profile_url, calculate_gravatar_hash
+
+        url = get_gravatar_url('alice@example.com', size=150)
+        gravatar_exists = has_gravatar('bob@example.com')
+        profile_url = get_gravatar_profile_url('alice@example.com')
+        email_hash = calculate_gravatar_hash('alice@example.com')
 
         a = {'email': 'дроздоваплатон@yahoo.com', 'password': 'lv210493'}
         a = {'email': 'pситников@дьячков-дьячкова.com', 'password': 'lv210493'}

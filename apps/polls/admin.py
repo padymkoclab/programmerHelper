@@ -3,15 +3,16 @@ from django.utils.safestring import mark_safe
 from django.template.defaultfilters import truncatechars
 from django.utils.html import format_html_join, format_html
 from django.template.defaultfilters import truncatewords
-from django.db.models import Count
 from django.utils.translation import ugettext_lazy as _
 from django.contrib import admin
 
+from mylabour.admin_listfilters import PositiveIntegerRangeListFilter
 import pygal
 
 from .models import Poll, Choice, VoteInPoll
-from .forms import PollModelForm, ChoiceModelForm, VoteInPollModelForm
+from .forms import PollModelForm, ChoiceModelForm
 from .formsets import ChoiceInlineFormSet
+from .actions import make_closed, make_draft, make_opened
 
 
 class ChoiceInline(admin.StackedInline):
@@ -71,6 +72,7 @@ class PollAdmin(admin.ModelAdmin):
     list_display = ('title', 'get_count_votes', 'get_count_choices', 'status', 'date_modified', 'date_added')
     list_filter = ('status', 'date_modified', 'date_added')
     search_fields = ('title',)
+    actions = [make_closed, make_draft, make_opened]
 
     # object
     form = PollModelForm
@@ -197,6 +199,7 @@ class ChoiceAdmin(admin.ModelAdmin):
     list_display = ('__str__', 'poll', 'get_count_votes')
     list_filter = (
         ('poll', admin.RelatedOnlyFieldListFilter),
+        PositiveIntegerRangeListFilter,
     )
     search_fields = ('text_choice',)
     list_select_related = ('poll',)
@@ -266,7 +269,7 @@ class VoteInPollAdmin(admin.ModelAdmin):
     list_filter = (
         ('poll', admin.RelatedOnlyFieldListFilter),
         ('account', admin.RelatedOnlyFieldListFilter),
-        'choice',
+        ('choice', admin.RelatedOnlyFieldListFilter),
         'date_voting',
     )
 

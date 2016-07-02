@@ -79,3 +79,19 @@ class LatestActivityListFilter(admin.SimpleListFilter):
             return queryset.filter(latest_activity__gte=tonow - timezone.timedelta(days=30))
         elif self.value() == 'more_year_ago':
             return queryset.filter(latest_activity__gte=tonow - timezone.timedelta(days=365))
+
+
+class PositiveIntegerRangeListFilter(admin.SimpleListFilter):
+    """
+
+    """
+
+    title = _('positive integer range')
+    parameter_name = 'positiveintegerrange'
+    template = 'mylabour/range_filter.html'
+
+    def lookups(self, request, model_admin):
+        return (('1', '1'), )
+
+    def queryset(self, request, queryset):
+        return queryset
