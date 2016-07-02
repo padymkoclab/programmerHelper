@@ -1,6 +1,13 @@
 
 {% extends "admin/change_form.html" %}
 
+{% load static from staticfiles %}
+
+{% block extrajs %}
+    {{ block.super }}
+    <script src="{% static 'project/js/pygal-tooltips.min.js' %}" type="text/javascript" charset="utf-8"></script>
+{% endblock extrajs %}
+
 
 {% block after_field_sets %}
     {{ block.super }}

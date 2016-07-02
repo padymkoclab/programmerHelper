@@ -1,6 +1,7 @@
 
 from django.conf.urls import url, include
 from django.views.i18n import javascript_catalog
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 from .admin import ProgrammerHelper_AdminSite
 from .views import IndexView
@@ -10,12 +11,15 @@ js_info_dict = {
 }
 
 urlpatterns = [
+
     # django
     url(r'^admin/', ProgrammerHelper_AdminSite.urls),
     url(r'^jsi18n/$', javascript_catalog, js_info_dict, name='javascript-catalog'),
     url(r'^i18n/', include('django.conf.urls.i18n')),
-    # main
+
+    # project
     url(r'^$', IndexView.as_view(), {}, 'index'),
+
     # apps
     url(r'^accounts/', include('apps.accounts.urls')),
     url(r'^activity/', include('apps.activity.urls')),
@@ -33,3 +37,6 @@ urlpatterns = [
     url(r'^testing/', include('apps.testing.urls')),
     url(r'^utilities/', include('apps.utilities.urls')),
 ]
+
+# Additional urls for static (only for development local)
+urlpatterns += staticfiles_urlpatterns()

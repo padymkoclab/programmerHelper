@@ -313,6 +313,9 @@ class PollTest(TestCase):
         ChoiceFactory(poll=self.poll)
         self.assertEqual(self.poll.get_count_choices(), 2)
 
+    def test_get_voters(self):
+        raise NotImplementedError
+
 
 class ChoiceTest(TestCase):
     """
@@ -373,6 +376,9 @@ class ChoiceTest(TestCase):
         VoteInPoll.objects.create(poll=self.poll, choice=self.choice, account=self.account2)
         VoteInPoll.objects.create(poll=self.poll, choice=self.choice, account=self.account3)
         self.assertEqual(self.choice.get_count_votes(), 3)
+
+    def test_get_voters(self):
+        raise NotImplementedError
 
 
 class VoteInPollTest(TestCase):

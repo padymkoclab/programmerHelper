@@ -206,8 +206,8 @@ LAMGUAGES = (
 
 STATIC_URL = '/static/'
 
-STATIC_DIRS = [
-    BASE_DIR.child('static')
+STATICFILES_DIRS = [
+    str(BASE_DIR.child('static'))
 ]
 
 STATIC_ROOT = str(BASE_DIR.child('assets'))

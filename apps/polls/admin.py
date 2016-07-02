@@ -1,5 +1,4 @@
 
-from django.utils import timezone
 from django.utils.safestring import mark_safe
 from django.template.defaultfilters import truncatechars
 from django.utils.html import format_html_join, format_html
@@ -11,7 +10,7 @@ from django.contrib import admin
 import pygal
 
 from .models import Poll, Choice, VoteInPoll
-from .forms import PollModelForm, ChoiceModelForm
+from .forms import PollModelForm, ChoiceModelForm, VoteInPollModelForm
 from .formsets import ChoiceInlineFormSet
 
 
@@ -20,14 +19,17 @@ class ChoiceInline(admin.StackedInline):
     Stacked Inline View for Choice
     '''
 
+    # templates
+    template = 'polls/admin/choice_stacked.html'
+
+    # object
+    model = Choice
     form = ChoiceModelForm
     formset = ChoiceInlineFormSet
-    model = Choice
     min_num = Poll.MIN_COUNT_CHOICES_IN_POLL
     max_num = Poll.MAX_COUNT_CHOICES_IN_POLL
     extra = 0
     list_select_related = ('poll',)
-    template = 'polls/admin/stacked.html'
 
 
 class VoteInPollInline(admin.TabularInline):
@@ -65,18 +67,17 @@ class PollAdmin(admin.ModelAdmin):
     # template
     change_form_template = 'polls/admin/poll_change_form.html'
 
-    # changelist page
+    # objects list
     list_display = ('title', 'get_count_votes', 'get_count_choices', 'status', 'date_modified', 'date_added')
     list_filter = ('status', 'date_modified', 'date_added')
     search_fields = ('title',)
 
-    # change page
+    # object
     form = PollModelForm
     readonly_fields = ('status_changed', 'display_most_popular_choice_or_choices', 'get_count_votes', 'get_count_choices')
     prepopulated_fields = {'slug': ('title', )}
 
     def get_queryset(self, request):
-        """Override method for getting queryset of polls."""
 
         qs = super(PollAdmin, self).get_queryset(request)
 
@@ -86,7 +87,6 @@ class PollAdmin(admin.ModelAdmin):
         return qs
 
     def change_view(self, request, object_id, form_url='', extra_context=None):
-        """Override default method of admin view Change_View for poll."""
 
         extra_context = extra_context or {}
 
@@ -96,7 +96,6 @@ class PollAdmin(admin.ModelAdmin):
         return super(PollAdmin, self).change_view(request, object_id, form_url, extra_context=extra_context)
 
     def get_inline_instances(self, request, obj=None):
-        """Override attribute inlines for AdminView."""
 
         self.inlines = [ChoiceInline]
 
@@ -194,43 +193,74 @@ class ChoiceAdmin(admin.ModelAdmin):
     Admin View for Choice
     '''
 
+    # objects list
     list_display = ('__str__', 'poll', 'get_count_votes')
     list_filter = (
         ('poll', admin.RelatedOnlyFieldListFilter),
     )
     search_fields = ('text_choice',)
+    list_select_related = ('poll',)
+
+    # object
     fieldsets = [
         [
             Choice._meta.verbose_name, {
-                'fields': ['poll', 'text_choice']
+                'fields': ['poll', 'text_choice', 'get_count_votes', 'display_voters_with_get_admin_links']
             }
         ]
     ]
-    list_select_related = ('poll',)
+    form = ChoiceModelForm
+    readonly_fields = ['get_count_votes', 'display_voters_with_get_admin_links']
 
     def get_queryset(self, request):
         qs = super(ChoiceAdmin, self).get_queryset(request)
-        qs = qs.annotate(
-            count_votes=Count('votes')
-        )
+        qs = qs.choices_with_count_votes()
         return qs
 
-    def get_count_votes(self, obj):
-        return obj.count_votes
-    get_count_votes.short_description = _('Count votes')
-    get_count_votes.admin_order_field = 'count_votes'
+    def get_fieldsets(self, request, obj=None):
+
+        # basic fields
+        fields = ['poll', 'text_choice']
+
+        # if objects already exists, then add new fields
+        if obj is not None:
+            additional_fields = ['get_count_votes', 'display_voters_with_get_admin_links']
+            fields.extend(additional_fields)
+
+        return [
+            [
+                Choice._meta.verbose_name, {'fields': fields}
+            ]
+        ]
 
     def shorted_text_choice(self, obj):
         """Display long text choice as truncated."""
 
         return truncatewords(obj, 5)
 
+    def display_voters_with_get_admin_links(self, obj):
+        """Display voters with link to admin url for each account."""
+
+        voters = obj.get_voters()
+        if not voters:
+            return mark_safe('<i>Nothing voted for this choice</i>')
+        return format_html_join(
+            ', ',
+            '<span><a href="{0}">{1}</a></span>',
+            ((voter.get_admin_url(), voter.get_full_name()) for voter in voters)
+        )
+    display_voters_with_get_admin_links.short_description = _('Voters')
+
 
 class VoteInPollAdmin(admin.ModelAdmin):
     '''
-        Admin View for VoteInPoll
+    Admin View for VoteInPoll
     '''
 
+    # templates
+    change_list_template = 'polls/admin/vote_in_poll_changelist.html'
+
+    # objects list
     list_select_related = ('poll', 'account', 'choice')
     list_display = ('poll', 'account', 'choice', 'date_voting')
     list_filter = (
@@ -239,11 +269,25 @@ class VoteInPollAdmin(admin.ModelAdmin):
         'choice',
         'date_voting',
     )
-    readonly_fields = ['poll', 'account', 'choice']
-    fieldsets = [
-        [
-            VoteInPoll._meta.verbose_name, {
-                'fields': ['poll', 'account', 'choice']
-            }
+
+    def get_fieldsets(self, request, obj=None):
+
+        fields = ['poll', 'account', 'choice', 'date_voting']
+
+        # if object does not exists then hide field 'date_voting'
+        if obj is None:
+            fields = ['poll', 'account', 'choice']
+
+        return [
+            [
+                VoteInPoll._meta.verbose_name, {'fields': fields}
+            ]
         ]
-    ]
+
+    def get_urls(self):
+
+        urls = super(VoteInPollAdmin, self).get_urls()
+
+        # remove urls for add, change and delete a vote, leaved only url changelist
+        urls = list(url for url in urls if url.name == 'polls_voteinpoll_changelist')
+        return urls

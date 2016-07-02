@@ -1,6 +1,7 @@
 
 import uuid
 
+from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
 from django.core.validators import MinLengthValidator
@@ -76,7 +77,7 @@ class Poll(TimeStampedModel):
     def get_admin_url(self):
         return reverse(
             'admin:{0}_{1}_change'.format(self._meta.app_label, self._meta.model_name),
-            args=(self.pk,)
+            args=(self.pk, )
         )
 
     def get_most_popular_choice_or_choices(self):
@@ -121,6 +122,11 @@ class Poll(TimeStampedModel):
     get_count_choices.admin_order_field = 'count_choices'
     get_count_choices.short_description = _('Count choices')
 
+    def get_voters(self):
+        """Return users, participated in this poll."""
+
+        return self.votes.all()
+
 
 class Choice(models.Model):
     """
@@ -159,6 +165,13 @@ class Choice(models.Model):
 
     def get_count_votes(self):
         return self.__class__.objects.choices_with_count_votes().get(pk=self.pk).count_votes
+    get_count_votes.short_description = _('Count votes')
+    get_count_votes.admin_order_field = 'count_votes'
+
+    def get_voters(self):
+        """Return users, participated in this poll."""
+
+        return get_user_model().objects.filter(pk__in=self.votes.values('account'))
 
 
 class VoteInPoll(models.Model):
