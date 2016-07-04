@@ -50,7 +50,10 @@
 {% gravatar user.email 150 %}
 # <img class="gravatar" src="https://secure.gravatar.com/avatar/hash.jpg?size=150" width="150" height="150" alt="" />
 
-{% gravatar user.email 150 "user@example.com" %}
+{% gravatar user.email 50 "user@example.com" %}
+{% gravatar user.email 50 "alice@example.com" %}
+{% gravatar user.email 50 "setivolkylany@gmail.com" %}
+# <img class="gravatar" src="https://secure.gravatar.com/avatar/hash.jpg?size=150" width="150" height="150" alt="user@example.com" />
 # <img class="gravatar" src="https://secure.gravatar.com/avatar/hash.jpg?size=150" width="150" height="150" alt="user@example.com" />
 
 {% gravatar_profile_url user.email %}

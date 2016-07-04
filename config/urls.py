@@ -3,7 +3,7 @@ from django.conf.urls import url, include
 from django.views.i18n import javascript_catalog
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
-from .admin import ProgrammerHelper_AdminSite
+from .admin import ProgrammerHelperAdminSite
 from .views import IndexView
 
 js_info_dict = {
@@ -13,12 +13,14 @@ js_info_dict = {
 urlpatterns = [
 
     # django
-    url(r'^admin/', ProgrammerHelper_AdminSite.urls),
-    url(r'^jsi18n/$', javascript_catalog, js_info_dict, name='javascript-catalog'),
+    url(r'^admin/export_import/', include('apps.export_import_models.urls')),
+    url(r'^admin/', ProgrammerHelperAdminSite.urls),
+    url(r'^jsi18n/$', javascript_catalog, js_info_dict, 'javascript-catalog'),
     url(r'^i18n/', include('django.conf.urls.i18n')),
 
     # project
     url(r'^$', IndexView.as_view(), {}, 'index'),
+    url(r'^django_js_reverse/$', 'django_js_reverse.views.urls_js', name='django_js_reverse'),
 
     # apps
     url(r'^accounts/', include('apps.accounts.urls')),

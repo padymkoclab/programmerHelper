@@ -6,8 +6,10 @@ from django.template.defaultfilters import truncatewords
 from django.utils.translation import ugettext_lazy as _
 from django.contrib import admin
 
-from mylabour.admin_listfilters import PositiveIntegerRangeListFilter
 import pygal
+
+from mylabour.admin_listfilters import PositiveIntegerRangeListFilter
+from apps.export_import_models.actions import advanced_export, export_as_json
 
 from .models import Poll, Choice, VoteInPoll
 from .forms import PollModelForm, ChoiceModelForm
@@ -72,7 +74,7 @@ class PollAdmin(admin.ModelAdmin):
     list_display = ('title', 'get_count_votes', 'get_count_choices', 'status', 'date_modified', 'date_added')
     list_filter = ('status', 'date_modified', 'date_added')
     search_fields = ('title',)
-    actions = [make_closed, make_draft, make_opened]
+    actions = [make_closed, make_draft, make_opened, advanced_export, export_as_json]
 
     # object
     form = PollModelForm
@@ -124,6 +126,11 @@ class PollAdmin(admin.ModelAdmin):
                 Poll._meta.verbose_name, {'fields': fields}
             ]
         ]
+
+    def view_preview(self):
+        """ """
+
+        raise NotImplementedError
 
     def _build_chart_poll_result(self, object_id):
         """Return chart as SVG , what reveal result a poll."""

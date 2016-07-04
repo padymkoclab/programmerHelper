@@ -59,12 +59,14 @@ MY_APPS = [
     'apps.utilities.apps.UtilitiesConfig',
     'apps.visits.apps.VisitsConfig',
     'apps.web_links.apps.WebLinksConfig',
+    'apps.export_import_models.apps.ExportImportModelsConfig',
 ]
 
 THIRD_PARTY_APPS = [
     'django_cleanup',
     'djangobower',
     'django_gravatar',
+    'django_js_reverse',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + MY_APPS + THIRD_PARTY_APPS
@@ -85,8 +87,8 @@ DJANGO_MIDDLEWARE_CLASSES = [
 ]
 
 MY_MIDDLEWARE_CLASSES = [
-    'mylabour.middleware.TimeLoadPageMiddleware',
-    'mylabour.middleware.CountQueriesMiddleware',
+    # 'mylabour.middleware.TimeLoadPageMiddleware',
+    # 'mylabour.middleware.CountQueriesMiddleware',
     # 'apps.visits.middleware.CountVisitsPageMiddleware',
     # 'apps.visits.middleware.RegistratorVisitAccountMiddleware',
 ]
@@ -319,6 +321,9 @@ IGNORABLE_URLS_FOR_COUNT_VISITS = (
 
 AUTOSLUG_SLUGIFY_FUNCTION = lambda value: slugify(value, allow_unicode=True)
 
+# django_js_reverse
+JS_REVERSE_JS_VAR_NAME = 'REVERSE'
+
 # DJANGO-BOWER
 # Require Bower, Nmp, NodeJS
 
@@ -433,3 +438,33 @@ SUIT_CONFIG = {
     'SHOW_REQUIRED_ASTERISK': True,
     'VERSION': ''
 }
+
+GRAVATAR_DEFAULT_IMAGE = 'identicon'
+
+
+# def generate_captcha(request):
+#     color = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
+#     img = Image.new('RGBA', (160, 80), color)
+#     imgDrawer = ImageDraw.Draw(img)
+#     textImg = Image.new('RGBA', (160, 80))
+#     tmpDraw = ImageDraw.Draw(textImg)
+#     font = ImageFont.truetype("resources/UbuntuMono-RI.ttf", 26)
+#     i = 15
+#     key = []
+#     for x in xrange(1, 7):
+#         r = str(random.randint(0, 9))
+#         key.append(r)
+#         tmpDraw.text((i, random.randint(20, 30)), r,
+#                      font=font, fill=(0, 0, 0))
+#         i += 22
+#     request.session['captcha'] = ''.join(key)
+#     for o in xrange((80 * 160) / 500):
+#         imgDrawer.line((random.randint(0, 160), random.randint(0, 80), random.randint(0, 160), random.randint(0, 80)),
+#                        fill=(random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)))
+#     output = StringIO.StringIO()
+#     textImg = textImg.rotate(random.randint(-20, 20))
+#     mask = Image.new('RGBA', (160, 80), (0, 0, 0))
+#     mask.paste(textImg, (0, 0))
+#     img.paste(textImg, (0, 0), mask)
+#     img.save(output, format='png')
+#     return StreamingHttpResponse([output.getvalue()], content_type="image/png")

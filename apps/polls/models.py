@@ -35,21 +35,21 @@ class Poll(TimeStampedModel):
     )
 
     title = models.CharField(
-        _('Title'),
+        _('title'),
         max_length=200,
         unique=True,
         validators=[MinLengthValidator(settings.MIN_LENGTH_FOR_NAME_OR_TITLE_OBJECT)],
         help_text=_('Allowed from {0} to 200 characters.').format(settings.MIN_LENGTH_FOR_NAME_OR_TITLE_OBJECT)
     )
     description = models.CharField(
-        _('Short description'),
+        _('short description'),
         validators=[MinCountWordsValidator(5)],
         help_text=_('Enter at least 5 words.'),
         max_length=100,
     )
     slug = ConfiguredAutoSlugField(_('Slug'), populate_from='title', unique=True)
     status = StatusField(verbose_name=_('status'), choices_name='CHOICES_STATUS', default=CHOICES_STATUS.draft)
-    status_changed = MonitorField(_('Lastest status changed'), monitor='status')
+    status_changed = MonitorField(_('latest status changed'), monitor='status')
     votes = models.ManyToManyField(
         settings.AUTH_USER_MODEL,
         related_name='+',

@@ -107,7 +107,7 @@ from django.views.generic import DetailView, ListView
             app_dir.child('forms.py').write_file("""
 from django import forms
 """)
-            app_dir.child('url.py').write_file("""
+            app_dir.child('urls.py').write_file("""
 from django.conf.urls import url
 
 app_name = '%s'
