@@ -1,4 +1,6 @@
 
+import warnings
+import pdb
 import random
 import itertools
 import re
@@ -7,6 +9,7 @@ from django.utils import timezone
 from django import template
 from django.template.defaultfilters import mark_safe
 
+import ipdb
 from bs4 import BeautifulSoup
 
 register = template.Library()
@@ -106,3 +109,13 @@ def DisplaySingNumber(number):
         return number
     else:
         return '{0:+}'.format(number)
+
+
+@register.filter(name='ipdb')
+def ipdb(element):
+    try:
+        ipdb.set_trace()
+    except ImportError:
+        warnings.warn('Module "ipdb" not found, then will be use module "pdb"', ImportWarning)
+        pdb.set_trace()
+    return element

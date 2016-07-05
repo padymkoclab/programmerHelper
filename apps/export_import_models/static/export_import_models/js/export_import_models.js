@@ -13,6 +13,7 @@ $(function() {
     var $btn_select_all_fields = django.jQuery('#btn_select_all_fields');
     var $btn_preview = django.jQuery('#link_admin_export_preview');
     var $btn_download = django.jQuery('#link_admin_export_download');
+    var $btn_download_as_csv = django.jQuery('#link_download_as_csv');
     var $formaters = django.jQuery('[name=format_exported_data]');
 
     //
@@ -61,10 +62,16 @@ $(function() {
             names_choices_fields,
             objects_pks
         );
+        var href_for_download_as_csv = REVERSE['export_import_models:admin_export_csv'](
+            ct_model_pk,
+            names_choices_fields,
+            objects_pks
+        );
 
         // replace a value of a attribute href on new value
         $btn_preview.attr('href', href_for_preview);
         $btn_download.attr('href', href_for_download);
+        $btn_download_as_csv.attr('href', href_for_download_as_csv);
     }
     // add listener of a event to elements
     $formaters.click(function_changing_href_on_based_choices_fields_and_format);

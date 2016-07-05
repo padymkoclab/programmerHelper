@@ -56,13 +56,13 @@
             </label>
             <div>
                 <a href="#" target="_blank" id="link_admin_export_preview">{% trans "Preview output data" %}</a>
-                <a href="#" target="_blank" id="link_admin_export_download">{% trans "Download as file" %}</a>
+                <a href="#" id="link_admin_export_download">{% trans "Download as file" %}</a>
             </div>
         </div>
         <div>
-            <a href="{% url 'export_import_models:admin_export_csv' %}">{% trans "Download as CSV" %}</a>
-            <a href="#">{% trans "Download as PDF" %}</a>
-            <a href="#">{% trans "Download as Excel" %}</a>
+            <a href="#" id="link_download_as_csv">{% trans "Download as CSV" %}</a>
+            <a href="{% url 'export_import_models:admin_export_pdf' %}">{% trans "Download as PDF" %}</a>
+            <a href="{% url 'export_import_models:admin_export_excel' %}">{% trans "Download as Excel" %}</a>
         </div>
     </div>
 {% endblock content %}

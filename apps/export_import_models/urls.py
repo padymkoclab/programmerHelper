@@ -2,7 +2,9 @@
 from django.conf.urls import url, include
 from django.contrib.admin.views.decorators import staff_member_required
 
-from .views import ExportTemplateView, ExportPreviewView, ExportCSV
+from .views import (
+    ExportTemplateView, ExportPreviewDownloadView, ExportCSV, ExportExcel, ExportPDF
+)
 
 
 app_name = 'export_import_models'
@@ -23,23 +25,36 @@ urlpatterns_for_export = [
                 '(?P<ct_model_pk>[-\w]+)',
                 '(?P<fields>[_,\w]+)',
                 '(?P<objects_pks>[-,\w]+)',
-                '$']),
-            staff_member_required(ExportPreviewView.as_view()),
+                '$',
+            ]),
+            staff_member_required(ExportPreviewDownloadView.as_view()),
             {},
             'admin_export_preview'
         ),
         url(
-            r'csv/',
+            r'/'.join([
+                'csv',
+                '(?P<ct_model_pk>[-\w]+)',
+                '(?P<fields>[_,\w]+)',
+                '(?P<objects_pks>[-,\w]+)',
+                '$',
+            ]),
             staff_member_required(ExportCSV.as_view()),
             {},
             'admin_export_csv',
         ),
         url(
             r'excel/',
-            staff_member_required(ExportCSV.as_view()),
+            staff_member_required(ExportExcel.as_view()),
             {},
             'admin_export_excel',
-        )
+        ),
+        url(
+            r'pdf/',
+            staff_member_required(ExportPDF.as_view()),
+            {},
+            'admin_export_pdf',
+        ),
     ]))
 ]
 

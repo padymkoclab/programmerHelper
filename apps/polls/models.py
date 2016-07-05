@@ -47,7 +47,7 @@ class Poll(TimeStampedModel):
         help_text=_('Enter at least 5 words.'),
         max_length=100,
     )
-    slug = ConfiguredAutoSlugField(_('Slug'), populate_from='title', unique=True)
+    slug = ConfiguredAutoSlugField(_('slug'), populate_from='title', unique=True)
     status = StatusField(verbose_name=_('status'), choices_name='CHOICES_STATUS', default=CHOICES_STATUS.draft)
     status_changed = MonitorField(_('latest status changed'), monitor='status')
     votes = models.ManyToManyField(
