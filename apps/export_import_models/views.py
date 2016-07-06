@@ -1,5 +1,5 @@
 
-from io import BytesIO
+from io import BytesIO, StringIO
 import warnings
 import itertools
 import csv
@@ -17,6 +17,9 @@ from django.core import serializers
 from config.admin import ProgrammerHelperAdminSite
 
 from reportlab.pdfgen import canvas
+import xlsxwriter
+import xlwt
+import xlrd
 
 from .utils import get_filename_by_datetime_name_and_extension
 
@@ -151,7 +154,7 @@ class ExportPreviewDownloadView(View):
                 name=model._meta.verbose_name_plural,
                 extension=file_ext,
             )
-            response['Content-Disposition'] = 'attachment;filename=' + filename
+            response['Content-Disposition'] = 'attachment;filename="%s"' % filename
 
         return response
 
@@ -187,7 +190,7 @@ class ExportCSV(View):
 
         # write items generator in a stream adn attach file to it
         response = StreamingHttpResponse((writer.writerow(row) for row in rows), content_type="text/csv")
-        response['Content-Disposition'] = 'attachment;filename=' + filename
+        response['Content-Disposition'] = 'attachment;filename="%s"' % filename
 
         return response
 
@@ -196,7 +199,7 @@ class ExportCSV(View):
 
         # create response and attach to it file CSV
         response = HttpResponse(content_type='text/csv')
-        response['Content-Disposition'] = 'attachment;filename=' + filename
+        response['Content-Disposition'] = 'attachment;filename="%s"' % filename
 
         # create a new writter and to write first row as the fields names
         writer = csv.writer(response)
@@ -213,7 +216,7 @@ class ExportCSV(View):
 
         # create response and attach file CSV
         response = HttpResponse(content_type='text/csv')
-        response['Content-Disposition'] = 'attachment;filename=' + filename
+        response['Content-Disposition'] = 'attachment;filename="%s"' % filename
 
         # generate template that similar next
         # {% for row in data %}"{{ row.0|addslashes }}", "{{ row.1|addslashes }}", "{{ row.2|addslashes }}",
@@ -271,6 +274,101 @@ class ExportExcel(View):
     """
     View for export data of a models to Excel
     """
+
+    def dispatch(self, request, *args, **kwargs):
+        response = made_validation(kwargs)
+        if isinstance(response, HttpResponseBadRequest):
+            return response
+        model, qs, list_fields = response
+        filename = get_filename_by_datetime_name_and_extension(name=model._meta.verbose_name_plural, extension='xls')
+
+        return self.import_from_xsl_with_xlrd()
+        return self.generate_excel_with_XlsxWriter(model, qs, list_fields, filename)
+        return self.generate_excel_with_xlwt(model, qs, list_fields, filename)
+        # return self.generate_csv_simple(model, qs, list_fields, filename)
+
+    def import_from_xsl_with_xlrd(self):
+
+        response = HttpResponse()
+
+        book = xlrd.open_workbook('/home/wlysenko/.virtualenvs/virtual_programmerHelper/project_programmerHelper/test.xls')
+        response.write('<br />Count sheets: %d' % book.nsheets)
+        first_sheet = book.sheet_by_index(0)
+        response.write('<br />Sheet1-Row1: %s\n' % first_sheet.row_values(0))
+        response.write('<br />Sheet1-Row1-Cell - 0, 0: %s\n' % first_sheet.cell(0, 0))
+        return response
+
+    def generate_excel_with_xlwt(self, model, qs, list_fields, filename):
+        """ """
+
+        # file:///media/wlysenko/66ABF2AC3D03BAAA/Web/Sites_info/MousePython/Creating%20Microsoft%20Excel%20Spreadsheets%20with%20Python%20and%20xlwt%20_%20The%20Mouse%20Vs.%20The%20Python.html
+
+        response = HttpResponse(content_type='application/application/vnd.ms-excel')
+        response['Content-Disposition'] = 'attachment;filename="%s"' % filename
+
+        #
+        output = StringIO()
+        book = xlwt.Workbook(output)
+        sheet1 = book.add_sheet("PySheet1")
+        cols = ["A", "B", "C", "D", "E"]
+        txt = "Row %s, Col %s"
+
+        for num in range(5):
+            row = sheet1.row(num)
+            for index, col in enumerate(cols):
+                value = txt % (num + 1, col)
+                row.write(index, value)
+
+        #
+        # book.close()
+        response.write(output.getvalue())
+
+        return response
+
+    def generate_excel_with_XlsxWriter(self, model, qs, list_fields, filename):
+        """ """
+
+        # file:///media/wlysenko/66ABF2AC3D03BAAA/Web/Sites_info/How%20to%20export%20Excel%20files%20in%20a%20Python_Django%20application%20_%20ASSIST%20Software%20Romania.html
+
+        response = HttpResponse(content_type='application/application/vnd.ms-excel')
+        # made extension as .xlsx ( + 'x' to end)
+        filename = filename + 'x'
+        response['Content-Disposition'] = 'attachment;filename="%s"' % filename
+
+        #
+        output = StringIO()
+        workbook = xlsxwriter.Workbook(output)
+
+        #
+        worksheet_s = workbook.add_worksheet("Summary")
+        title = workbook.add_format({
+            'bold': True,
+            'font_size': 14,
+            'align': 'center',
+            'valign': 'vcenter'
+        })
+        header = workbook.add_format({
+            'bg_color': '#F7F7F7',
+            'color': 'black',
+            'align': 'center',
+            'valign': 'top',
+            'border': 1
+        })
+        title_text = "{0} {1}".format("Weather History for", 'town_text')
+        worksheet_s.merge_range('B2:H2', title_text, title)
+        worksheet_s.write(4, 0, "No", header)
+        worksheet_s.write(4, 1, "Town", header)
+        worksheet_s.write(4, 3, "Max T. (℃)", header)
+        # # the rest of the headers from the HTML file
+
+        #
+        workbook.close()
+
+        #
+        xlsx_data = output.getvalue()
+        response.write(xlsx_data)
+
+        return response
 
 
 class ExportPDF(View):

@@ -44,7 +44,13 @@ urlpatterns_for_export = [
             'admin_export_csv',
         ),
         url(
-            r'excel/',
+            r'/'.join([
+                'excel',
+                '(?P<ct_model_pk>[-\w]+)',
+                '(?P<fields>[_,\w]+)',
+                '(?P<objects_pks>[-,\w]+)',
+                '$',
+            ]),
             staff_member_required(ExportExcel.as_view()),
             {},
             'admin_export_excel',
