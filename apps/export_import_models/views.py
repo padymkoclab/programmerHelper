@@ -1,8 +1,10 @@
 
+import datetime
 from io import BytesIO
 import warnings
 import itertools
 import csv
+import uuid
 
 from django.template import Template, Context
 from django.core.exceptions import FieldDoesNotExist
@@ -17,6 +19,7 @@ from django.core import serializers
 from config.admin import ProgrammerHelperAdminSite
 
 from reportlab.pdfgen import canvas
+import xlsxwriter
 
 from .utils import get_filename_by_datetime_name_and_extension
 
@@ -58,7 +61,9 @@ def made_validation(kwargs):
 
 
 class ExportTemplateView(TemplateView):
-    """ """
+    """
+    View fo export
+    """
 
     template_name = "export_import_models/admin/export.html"
 
@@ -151,7 +156,7 @@ class ExportPreviewDownloadView(View):
                 name=model._meta.verbose_name_plural,
                 extension=file_ext,
             )
-            response['Content-Disposition'] = 'attachment;filename=' + filename
+            response['Content-Disposition'] = 'attachment;filename="%s"' % filename
 
         return response
 
@@ -187,7 +192,7 @@ class ExportCSV(View):
 
         # write items generator in a stream adn attach file to it
         response = StreamingHttpResponse((writer.writerow(row) for row in rows), content_type="text/csv")
-        response['Content-Disposition'] = 'attachment;filename=' + filename
+        response['Content-Disposition'] = 'attachment;filename="%s"' % filename
 
         return response
 
@@ -196,7 +201,7 @@ class ExportCSV(View):
 
         # create response and attach to it file CSV
         response = HttpResponse(content_type='text/csv')
-        response['Content-Disposition'] = 'attachment;filename=' + filename
+        response['Content-Disposition'] = 'attachment;filename="%s"' % filename
 
         # create a new writter and to write first row as the fields names
         writer = csv.writer(response)
@@ -213,7 +218,7 @@ class ExportCSV(View):
 
         # create response and attach file CSV
         response = HttpResponse(content_type='text/csv')
-        response['Content-Disposition'] = 'attachment;filename=' + filename
+        response['Content-Disposition'] = 'attachment;filename="%s"' % filename
 
         # generate template that similar next
         # {% for row in data %}"{{ row.0|addslashes }}", "{{ row.1|addslashes }}", "{{ row.2|addslashes }}",
@@ -271,6 +276,94 @@ class ExportExcel(View):
     """
     View for export data of a models to Excel
     """
+
+    def dispatch(self, request, *args, **kwargs):
+        response = made_validation(kwargs)
+        if isinstance(response, HttpResponseBadRequest):
+            return response
+        model, qs, list_fields = response
+        filename = get_filename_by_datetime_name_and_extension(name=model._meta.verbose_name_plural, extension='xls')
+
+        return self.generate_excel_with_XlsxWriter(model, qs, list_fields, filename)
+
+    def generate_excel_with_XlsxWriter(self, model, qs, list_fields, filename):
+        """ """
+
+        response = HttpResponse(content_type='application/application/vnd.ms-excel')
+        # made extension as .xlsx ( + 'x' to end)
+        filename = filename + 'x'
+        response['Content-Disposition'] = 'attachment;filename="%s"' % filename
+
+        #
+        output = BytesIO()
+        options = {
+            'strings_to_formulas': True,
+            'nan_inf_to_errors': True,
+        }
+        workbook = xlsxwriter.Workbook(output, options)
+
+        #
+        sheet1 = workbook.add_worksheet(_("Summary").format())
+
+        # add formating
+        format_title = workbook.add_format({
+            'bold': True,
+            'font_size': 14,
+            'align': 'center',
+            'valign': 'vcenter'
+        })
+        format_header = workbook.add_format({
+            'bg_color': '#F7F7F7',
+            'color': 'black',
+            'align': 'center',
+            'valign': 'top',
+            'border': 1
+        })
+
+        # write model`s name as title
+        title_text = _("Excel report on the model \"{0}\"").format(model._meta.verbose_name)
+        sheet1.merge_range('B1:I2', title_text, format_title)
+
+        # write field name
+        for i, field_name in enumerate(list_fields):
+            field = model._meta.get_field(field_name)
+            verbose_field_name = str(field.verbose_name)
+            sheet1.write(4, i, verbose_field_name)
+
+        # write data
+        for i, values_fields in enumerate(qs.values_list(*list_fields)):
+            i += 5
+            for j, field_name in enumerate(list_fields):
+                value = values_fields[j]
+                try:
+
+                    #
+                    if isinstance(value, datetime.datetime):
+                        value = value.strftime('%H:%M:%S %d / %m / %Y')
+                    elif isinstance(value, datetime.date):
+                        value = value.strftime('%d / %m / %Y')
+                    elif isinstance(value, uuid.UUID):
+                        value = 'UUID({0})'.format(value)
+
+                    #
+                    sheet1.write(i, j, value)
+
+                    #
+                    len_val = len(value)
+                    width_col = 50 if len_val > 50 else len_val
+                    sheet1.set_column('A:A', width_col)
+
+                except TypeError as e:
+                    sheet1.write(i, j, str(e))
+
+        # close workbook
+        workbook.close()
+
+        # get a xlsx data from the file and to write it in the HttpResponse
+        xlsx_data = output.getvalue()
+        response.write(xlsx_data)
+
+        return response
 
 
 class ExportPDF(View):
