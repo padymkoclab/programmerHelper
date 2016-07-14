@@ -1,0 +1,50 @@
+
+{% extends "admin/index.html" %}
+{% load i18n %}
+{% load url from suit_compat %}
+
+{% if not is_popup %}
+    {% block breadcrumbs %}
+        <ul class="breadcrumb">
+            <li><a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+                <span class="divider">&raquo;</span></li>
+            {% for app in app_list %}
+                <li class="active">{% blocktrans with app.name as name %}{{ name }}{% endblocktrans %}</li>
+            {% endfor %}
+        </ul>
+    {% endblock %}
+{% endif %}
+
+{% block content %}
+    {{ block.super }}
+    <style>
+        #content-reports{
+            clear: both;
+        }
+    </style>
+    <div id="content-reports">
+        {% if app_list %}
+
+                <div class="module">
+                    <table class="table-overview applist">
+                        <caption><a class="section">{% trans 'Reports' %}</a></caption>
+
+                        <tr>
+                            <td scope="row">{% trans "Make PDF report" %}</td>
+                        </tr>
+                        <tr>
+                            <td scope="row"><a href="{% url 'admin:polls_poll_make_excel_report' %}">{% trans "Make Excel report" %}</a></td>
+                        </tr>
+                        <tr>
+                            <td scope="row">{% trans "Configure system generate of reports" %}</td>
+                        </tr>
+
+                    </table>
+                </div>
+        {% else %}
+            <p>{% trans "You don't have permission to make reports." %}</p>
+        {% endif %}
+    </div>
+{% endblock content %}
+
+{% block sidebar %}{% endblock %}

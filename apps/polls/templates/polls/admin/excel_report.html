@@ -1,0 +1,24 @@
+
+{% extends "admin/base_site.html" %}
+
+{% load i18n %}
+
+{% block content %}
+
+<div>
+    <p>Choice what you need.</p>
+    <p>on independent sheet of Excel</p>
+    <div>
+        <p>Fields</p>
+        <div>
+            <form action="{% url 'admin:polls_poll_make_excel_report' %}" method="post" accept-charset="utf-8">
+                {% csrf_token %}
+                <span><input type="checkbox" name="all_objects" value="all_objects">All objects</span>
+                <!--<span><input type="checkbox" name="all_objects" value="all_objects">Popular polls</span>-->
+                <span><input type="checkbox" name="all_objects" value="all_objects">{% trans "Chart number of the polls" %}</span>
+                <input type="submit" name="submit" value="Make report">
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock content %}

@@ -1,4 +1,11 @@
 
+import functools
+from io import BytesIO
+import textwrap
+
+from django.http import HttpResponse
+from django.template.response import TemplateResponse
+from django.conf.urls import url
 from django.utils.safestring import mark_safe
 from django.template.defaultfilters import truncatechars
 from django.utils.html import format_html_join, format_html
@@ -7,7 +14,9 @@ from django.utils.translation import ugettext_lazy as _
 from django.contrib import admin
 
 import pygal
+import xlsxwriter
 
+from mylabour.utils import get_statistics_count_objects_by_year
 from mylabour.admin_listfilters import PositiveIntegerRangeListFilter
 from apps.export_import_models.actions import advanced_export, export_as_json
 
@@ -15,6 +24,19 @@ from .models import Poll, Choice, VoteInPoll
 from .forms import PollModelForm, ChoiceModelForm
 from .formsets import ChoiceInlineFormSet
 from .actions import make_closed, make_draft, make_opened
+
+
+def add_current_app_to_request_in_admin_view(view):
+    @functools.wraps(view)
+    def _wrappeped_view(modelAdmin, request, **kwargs):
+
+        # only for admin theme Django-Suit
+        # it is give feature display menu in left sidebar
+        request.current_app = 'admin'
+
+        response = view(modelAdmin, request, **kwargs)
+        return response
+    return _wrappeped_view
 
 
 class ChoiceInline(admin.StackedInline):
@@ -78,7 +100,9 @@ class PollAdmin(admin.ModelAdmin):
 
     # object
     form = PollModelForm
-    readonly_fields = ('status_changed', 'display_most_popular_choice_or_choices', 'get_count_votes', 'get_count_choices')
+    readonly_fields = (
+        'status_changed', 'display_most_popular_choice_or_choices', 'get_count_votes', 'get_count_choices'
+    )
     prepopulated_fields = {'slug': ('title', )}
 
     def get_queryset(self, request):
@@ -127,7 +151,260 @@ class PollAdmin(admin.ModelAdmin):
             ]
         ]
 
-    def view_preview(self):
+    def get_urls(self):
+
+        urls = super(PollAdmin, self).get_urls()
+
+        # 'polls_poll_preview'
+        preview_url_name = '{0}_{1}_{2}'.format(
+            self.model._meta.app_label, self.model._meta.model_name, 'preview'
+        )
+        # 'polls_poll_make_excel_report'
+        make_excel_report_url_name = '{0}_{1}_{2}'.format(
+            self.model._meta.app_label, self.model._meta.model_name, 'make_excel_report'
+        )
+        # 'polls_poll_statistics'
+        statistics_url_name = '{0}_{1}_{2}'.format(
+            self.model._meta.app_label, self.model._meta.model_name, 'statistics'
+        )
+
+        # add urls
+        additional_urls = [
+            url(
+                r'^preview/$',
+                self.admin_site.admin_view(self.view_preview),
+                {},
+                preview_url_name
+            ),
+            url(
+                r'^make_excel_report/$',
+                self.admin_site.admin_view(self.view_make_excel_report),
+                {},
+                make_excel_report_url_name
+            ),
+            url(
+                r'^statistics/$',
+                self.admin_site.admin_view(self.view_statistics),
+                {},
+                statistics_url_name
+            ),
+            # url(r'^make_pdf_report/$', self.admin_site.admin_view(self.view_preview), {}, preview_url_name),
+        ]
+        return additional_urls + urls
+
+    def view_preview(self, request):
+        """ """
+
+        raise NotImplementedError
+
+    def _build_chart_polls_statistics(self):
+        """Return chart in SVG format on based statistics of count votes by year."""
+
+        # get a statistics data by votes
+        statistics_count_votes_by_year = get_statistics_count_objects_by_year(VoteInPoll, 'date_voting')
+
+        # create a line chart
+        chart_statistics_count_votes_by_year = pygal.Line()
+
+        # customization the chart
+        chart_statistics_count_votes_by_year.x_label_rotation = 20
+        chart_statistics_count_votes_by_year.show_legend = False
+        chart_statistics_count_votes_by_year.explicit_size = (1000, 800)
+        chart_statistics_count_votes_by_year.title = str(_('Dymanic an amount votes for the year'))
+        chart_statistics_count_votes_by_year.x_labels = list(i[0]for i in statistics_count_votes_by_year)
+
+        # add a data to the chart
+        chart_statistics_count_votes_by_year.add(
+            str(_("Count votes")),
+            list(i[1]for i in statistics_count_votes_by_year)
+        )
+
+        # return chart in SVG format
+        return chart_statistics_count_votes_by_year.render()
+
+    @add_current_app_to_request_in_admin_view
+    def view_statistics(self, request):
+        """Admin view for display statistics about polls, choices and votes."""
+
+        # get a total statistics for the polls, choices and votes
+        statistics = {
+            'count_polls': Poll.objects.count(),
+            'count_opened_polls': Poll.objects.opened_polls().count(),
+            'count_closed_polls': Poll.objects.closed_polls().count(),
+            'count_draft_polls': Poll.objects.draft_polls().count(),
+            'count_choices': Choice.objects.count(),
+            'count_votes': VoteInPoll.objects.count(),
+            'count_voters': VoteInPoll.objects.values('account').distinct().count(),
+            'latest_vote': VoteInPoll.objects.latest().date_voting,
+        }
+
+        # get a chart statistics of count votes by year
+        chart_statistics_count_votes_by_year = self._build_chart_polls_statistics()
+
+        # add a custom context to the view
+        # and a context, needed for any admin view
+        context = dict(
+            self.admin_site.each_context(request),
+            title=_('Statistics polls'),
+            statistics=statistics,
+            chart_statistics_count_votes_by_year=chart_statistics_count_votes_by_year,
+        )
+
+        # return a response, on based a template and passed the context
+        return TemplateResponse(request, "polls/admin/statistics.html", context)
+
+    def view_make_pdf_report(self, request):
+        """ """
+
+        raise NotImplementedError
+
+    @add_current_app_to_request_in_admin_view
+    def view_make_excel_report(self, request):
+        """ """
+
+        request.current_app
+        if request.method == 'GET':
+            context = dict(
+                self.admin_site.each_context(request),
+                title=_('Make report for polls in Excel'),
+            )
+
+            return TemplateResponse(request, "polls/admin/excel_report.html", context)
+        elif request.method == 'POST':
+
+            # create response with file
+            response = HttpResponse(content_type='application/application/vnd.ms-excel')
+            response['Content-Disposition'] = 'attachment; filename=Polls.xlsx'
+
+            # create workbook
+            output = BytesIO()
+            workbook = xlsxwriter.Workbook(output)
+            sheet1 = workbook.add_worksheet('Polls')
+            sheet2 = workbook.add_worksheet('Chart count of polls')
+
+            # create formats
+            title = workbook.add_format({
+                'bold': True,
+                'border': 6,
+                'fg_color': '#D7E4BC',
+                'align': 'center',
+                'valign': 'vcenter',
+            })
+            header = workbook.add_format({
+                'bg_color': '#F7F7F7',
+                'color': 'black',
+                'align': 'center',
+                'valign': 'vcenter',
+                'border': 1,
+                'bold': True,
+            })
+            table_format = workbook.add_format({
+                'border': 1,
+                'valign': 'vcenter',
+                'align': 'center',
+            })
+            datetime_format = workbook.add_format({
+                'valign': 'vcenter',
+                'align': 'right',
+                'border': 1,
+            })
+            text_format = workbook.add_format({
+                'valign': 'vcenter',
+                'align': 'justify',
+                'border': 1,
+                'text_wrap': True,
+            })
+            formula_format = workbook.add_format({
+                'border': 2,
+                'align': 'right',
+                'bg_color': 'yellow',
+                'border_color': 'green',
+            })
+
+            # write title
+            title_text = 'All polls'
+            sheet1.merge_range('A2:K3', title_text, title)
+
+            sheet1.write_row(
+                'A5',
+                map(str, [
+                    '№',
+                    _('Id (as UUID)'),
+                    _('Title'),
+                    _('Slug'),
+                    _('Description'),
+                    _('Count votes'),
+                    _('Count choices'),
+                    _('Status'),
+                    _('Date latest changed of status'),
+                    _('Date modified'),
+                    _('Date added'),
+                ]),
+                header
+            )
+
+            # write data
+            for num_row, poll in enumerate(Poll.objects.iterator()):
+                start_row = num_row + 5
+                num_row += 1
+
+                # write number
+                sheet1.write(start_row, 0, num_row, table_format)
+                # convert UUID to str, because Excel doesn`t have support this type of data
+                # and write id as str
+                sheet1.write(start_row, 1, str(poll.id), table_format)
+                # make text for title of poll by length in 50 characters
+                sheet1.write(start_row, 2, poll.title, text_format)
+                # make text for slug of poll by length in 50 characters
+                sheet1.write(start_row, 3, poll.slug, text_format)
+                # make text for description of poll by length in 50 characters
+                sheet1.write(start_row, 4, poll.description, text_format)
+
+                #
+                sheet1.write(start_row, 5, poll.get_count_votes(), table_format)
+                sheet1.write(start_row, 6, poll.get_count_choices(), table_format)
+
+                # write displayed value of status
+                sheet1.write(start_row, 7, poll.get_status_display(), table_format)
+                # write datatime as a string, but in a given format (localizated and timezone)
+                sheet1.write(start_row, 8, poll.status_changed.strftime('%c %z (%Z)'), datetime_format)
+                sheet1.write(start_row, 9, poll.date_modified.strftime('%c %z (%Z)'), datetime_format)
+                sheet1.write(start_row, 10, poll.date_added.strftime('%c %z (%Z)'), datetime_format)
+
+                # choice max count rows in that row and make incrementation it on 1
+                count_rows = max(
+                    textwrap.fill(poll.title, 50).count('\n'),
+                    textwrap.fill(poll.slug, 50).count('\n'),
+                    textwrap.fill(poll.description, 50).count('\n')
+                )
+                if count_rows in [0, 1]:
+                    count_rows += 1
+                # a standart height of a single row is 20, thus make multiplication count_rows on 20
+                # for get correct height in Excel
+                count_rows = count_rows * 20
+                sheet1.set_row(start_row, count_rows)
+
+            sheet1.set_column('B1:B1', 37)
+            sheet1.set_column('C1:E1', 50)
+            sheet1.set_column('F1:G1', 15)
+            sheet1.set_column('I1:K1', 34)
+
+            # add formula - Total count votes
+            formula_total_count_votes = '=SUM(F6:F{0})'.format(start_row + 1)
+            formula_total_count_choices = '=SUM(G6:G{0})'.format(start_row + 1)
+            sheet1.write_formula(start_row + 1, 5, formula_total_count_votes, formula_format)
+            sheet1.write_formula(start_row + 1, 6, formula_total_count_choices, formula_format)
+
+            # Create chart on sheet2
+
+            # sheet2.
+
+            # close workbook, write Excel file in response and return it
+            workbook.close()
+            response.write(output.getvalue())
+            return response
+
+    def view_customization_generate_reports(self, request):
         """ """
 
         raise NotImplementedError
@@ -193,7 +470,7 @@ class PollAdmin(admin.ModelAdmin):
                 popular_choice.count_votes,
             )
         else:
-            return mark_safe(_('<i>Poll does not have a choices at all.</i>'))
+            return mark_safe(_('<i>%s</i>' % _('Poll does not have a choices at all.')))
     display_most_popular_choice_or_choices.short_description = _('Most popular choice/choices')
 
 

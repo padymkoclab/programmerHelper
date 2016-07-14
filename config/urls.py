@@ -1,4 +1,5 @@
 
+# from django.contrib import admin
 from django.conf.urls import url, include
 from django.views.i18n import javascript_catalog
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
@@ -15,6 +16,7 @@ urlpatterns = [
     # django
     url(r'^admin/export_import/', include('apps.export_import_models.urls')),
     url(r'^admin/', ProgrammerHelperAdminSite.urls),
+    # url(r'^admin/', admin.site..urls),
     url(r'^jsi18n/$', javascript_catalog, js_info_dict, 'javascript-catalog'),
     url(r'^i18n/', include('django.conf.urls.i18n')),
 
