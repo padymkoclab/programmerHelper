@@ -1,9 +1,6 @@
 
 import functools
-from io import BytesIO
-import textwrap
 
-from django.http import HttpResponse
 from django.template.response import TemplateResponse
 from django.conf.urls import url
 from django.utils.safestring import mark_safe
@@ -14,7 +11,6 @@ from django.utils.translation import ugettext_lazy as _
 from django.contrib import admin
 
 import pygal
-import xlsxwriter
 
 from mylabour.utils import get_statistics_count_objects_by_year
 from mylabour.admin_listfilters import PositiveIntegerRangeListFilter
@@ -24,6 +20,7 @@ from .models import Poll, Choice, VoteInPoll
 from .forms import PollModelForm, ChoiceModelForm
 from .formsets import ChoiceInlineFormSet
 from .actions import make_closed, make_draft, make_opened
+from .reports import ExcelReport
 
 
 def add_current_app_to_request_in_admin_view(view):
@@ -224,7 +221,7 @@ class PollAdmin(admin.ModelAdmin):
 
     @add_current_app_to_request_in_admin_view
     def view_statistics(self, request):
-        """Admin view for display statistics about polls, choices and votes."""
+        """Admin view for display statistics about polls, choices, votes and a chart statistics count votes by year"""
 
         # get a total statistics for the polls, choices and votes
         statistics = {
@@ -272,136 +269,8 @@ class PollAdmin(admin.ModelAdmin):
             return TemplateResponse(request, "polls/admin/excel_report.html", context)
         elif request.method == 'POST':
 
-            # create response with file
-            response = HttpResponse(content_type='application/application/vnd.ms-excel')
-            response['Content-Disposition'] = 'attachment; filename=Polls.xlsx'
-
-            # create workbook
-            output = BytesIO()
-            workbook = xlsxwriter.Workbook(output)
-            sheet1 = workbook.add_worksheet('Polls')
-            sheet2 = workbook.add_worksheet('Chart count of polls')
-
-            # create formats
-            title = workbook.add_format({
-                'bold': True,
-                'border': 6,
-                'fg_color': '#D7E4BC',
-                'align': 'center',
-                'valign': 'vcenter',
-            })
-            header = workbook.add_format({
-                'bg_color': '#F7F7F7',
-                'color': 'black',
-                'align': 'center',
-                'valign': 'vcenter',
-                'border': 1,
-                'bold': True,
-            })
-            table_format = workbook.add_format({
-                'border': 1,
-                'valign': 'vcenter',
-                'align': 'center',
-            })
-            datetime_format = workbook.add_format({
-                'valign': 'vcenter',
-                'align': 'right',
-                'border': 1,
-            })
-            text_format = workbook.add_format({
-                'valign': 'vcenter',
-                'align': 'justify',
-                'border': 1,
-                'text_wrap': True,
-            })
-            formula_format = workbook.add_format({
-                'border': 2,
-                'align': 'right',
-                'bg_color': 'yellow',
-                'border_color': 'green',
-            })
-
-            # write title
-            title_text = 'All polls'
-            sheet1.merge_range('A2:K3', title_text, title)
-
-            sheet1.write_row(
-                'A5',
-                map(str, [
-                    '№',
-                    _('Id (as UUID)'),
-                    _('Title'),
-                    _('Slug'),
-                    _('Description'),
-                    _('Count votes'),
-                    _('Count choices'),
-                    _('Status'),
-                    _('Date latest changed of status'),
-                    _('Date modified'),
-                    _('Date added'),
-                ]),
-                header
-            )
-
-            # write data
-            for num_row, poll in enumerate(Poll.objects.iterator()):
-                start_row = num_row + 5
-                num_row += 1
-
-                # write number
-                sheet1.write(start_row, 0, num_row, table_format)
-                # convert UUID to str, because Excel doesn`t have support this type of data
-                # and write id as str
-                sheet1.write(start_row, 1, str(poll.id), table_format)
-                # make text for title of poll by length in 50 characters
-                sheet1.write(start_row, 2, poll.title, text_format)
-                # make text for slug of poll by length in 50 characters
-                sheet1.write(start_row, 3, poll.slug, text_format)
-                # make text for description of poll by length in 50 characters
-                sheet1.write(start_row, 4, poll.description, text_format)
-
-                #
-                sheet1.write(start_row, 5, poll.get_count_votes(), table_format)
-                sheet1.write(start_row, 6, poll.get_count_choices(), table_format)
-
-                # write displayed value of status
-                sheet1.write(start_row, 7, poll.get_status_display(), table_format)
-                # write datatime as a string, but in a given format (localizated and timezone)
-                sheet1.write(start_row, 8, poll.status_changed.strftime('%c %z (%Z)'), datetime_format)
-                sheet1.write(start_row, 9, poll.date_modified.strftime('%c %z (%Z)'), datetime_format)
-                sheet1.write(start_row, 10, poll.date_added.strftime('%c %z (%Z)'), datetime_format)
-
-                # choice max count rows in that row and make incrementation it on 1
-                count_rows = max(
-                    textwrap.fill(poll.title, 50).count('\n'),
-                    textwrap.fill(poll.slug, 50).count('\n'),
-                    textwrap.fill(poll.description, 50).count('\n')
-                )
-                if count_rows in [0, 1]:
-                    count_rows += 1
-                # a standart height of a single row is 20, thus make multiplication count_rows on 20
-                # for get correct height in Excel
-                count_rows = count_rows * 20
-                sheet1.set_row(start_row, count_rows)
-
-            sheet1.set_column('B1:B1', 37)
-            sheet1.set_column('C1:E1', 50)
-            sheet1.set_column('F1:G1', 15)
-            sheet1.set_column('I1:K1', 34)
-
-            # add formula - Total count votes
-            formula_total_count_votes = '=SUM(F6:F{0})'.format(start_row + 1)
-            formula_total_count_choices = '=SUM(G6:G{0})'.format(start_row + 1)
-            sheet1.write_formula(start_row + 1, 5, formula_total_count_votes, formula_format)
-            sheet1.write_formula(start_row + 1, 6, formula_total_count_choices, formula_format)
-
-            # Create chart on sheet2
-
-            # sheet2.
-
-            # close workbook, write Excel file in response and return it
-            workbook.close()
-            response.write(output.getvalue())
+            # generate an Excel file and return it in the response
+            response = ExcelReport().create_report()
             return response
 
     def view_customization_generate_reports(self, request):

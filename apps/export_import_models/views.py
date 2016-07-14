@@ -19,12 +19,11 @@ from django.contrib.contenttypes.models import ContentType
 from django.views.generic import View, TemplateView
 from django.core import serializers
 
-from config.admin import ProgrammerHelperAdminSite
-
 from reportlab.pdfgen import canvas
 import xlsxwriter
 
-from .utils import get_filename_by_datetime_name_and_extension
+from config.admin import ProgrammerHelperAdminSite
+from mylabour.utils import get_filename_with_datetime
 
 
 def made_validation(kwargs):
@@ -155,7 +154,7 @@ class ExportPreviewDownloadView(View):
         # if need return file (download), not preview
         mode = kwargs['mode']
         if mode == 'download':
-            filename = get_filename_by_datetime_name_and_extension(
+            filename = get_filename_with_datetime(
                 name=model._meta.verbose_name_plural,
                 extension=file_ext,
             )
@@ -257,7 +256,7 @@ class ExportCSV(View):
         if isinstance(response, HttpResponseBadRequest):
             return response
         model, qs, list_fields = response
-        filename = get_filename_by_datetime_name_and_extension(name=model._meta.verbose_name_plural, extension='csv')
+        filename = get_filename_with_datetime(name=model._meta.verbose_name_plural, extension='csv')
 
         warnings.warn('Choice good way', Warning)
         return self.generate_csv_by_DTL(model, qs, list_fields, filename)
@@ -285,7 +284,7 @@ class ExportExcel(View):
         if isinstance(response, HttpResponseBadRequest):
             return response
         model, qs, list_fields = response
-        filename = get_filename_by_datetime_name_and_extension(name=model._meta.verbose_name_plural, extension='xlsx')
+        filename = get_filename_with_datetime(name=model._meta.verbose_name_plural, extension='xlsx')
 
         return self.generate_excel_with_XlsxWriter(model, qs, list_fields, filename)
 
@@ -520,7 +519,7 @@ class ExportPDF(View):
         # model, qs, list_fields = response
         from apps.polls.models import Poll
         model = Poll
-        filename = get_filename_by_datetime_name_and_extension(model._meta.verbose_name_plural, 'pdf')
+        filename = get_filename_with_datetime(model._meta.verbose_name_plural, 'pdf')
 
         # return self.generate_pdf_simple(model, qs, list_fields, filename=filename)
         return self.generate_pdf_complex(filename=filename)
