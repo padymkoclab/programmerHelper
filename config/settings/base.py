@@ -32,6 +32,7 @@ DJANGO_APPS = [
 
 MY_APPS = [
     'mylabour',
+    'apps.core.apps.CoreConfig',
     'apps.accounts.apps.AccountsConfig',
     'apps.activity.apps.ActivityConfig',
     'apps.articles.apps.ArticlesConfig',
@@ -174,7 +175,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # GLOBALIZATION
 # ----------------------------------------
 
-LANGUAGE_CODE = 'ru'
+LANGUAGE_CODE = 'en'
 
 TIME_ZONE = 'Europe/Kiev'
 
@@ -261,3 +262,9 @@ EMAIL_HOST_PASSWORD = 'lv210493'
 SERVER_EMAIL = 'programmerHelper_admin@gmail.com'
 
 DEFAULT_FROM_EMAIL = 'programmerHelper@gmail.com'
+
+# ----------------------------------------
+# GEOIP2
+# ----------------------------------------
+
+GEOIP_PATH = str(BASE_DIR.child('static', 'project', 'files'))

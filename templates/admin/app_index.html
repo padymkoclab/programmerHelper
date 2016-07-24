@@ -30,7 +30,7 @@
                         <caption><a class="section">{% trans 'Reports' %}</a></caption>
 
                         <tr>
-                            <td scope="row">{% trans "Make PDF report" %}</td>
+                            <td scope="row"><a href="{% url 'admin:polls_poll_make_pdf_report' %}">{% trans "Make PDF report" %}</td>
                         </tr>
                         <tr>
                             <td scope="row"><a href="{% url 'admin:polls_poll_make_excel_report' %}">{% trans "Make Excel report" %}</a></td>

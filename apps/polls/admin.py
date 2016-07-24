@@ -20,7 +20,7 @@ from .models import Poll, Choice, VoteInPoll
 from .forms import PollModelForm, ChoiceModelForm
 from .formsets import ChoiceInlineFormSet
 from .actions import make_closed, make_draft, make_opened
-from .reports import ExcelReport
+from .reports import ExcelReport, PollPDFReport
 
 
 def add_current_app_to_request_in_admin_view(view):
@@ -90,7 +90,15 @@ class PollAdmin(admin.ModelAdmin):
     change_form_template = 'polls/admin/poll_change_form.html'
 
     # objects list
-    list_display = ('title', 'get_count_votes', 'get_count_choices', 'status', 'date_modified', 'date_added')
+    list_display = (
+        'title',
+        'get_count_votes',
+        'get_count_choices',
+        'colored_status_display',
+        'get_date_lastest_voting',
+        'date_modified',
+        'date_added',
+    )
     list_filter = ('status', 'date_modified', 'date_added')
     search_fields = ('title',)
     actions = [make_closed, make_draft, make_opened, advanced_export, export_as_json]
@@ -98,7 +106,11 @@ class PollAdmin(admin.ModelAdmin):
     # object
     form = PollModelForm
     readonly_fields = (
-        'status_changed', 'display_most_popular_choice_or_choices', 'get_count_votes', 'get_count_choices'
+        'status_changed',
+        'display_most_popular_choice_or_choices',
+        'get_date_lastest_voting',
+        'get_count_votes',
+        'get_count_choices'
     )
     prepopulated_fields = {'slug': ('title', )}
 
@@ -106,8 +118,11 @@ class PollAdmin(admin.ModelAdmin):
 
         qs = super(PollAdmin, self).get_queryset(request)
 
-        # add addition annotation for determination count choice and votes for each poll
-        qs = qs.polls_with_count_choices_and_votes()
+        # for a ability sorting, add addition annotation for determination for each poll:
+        #   count choice
+        #   count votes
+        #   date latest voting
+        qs = qs.polls_with_count_choices_and_votes_and_date_lastest_voting()
 
         return qs
 
@@ -160,6 +175,10 @@ class PollAdmin(admin.ModelAdmin):
         make_excel_report_url_name = '{0}_{1}_{2}'.format(
             self.model._meta.app_label, self.model._meta.model_name, 'make_excel_report'
         )
+        # 'polls_poll_make_pdf_report'
+        make_pdf_report_url_name = '{0}_{1}_{2}'.format(
+            self.model._meta.app_label, self.model._meta.model_name, 'make_pdf_report'
+        )
         # 'polls_poll_statistics'
         statistics_url_name = '{0}_{1}_{2}'.format(
             self.model._meta.app_label, self.model._meta.model_name, 'statistics'
@@ -180,12 +199,17 @@ class PollAdmin(admin.ModelAdmin):
                 make_excel_report_url_name
             ),
             url(
+                r'^make_pdf_report/$',
+                self.admin_site.admin_view(self.view_make_pdf_report),
+                {},
+                make_pdf_report_url_name
+            ),
+            url(
                 r'^statistics/$',
                 self.admin_site.admin_view(self.view_statistics),
                 {},
                 statistics_url_name
             ),
-            # url(r'^make_pdf_report/$', self.admin_site.admin_view(self.view_preview), {}, preview_url_name),
         ]
         return additional_urls + urls
 
@@ -250,23 +274,48 @@ class PollAdmin(admin.ModelAdmin):
         # return a response, on based a template and passed the context
         return TemplateResponse(request, "polls/admin/statistics.html", context)
 
-    def view_make_pdf_report(self, request):
-        """ """
-
-        raise NotImplementedError
-
     @add_current_app_to_request_in_admin_view
-    def view_make_excel_report(self, request):
-        """ """
+    def view_make_pdf_report(self, request):
+        """View for ability of creating an Pdf reports in the admin."""
 
-        request.current_app
+        # if request`s method is GET,
+        # then return simple view for customization creating of Pdf report
         if request.method == 'GET':
             context = dict(
                 self.admin_site.each_context(request),
-                title=_('Make report for polls in Excel'),
+                title=_('Make Pdf-report about a polls'),
+            )
+
+            return TemplateResponse(request, "polls/admin/pdf_report.html", context)
+
+        # if request`s method is POST,
+        # then Pdf report as file
+        elif request.method == 'POST':
+
+            # generate an Pdf file and return it in the response
+            pdf_report = PollPDFReport(request)
+            # response = pdf_report.report_polls()
+            response = pdf_report.report_choices()
+            # response = pdf_report.report_votes()
+            # response = pdf_report.report_polls_results()
+            return response
+
+    @add_current_app_to_request_in_admin_view
+    def view_make_excel_report(self, request):
+        """View for ability of creating an Excel reports in the admin."""
+
+        # if request`s method is GET,
+        # then return simple view for customization creating of Excel report
+        if request.method == 'GET':
+            context = dict(
+                self.admin_site.each_context(request),
+                title=_('Make Excel-report about a polls'),
             )
 
             return TemplateResponse(request, "polls/admin/excel_report.html", context)
+
+        # if request`s method is POST,
+        # then Excel report as file
         elif request.method == 'POST':
 
             # generate an Excel file and return it in the response
@@ -280,8 +329,6 @@ class PollAdmin(admin.ModelAdmin):
 
     def _build_chart_poll_result(self, object_id):
         """Return chart as SVG , what reveal result a poll."""
-
-        # chart = pygal.Pie(js=['//kozea.github.io/pygal.js/2.0.x/pygal-tooltips.min.js'])
 
         # preliminary configuration for chart
         config = pygal.Config()
@@ -342,6 +389,24 @@ class PollAdmin(admin.ModelAdmin):
             return mark_safe(_('<i>%s</i>' % _('Poll does not have a choices at all.')))
     display_most_popular_choice_or_choices.short_description = _('Most popular choice/choices')
 
+    def colored_status_display(self, obj):
+        """ """
+
+        #
+        if obj.status == Poll.CHOICES_STATUS.draft:
+            color = '#00f'
+        elif obj.status == Poll.CHOICES_STATUS.opened:
+            color = '#0f0'
+        elif obj.status == Poll.CHOICES_STATUS.closed:
+            color = '#f00'
+
+        #
+        displayed_status = obj.get_status_display()
+
+        return format_html('<span style="color: {0}">{1}</span>', color, displayed_status)
+    colored_status_display.short_description = _('Status')
+    colored_status_display.admin_order_field = 'status'
+
 
 class ChoiceAdmin(admin.ModelAdmin):
     '''
@@ -399,7 +464,7 @@ class ChoiceAdmin(admin.ModelAdmin):
 
         voters = obj.get_voters()
         if not voters:
-            return mark_safe('<i>Nothing voted for this choice</i>')
+            return mark_safe('<i>Nothing voted for this choice.</i>')
         return format_html_join(
             ', ',
             '<span><a href="{0}">{1}</a></span>',

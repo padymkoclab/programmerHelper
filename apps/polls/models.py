@@ -15,8 +15,9 @@ from model_utils import Choices
 from mylabour.fields_db import ConfiguredAutoSlugField
 from mylabour.models import TimeStampedModel
 from mylabour.validators import MinCountWordsValidator
+from mylabour.utils import ClassmethodProperty
 
-from .managers import PollManager
+from .managers import PollManager, VotesManager
 from .querysets import PollQuerySet, ChoiceQuerySet
 
 
@@ -35,24 +36,23 @@ class Poll(TimeStampedModel):
     )
 
     title = models.CharField(
-        _('title'),
+        _('Title'),
         max_length=200,
         unique=True,
         validators=[MinLengthValidator(settings.MIN_LENGTH_FOR_NAME_OR_TITLE_OBJECT)],
         help_text=_('Allowed from {0} to 200 characters.').format(settings.MIN_LENGTH_FOR_NAME_OR_TITLE_OBJECT)
     )
     description = models.CharField(
-        _('short description'),
+        _('Short description'),
         validators=[MinCountWordsValidator(5)],
         help_text=_('Enter at least 5 words.'),
         max_length=100,
     )
-    slug = ConfiguredAutoSlugField(_('slug'), populate_from='title', unique=True)
-    status = StatusField(verbose_name=_('status'), choices_name='CHOICES_STATUS', default=CHOICES_STATUS.draft)
-    status_changed = MonitorField(_('latest status changed'), monitor='status')
+    slug = ConfiguredAutoSlugField(_('Slug'), populate_from='title', unique=True)
+    status = StatusField(verbose_name=_('Status'), choices_name='CHOICES_STATUS', default=CHOICES_STATUS.draft)
+    status_changed = MonitorField(_('Date latest status changed'), monitor='status')
     votes = models.ManyToManyField(
         settings.AUTH_USER_MODEL,
-        related_name='+',
         through='VoteInPoll',
         through_fields=['poll', 'account'],
         verbose_name=_('Voted users'),
@@ -81,13 +81,14 @@ class Poll(TimeStampedModel):
         )
 
     def get_most_popular_choice_or_choices(self):
-        """Return most popular choice/choices as queryset."""
+        """Return a most popular choice/choices of that poll, as queryset."""
 
         # determinating a count votes for choices this poll
         choices_with_count_votes = self.choices.choices_with_count_votes()
 
         # get max count votes from all choices
-        max_count_votes = choices_with_count_votes.aggregate(max_count_votes=models.Max('count_votes'))['max_count_votes']
+        max_count_votes = choices_with_count_votes.aggregate(max_count_votes=models.Max('count_votes'))
+        max_count_votes = max_count_votes['max_count_votes']
 
         # filter choice or choices with max count votes
         choices_with_max_count_votes = choices_with_count_votes.filter(count_votes=max_count_votes)
@@ -126,6 +127,22 @@ class Poll(TimeStampedModel):
         """Return users, participated in this poll."""
 
         return self.votes.all()
+
+    def get_date_lastest_voting(self):
+        """Return a datetime latest voting in that poll or None."""
+
+        votes = self.voteinpoll_set
+        if votes.count():
+            return self.voteinpoll_set.latest().date_voting
+    get_date_lastest_voting.admin_order_field = 'date_latest_voting'
+    get_date_lastest_voting.short_description = _('Date latest voting')
+
+    @ClassmethodProperty
+    @classmethod
+    def get_statuses_for_display(cls):
+        """ """
+
+        return cls.CHOICES_STATUS._display_map
 
 
 class Choice(models.Model):
@@ -201,6 +218,7 @@ class VoteInPoll(models.Model):
     date_voting = models.DateTimeField(_('Date voting'), auto_now=True)
 
     objects = models.Manager()
+    objects = VotesManager()
 
     class Meta:
         db_table = 'votes_in_polls'

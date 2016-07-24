@@ -1,8 +1,10 @@
 
-# from django.contrib import admin
+from django.views.decorators.cache import cache_page
 from django.conf.urls import url, include
 from django.views.i18n import javascript_catalog
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+
+from django_js_reverse.views import urls_js
 
 from .admin import ProgrammerHelperAdminSite
 from .views import IndexView
@@ -16,13 +18,12 @@ urlpatterns = [
     # django
     url(r'^admin/export_import/', include('apps.export_import_models.urls')),
     url(r'^admin/', ProgrammerHelperAdminSite.urls),
-    # url(r'^admin/', admin.site..urls),
     url(r'^jsi18n/$', javascript_catalog, js_info_dict, 'javascript-catalog'),
     url(r'^i18n/', include('django.conf.urls.i18n')),
 
     # project
     url(r'^$', IndexView.as_view(), {}, 'index'),
-    url(r'^django_js_reverse/$', 'django_js_reverse.views.urls_js', name='django_js_reverse'),
+    url(r'^django_js_reverse/$', cache_page(3600)(urls_js), name='django_js_reverse'),
 
     # apps
     url(r'^accounts/', include('apps.accounts.urls')),

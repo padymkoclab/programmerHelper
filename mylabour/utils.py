@@ -1,4 +1,7 @@
 
+import socket
+import datetime
+import math
 import logging
 import warnings
 import urllib
@@ -14,13 +17,14 @@ import json
 
 from django.utils import timezone
 from django.template import Template, Context
-# from django.utils import timezone
 from django.db import models
 from django.core.exceptions import ImproperlyConfigured
 
 import factory
 from dateutil.relativedelta import relativedelta
 from pygments import lexers
+
+import ephem
 
 
 def get_statistics_count_objects_by_year(model, date_field_name):
@@ -151,6 +155,7 @@ def attempt_get_value_attribute_or_return_default(object, attribute, default):
 
 def get_different_between_elements(sequence, left_to_right=True):
     """Return different between adjoining element in the one-nested sequence, with elements same types."""
+
     if hasattr(sequence, '__iter__'):
         lst = list()
         for i, el in enumerate(sequence):
@@ -165,6 +170,8 @@ def get_different_between_elements(sequence, left_to_right=True):
 
 
 def show_concecutive_certain_element(sequence, element):
+    """ """
+
     iteration = iter(sequence)
     k = list()
     t = list()
@@ -376,7 +383,9 @@ def generate_words(min_count_words, max_count_words, to_register='capitalize', l
 
     # validate values of parameter 'locale'
     if locale not in ['ru', 'en']:
-        raise ValueError("Words may can generated only on English or Russian ('en' or 'ru'). Set 'locale' to 'ru' or 'en'.")
+        raise ValueError(
+            "Words may can generated only on English or Russian ('en' or 'ru'). Set 'locale' to 'ru' or 'en'."
+        )
 
     #
     # Generate words
@@ -443,6 +452,191 @@ def get_filename_with_datetime(name, extension):
     datetime_ISO_format = now.strftime('%Y-%m-%d %H:%M:%S')
 
     return '{0} {1}.{2}'.format(name, datetime_ISO_format, extension)
+
+
+def get_number_week_in_month(datetime):
+    """
+    Return the week`s number in the current month.
+
+    >>> 1 + 3
+    2
+    """
+
+    # a number of the current day
+    now_day = datetime.day
+
+    # a date/datetime for begin the month
+    begin_month = datetime.replace(day=1)
+
+    # a day`s number of the month with respect a day`s number of start the month
+    number_day_month_with_respect_day_start_month = begin_month.weekday() + now_day
+
+    # make division on a count days in a week - 7, to ceil this value and tp return it
+    number_week = math.ceil(number_day_month_with_respect_day_start_month / 7)
+    return number_week
+
+
+def random_text(count_sentences=3):
+    """
+    Analogy familiar 'Lorem', but realized on the pure Python.
+
+    >>> random_text = random_text()
+    >>> len(random_text.split('.'))
+    3
+    >>> random_text = random_text(78)
+    >>> len(random_text.split('.'))
+    78
+    >>> random_text = random_text(2)
+    >>> len(random_text.split('.'))
+    2
+    >>> random_text = random_text(1)
+    >>> lst = random_text.split('.')
+    >>> len(lst)
+    2
+    >>> lst[1]
+    ''
+    >>> random_text.count('.')
+    1
+    >>> random_text = random_text(0)
+    >>> len(random_text)
+    0
+    >>> random_text
+    ''
+    >>> random_text = random_text(-1)
+    >>> len(random_text)
+    0
+    >>> random_text
+    ''
+    """
+
+    # make triple an all ascii-lower letters,
+    # for ability a choice one character not once in word
+    TRIPLE_CHARS = string.ascii_lowercase * 3
+
+    # a list all a generated sentences
+    sentences = list()
+
+    # generate sentences
+    for i in range(count_sentences):
+
+        # list an all words in a sentence
+        sentence = list()
+
+        # random count a words in the sentence
+        count_words_in_sentence = random.randint(3, 30)
+
+        # generate words
+        for j in range(count_words_in_sentence):
+
+            # random length of a word
+            word_length = random.randint(1, 20)
+
+            # generate word by length
+            for k in range(word_length):
+
+                # a list of a chars, used in the word
+                list_chars_in_words = random.sample(TRIPLE_CHARS, word_length)
+
+                # make the list of the chars to string
+                word = ''.join(list_chars_in_words)
+
+            # add the word to the sentence
+            sentence.append(word)
+
+        # make the sentence from list to string, where a words will be separated by the gap
+        sentence = ' '.join(sentence)
+
+        # the sentence must be begin from a word with a big first letter
+        sentence = sentence.capitalize()
+
+        # the sentence must be end at the point
+        sentence = sentence + '.'
+
+        # add the sentence to the list of sentences
+        sentences.append(sentence)
+
+    # make the list of sentences to string, where an each sentence will be separated by the gap
+    sentences = ' '.join(sentences)
+
+    # return random text
+    return sentences
+
+
+def get_year_by_slavic_aryan_calendar(self):
+    """Get year by Slavic-Aryan calendar on today.
+
+    New year (Новолетие) by Slavic-Aryan Clandar starting in the day autum equinox.
+    If the day autum equinox was passed of the current year,
+    then from current year must be add 5509 years,
+    else - 5508.
+
+    Returns:
+        [type] -- [description]
+    """
+
+    now = timezone.now()
+
+    format_datetime = '%Y/%m/%d %H:%M:%S'
+    str_datetime_next_autumn_equinox = str(ephem.next_autumn_equinox(now))
+    datetime_next_autumn_equinox = timezone.datetime.strptime(str_datetime_next_autumn_equinox, format_datetime)
+
+    # set timezone`s
+    datetime_next_autumn_equinox = datetime_next_autumn_equinox.replace(tzinfo=now.tzinfo)
+
+    if datetime_next_autumn_equinox.year > now.year:
+        return now.year + 5509
+    return now.year + 5508
+
+
+def convert_date_to_django_date_format(date):
+    """ """
+
+    if isinstance(date, datetime.datetime):
+        django_format = "DATETIME_FORMAT"
+    elif isinstance(date, datetime.date):
+        django_format = "DATE_FORMAT"
+    else:
+        raise ValueError('Attribute "date" must be a instance of datetime.datetime or datetime.date')
+    t = Template('{{ date_datetime|date:"%s" }}' % django_format)
+    c = Context({'date_datetime': date})
+    return t.render(c)
+
+
+class ClassmethodProperty(property):
+    """Realization merge two descriptors: @classmethod and @property (getter)
+
+    A base taken from http://stackoverflow.com/questions/128573/using-property-on-classmethods
+    """
+
+    def __get__(self, obj, objtype):
+        return self.fget.__get__(None, objtype)()
+
+
+def get_ip_from_request(request):
+    """Return IP-address from request."""
+
+    request.META.get('HTTP_X_FORWARDED_FOR')
+    ip = request.META['REMOTE_ADDR']
+    return ip
+
+
+def get_location_from_ip(ip):
+    """ """
+
+    from django.contrib.gis.geoip2 import GeoIP2
+    g = GeoIP2()
+    try:
+        location_detail = g.city(ip)
+    except:
+        ip = '91.202.144.122'
+        location_detail = g.city(ip)
+    return location_detail
+
+
+def get_ip_by_host(host):
+    """ """
+
+    return socket.gethostbyname(host)
 
 
 if __name__ == "__main__":

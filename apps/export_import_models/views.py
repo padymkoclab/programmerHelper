@@ -280,6 +280,7 @@ class ExportExcel(View):
     """
 
     def dispatch(self, request, *args, **kwargs):
+        raise NotImplementedError('Rewrite code on OpenPyXl')
         response = made_validation(kwargs)
         if isinstance(response, HttpResponseBadRequest):
             return response
