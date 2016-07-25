@@ -214,6 +214,7 @@ class SitePDFReportTemplate(object):
 
         # get an IP-address from the request
         ip = get_ip_from_request(self.request)
+
         # get details about a location, from the IP-address
         GeoLocation = get_location_from_ip(ip)
 

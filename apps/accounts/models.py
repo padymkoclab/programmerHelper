@@ -1,6 +1,5 @@
 
 import random
-import shutil
 import uuid
 
 from django.utils import timezone
@@ -12,7 +11,6 @@ from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.db import models
 from django.conf import settings
 
-from autoslug import AutoSlugField
 from model_utils import Choices
 from model_utils.managers import QueryManager
 
@@ -23,6 +21,7 @@ from apps.badges.managers import BadgeManager
 from apps.sessions.models import ExpandedSession
 from mylabour import utils
 # from mylabour.fields_db import PhoneField
+from mylabour.fields_db import ConfiguredAutoSlugField
 
 from .managers import AccountManager
 from .querysets import AccountQuerySet
@@ -52,7 +51,7 @@ class AccountLevel(models.Model):
 
     id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
     name = models.CharField(_('Name'), max_length=50, choices=CHOICES_LEVEL, unique=True)
-    slug = AutoSlugField(_('Slug'), populate_from='name', unique=True, always_update=True, allow_unicode=True, db_index=True)
+    slug = ConfiguredAutoSlugField(_('Slug'), populate_from='name', unique=True)
     description = models.TextField(_('Description'))
     color = models.CharField(_('Color'), max_length=50)
 
@@ -80,12 +79,9 @@ class Account(AbstractBaseUser, PermissionsMixin):
     """
 
     CHOICES_GENDER = Choices(
-        ('vague', _('Vague')),
         ('man', _('Man')),
         ('woman', _('Woman')),
     )
-
-    PATH_TO_ACCOUNT_DEFAULT_PICTURES = settings.STATIC_ROOT + '/accounts/images/avatar_pictures_default/'
 
     # account detail
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -97,37 +93,35 @@ class Account(AbstractBaseUser, PermissionsMixin):
         }
     )
     username = models.CharField(_('Username'), max_length=200, help_text=_('Displayed name'))
-    is_active = models.BooleanField(_('Is active'), default=True, help_text=_('Designated that this user is not disabled.'))
+    is_active = models.BooleanField(
+        _('Is active'),
+        default=True,
+        help_text=_('Designated that this user is not disabled.'),
+    )
     profile_views = models.IntegerField(_('Profile views'), default=0, editable=False)
     date_joined = models.DateTimeField(_('Date joined'), auto_now_add=True)
     level = models.ForeignKey(
         'AccountLevel',
         verbose_name='Level',
         related_name='accounts',
-        null=True,
-        blank=True,
+        default=lambda: AccountLevel.objects.get(name=AccountLevel.CHOICES_LEVEL.regular),
         on_delete=models.PROTECT,
     )
-    picture = models.FilePathField(
-        path=PATH_TO_ACCOUNT_DEFAULT_PICTURES,
-        match='.*',
-        recursive=True,
-        verbose_name=_('Picture'),
-        max_length=200,
-        blank=True,
-        allow_folders=False,
-        allow_files=True,
-    )
     signature = models.CharField(_('Signature'), max_length=50, default='', blank=True)
+
     # presents in web
     presents_on_gmail = models.URLField(_('Presents on google services'), default='')
     presents_on_github = models.URLField(_('Presents on github'), default='')
     presents_on_stackoverflow = models.URLField(_('Presents on stackoverflow'), default='')
     personal_website = models.URLField(_('Personal website'), default='')
+
     # private fields
-    gender = models.CharField(_('Gender'), max_length=50, choices=CHOICES_GENDER, default=CHOICES_GENDER.vague)
+    gender = models.CharField(
+        _('Gender'), max_length=50, choices=CHOICES_GENDER, default=CHOICES_GENDER.man
+    )
     date_birthday = models.DateField(_('Date birthday'))
     real_name = models.CharField(_('Real name'), max_length=200, default='')
+
     # phone = PhoneField(_('Phone'), default='')
     # ваши направления развития верстка, программирование
     # biography (date birth not mention)
@@ -155,13 +149,6 @@ class Account(AbstractBaseUser, PermissionsMixin):
         return '{0.email}'.format(self)
 
     def save(self, *args, **kwargs):
-        if not self.picture:
-            files = shutil.os.listdir(self.PATH_TO_ACCOUNT_DEFAULT_PICTURES)
-            if files:
-                self.picture = self.PATH_TO_ACCOUNT_DEFAULT_PICTURES + random.choice(files)
-        if self.level is None:
-            default_level = AccountLevel.objects.get(name=AccountLevel.CHOICES_LEVEL.regular)
-            self.level = default_level
         super(Account, self).save(*args, **kwargs)
 
     def get_absolute_url(self):
@@ -365,9 +352,6 @@ class Account(AbstractBaseUser, PermissionsMixin):
         return NotImplementedError
 
     def comments(self):
-        pass
-
-    def count_comments(self):
         pass
 
     def count_comments(self):

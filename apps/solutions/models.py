@@ -8,11 +8,11 @@ from django.core.urlresolvers import reverse
 from django.core.validators import MinLengthValidator
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+from django.contrib.postgres.fields import ArrayField
 
 from apps.comments.models import Comment
 from apps.opinions.models import Opinion
 from apps.tags.models import Tag
-from apps.web_links.models import WebLink
 from mylabour.fields_db import ConfiguredAutoSlugField
 from mylabour.models import TimeStampedModel
 
@@ -105,12 +105,12 @@ class Solution(TimeStampedModel):
         related_name='solutions',
         verbose_name=_('Tags'),
     )
-    links = models.ManyToManyField(
-        WebLink,
-        related_name='solutions',
-        verbose_name=_('Useful links'),
+    links = ArrayField(
+        models.URLField(max_length=1000, blank=True),
+        size=10,
+        verbose_name=_('Links'),
+        help_text=_('Useful links'),
     )
-
     comments = GenericRelation(Comment, related_query_name='solutions')
     opinions = GenericRelation(Opinion, related_query_name='solutions')
 

@@ -6,6 +6,7 @@ from django.core.validators import MinLengthValidator
 from django.utils.translation import ugettext_lazy as _
 from django.db import models
 from django.conf import settings
+from django.contrib.postgres.fields import ArrayField
 
 from model_utils.fields import StatusField, MonitorField
 from model_utils import Choices
@@ -13,7 +14,6 @@ from model_utils import Choices
 from apps.comments.models import Comment
 from apps.marks.models import Mark
 from apps.tags.models import Tag
-from apps.web_links.models import WebLink
 from mylabour.fields_db import ConfiguredAutoSlugField
 from mylabour.models import TimeStampedModel
 from mylabour.validators import MinCountWordsValidator
@@ -40,7 +40,7 @@ class Article(TimeStampedModel):
     )
     slug = ConfiguredAutoSlugField(_('Slug'), populate_from='title', unique_with=['account'])
     quotation = models.CharField(_('Quotation'), max_length=200, validators=[MinLengthValidator(10)])
-    picture = models.URLField(_('Picture'), max_length=1000)
+    picture = models.ImageField(_('Picture'), max_length=1000)
     header = models.TextField(_('Header'), validators=[MinCountWordsValidator(10)])
     conclusion = models.TextField(_('Conclusion'), validators=[MinCountWordsValidator(10)])
     status = StatusField(verbose_name=_('Status'), choices_name='STATUS_ARTICLE', default=STATUS_ARTICLE.draft)
@@ -64,9 +64,9 @@ class Article(TimeStampedModel):
         related_name='articles',
         verbose_name=_('Tags'),
     )
-    links = models.ManyToManyField(
-        WebLink,
-        related_name='articles',
+    links = ArrayField(
+        models.URLField(max_length=1000, blank=True),
+        size=10,
         verbose_name=_('Links'),
         help_text=_('Useful links'),
     )

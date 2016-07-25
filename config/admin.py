@@ -20,8 +20,8 @@ from apps.books.admin import BookAdmin, WritterAdmin
 from apps.books.models import Book, Writter
 from apps.comments.admin import CommentAdmin
 from apps.comments.models import Comment
-from apps.courses.admin import CourseAdmin, LessonAdmin, SublessonAdmin
-from apps.courses.models import Course, Lesson, Sublesson
+# from apps.courses.admin import CourseAdmin, LessonAdmin, SublessonAdmin
+# from apps.courses.models import Course, Lesson, Sublesson
 from apps.forum.admin import ForumSectionAdmin, ForumTopicAdmin, ForumPostAdmin
 from apps.forum.models import ForumSection, ForumTopic, ForumPost
 from apps.notifications.admin import NotificationAdmin
@@ -48,8 +48,6 @@ from apps.testing.admin import TestingSuitAdmin, TestingPassageAdmin, TestingQue
 from apps.testing.models import TestingSuit, TestingPassage, TestingQuestion, TestingVariant
 from apps.utilities.admin import UtilityCategoryAdmin, UtilityAdmin
 from apps.utilities.models import UtilityCategory, Utility
-from apps.web_links.admin import WebLinkAdmin
-from apps.web_links.models import WebLink
 
 
 class ProgrammerHelperSite(admin.AdminSite):
@@ -69,59 +67,75 @@ ProgrammerHelperAdminSite.add_action(export_as_yaml)
 ProgrammerHelperAdminSite.add_action(export_as_xlsx)
 
 ProgrammerHelperAdminSite.register(Group)
+
 # accounts
 ProgrammerHelperAdminSite.register(Account, AccountAdmin)
 ProgrammerHelperAdminSite.register(AccountLevel, AccountLevelAdmin)
+
 # badges
 ProgrammerHelperAdminSite.register(Badge, BadgeAdmin)
 ProgrammerHelperAdminSite.register(GettingBadge, GettingBadgeAdmin)
-# programming_utilities
+
+# utilities
 ProgrammerHelperAdminSite.register(UtilityCategory, UtilityCategoryAdmin)
 ProgrammerHelperAdminSite.register(Utility, UtilityAdmin)
-# web_links
-ProgrammerHelperAdminSite.register(WebLink, WebLinkAdmin)
-# programming_tester
+
+# tester
 ProgrammerHelperAdminSite.register(TestingSuit, TestingSuitAdmin)
 ProgrammerHelperAdminSite.register(TestingPassage, TestingPassageAdmin)
 ProgrammerHelperAdminSite.register(TestingQuestion, TestingQuestionAdmin)
 ProgrammerHelperAdminSite.register(TestingVariant, TestingVariantAdmin)
+
 # solution
 ProgrammerHelperAdminSite.register(SolutionCategory, SolutionCategoryAdmin)
 ProgrammerHelperAdminSite.register(Solution, SolutionAdmin)
+
 # question
 ProgrammerHelperAdminSite.register(Question, QuestionAdmin)
 ProgrammerHelperAdminSite.register(Answer, AnswerAdmin)
+
 # articles
 ProgrammerHelperAdminSite.register(Article, ArticleAdmin)
 ProgrammerHelperAdminSite.register(ArticleSubsection, ArticleSubsectionAdmin)
+
 # tags
 ProgrammerHelperAdminSite.register(Tag, TagAdmin)
+
 # forum
 ProgrammerHelperAdminSite.register(ForumSection, ForumSectionAdmin)
 ProgrammerHelperAdminSite.register(ForumTopic, ForumTopicAdmin)
 ProgrammerHelperAdminSite.register(ForumPost, ForumPostAdmin)
+
 # snippets
 ProgrammerHelperAdminSite.register(Snippet, SnippetAdmin)
+
 # newsletters
 ProgrammerHelperAdminSite.register(Newsletter, NewsletterAdmin)
+
 # books
 ProgrammerHelperAdminSite.register(Book, BookAdmin)
 ProgrammerHelperAdminSite.register(Writter, WritterAdmin)
+
 # cources
-ProgrammerHelperAdminSite.register(Course, CourseAdmin)
-ProgrammerHelperAdminSite.register(Lesson, LessonAdmin)
-ProgrammerHelperAdminSite.register(Sublesson, SublessonAdmin)
+# ProgrammerHelperAdminSite.register(Course, CourseAdmin)
+# ProgrammerHelperAdminSite.register(Lesson, LessonAdmin)
+# ProgrammerHelperAdminSite.register(Sublesson, SublessonAdmin)
+
 # polls
 ProgrammerHelperAdminSite.register(Poll, PollAdmin)
 ProgrammerHelperAdminSite.register(Choice, ChoiceAdmin)
 ProgrammerHelperAdminSite.register(VoteInPoll, VoteInPollAdmin)
+
 # Apps with generic models
 ProgrammerHelperAdminSite.register(Comment, CommentAdmin)
 ProgrammerHelperAdminSite.register(Opinion, OpinionAdmin)
 ProgrammerHelperAdminSite.register(Mark, MarkAdmin)
+
 # activity
 ProgrammerHelperAdminSite.register(Activity, ActivityAdmin)
+
 # notifications
 ProgrammerHelperAdminSite.register(Notification, NotificationAdmin)
+
 # sessions
 ProgrammerHelperAdminSite.register(ExpandedSession, ExpandedSessionAdmin)

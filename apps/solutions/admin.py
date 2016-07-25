@@ -93,7 +93,7 @@ class SolutionAdmin(admin.ModelAdmin):
         ],
     ]
     filter_horizontal = ['tags']
-    filter_vertical = ['links']
+    # filter_vertical = ['links']
     prepopulated_fields = {'slug': ['title']}
     form = SolutionForm
 

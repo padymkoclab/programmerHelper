@@ -3,7 +3,27 @@ from django.utils.text import slugify
 from django.conf import global_settings
 
 
-# Third-party app DJANGO_PASSWORD
+# Django-Extensions
+
+SHELL_PLUS = 'ipython'
+
+# additional autoload
+SHELL_PLUS_PRE_IMPORTS = (
+    ('mylabour', 'utils'),
+    ('django.template', ('Template', 'Context')),
+)
+
+# what needn`t rename in time autoload
+SHELL_PLUS_MODEL_ALIASES = {
+    # 'accounts': {'Account': 'AAAA'},
+}
+
+# what needn`t autoload
+SHELL_PLUS_DONT_LOAD = [
+    # '',  # app name
+]
+
+# Django-Password
 
 PASSWORD_MIN_LENGTH = 8
 
@@ -24,14 +44,15 @@ PASSWORD_COMPLEXITY = {
     "WORDS": 0,
 }
 
-# AUTOSLUGFIELD
+# Django-AutoSlug
 
 AUTOSLUG_SLUGIFY_FUNCTION = lambda value: slugify(value, allow_unicode=True)
 
 # django_js_reverse
+
 JS_REVERSE_JS_VAR_NAME = 'REVERSE'
 
-# DJANGO-BOWER
+# Django-Bower
 # Require Bower, Nmp, NodeJS
 
 # BOWER_COMPONENTS_ROOT = str(BASE_DIR.child('static', 'project', 'js'))
@@ -48,7 +69,7 @@ BOWER_INSTALLED_APPS = (
     'pygal.js',
 )
 
-# Suit (admin theme)
+# Django-Suit (admin theme)
 
 SUIT_CONFIG = {
     'ADMIN_NAME': 'ProgramerHelperAdmin',

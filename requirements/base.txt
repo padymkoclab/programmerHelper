@@ -16,6 +16,7 @@ django-cleanup==0.4.2
 django-crispy-forms==1.6.0
 django-model-utils==2.5
 maxminddb==1.2.
+django-gravatar2==1.4.0
 geoip2==2.4.0
 django-passwords==0.3.10
 django-simple-captcha==0.5.1

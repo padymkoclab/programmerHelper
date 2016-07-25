@@ -27,6 +27,9 @@ from pygments import lexers
 import ephem
 
 
+__all__ = []
+
+
 def get_statistics_count_objects_by_year(model, date_field_name):
     """ """
 
@@ -153,7 +156,7 @@ def attempt_get_value_attribute_or_return_default(object, attribute, default):
         return value
 
 
-def get_different_between_elements(sequence, left_to_right=True):
+def get_different_between_elements_in_sequence(sequence, left_to_right=True):
     """Return different between adjoining element in the one-nested sequence, with elements same types."""
 
     if hasattr(sequence, '__iter__'):
@@ -167,24 +170,6 @@ def get_different_between_elements(sequence, left_to_right=True):
                 lst.append(different)
         return lst
     raise TypeError('Type of sequence must iterable.')
-
-
-def show_concecutive_certain_element(sequence, element):
-    """ """
-
-    iteration = iter(sequence)
-    k = list()
-    t = list()
-    for i in iteration:
-        if i == 1:
-            t.append(i)
-        else:
-            if t:
-                k.append(t)
-            t = list()
-    if t:
-        k.append(t)
-    return k
 
 
 def pip_installed_packages():
@@ -412,34 +397,28 @@ def generate_words(min_count_words, max_count_words, to_register='capitalize', l
     return words
 
 
-def create_log_for_terminal(name='DefaultLog'):
-    """Configure log for using in terminal."""
+def create_logger_by_filename(name):
+    """Return a logger for with passed name."""
 
+    # create log
     logger = logging.getLogger(name)
     logger.setLevel(logging.DEBUG)
-    formatter = logging.Formatter('%(asctime)s %(name)-12s %(levelname)-8s %(message)s')
 
-    console = logging.StreamHandler()
-    console.setLevel(logging.DEBUG)
-    console.setFormatter(formatter)
+    # create handler for terminal
+    terminalHandler = logging.StreamHandler()
 
-    logger.addHandler(console)
-    return logger
+    # set level messages for handler
+    terminalHandler.setLevel(logging.DEBUG)
 
+    # create formatter for handler
+    fmt = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
-def configured_logging():
-    # create logger
-    logger = logging.getLogger(__name__)
-    logger.setLevel(logging.DEBUG)
-    # create console handler and set level to debug
-    console = logging.StreamHandler()
-    console.setLevel(logging.DEBUG)
-    # create formatter
-    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-    # add formatter to console
-    console.setFormatter(formatter)
-    # add console to logger
-    logger.addHandler(console)
+    # add formatter for handler
+    terminalHandler.setFormatter(fmt)
+
+    # add handler to logger
+    logger.addHandler(terminalHandler)
+
     return logger
 
 
@@ -600,16 +579,6 @@ def convert_date_to_django_date_format(date):
     t = Template('{{ date_datetime|date:"%s" }}' % django_format)
     c = Context({'date_datetime': date})
     return t.render(c)
-
-
-class ClassmethodProperty(property):
-    """Realization merge two descriptors: @classmethod and @property (getter)
-
-    A base taken from http://stackoverflow.com/questions/128573/using-property-on-classmethods
-    """
-
-    def __get__(self, obj, objtype):
-        return self.fget.__get__(None, objtype)()
 
 
 def get_ip_from_request(request):

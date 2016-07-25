@@ -2,7 +2,6 @@
 from django import forms
 
 from apps.tags.forms import clean_tags
-from apps.web_links.forms import clean_weblinks
 
 from .models import Solution, SolutionCategory
 
@@ -38,8 +37,3 @@ class SolutionForm(forms.ModelForm):
         super(SolutionForm, self).clean()
         cleaned_tags = clean_tags(self)
         return cleaned_tags
-
-    def clean_links(self):
-        super(SolutionForm, self).clean()
-        cleaned_weblinks = clean_weblinks(self)
-        return cleaned_weblinks

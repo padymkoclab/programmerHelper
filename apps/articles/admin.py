@@ -72,7 +72,7 @@ class ArticleAdmin(admin.ModelAdmin):
         }),
     ]
     filter_horizontal = ['tags']
-    filter_vertical = ['links']
+    # filter_vertical = ['links']
     date_hierarchy = 'date_added'
     readonly_fields = ['status_changed']
     prepopulated_fields = {'slug': ['title']}

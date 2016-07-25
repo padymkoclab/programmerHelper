@@ -2,8 +2,8 @@
 import itertools
 import collections
 
-from django.db import models
-from django.utils.translation import ugettext as _
+# from django.db import models
+# from django.utils.translation import ugettext as _
 from django.contrib.auth.models import BaseUserManager
 
 
@@ -12,11 +12,9 @@ class AccountManager(BaseUserManager):
     Custom manager for custom auth model - Account.
     """
 
-    def create_user(self, email, username, date_birthday, password=None):
+    def create_user(self, email, username, date_birthday, password):
         """Create staff user with certain attributes."""
 
-        if not (email, username, date_birthday):
-            raise ValueError(_('User must be have email, first name and last name.'))
         user = self.model(
             email=self.normalize_email(email),
             username=username,
@@ -49,12 +47,12 @@ class AccountManager(BaseUserManager):
             queryset = self
         # listing restrictions determinating filled profile of account
         list_restictions = (
-                queryset.exclude(presents_on_stackoverflow='').values_list('pk', flat=True),
-                queryset.exclude(personal_website='').values_list('pk', flat=True),
-                queryset.exclude(presents_on_github='').values_list('pk', flat=True),
-                queryset.exclude(presents_on_gmail='').values_list('pk', flat=True),
-                queryset.filter(gender__isnull=False).values_list('pk', flat=True),
-                queryset.exclude(real_name='').values_list('pk', flat=True),
+            queryset.exclude(presents_on_stackoverflow='').values_list('pk', flat=True),
+            queryset.exclude(personal_website='').values_list('pk', flat=True),
+            queryset.exclude(presents_on_github='').values_list('pk', flat=True),
+            queryset.exclude(presents_on_gmail='').values_list('pk', flat=True),
+            queryset.filter(gender__isnull=False).values_list('pk', flat=True),
+            queryset.exclude(real_name='').values_list('pk', flat=True),
         )
         # counter all suitable instances
         counter = collections.Counter(

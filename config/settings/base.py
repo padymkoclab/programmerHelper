@@ -39,7 +39,7 @@ MY_APPS = [
     'apps.badges.apps.BadgesConfig',
     'apps.books.apps.BooksConfig',
     'apps.comments.apps.CommentsConfig',
-    'apps.courses.apps.CoursesConfig',
+    # 'apps.courses.apps.CoursesConfig',  # temporary is disabled
     'apps.favours.apps.FavoursConfig',
     'apps.forum.apps.ForumConfig',
     'apps.newsletters.apps.NewslettersConfig',
@@ -56,7 +56,6 @@ MY_APPS = [
     'apps.testing.apps.TestingConfig',
     'apps.utilities.apps.UtilitiesConfig',
     'apps.visits.apps.VisitsConfig',
-    'apps.web_links.apps.WebLinksConfig',
     'apps.export_import_models.apps.ExportImportModelsConfig',
 ]
 
@@ -64,6 +63,7 @@ THIRD_PARTY_APPS = [
     'django_cleanup',
     'djangobower',
     'django_js_reverse',
+    'django_gravatar',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + MY_APPS + THIRD_PARTY_APPS
@@ -193,7 +193,7 @@ LOCALE_PATHS = (
 #     str(APPS_DIR.path('fixtures')),
 # )
 
-LAMGUAGES = (
+LANGUAGES = (
     ('en', 'English'),
     ('ru', 'Russian'),
 )

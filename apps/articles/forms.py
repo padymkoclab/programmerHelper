@@ -5,7 +5,6 @@ from django.utils.translation import ugettext_lazy as _
 from django import forms
 
 from apps.tags.forms import clean_tags
-from apps.web_links.forms import clean_weblinks
 
 from .models import Article, ArticleSubsection
 
@@ -27,11 +26,6 @@ class ArticleForm(forms.ModelForm):
         super(ArticleForm, self).clean()
         cleaned_tags = clean_tags(self)
         return cleaned_tags
-
-    def clean_links(self):
-        super(ArticleForm, self).clean()
-        cleaned_weblinks = clean_weblinks(self)
-        return cleaned_weblinks
 
 
 class ArticleSubsectionFormset(forms.models.BaseInlineFormSet):
@@ -55,7 +49,9 @@ class ArticleSubsectionFormset(forms.models.BaseInlineFormSet):
     def clean(self):
         super(ArticleSubsectionFormset, self).clean()
         # validate unique number of subarticle on formset
-        counter_numbers_of_subsections = collections.Counter(form.cleaned_data.get('number', None) for form in self.forms)
+        counter_numbers_of_subsections = collections.Counter(
+            form.cleaned_data.get('number', None) for form in self.forms
+        )
         for form in self.forms:
             number = form.cleaned_data.get('number', None)
             if counter_numbers_of_subsections.get(number, 0) > 1:

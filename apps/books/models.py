@@ -26,6 +26,8 @@ from .querysets import BookQuerySet, WritterQuerySet
 NOW_YEAR = timezone.datetime.now().year
 
 # announs book, soon
+#
+# read with Scrapy data from Amazon.com
 
 
 class Book(models.Model):

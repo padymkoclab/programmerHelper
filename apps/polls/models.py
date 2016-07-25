@@ -15,7 +15,7 @@ from model_utils import Choices
 from mylabour.fields_db import ConfiguredAutoSlugField
 from mylabour.models import TimeStampedModel
 from mylabour.validators import MinCountWordsValidator
-from mylabour.utils import ClassmethodProperty
+from mylabour.decorators import ClassmethodProperty
 
 from .managers import PollManager, VotesManager
 from .querysets import PollQuerySet, ChoiceQuerySet
