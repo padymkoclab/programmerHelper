@@ -20,6 +20,8 @@ from mylabour.models import TimeStampedModel
 from .managers import QuestionManager, AnswerManager
 
 
+# scrapy data question from StackOverFlow by tags Django, JS as latest
+
 class Question(TimeStampedModel):
     """
 

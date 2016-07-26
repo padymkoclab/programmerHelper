@@ -17,10 +17,9 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
-        # clear all records, about the levels of accounts, in database
-        AccountLevel.objects.filter().delete()
-
-        # create levels of accounts
-        for obj in ACCOUNT_LEVEL_DATAS:
-            AccountLevelFactory(name=obj.name, color=obj.color, description=obj.description)
-        logger.info('Successful executed creating levels for accounts')
+        # create levels of accounts if don`t yet
+        if not AccountLevel.objects.count():
+            for obj in ACCOUNT_LEVEL_DATAS:
+                AccountLevelFactory(name=obj.name, color=obj.color, description=obj.description)
+            logger.info('Created levels for accounts')
+        logger.debug('Levels of accounts already exists')

@@ -25,7 +25,7 @@ from .reports import ExcelReport, PollPDFReport
 
 def add_current_app_to_request_in_admin_view(view):
     @functools.wraps(view)
-    def _wrappeped_view(modelAdmin, request, **kwargs):
+    def wrapped_view(modelAdmin, request, **kwargs):
 
         # only for admin theme Django-Suit
         # it is give feature display menu in left sidebar
@@ -33,7 +33,7 @@ def add_current_app_to_request_in_admin_view(view):
 
         response = view(modelAdmin, request, **kwargs)
         return response
-    return _wrappeped_view
+    return wrapped_view
 
 
 class ChoiceInline(admin.StackedInline):

@@ -9,7 +9,6 @@ from django.utils import timezone
 from django import template
 from django.template.defaultfilters import mark_safe
 
-import ipdb
 from bs4 import BeautifulSoup
 
 register = template.Library()
@@ -41,8 +40,8 @@ def FormattingBigNumber(value, paraments=' &3'):
     starting_digits = unit_number[:remainder]
     unit_number = unit_number[remainder:]
     for i in range(0, count_unit_times_block_in_number):
-        start = count_digits_in_block*i
-        end = count_digits_in_block*(i+1)
+        start = count_digits_in_block * i
+        end = count_digits_in_block * (i + 1)
         temp_list.append(unit_number[start:end])
     result = starting_digits + separator + separator.join(temp_list)
     result = (result).strip(separator)
@@ -114,6 +113,7 @@ def DisplaySingNumber(number):
 @register.filter(name='ipdb')
 def ipdb(element):
     try:
+        import ipdb
         ipdb.set_trace()
     except ImportError:
         warnings.warn('Module "ipdb" not found, then will be use module "pdb"', ImportWarning)

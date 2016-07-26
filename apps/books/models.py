@@ -35,9 +35,12 @@ class Book(models.Model):
     Model for books
     """
 
+    LANGUAGES = tuple((code, _(name)) for code, name in settings.LANGUAGES)
+
     # display language name on Site Language for user
 
-    LANGUAGES = tuple((code, _(name)) for code, name in settings.LANGUAGES)
+    def upload_media(instance, filename):
+        return 'books/{slug}/{filename}'.format(slug=instance.slug, filename=filename)
 
     id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
     name = models.CharField(
@@ -52,10 +55,10 @@ class Book(models.Model):
         validators=[MinLengthValidator(100)],
         help_text=_('Minimal length 100 characters.'),
     )
-    picture = models.URLField(_('Picture'), max_length=1000)
+    picture = models.ImageField(_('Picture'), upload_to=upload_media, max_length=1000)
     language = models.CharField(_('Language'), max_length=25, choices=LANGUAGES)
     pages = models.PositiveSmallIntegerField(_('Count pages'), validators=[MinValueValidator(1)])
-    accounts = models.ManyToManyField(
+    authorship = models.ManyToManyField(
         'Writter',
         verbose_name=_('Authorship'),
         related_name='books',

@@ -35,12 +35,22 @@ class Article(TimeStampedModel):
         ('published', _('Published')),
     )
 
+    def upload_media(self, instance, filename):
+        return '{account}/{model}/{slug}/{filename}'.format(
+            filename=filename,
+            slug=instance.slug,
+            model=self.__class__._meta.verbose_name_plural,
+            account=instance.account.get_short_name(),
+        )
+
     title = models.CharField(
-        _('Title'), max_length=200, validators=[MinLengthValidator(settings.MIN_LENGTH_FOR_NAME_OR_TITLE_OBJECT)]
+        _('Title'),
+        max_length=200,
+        validators=[MinLengthValidator(settings.MIN_LENGTH_FOR_NAME_OR_TITLE_OBJECT)],
     )
     slug = ConfiguredAutoSlugField(_('Slug'), populate_from='title', unique_with=['account'])
     quotation = models.CharField(_('Quotation'), max_length=200, validators=[MinLengthValidator(10)])
-    picture = models.ImageField(_('Picture'), max_length=1000)
+    picture = models.ImageField(_('Picture'), upload_to=upload_media, max_length=1000)
     header = models.TextField(_('Header'), validators=[MinCountWordsValidator(10)])
     conclusion = models.TextField(_('Conclusion'), validators=[MinCountWordsValidator(10)])
     status = StatusField(verbose_name=_('Status'), choices_name='STATUS_ARTICLE', default=STATUS_ARTICLE.draft)
@@ -65,7 +75,7 @@ class Article(TimeStampedModel):
         verbose_name=_('Tags'),
     )
     links = ArrayField(
-        models.URLField(max_length=1000, blank=True),
+        models.URLField(max_length=1000),
         size=10,
         verbose_name=_('Links'),
         help_text=_('Useful links'),

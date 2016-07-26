@@ -6,7 +6,6 @@ import random
 import string
 
 from django.conf import settings
-from django.core import management
 
 from invoke import run, task
 
@@ -165,5 +164,3 @@ def recreate_db():
         run('./manage.py migrate')
         logger.debug('Applied migrations to database.')
 
-        # create main superuser
-        management.call_command('create_default_superuser')

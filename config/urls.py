@@ -1,49 +1,47 @@
 
-from django.contrib import admin
-# from django.views.decorators.cache import cache_page
+from django.views.decorators.cache import cache_page
 from django.conf.urls import url, include
-# from django.views.i18n import javascript_catalog
-# from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+from django.views.i18n import javascript_catalog
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
-# from django_js_reverse.views import urls_js
+from django_js_reverse.views import urls_js
 
-# from .admin import ProgrammerHelperAdminSite
-# from .views import IndexView
+from .admin import ProgrammerHelperAdminSite
+from .views import IndexView
 
-# js_info_dict = {
-#     'packages': ('your.app.package',),
-# }
+js_info_dict = {
+    'packages': ('your.app.package',),
+}
 
 urlpatterns = [
 
     # django
-    # url(r'^admin/export_import/', include('apps.export_import_models.urls')),
-    # url(r'^admin/', admin.site.urls),
-    # url(r'^admin/', ProgrammerHelperAdminSite.urls),
-    # url(r'^jsi18n/$', javascript_catalog, js_info_dict, 'javascript-catalog'),
-    # url(r'^i18n/', include('django.conf.urls.i18n')),
+    url(r'^admin/export_import/', include('apps.export_import_models.urls')),
+    url(r'^admin/', ProgrammerHelperAdminSite.urls),
+    url(r'^jsi18n/$', javascript_catalog, js_info_dict, 'javascript-catalog'),
+    url(r'^i18n/', include('django.conf.urls.i18n')),
 
     # project
-    # url(r'^$', IndexView.as_view(), {}, 'index'),
-    # url(r'^django_js_reverse/$', cache_page(3600)(urls_js), name='django_js_reverse'),
+    url(r'^$', IndexView.as_view(), {}, 'index'),
+    url(r'^django_js_reverse/$', cache_page(3600)(urls_js), name='django_js_reverse'),
 
     # apps
-    # url(r'^accounts/', include('apps.accounts.urls')),
-    # url(r'^activity/', include('apps.activity.urls')),
-    # url(r'^articles/', include('apps.articles.urls')),
-    # url(r'^books/', include('apps.books.urls')),
+    url(r'^accounts/', include('apps.accounts.urls')),
+    url(r'^activity/', include('apps.activity.urls')),
+    url(r'^articles/', include('apps.articles.urls')),
+    url(r'^books/', include('apps.books.urls')),
     # url(r'^courses/', include('apps.courses.urls')), # temporary is disabled
-    # url(r'^forum/', include('apps.forum.urls')),
-    # url(r'^notifications/', include('apps.notifications.urls')),
-    # url(r'^news/', include('apps.newsletters.urls')),
-    # url(r'^polls/', include('apps.polls.urls')),
-    # url(r'^questions/', include('apps.questions.urls')),
-    # url(r'^snippets/', include('apps.snippets.urls')),
-    # url(r'^solutions/', include('apps.solutions.urls')),
-    # url(r'^tags/', include('apps.tags.urls')),
-    # url(r'^testing/', include('apps.testing.urls')),
-    # url(r'^utilities/', include('apps.utilities.urls')),
+    url(r'^forum/', include('apps.forum.urls')),
+    url(r'^notifications/', include('apps.notifications.urls')),
+    url(r'^news/', include('apps.newsletters.urls')),
+    url(r'^polls/', include('apps.polls.urls')),
+    url(r'^questions/', include('apps.questions.urls')),
+    url(r'^snippets/', include('apps.snippets.urls')),
+    url(r'^solutions/', include('apps.solutions.urls')),
+    url(r'^tags/', include('apps.tags.urls')),
+    url(r'^testing/', include('apps.testing.urls')),
+    url(r'^utilities/', include('apps.utilities.urls')),
 ]
 
 # Additional urls for static (only for development local)
-# urlpatterns += staticfiles_urlpatterns()
+urlpatterns += staticfiles_urlpatterns()

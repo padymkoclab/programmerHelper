@@ -8,13 +8,12 @@ from django.utils.translation import ugettext_lazy as _
 from django.db import models
 from django.conf import settings
 
-from autoslug import AutoSlugField
-
 from apps.opinions.models import Opinion
 from apps.comments.models import Comment
 from apps.replies.models import Reply
 from mylabour.models import TimeStampedModel
 from mylabour.constants import CHOICES_LEXERS
+from mylabour.fields_db import ConfiguredAutoSlugField
 
 from .managers import CourseManager, CourseQuerySet
 
@@ -34,8 +33,8 @@ class Course(TimeStampedModel):
         unique=True,
         validators=[MinLengthValidator(settings.MIN_LENGTH_FOR_NAME_OR_TITLE_OBJECT)],
     )
-    slug = AutoSlugField(_('Slug'), populate_from='name', always_update=True, unique=True, allow_unicode=True, db_index=True)
-    picture = models.URLField(_('Picture'))
+    slug = ConfiguredAutoSlugField(_('Slug'), populate_from='name', unique=True)
+    picture = models.ImageField(_('Picture'))
     description = models.TextField(_('Description'))
     lexer = models.CharField(_('Lexer'), max_length=30, choices=CHOICES_LEXERS)
     authorship = models.ManyToManyField(

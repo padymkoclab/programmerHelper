@@ -66,7 +66,7 @@ THIRD_PARTY_APPS = [
     'django_gravatar',
 ]
 
-INSTALLED_APPS = DJANGO_APPS + MY_APPS + THIRD_PARTY_APPS
+INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + MY_APPS
 
 # Project settings
 
@@ -110,12 +110,15 @@ TEMPLATES = [
                 'django.template.context_processors.static',
                 'django.core.context_processors.request',
                 # 'django.template.context_processors.tz',
-                'mylabour.context_processors.date_creating_website',
-                # 'apps.visits.context_processors.count_visits',
-                'apps.sessions.context_processors.users_online',
             ],
         },
     },
+]
+
+MY_CONTEXT_PROCCESSORS = [
+    'mylabour.context_processors.date_creating_website',
+    'apps.visits.context_processors.count_visits',
+    'apps.sessions.context_processors.users_online',
 ]
 
 WSGI_APPLICATION = 'config.wsgi.application'
@@ -189,9 +192,9 @@ LOCALE_PATHS = (
     BASE_DIR.child('locale'),
 )
 
-# FIXTURE_DIRS = (
-#     str(APPS_DIR.path('fixtures')),
-# )
+FIXTURE_DIRS = (
+    str(BASE_DIR.child('fixtures')),
+)
 
 LANGUAGES = (
     ('en', 'English'),

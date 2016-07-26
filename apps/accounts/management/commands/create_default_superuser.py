@@ -23,7 +23,7 @@ class Command(BaseCommand):
         # or return message that it already exists
         try:
             Account.objects.get_by_natural_key(DEFAULT_SUPERUSER_DATA['email'])
-        except Account.DoesNotExists:
+        except Account.DoesNotExist:
             get_user_model().objects.create_superuser(**DEFAULT_SUPERUSER_DATA)
             logger.info('Succesful added superuser!')
         else:

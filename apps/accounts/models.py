@@ -104,7 +104,8 @@ class Account(AbstractBaseUser, PermissionsMixin):
         'AccountLevel',
         verbose_name='Level',
         related_name='accounts',
-        default=lambda: AccountLevel.objects.get(name=AccountLevel.CHOICES_LEVEL.regular),
+        default=AccountLevel.CHOICES_LEVEL.regular,
+        to_field='name',
         on_delete=models.PROTECT,
     )
     signature = models.CharField(_('Signature'), max_length=50, default='', blank=True)

@@ -5,6 +5,11 @@ from apps.tags.constants import TAGS_NAMES
 from apps.tags.factories import TagFactory
 from apps.tags.models import Tag
 
+from mylabour.utils import create_logger_by_filename
+
+
+logger = create_logger_by_filename(__name__)
+
 
 class Command(BaseCommand):
 
@@ -12,9 +17,9 @@ class Command(BaseCommand):
 
     def handle(self, *args, **kwargs):
 
-        # clear database from tags
-        Tag.objects.filter().delete()
-
-        # create tags
-        for tag_name in TAGS_NAMES:
-            TagFactory(name=tag_name)
+        # create tags if not yet
+        if not Tag.objects.filter().count():
+            for tag_name in TAGS_NAMES:
+                TagFactory(name=tag_name)
+            logger.info('Created tags for a whole project.')
+        logger.debug('Tags already presents in database.')

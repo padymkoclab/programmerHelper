@@ -37,7 +37,7 @@ class BookAdmin(admin.ModelAdmin):
     search_fields = ('name', 'publishers', 'accounts__name')
     date_hierarchy = 'date_added'
     filter_horizontal = ['tags']
-    filter_vertical = ['accounts']
+    filter_vertical = ['authorship']
     fieldsets = [
         [
             Book._meta.verbose_name, {
@@ -50,7 +50,7 @@ class BookAdmin(admin.ModelAdmin):
                     'language',
                     'isbn',
                     'publishers',
-                    'accounts',
+                    'authorship',
                     'tags',
                 ]
             }
