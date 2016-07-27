@@ -136,10 +136,10 @@ class AccountQuerySet(models.QuerySet):
             queryset = self
         return queryset.annotate(count_opinions=models.Count('marks', distinct=True))
 
-    def random_accounts(self, count=1):
+    def random_accounts(self, count, single_as_qs=False):
         """Getting certain count random objects from queryset."""
 
-        return get_random_objects(queryset=self, count=count)
+        return get_random_objects(queryset=self, count=count, single_as_qs=single_as_qs)
 
     def objects_with_count_favorites_and_unfavorites(self, queryset=None):
         """Getting count favorites and unfavorites of accounts."""

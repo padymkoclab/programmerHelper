@@ -107,14 +107,18 @@ def get_choice_lexers():
     return CHOICES_LEXERS
 
 
-def get_random_objects(queryset, count=1):
+def get_random_objects(queryset, count, single_as_qs=False):
     """Return certain count random objects from queryset.
     If 'count' is great than queryset, then return all avaibled objects.
     If queryset is empty - raise error."""
 
     # preluminary restrictions
-    assert isinstance(queryset, models.QuerySet) is True, 'Passed queryset is not subclass models.QuerySet'
-    assert count > 0, 'Count random objects must be more 0'
+    if not isinstance(queryset, models.QuerySet):
+        raise ValueError('Passed queryset is not subclass models.QuerySet')
+
+    #
+    if count < 1:
+        return queryset.none()
 
     #
     if not queryset.count():
@@ -123,6 +127,8 @@ def get_random_objects(queryset, count=1):
     #
     if queryset.count() == 1:
         warnings.warn('In queryset only 1 object, thus returned it.', Warning)
+        if single_as_qs:
+            return queryset.filter()
         return queryset.first()
 
     #
@@ -137,6 +143,8 @@ def get_random_objects(queryset, count=1):
 
     #
     if count == 1:
+        if single_as_qs:
+            return queryset.filter()
         return random_objects.first()
 
     # prevent dublicates through SQL

@@ -1,9 +1,7 @@
 
 from django.db import models
 
-
-COUNT_VOTES_FOR_LOW_ACTIVE_POLL = 5
-COUNT_VOTES_FOR_HIGH_ACTIVE_POLL = 30
+from .constants import COUNT_VOTES_FOR_HIGH_ACTIVE_POLL, COUNT_VOTES_FOR_LOW_ACTIVE_POLL
 
 
 class PollQuerySet(models.QuerySet):
@@ -42,6 +40,7 @@ class PollQuerySet(models.QuerySet):
         self = self.polls_with_count_votes()
         self = self.polls_with_count_choices()
         self = self.polls_with_date_lastest_voting()
+        self = self.prefetch_related('voteinpoll_set', 'choices', 'votes')
         return self
 
     def polls_with_high_activity(self):
