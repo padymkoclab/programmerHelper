@@ -4,9 +4,17 @@ from collections import namedtuple
 from .models import AccountLevel
 
 
-AccountLevelData = namedtuple('AccountLevelData', ('name', 'color', 'description'))
+# Attributes for default superuser
+DEFAULT_SUPERUSER_DATA = dict(
+    email='setivolkylany@gmail.com',
+    username='setivolkylany',
+    password='PyJS210493',
+    date_birthday='2000-12-12',
+)
+
 
 # Data for creating levels of accounts
+AccountLevelData = namedtuple('AccountLevelData', ('name', 'color', 'description'))
 ACCOUNT_LEVEL_DATAS = [
     AccountLevelData(
         name=AccountLevel.CHOICES_LEVEL.platinum, color='#D8BFD8', description='Regular level of account'
@@ -51,11 +59,3 @@ ACCOUNT_LEVEL_DATAS = [
         name=AccountLevel.CHOICES_LEVEL.regular, color='#F0F8FF', description='Regular level of account'
     ),
 ]
-
-# Attributes for default superuser
-DEFAULT_SUPERUSER_DATA = dict(
-    email='setivolkylany@gmail.com',
-    username='setivolkylany',
-    password='lv210493',
-    date_birthday='2000-12-12',
-)

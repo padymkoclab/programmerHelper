@@ -5,7 +5,6 @@ from django.http import HttpResponse
 from django.conf import settings
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
-from django.contrib.gis.geoip2 import GeoIP2
 
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
@@ -37,15 +36,11 @@ class SitePDFReportTemplate(object):
     """
     A base class for all all classes generate PDF report on site.
     """
-        # register fonts
+
+    # register fonts
     pdfmetrics.registerFont(TTFont('DejaVuSans', 'DejaVuSans.ttf'))
     pdfmetrics.registerFont(TTFont('FreeSans', 'FreeSans.ttf'))
     pdfmetrics.registerFont(TTFont('FreeSansBold', 'FreeSansBold.ttf'))
-
-    # def __new__(cls, *args, **kwargs):
-
-
-        # return super(SitePDFReportTemplate, cls).__new__(cls, *args, **kwargs)
 
     def __init__(self, request, *args, **kwargs):
         self.now = timezone.now()
@@ -101,7 +96,7 @@ class SitePDFReportTemplate(object):
             alignment=TA_RIGHT,
             parent=self.styles['Normal'],
             fontName='FreeSans',
-            fontSize=16,
+            fontSize=12,
         ))
         self.styles.add(ParagraphStyle(
             'JustifyParagraph',
@@ -154,6 +149,13 @@ class SitePDFReportTemplate(object):
             ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
         ])
 
+        self.tblSingleEmptyRowStyle = TableStyle(self.tblObjectsStyle.getCommands())
+        self.tblSingleEmptyRowStyle.add('SPAN', (0, -1), (-1, -1))
+        self.tblSingleEmptyRowStyle.add('TEXTCOLOR', (0, -1), (-1, -1), colors.red)
+        self.tblSingleEmptyRowStyle.add('TOPPADDING', (0, -1), (-1, -1), 20)
+        self.tblSingleEmptyRowStyle.add('BOTTOMPADDING', (0, -1), (-1, -1), 20)
+        self.tblSingleEmptyRowStyle.add('FONTSIZE', (0, -1), (-1, -1), 17)
+
         self.tblFilterObjectsStyle = TableStyle([
             ('SPAN', (0, 0), (-1, 0)),
             ('TOPPADDING', (0, 0), (-1, 0), inch / 2),
@@ -166,6 +168,12 @@ class SitePDFReportTemplate(object):
             ('ALIGN', (0, 0), (-1, -1), 'CENTRE'),
             ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
         ])
+        self.tblSingleEmptyRowFilterStyle = TableStyle(self.tblFilterObjectsStyle.getCommands())
+        self.tblSingleEmptyRowFilterStyle.add('SPAN', (0, -1), (-1, -1))
+        self.tblSingleEmptyRowFilterStyle.add('TEXTCOLOR', (0, -1), (-1, -1), colors.red)
+        self.tblSingleEmptyRowFilterStyle.add('TOPPADDING', (0, -1), (-1, -1), 20)
+        self.tblSingleEmptyRowFilterStyle.add('BOTTOMPADDING', (0, -1), (-1, -1), 20)
+        self.tblSingleEmptyRowFilterStyle.add('FONTSIZE', (0, -1), (-1, -1), 17)
 
     def create_response(self, begin_filename):
         """Create and to return a HttpResponse with attached a pdf-file."""
@@ -299,3 +307,11 @@ class SitePDFReportTemplate(object):
         tbl.drawOn(canv, doc.leftMargin, self.doc_height - doc.topMargin)
 
         canv.drawCentredString(self.doc_width / 2, self.doc.bottomMargin - 15, 'Page %s' % str(doc.page))
+
+    @staticmethod
+    def _eval_step_for_valueAxis_linechart(minvalue, maxvalue):
+        """ """
+
+        step = (maxvalue - minvalue) / 10
+
+        return step

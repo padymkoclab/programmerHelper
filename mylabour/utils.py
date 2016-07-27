@@ -608,6 +608,24 @@ def get_ip_by_host(host):
     return socket.gethostbyname(host)
 
 
+def get_random_date_from_days_ago_to_now(start_date=None):
+    """ """
+
+    days_close_half_year_ago = 550
+    now = timezone.now()
+
+    if start_date is None:
+        start_date = timezone.now() - timezone.timedelta(days=days_close_half_year_ago)
+
+    diff_days = (now - start_date).days
+
+    days_ago = random.randint(1, diff_days)
+
+    date = now - timezone.timedelta(days=days_ago)
+
+    return date
+
+
 if __name__ == "__main__":
     import doctest
     doctest.testmod()

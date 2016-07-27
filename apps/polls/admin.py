@@ -283,7 +283,7 @@ class PollAdmin(admin.ModelAdmin):
         if request.method == 'GET':
             context = dict(
                 self.admin_site.each_context(request),
-                title=_('Make Pdf-report about a polls'),
+                title=_('Make report in PDF'),
             )
 
             return TemplateResponse(request, "polls/admin/pdf_report.html", context)
@@ -292,12 +292,20 @@ class PollAdmin(admin.ModelAdmin):
         # then Pdf report as file
         elif request.method == 'POST':
 
-            # generate an Pdf file and return it in the response
+            # get subject of report
+            subject = request.POST['subject']
+
+            # generate an needed report as Pdf file
+            # and return it in the response
             pdf_report = PollPDFReport(request)
-            # response = pdf_report.report_polls()
-            response = pdf_report.report_choices()
-            # response = pdf_report.report_votes()
-            # response = pdf_report.report_polls_results()
+            if subject == 'polls':
+                response = pdf_report.report_polls()
+            elif subject == 'choices':
+                response = pdf_report.report_choices()
+            elif subject == 'votes':
+                response = pdf_report.report_votes()
+            elif subject == 'results_polls':
+                response = pdf_report.report_polls_results()
             return response
 
     @add_current_app_to_request_in_admin_view

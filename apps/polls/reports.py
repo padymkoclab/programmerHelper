@@ -5,6 +5,7 @@ import logging
 import random
 import textwrap
 
+from django.db import connection, reset_queries
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 from django.http import HttpResponse
@@ -551,7 +552,7 @@ class PollPDFReport(SitePDFReportTemplate):
 
         # draw results all of the polls by PieChart
         # where a each chart will be placed on a separated page
-        for poll in Poll.objects.iterator():
+        for poll in Poll.objects.all().prefetch_related('choices', 'voteinpoll_set', 'votes'):
 
             # move to PageTemplate for draw charts
             story.append(NextPageTemplate('Object'))
@@ -579,8 +580,12 @@ class PollPDFReport(SitePDFReportTemplate):
     def get_table_statistics_polls(self):
         """ """
 
-        str_latest_poll = str(Poll.objects.latest())
-        latest_poll = textwrap.fill(str_latest_poll, 50)
+        # if polls not yet, then latest poll will be replace on empty
+        if Poll.objects.count():
+            str_latest_poll = str(Poll.objects.latest())
+            latest_poll = '"%s"' % textwrap.fill(str_latest_poll, 50)
+        else:
+            latest_poll = ''
 
         data = [
             ['Statictics'],
@@ -588,7 +593,7 @@ class PollPDFReport(SitePDFReportTemplate):
             ['Count an opened polls', Poll.objects.opened_polls().count()],
             ['Count a closed polls', Poll.objects.closed_polls().count()],
             ['Count a draft polls', Poll.objects.draft_polls().count()],
-            ['Latest an added poll', '"%s"' % latest_poll],
+            ['Latest an added poll', latest_poll],
             ['Average a count votes in the polls', Poll.objects.get_average_count_votes_in_polls()],
             ['Average a count choices in the polls', Poll.objects.get_average_count_choices_in_polls()],
         ]
@@ -610,16 +615,27 @@ class PollPDFReport(SitePDFReportTemplate):
     def get_table_statistics_votes(self):
         """ """
 
-        latest_vote = VoteInPoll.objects.latest()
+        # if votes is exists, then getting atributes of latest vote
+        if VoteInPoll.objects.count():
+            latest_vote = VoteInPoll.objects.latest()
+            latest_voter = textwrap.fill(latest_vote.account.get_full_name(), 50)
+            latest_date_voting = convert_date_to_django_date_format(latest_vote.date_voting)
+            latest_poll = textwrap.fill(str(latest_vote.poll), 50)
+            latest_choice = textwrap.fill(str(latest_vote.choice), 50)
+        else:
+            latest_voter = ''
+            latest_date_voting = ''
+            latest_poll = ''
+            latest_choice = ''
 
         data = [
             ['Statictics'],
             ['Count a votes', VoteInPoll.objects.count()],
             ['Count a voters', Poll.objects.get_all_voters().count()],
-            ['Latest a voter', textwrap.fill(latest_vote.account.get_full_name(), 50)],
-            ['Date a latest voting', convert_date_to_django_date_format(latest_vote.date_voting)],
-            ['Poll with the latest vote', textwrap.fill(str(latest_vote.poll), 50)],
-            ['Choice with the latest vote', textwrap.fill(str(latest_vote.choice), 50)],
+            ['Latest a voter', latest_voter],
+            ['Date a latest voting', latest_date_voting],
+            ['Poll with the latest vote', latest_poll],
+            ['Choice with the latest vote', latest_choice],
         ]
 
         tbl = Table(data, colWidths=[self.doc_width / 1.75, inch], style=self.tblStaticticsStyle)
@@ -634,7 +650,7 @@ class PollPDFReport(SitePDFReportTemplate):
         # if no votes yet
         try:
             latest_date_voting = VoteInPoll.objects.latest().date_voting
-        except VoteInPoll.DoesNotExists:
+        except VoteInPoll.DoesNotExist:
             latest_date_voting = self.ParagraphNoVotes
         else:
             latest_date_voting = convert_date_to_django_date_format(latest_date_voting)
@@ -656,22 +672,31 @@ class PollPDFReport(SitePDFReportTemplate):
 
         data = [['Primary\nkey', 'Title', 'Description', 'Status', 'Count\nchoices', 'Count\nvotes', 'Date\nadded']]
 
-        for poll in Poll.objects.iterator():
-            row = [
-                textwrap.fill(str(poll.pk), 10),
-                textwrap.fill(poll.title, 20),
-                textwrap.fill(poll.description, 20),
-                poll.get_status_display(),
-                poll.get_count_choices(),
-                poll.get_count_votes(),
-                textwrap.fill(convert_date_to_django_date_format(poll.date_added), 10),
-            ]
-            data.append(row)
+        # if objects does not exists yet, then
+        # append a whole row with corresponding message
+        # else to append objects as rows of table.
+        # as well as select corresponding style for table
+        if Poll.objects.count():
+            style = self.tblObjectsStyle
+            for poll in Poll.objects.all().prefetch_related('choices', 'votes', 'voteinpoll_set'):
+                row = [
+                    textwrap.fill(str(poll.pk), 10),
+                    textwrap.fill(poll.title, 20),
+                    textwrap.fill(poll.description, 20),
+                    poll.get_status_display(),
+                    poll.get_count_choices(),
+                    poll.get_count_votes(),
+                    textwrap.fill(convert_date_to_django_date_format(poll.date_added), 10),
+                ]
+                data.append(row)
+        else:
+            style = self.tblSingleEmptyRowStyle
+            data.append(['Objects does not exists'])
 
         tbl = Table(
             data,
-            colWidths=[inch / 1.2, inch * 1.5, inch * 1.5, inch / 1.5, inch / 2, inch / 1.8, inch / 1.4],
-            style=self.tblObjectsStyle,
+            colWidths=[inch / 1.2, inch * 1.5, inch * 1.5, inch / 1.6, inch / 1.8, inch / 1.9, inch / 1.4],
+            style=style,
         )
 
         return tbl
@@ -681,20 +706,29 @@ class PollPDFReport(SitePDFReportTemplate):
 
         data = [['Primary\nkey', 'Poll', 'Choice', 'Account', 'Date\nvoting']]
 
-        for vote in VoteInPoll.objects.iterator():
-            row = [
-                textwrap.fill(str(vote.pk), 10),
-                textwrap.fill(str(vote.poll), 20),
-                textwrap.fill(str(vote.choice), 20),
-                textwrap.fill(vote.account.get_full_name(), 20),
-                textwrap.fill(convert_date_to_django_date_format(vote.date_voting), 10),
-            ]
-            data.append(row)
+        # if objects does not exists yet, then
+        # append a whole row with corresponding message
+        # else to append objects as rows of table.
+        # as well as select corresponding style for table
+        if VoteInPoll.objects.count():
+            style = self.tblObjectsStyle
+            for vote in VoteInPoll.objects.select_related('poll', 'account', 'choice'):
+                row = [
+                    textwrap.fill(str(vote.pk), 10),
+                    textwrap.fill(str(vote.poll), 20),
+                    textwrap.fill(str(vote.choice), 20),
+                    textwrap.fill(vote.account.get_full_name(), 20),
+                    textwrap.fill(convert_date_to_django_date_format(vote.date_voting), 10),
+                ]
+                data.append(row)
+        else:
+            style = self.tblSingleEmptyRowStyle
+            data.append(['Objects does not exists'])
 
         tbl = Table(
             data,
             colWidths=[inch / 1.2, inch * 1.6, inch * 1.6, inch * 1.5, inch / 1.3],
-            style=self.tblObjectsStyle,
+            style=style,
         )
 
         return tbl
@@ -704,19 +738,28 @@ class PollPDFReport(SitePDFReportTemplate):
 
         data = [['Primary\nkey', 'Choice`s\ntext', 'Poll', 'Count\nvotes']]
 
-        for choice in Choice.objects.choices_with_count_votes():
-            row = [
-                textwrap.fill(str(choice.pk), 10),
-                textwrap.fill(choice.text_choice, 30),
-                textwrap.fill(str(choice.poll), 30),
-                choice.count_votes,
-            ]
-            data.append(row)
+        # if objects does not exists yet, then
+        # append a whole row with corresponding message
+        # else to append objects as rows of table.
+        # as well as select corresponding style for table
+        if Choice.objects.count():
+            style = self.tblObjectsStyle
+            for choice in Choice.objects.select_related('poll').prefetch_related('votes'):
+                row = [
+                    textwrap.fill(str(choice.pk), 10),
+                    textwrap.fill(choice.text_choice, 30),
+                    textwrap.fill(str(choice.poll), 30),
+                    choice.get_count_votes(),
+                ]
+                data.append(row)
+        else:
+            style = self.tblSingleEmptyRowStyle
+            data.append(['Objects does not exists'])
 
         tbl = Table(
             data,
             colWidths=[inch / 1.3, inch * 2.4, inch * 2.4, inch / 1.5],
-            style=self.tblObjectsStyle,
+            style=style,
         )
 
         return tbl
@@ -806,6 +849,9 @@ class PollPDFReport(SitePDFReportTemplate):
 
         chart = HorizontalLineChart()
 
+        valueMin = 0
+        valueMax = max(values) + 10
+
         chart.x = 50
         chart.y = 0
         chart.data = [values]
@@ -813,12 +859,12 @@ class PollPDFReport(SitePDFReportTemplate):
         chart.height = canvas.height - inch * 2
         chart.width = canvas.width - 75
         chart.categoryAxis.categoryNames = dates
-        chart.categoryAxis.labels.boxAnchor = 'e'
-        chart.categoryAxis.labels.angle = 45
+        chart.categoryAxis.labels.boxAnchor = 'se'
+        chart.categoryAxis.labels.angle = 60
         chart.categoryAxis.joinAxisMode = 'bottom'
-        chart.valueAxis.valueMin = 0
-        chart.valueAxis.valueMax = max(values) + 10
-        chart.valueAxis.valueStep = 4
+        chart.valueAxis.valueMin = valueMin
+        chart.valueAxis.valueMax = valueMax
+        chart.valueAxis.valueStep = self._eval_step_for_valueAxis_linechart(valueMin, valueMax)
         chart.valueAxis.labelTextFormat = '%d votes '
         chart.lines[0].strokeWidth = 1
         chart.lines[0].strokeColor = colors.purple
@@ -1026,40 +1072,54 @@ class PollPDFReport(SitePDFReportTemplate):
     def _generate_table_polls_by_activity(self, header_table, qs):
         """ """
 
-        data_header = [
+        # two headers to a table
+        data_headers = [
             [header_table],
             [_('Poll'), _('Count\nchoices'), _('Count\nvotes'), _('Date last\nvoting'), _('Date added')],
         ]
 
+        # create rows for the table
         data = []
-        data.extend(data_header)
+        data.extend(data_headers)
 
-        for poll in qs:
+        # if the filtered objects exists, otherwise add an empty row after the two headers
+        # as well as add style to the table
+        if qs.exists():
+            style = self.tblFilterObjectsStyle
+            for poll in qs.prefetch_related('choices', 'votes', 'voteinpoll_set'):
 
-            #
-            date_lastest_voting = poll.get_date_lastest_voting()
-            if date_lastest_voting is not None:
-                date_lastest_voting = timezone.localtime(date_lastest_voting)
-                date_lastest_voting = convert_date_to_django_date_format(date_lastest_voting)
-                date_lastest_voting = textwrap.fill(date_lastest_voting, 15)
-            else:
-                date_lastest_voting = self.ParagraphNoVotes
-            #
-            date_added = timezone.localtime(poll.date_added)
-            date_added = convert_date_to_django_date_format(date_added)
-            date_added = textwrap.fill(date_added, 15)
+                # if a poll has votes, then add a details about a latest vote,
+                # otherwise add a paragraph with a corresponding message
+                date_lastest_voting = poll.get_date_lastest_voting()
+                if date_lastest_voting is not None:
+                    date_lastest_voting = timezone.localtime(date_lastest_voting)
+                    date_lastest_voting = convert_date_to_django_date_format(date_lastest_voting)
+                    date_lastest_voting = textwrap.fill(date_lastest_voting, 15)
+                else:
+                    date_lastest_voting = self.ParagraphNoVotes
 
-            row = [
-                textwrap.fill(str(poll), 35),
-                poll.get_count_choices(),
-                poll.get_count_votes(),
-                date_lastest_voting,
-                date_added,
-            ]
-            data.append(row)
+                # convert a date added of the poll to a convenient view
+                date_added = timezone.localtime(poll.date_added)
+                date_added = convert_date_to_django_date_format(date_added)
+                date_added = textwrap.fill(date_added, 15)
 
-        colWidths = [inch * 2.6, inch / 1.6, inch / 1.6, inch * 1.2, inch * 1.2]
+                # add details about the poll to row
+                row = [
+                    textwrap.fill(str(poll), 35),
+                    poll.get_count_choices(),
+                    poll.get_count_votes(),
+                    date_lastest_voting,
+                    date_added,
+                ]
+                data.append(row)
+        else:
+            style = self.tblSingleEmptyRowFilterStyle
+            data.append(['Objects does not exists'])
 
-        tbl = Table(data, colWidths=colWidths, style=self.tblFilterObjectsStyle)
+        tbl = Table(
+            data,
+            colWidths=[inch * 2.6, inch / 1.6, inch / 1.6, inch * 1.2, inch * 1.2],
+            style=style,
+        )
 
         return tbl

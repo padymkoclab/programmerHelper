@@ -97,7 +97,9 @@ ROOT_URLCONF = 'config.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR.child('templates')],
+        'DIRS': [
+            BASE_DIR.child('templates')
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -117,9 +119,11 @@ TEMPLATES = [
 
 MY_CONTEXT_PROCCESSORS = [
     'mylabour.context_processors.date_creating_website',
-    'apps.visits.context_processors.count_visits',
-    'apps.sessions.context_processors.users_online',
+    # 'apps.visits.context_processors.count_visits',
+    # 'apps.sessions.context_processors.users_online',
 ]
+
+TEMPLATES[0]['OPTIONS']['context_processors'].extend(MY_CONTEXT_PROCCESSORS)
 
 WSGI_APPLICATION = 'config.wsgi.application'
 

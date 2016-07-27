@@ -14,7 +14,6 @@ from model_utils import Choices
 
 from mylabour.fields_db import ConfiguredAutoSlugField
 from mylabour.models import TimeStampedModel
-from mylabour.validators import MinCountWordsValidator
 from mylabour.decorators import ClassmethodProperty
 
 from .managers import PollManager, VotesManager
@@ -44,8 +43,8 @@ class Poll(TimeStampedModel):
     )
     description = models.CharField(
         _('Short description'),
-        validators=[MinCountWordsValidator(5)],
-        help_text=_('Enter at least 5 words.'),
+        validators=[MinLengthValidator(10)],
+        help_text=_('Enter at least 10 characters.'),
         max_length=100,
     )
     slug = ConfiguredAutoSlugField(_('Slug'), populate_from='title', unique=True)
@@ -103,7 +102,7 @@ class Poll(TimeStampedModel):
 
         # replace pk on itself object and return it as tuple
         objects_and_count_votes_need_choices = (
-            (Choice.objects.get(pk=choice_pk), count_votes)
+            (self.choices.get(pk=choice_pk), count_votes)
             for choice_pk, count_votes in pks_and_count_votes_need_choices
         )
 
@@ -181,7 +180,7 @@ class Choice(models.Model):
         return super(Choice, self).unique_error_message(model_class, unique_check)
 
     def get_count_votes(self):
-        return self.__class__.objects.choices_with_count_votes().get(pk=self.pk).count_votes
+        return self.votes.count()
     get_count_votes.short_description = _('Count votes')
     get_count_votes.admin_order_field = 'count_votes'
 
