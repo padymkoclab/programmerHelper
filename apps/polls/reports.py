@@ -5,7 +5,6 @@ import logging
 import random
 import textwrap
 
-from django.db import connection, reset_queries
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 from django.http import HttpResponse
@@ -30,7 +29,11 @@ from reportlab.graphics.widgets.markers import makeMarker
 import xlsxwriter
 
 from apps.core.reports import SitePDFReportTemplate
-from mylabour.utils import get_filename_with_datetime, convert_date_to_django_date_format
+from mylabour.utils import (
+    get_filename_with_datetime,
+    convert_date_to_django_date_format,
+    get_latest_or_none,
+)
 
 from apps.polls.models import Poll, Choice, VoteInPoll
 
@@ -581,11 +584,10 @@ class PollPDFReport(SitePDFReportTemplate):
         """ """
 
         # if polls not yet, then latest poll will be replace on empty
-        if Poll.objects.count():
-            str_latest_poll = str(Poll.objects.latest())
-            latest_poll = '"%s"' % textwrap.fill(str_latest_poll, 50)
-        else:
-            latest_poll = ''
+        latest_poll = get_latest_or_none(Poll)
+        if latest_poll is not None:
+            latest_poll = str(latest_poll)
+            latest_poll = '"%s"' % textwrap.fill(latest_poll, 50)
 
         data = [
             ['Statictics'],
@@ -616,8 +618,8 @@ class PollPDFReport(SitePDFReportTemplate):
         """ """
 
         # if votes is exists, then getting atributes of latest vote
-        if VoteInPoll.objects.count():
-            latest_vote = VoteInPoll.objects.latest()
+        latest_vote = get_latest_or_none(VoteInPoll)
+        if latest_vote is not None:
             latest_voter = textwrap.fill(latest_vote.account.get_full_name(), 50)
             latest_date_voting = convert_date_to_django_date_format(latest_vote.date_voting)
             latest_poll = textwrap.fill(str(latest_vote.poll), 50)

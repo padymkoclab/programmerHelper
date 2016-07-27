@@ -25,21 +25,6 @@ class PollManager(models.Manager):
             self.model.CHOICES_STATUS.draft: self.draft_polls().count(),
         }
 
-    def make_polls_as_closed(self, poll=None):
-        """ """
-
-        raise NotImplementedError
-
-    def make_polls_as_opened(self):
-        """ """
-
-        raise NotImplementedError
-
-    def make_polls_as_draft(self):
-        """ """
-
-        raise NotImplementedError
-
     def most_active_voters(self):
         """A users participated in more than haft from all count polls."""
 
@@ -51,7 +36,14 @@ class PollManager(models.Manager):
         """ """
 
         accounts_with_count_votes = Account.objects.accounts_with_count_votes()
-        return accounts_with_count_votes.filter(count_votes__gt=0)
+        all_voters = accounts_with_count_votes.filter(count_votes__gt=0)
+        all_voters = all_voters.order_by('-count_votes')
+        return all_voters
+
+    def get_count_voters(self):
+        """ """
+
+        return self.get_all_voters().count()
 
     def get_average_count_votes_in_polls(self):
         """Return an average count votes on the polls.

@@ -358,5 +358,10 @@ class Account(AbstractBaseUser, PermissionsMixin):
     def count_comments(self):
         pass
 
+    def get_count_votes(self):
+        """Return count votes in polls, where user has participated."""
+
+        return self.votes.count()
+
     # https://www.digitalocean.com/community/users/jellingwood?primary_filter=upvotes_given
     # answer, queations, hearts, opinons and more

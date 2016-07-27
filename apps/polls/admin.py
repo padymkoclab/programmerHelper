@@ -5,14 +5,15 @@ from django.template.response import TemplateResponse
 from django.conf.urls import url
 from django.utils.safestring import mark_safe
 from django.template.defaultfilters import truncatechars
-from django.utils.html import format_html_join, format_html
+from django.utils.html import format_html_join, format_html, conditional_escape
 from django.template.defaultfilters import truncatewords
 from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ungettext
 from django.contrib import admin
 
 import pygal
 
-from mylabour.utils import get_statistics_count_objects_by_year
+from mylabour.utils import get_statistics_count_objects_by_year, get_latest_or_none
 from mylabour.admin_listfilters import PositiveIntegerRangeListFilter
 from apps.export_import_models.actions import advanced_export, export_as_json
 
@@ -231,7 +232,7 @@ class PollAdmin(admin.ModelAdmin):
         chart_statistics_count_votes_by_year.x_label_rotation = 20
         chart_statistics_count_votes_by_year.show_legend = False
         chart_statistics_count_votes_by_year.explicit_size = (1000, 800)
-        chart_statistics_count_votes_by_year.title = str(_('Dymanic an amount votes for the year'))
+        chart_statistics_count_votes_by_year.title = str(_('Dymanic an amount votes for past year'))
         chart_statistics_count_votes_by_year.x_labels = list(i[0]for i in statistics_count_votes_by_year)
 
         # add a data to the chart
@@ -255,9 +256,17 @@ class PollAdmin(admin.ModelAdmin):
             'count_draft_polls': Poll.objects.draft_polls().count(),
             'count_choices': Choice.objects.count(),
             'count_votes': VoteInPoll.objects.count(),
-            'count_voters': VoteInPoll.objects.values('account').distinct().count(),
-            'latest_vote': VoteInPoll.objects.latest().date_voting,
+            'count_voters': Poll.objects.get_count_voters(),
+            'latest_poll': get_latest_or_none(Poll),
+            'all_voters': self.get_listing_voters_with_admin_url_and_count_votes(),
         }
+
+        # add detail about latest changes in polls, if is
+        latest_vote = get_latest_or_none(VoteInPoll)
+        statistics['date_latest_vote'] = latest_vote.date_voting
+        statistics['latest_active_poll'] = getattr(latest_vote, 'poll', None)
+        statistics['latest_voter'] = getattr(latest_vote, 'account', None)
+        statistics['latest_selected_choice'] = getattr(latest_vote, 'choice', None)
 
         # get a chart statistics of count votes by year
         chart_statistics_count_votes_by_year = self._build_chart_polls_statistics()
@@ -371,6 +380,46 @@ class PollAdmin(admin.ModelAdmin):
 
         # return chart as SVG
         return pie_chart.render()
+
+    def get_listing_voters_with_admin_url_and_count_votes(self):
+        """ """
+
+        # get all voters
+        all_voters = Poll.objects.get_all_voters()
+
+        # if no voters - return corresponding message
+        if not all_voters:
+            msg = _('No-one yet not participated in polls.')
+            return format_html('<i>{0}</i>', msg)
+
+        # else return a listing voters as a links with url to admin_url of a each voter,
+        # full name of voter and count votes its
+        html_voters = list()
+        for voter in all_voters:
+            admin_url = voter.get_admin_url()
+            voter_full_name = voter.get_full_name()
+            count_votes = voter.get_count_votes()
+
+            # make a translatable text for a count votes
+            translated_part = ungettext(
+                '(%(count_votes)d vote)',
+                '(%(count_votes)d votes)',
+                count_votes,
+            ) % {
+                'count_votes': count_votes,
+            }
+
+            # pattern for link
+            pattern = '<a href="{0}">{1} {2}</a>'.format(admin_url, voter_full_name, translated_part)
+
+            # create html representation for voter and add it to the listing voters,
+            # prepared to dislay on page
+            html_voter = format_html(pattern, admin_url, voter_full_name, count_votes)
+            html_voters.append(html_voter)
+
+        # make join all voters in a safe html
+        html_listing_voters = mark_safe(conditional_escape(', ').join(html_voters))
+        return html_listing_voters
 
     def display_most_popular_choice_or_choices(self, obj):
         """Method-wrapper for method get_most_popular_choice_or_choices() of model Poll.

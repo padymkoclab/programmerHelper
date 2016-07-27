@@ -15,6 +15,7 @@ import time
 import random
 import json
 
+from django.shortcuts import _get_queryset
 from django.utils import timezone
 from django.template import Template, Context
 from django.db import models
@@ -632,6 +633,17 @@ def get_random_date_from_days_ago_to_now(start_date=None):
     date = now - timezone.timedelta(days=days_ago)
 
     return date
+
+
+def get_latest_or_none(model):
+    """ """
+
+    qs = _get_queryset(model)
+
+    try:
+        return qs.latest()
+    except model.DoesNotExist:
+        return None
 
 
 if __name__ == "__main__":

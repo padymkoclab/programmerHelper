@@ -1,4 +1,12 @@
 
+/* Common styles */
+
+.clear{
+    clear: both;
+}
+
+/* Styles for page PDF-report */
+
 :root{
     --block-font-size: 15px;
 }
@@ -29,4 +37,65 @@
         outline: none;
         font-size: var(--block-font-size);
         font-weight: bold;
+    }
+
+
+/* Styles for page Statistics */
+
+:root {
+    --inner-backgroud-django-suit: #EDEFF1;
+}
+
+#div_statistics{
+    width: 100%;
+    background: white;
+}
+
+    #div_statistics .header_statistics{
+        text-align: center;
+        font-size: 20px;
+        padding: 10px;
+    }
+
+    #div_statistics .div_statistics_data{
+        margin: 30px 10px;
+    }
+    #div_statistics table{
+        margin: 0 3px;
+        float: left;
+        width: 30%;
+    }
+        #div_statistics table caption{
+            text-align: center;
+            font-size: 15px;
+            font-weight: bold;
+        }
+        #div_statistics table tr td:last-child{
+            background: var(--inner-backgroud-django-suit);
+            text-align: right;
+        }
+
+    #div_statistics div.div_chart{
+        position: relative;
+        left: 13%;
+        padding: 10px 0;
+    }
+
+    #div_statistics .div_all_voters {
+        padding: 5px 20px;
+    }
+
+    #div_statistics .all_voters_header {
+        font-size: 16px;
+        font-weight: bold;
+        padding: 10px;
+        background: var(--inner-backgroud-django-suit);
+        margin: 0;
+    }
+    #div_statistics .listing_voters {
+        font-size: 14px;
+        padding: 10px;
+        border: 3px solid var(--inner-backgroud-django-suit);
+        height: 300px;
+        overflow-y: scroll;
     }
