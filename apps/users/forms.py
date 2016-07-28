@@ -7,12 +7,12 @@ from passwords.fields import PasswordField
 from passwords.validators import (
     DictionaryValidator, LengthValidator, ComplexityValidator)
 
-from .models import Account
+from .models import User
 
 
-class CreateAccountForm(forms.ModelForm):
+class Createuserform(forms.ModelForm):
     """
-    Form for creating account
+    Form for creating user
     """
 
     password = PasswordField(label=_('Passowrd'))
@@ -27,7 +27,7 @@ class CreateAccountForm(forms.ModelForm):
         )])
 
     class Meta:
-        model = Account
+        model = User
         fields = ('email', 'password', 'username', 'date_birthday')
         widgets = {
             'email': forms.EmailInput(attrs={'placeholder': _('Enter your email')}),
@@ -49,7 +49,7 @@ class UserCreationForm(forms.ModelForm):
         help_text=_('Enter the same password as before, for verification.'))
 
     class Meta:
-        model = Account
+        model = User
         fields = ('email', 'username', 'date_birthday')
 
     def clean_password2(self):
@@ -77,7 +77,7 @@ class UserChangeForm(forms.ModelForm):
     password = ReadOnlyPasswordHashField()
 
     class Meta:
-        model = Account
+        model = User
         fields = ('email',)
 
     def clean_password(self):

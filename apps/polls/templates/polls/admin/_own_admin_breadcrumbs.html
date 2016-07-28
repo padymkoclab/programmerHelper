@@ -1,0 +1,12 @@
+
+{% load i18n %}
+
+<ul class="breadcrumb">
+    <li>
+        <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+        <span class="divider">&raquo;</span></li>
+    <li>
+        <a href="{% url 'admin:app_list' app_label=current_app.label %}">{{ current_app.verbose_name|capfirst }}</a>
+        <span class="divider">&raquo;</span></li>
+    <li class="active">{{ title|capfirst }}</li>
+</ul>

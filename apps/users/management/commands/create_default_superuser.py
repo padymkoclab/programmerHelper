@@ -4,7 +4,7 @@ from django.core.management.base import BaseCommand
 
 from mylabour.utils import create_logger_by_filename
 
-from apps.accounts.constants import DEFAULT_SUPERUSER_DATA
+from apps.users.constants import DEFAULT_SUPERUSER_DATA
 
 
 logger = create_logger_by_filename(__name__)
@@ -17,18 +17,18 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
 
         # get a user model for project
-        Account = get_user_model()
+        User = get_user_model()
 
         # create a superuser if yet does not exists
         # or return message that it already exists
         try:
-            Account.objects.get_by_natural_key(DEFAULT_SUPERUSER_DATA['email'])
-        except Account.DoesNotExist:
+            User.objects.get_by_natural_key(DEFAULT_SUPERUSER_DATA['email'])
+        except User.DoesNotExist:
             get_user_model().objects.create_superuser(**DEFAULT_SUPERUSER_DATA)
             logger.info('Succesful added superuser!')
         else:
             logger.warning(
                 'Superuser with %s "%s" already exist.' % (
-                    Account.USERNAME_FIELD, DEFAULT_SUPERUSER_DATA['email']
+                    User.USERNAME_FIELD, DEFAULT_SUPERUSER_DATA['email']
                 )
             )

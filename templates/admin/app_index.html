@@ -1,7 +1,14 @@
 
 {% extends "admin/index.html" %}
+
 {% load i18n %}
 {% load url from suit_compat %}
+{% load static %}
+
+{% block extrastyle %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static 'project/css/admin/app_index.css' %}">
+{% endblock extrastyle %}
 
 {% if not is_popup %}
     {% block breadcrumbs %}
@@ -17,33 +24,18 @@
 
 {% block content %}
     {{ block.super }}
-    <style>
-        #content-reports{
-            clear: both;
-        }
-    </style>
-    <div id="content-reports">
+    <div id="content-summary">
         {% if app_list %}
-
-                <div class="module">
-                    <table class="table-overview applist">
-                        <caption><a class="section">{% trans 'Reports' %}</a></caption>
-
-                        <tr>
-                            <td scope="row"><a href="{% url 'admin:polls_poll_make_pdf_report' %}">{% trans "Make PDF report" %}</a></td>
-                        </tr>
-                        <tr>
-                            <td scope="row"><a href="{% url 'admin:polls_poll_make_excel_report' %}">{% trans "Make Excel report" %}</a></td>
-                        </tr>
-                        <tr>
-                            <td scope="row"><a href="{% url 'admin:polls_poll_statistics' %}">{% trans "Statistics" %}</a></td>
-                        </tr>
-                        <tr>
-                            <td scope="row">{% trans "Configure system generate of reports" %}</td>
-                        </tr>
-
-                    </table>
-                </div>
+            <table class="table-overview applist">
+                <caption><a class="section">{% trans 'Summary' %}</a></caption>
+                <tr>
+                    <td scope="row"><a href="{% url 'admin:polls_poll_make_report' %}">{% trans "Make report" %}</a></td>
+                    <td><i class="icon-file icon-alpha75" aria-hidden="true"></i></td>
+                </tr>
+                <tr>
+                    <td scope="row"><a href="{% url 'admin:polls_poll_statistics' %}">{% trans "Statistics" %}</a></td>
+                </tr>
+            </table>
         {% else %}
             <p>{% trans "You don't have permission to make reports." %}</p>
         {% endif %}

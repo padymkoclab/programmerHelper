@@ -2,12 +2,13 @@
 import datetime
 import itertools
 
+from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils import timezone
 
 from dateutil.relativedelta import relativedelta
 
-from apps.accounts.models import Account
+# from apps.users.models import User
 
 
 class PollManager(models.Manager):
@@ -28,15 +29,17 @@ class PollManager(models.Manager):
     def most_active_voters(self):
         """A users participated in more than haft from all count polls."""
 
+        User = get_user_model()
         half_count_polls = self.count() // 2
-        accounts_with_count_votes = Account.objects.accounts_with_count_votes()
-        return accounts_with_count_votes.filter(count_votes__gt=half_count_polls)
+        users_with_count_votes = User.objects.users_with_count_votes()
+        return users_with_count_votes.filter(count_votes__gt=half_count_polls)
 
     def get_all_voters(self):
         """ """
 
-        accounts_with_count_votes = Account.objects.accounts_with_count_votes()
-        all_voters = accounts_with_count_votes.filter(count_votes__gt=0)
+        User = get_user_model()
+        users_with_count_votes = User.objects.users_with_count_votes()
+        all_voters = users_with_count_votes.filter(count_votes__gt=0)
         all_voters = all_voters.order_by('-count_votes')
         return all_voters
 

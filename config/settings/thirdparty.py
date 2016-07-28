@@ -79,9 +79,9 @@ SUIT_CONFIG = {
     'LIST_PER_PAGE': 20,
     'MENU': (
         {
-            'app': 'accounts',
+            'app': 'users',
             'icon': 'icon-user',
-            'models': ('account', 'accountlevel', 'auth.group'),
+            'models': ('user', 'userlevel', 'auth.group'),
         },
         {
             'app': 'actions',

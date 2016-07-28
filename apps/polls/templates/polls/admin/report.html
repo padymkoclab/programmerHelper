@@ -1,47 +1,71 @@
+
 {% extends "admin/base_site.html" %}
+
 {% load i18n %}
 {% load static %}
+
 {% block extrastyle %}
     {{ block.super }}
     <link rel="stylesheet" href="{% static 'polls/css/admin.css' %}">
 {% endblock extrastyle %}
+
+{% block breadcrumbs %}
+    {% include "polls/admin/_own_admin_breadcrumbs.html" %}
+{% endblock %}
+
 {% block content %}
     <div class="content-main">
         <div class="module">
-            <form action="{% url 'admin:polls_poll_make_pdf_report' %}" method="post" accept-charset="utf-8">
+            <form action="{% url 'admin:polls_poll_make_report' %}" method="post" accept-charset="utf-8">
                 {% csrf_token %}
                 <table class="table-overview applist" id="table_radio_group_select_report">
                     <caption>{% trans "Select needed report" %}</caption>
                     <tbody>
                         <tr>
                             <td class="section">
-                                <label for="radio_polls">
-                                    <input type="radio" name="subject" value="polls" id="radio_polls">
+                                <select name="output_report">
+                                    <option value="report_pdf">{% trans "Report PDF" %}</option>
+                                    <option value="report_excel">{% trans "Report Excel" %}</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="section">
+                                <label for="subject_polls">
+                                    <input type="radio" name="subject" value="polls" id="subject_polls">
                                     <span>{% trans "Polls" %}</span>
                                 </label>
                             </td>
                         </tr>
                         <tr>
                             <td class="section">
-                                <label for="radio_choices">
-                                    <input type="radio" name="subject" value="choices" id="radio_choices">
+                                <label for="subject_choices">
+                                    <input type="radio" name="subject" value="choices" id="subject_choices">
                                     <span>{% trans "Choices" %}</span>
                                 </label>
                             </td>
                         </tr>
                         <tr>
                             <td class="section">
-                                <label for="radio_votes">
-                                    <input type="radio" name="subject" value="votes" id="radio_votes">
+                                <label for="subject_votes">
+                                    <input type="radio" name="subject" value="votes" id="subject_votes">
                                     <span>{% trans "Votes" %}</span>
                                 </label>
                             </td>
                         </tr>
                         <tr>
                             <td class="section">
-                                <label for="radio_results_polls">
-                                    <input type="radio" name="subject" value="results_polls" id="radio_results_polls" checked="checked">
+                                <label for="subject_results_polls">
+                                    <input type="radio" name="subject" value="results_polls" id="subject_results_polls" checked="checked">
                                     <span>{% trans "Result of polls" %}</span>
+                                </label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="section">
+                                <label for="subject_voters">
+                                    <input type="radio" name="subject" value="voters" id="subject_voters">
+                                    <span>{% trans "Voters" %}</span>
                                 </label>
                             </td>
                         </tr>

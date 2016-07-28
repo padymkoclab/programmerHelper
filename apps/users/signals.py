@@ -10,21 +10,21 @@ logger = create_logger_by_filename(__name__)
 
 
 @receiver(user_logged_in)
-def signal_logged_in_account(sender, request, user, **kwargs):
+def signal_logged_in_user(sender, request, user, **kwargs):
     pass
 
 
 @receiver(user_logged_out)
-def signal_logged_out_account(sender, request, user, **kwargs):
+def signal_logged_out_user(sender, request, user, **kwargs):
     pass
 
 
 @receiver(user_login_failed)
-def signal_login_failed_account(sender, credentials, **kwargs):
+def signal_login_failed_user(sender, credentials, **kwargs):
     pass
 
 
-def signal_post_migrate_model_levels_of_accounts(sender, **kwargs):
-    call_command('create_levels_of_accounts')
+def signal_post_migrate_model_levels_of_users(sender, **kwargs):
+    call_command('create_levels_of_users')
     call_command('create_default_superuser')
-    logger.debug('A signal post_migration for app Accounts was called')
+    logger.debug('A signal post_migration for app Users was called')

@@ -2,8 +2,8 @@
 from mylabour.basecommands import ExtendedBaseCommand
 from mylabour.utils import create_logger_by_filename
 
-from apps.accounts.factories import AccountFactory
-from apps.accounts.models import Account
+from apps.users.factories import UserFactory
+from apps.users.models import User
 
 
 logger = create_logger_by_filename(__name__)
@@ -11,7 +11,7 @@ logger = create_logger_by_filename(__name__)
 
 class Command(ExtendedBaseCommand):
 
-    help = 'Factory a given amount accounts.'
+    help = 'Factory a given amount users.'
 
     def add_arguments(self, parser):
 
@@ -24,11 +24,11 @@ class Command(ExtendedBaseCommand):
 
     def handle(self, *args, **kwargs):
 
-        # clear all records, about the levels of accounts, in database
-        Account.objects.filter().delete()
+        # clear all records, about the levels of users, in database
+        User.objects.filter().delete()
 
-        # create levels of accounts
+        # create levels of users
         count_objects = kwargs['count_objects'][0]
         for i in range(count_objects):
-            AccountFactory()
-        logger.debug('Made factory %d accounts.' % count_objects)
+            UserFactory()
+        logger.debug('Made factory %d users.' % count_objects)

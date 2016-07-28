@@ -11,7 +11,7 @@ import openpyxl
 from openpyxl.cell import get_column_letter
 
 
-def make_accounts_as_non_superuser(self, request, queryset):
+def make_users_as_non_superuser(self, request, queryset):
     """Admin action by selected users will be non-superusers."""
     for obj in queryset:
         obj.is_superuser = False
@@ -24,10 +24,10 @@ def make_accounts_as_non_superuser(self, request, queryset):
         'count_users': len(queryset),
     }
     self.message_user(request, message)
-make_accounts_as_non_superuser.short_description = _('Make selected users as non-superuser')
+make_users_as_non_superuser.short_description = _('Make selected users as non-superuser')
 
 
-def make_accounts_as_superuser(self, request, queryset):
+def make_users_as_superuser(self, request, queryset):
     """Admin action by selected users will be superusers."""
     for obj in queryset:
         obj.is_superuser = True
@@ -40,10 +40,10 @@ def make_accounts_as_superuser(self, request, queryset):
         'count_users': len(queryset),
     }
     self.message_user(request, message)
-make_accounts_as_superuser.short_description = _('Make selected users as superuser')
+make_users_as_superuser.short_description = _('Make selected users as superuser')
 
 
-def make_accounts_as_non_active(self, request, queryset):
+def make_users_as_non_active(self, request, queryset):
     """Admin action by selected users will be non-superusers."""
     for obj in queryset:
         obj.is_active = False
@@ -56,10 +56,10 @@ def make_accounts_as_non_active(self, request, queryset):
         'count_users': len(queryset),
     }
     self.message_user(request, message)
-make_accounts_as_non_active.short_description = _('Make selected users as non-active')
+make_users_as_non_active.short_description = _('Make selected users as non-active')
 
 
-def make_accounts_as_active(self, request, queryset):
+def make_users_as_active(self, request, queryset):
     """Admin action by selected users will be superusers."""
     for obj in queryset:
         obj.is_active = True
@@ -72,7 +72,7 @@ def make_accounts_as_active(self, request, queryset):
         'count_users': len(queryset),
     }
     self.message_user(request, message)
-make_accounts_as_active.short_description = _('Make selected users as active')
+make_users_as_active.short_description = _('Make selected users as active')
 
 
 def export_as_json(self, request, queryset):

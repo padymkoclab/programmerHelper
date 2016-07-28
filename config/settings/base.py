@@ -33,7 +33,7 @@ DJANGO_APPS = [
 MY_APPS = [
     'mylabour',
     'apps.core.apps.CoreConfig',
-    'apps.accounts.apps.AccountsConfig',
+    'apps.users.apps.UsersConfig',
     'apps.activity.apps.ActivityConfig',
     'apps.articles.apps.ArticlesConfig',
     'apps.badges.apps.BadgesConfig',
@@ -132,17 +132,17 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # AUTH
 # -----------------------------
 
-AUTH_USER_MODEL = 'accounts.Account'
+AUTH_USER_MODEL = 'users.User'
 
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
 )
 
-LOGIN_URL = '/accounts/login/'
+LOGIN_URL = '/users/login/'
 
-LOGOUT_URL = '/accounts/logout/'
+LOGOUT_URL = '/users/logout/'
 
-LOGIN_REDIRECT_URL = '/accounts/account_profile/'
+LOGIN_REDIRECT_URL = '/users/profile/'
 
 PASSWORD_RESET_TIMEOUT_DAYS = 3
 

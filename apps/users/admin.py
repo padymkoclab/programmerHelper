@@ -6,24 +6,24 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
 from mylabour.admin_listfilters import ListFilterLastLogin
 from mylabour.admin_actions import (
-    make_accounts_as_non_superuser,
-    make_accounts_as_superuser,
-    make_accounts_as_non_active,
-    make_accounts_as_active,
+    make_users_as_non_superuser,
+    make_users_as_superuser,
+    make_users_as_non_active,
+    make_users_as_active,
 )
 
 from .forms import UserChangeForm, UserCreationForm
-from .models import AccountLevel
+from .models import UserLevel
 
 
-class AccountAdmin(BaseUserAdmin):
+class UserAdmin(BaseUserAdmin):
     """
-    Admin configuration for model Account
+    Admin configuration for model User
     """
 
     form = UserChangeForm
     add_form = UserCreationForm
-    actions = [make_accounts_as_non_superuser, make_accounts_as_superuser, make_accounts_as_non_active, make_accounts_as_active]
+    actions = [make_users_as_non_superuser, make_users_as_superuser, make_users_as_non_active, make_users_as_active]
 
     list_display = [
         'email',
@@ -63,7 +63,7 @@ class AccountAdmin(BaseUserAdmin):
     readonly_fields = ['last_login', 'level']
     fieldsets = [
         (
-            _('Account detail'), {
+            _('User detail'), {
                 'classes': ['wide'],
                 'fields':
                     [
@@ -122,7 +122,7 @@ class AccountAdmin(BaseUserAdmin):
     ]
 
     def get_queryset(self, request):
-        qs = super(AccountAdmin, self).get_queryset(request)
+        qs = super(UserAdmin, self).get_queryset(request)
         qs = qs.annotate(
             # count_comments=models.Count('comments', distinct=True),
             # count_opinions=models.Count('opinions', distinct=True),
@@ -207,29 +207,29 @@ class AccountAdmin(BaseUserAdmin):
     get_count_passages.short_description = _('Count passages')
 
 
-class AccountLevelAdmin(admin.ModelAdmin):
+class UserLevelAdmin(admin.ModelAdmin):
     '''
-    Admin View for AccountLevel
+    Admin View for UserLevel
     '''
 
-    list_display = ('name', 'get_count_accounts', 'color', 'description')
+    list_display = ('name', 'get_count_users', 'color', 'description')
     search_fields = ('name',)
     fieldsets = [
         [
-            AccountLevel._meta.verbose_name, {
+            UserLevel._meta.verbose_name, {
                 'fields': ['name', 'color', 'description']
             }
         ]
     ]
 
     def get_queryset(self, request):
-        qs = super(AccountLevelAdmin, self).get_queryset(request)
+        qs = super(UserLevelAdmin, self).get_queryset(request)
         qs = qs.annotate(
-            count_accounts=models.Count('accounts'),
+            count_users=models.Count('users'),
         )
         return qs
 
-    def get_count_accounts(self, obj):
-        return obj.count_accounts
-    get_count_accounts.admin_order_field = 'count_accounts'
-    get_count_accounts.short_description = _('Count accounts')
+    def get_count_users(self, obj):
+        return obj.count_users
+    get_count_users.admin_order_field = 'count_users'
+    get_count_users.short_description = _('Count users')

@@ -42,3 +42,4 @@ sqlparse==0.1.19
 static3==0.6.1
 traitlets==4.2.1
 whitenoise==3.0
+PyPDF2==1.26.0

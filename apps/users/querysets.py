@@ -5,18 +5,18 @@ from mylabour.utils import get_random_objects
 from apps.testing.models import TestingPassage
 
 
-class AccountQuerySet(models.QuerySet):
+class UserQuerySet(models.QuerySet):
     """
-    Queryset for accounts.
+    Queryset for users.
     """
 
-    def active_accounts(self):
-        """Filter only active account."""
+    def active_users(self):
+        """Filter only active user."""
 
         return self.filter(is_active=True)
 
-    def non_active_accounts(self):
-        """Filter only non active account."""
+    def non_active_users(self):
+        """Filter only non active user."""
 
         return self.filter(is_active=False)
 
@@ -25,7 +25,7 @@ class AccountQuerySet(models.QuerySet):
 
         return self.filter(is_superuser=True)
 
-    def accounts_with_total_mark_for_solutions(self, queryset=None):
+    def users_with_total_mark_for_solutions(self, queryset=None):
         """Created new field 'total_mark_for_solutions' by help annotation and
          return new queryset for certain instance/instances or all instances, if queryset is none."""
 
@@ -42,7 +42,7 @@ class AccountQuerySet(models.QuerySet):
             )
         )
 
-    def accounts_with_total_mark_for_questions(self, queryset=None):
+    def users_with_total_mark_for_questions(self, queryset=None):
         """Created new field 'total_mark_for_questions' by help annotation and
          return new queryset for certain instance/instances or all instances, if queryset is none."""
 
@@ -59,7 +59,7 @@ class AccountQuerySet(models.QuerySet):
             )
         )
 
-    def accounts_with_total_mark_for_answers(self, queryset=None):
+    def users_with_total_mark_for_answers(self, queryset=None):
         """Created new field 'total_mark_for_answers' by help annotation and
          return new queryset for certain instance/instances or all instances, if queryset is none."""
 
@@ -76,7 +76,7 @@ class AccountQuerySet(models.QuerySet):
             )
         )
 
-    def accounts_with_total_mark_for_snippets(self, queryset=None):
+    def users_with_total_mark_for_snippets(self, queryset=None):
         """Created new field 'total_mark_for_snippets' by help annotation and
          return new queryset for certain instance/instances or all instances, if queryset is none."""
 
@@ -93,7 +93,7 @@ class AccountQuerySet(models.QuerySet):
             )
         )
 
-    # def accounts_with_total_rating_for_articles(self, queryset=None):
+    # def users_with_total_rating_for_articles(self, queryset=None):
     #     """Created new field 'total_rating_for_articles' by help annotation and
     #      return new queryset for certain instance/instances or all instances, if queryset is none."""
     #     # if queryset is none, then using all instances of model
@@ -136,13 +136,13 @@ class AccountQuerySet(models.QuerySet):
             queryset = self
         return queryset.annotate(count_opinions=models.Count('marks', distinct=True))
 
-    def random_accounts(self, count, single_as_qs=False):
+    def random_users(self, count, single_as_qs=False):
         """Getting certain count random objects from queryset."""
 
         return get_random_objects(queryset=self, count=count, single_as_qs=single_as_qs)
 
     def objects_with_count_favorites_and_unfavorites(self, queryset=None):
-        """Getting count favorites and unfavorites of accounts."""
+        """Getting count favorites and unfavorites of users."""
 
         return self.annotate(
             count_favorites=models.Sum(
@@ -160,17 +160,17 @@ class AccountQuerySet(models.QuerySet):
         )
 
     def objects_with_count_articles(self, queryset=None):
-        """Getting count articles of accounts."""
+        """Getting count articles of users."""
 
         return self.annotate(count_articles=models.Count('articles', distinct=True))
 
     def objects_passages_testsuits(self, queryset=None):
-        """Getting accounts what passed at least 1 testing suit."""
+        """Getting users what passed at least 1 testing suit."""
 
         return self.filter(passages__status=TestingPassage.CHOICES_STATUS.passed)
 
     def creators_testing_suits(self):
-        """Getting accounts what passed at least 1 testing suit."""
+        """Getting users what passed at least 1 testing suit."""
 
         return self.filter(testing_suits__isnull=False)
 
@@ -182,7 +182,7 @@ class AccountQuerySet(models.QuerySet):
                 result = result.exclude(pk=obj.pk)
         return result
 
-    def accounts_with_count_votes(self):
-        """Return queryset where to determined count votes for each account."""
+    def users_with_count_votes(self):
+        """Return queryset where to determined count votes for each user."""
 
         return self.annotate(count_votes=models.Count('votes', distinct=True))

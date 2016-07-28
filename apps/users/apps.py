@@ -8,14 +8,14 @@ from django.db.models.signals import post_migrate
 from django.utils.translation import ugettext_lazy as _
 from django.apps import AppConfig
 
-from .signals import signal_post_migrate_model_levels_of_accounts
+from .signals import signal_post_migrate_model_levels_of_users
 
 
-class AccountsConfig(AppConfig):
-    name = 'apps.accounts'
-    verbose_name = _('Accounts')
+class UsersConfig(AppConfig):
+    name = 'apps.users'
+    verbose_name = _('Users')
 
     def ready(self):
         """ """
 
-        post_migrate.connect(signal_post_migrate_model_levels_of_accounts, sender=self)
+        post_migrate.connect(signal_post_migrate_model_levels_of_users, sender=self)

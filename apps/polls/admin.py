@@ -1,6 +1,7 @@
 
 import functools
 
+from django.apps import apps
 from django.template.response import TemplateResponse
 from django.conf.urls import url
 from django.utils.safestring import mark_safe
@@ -169,80 +170,30 @@ class PollAdmin(admin.ModelAdmin):
         urls = super(PollAdmin, self).get_urls()
 
         # 'polls_poll_preview'
-        preview_url_name = '{0}_{1}_{2}'.format(
+        preview = '{0}_{1}_{2}'.format(
             self.model._meta.app_label, self.model._meta.model_name, 'preview'
         )
-        # 'polls_poll_make_excel_report'
-        make_excel_report_url_name = '{0}_{1}_{2}'.format(
-            self.model._meta.app_label, self.model._meta.model_name, 'make_excel_report'
-        )
-        # 'polls_poll_make_pdf_report'
-        make_pdf_report_url_name = '{0}_{1}_{2}'.format(
-            self.model._meta.app_label, self.model._meta.model_name, 'make_pdf_report'
+        # 'polls_poll_make_report'
+        make_report = '{0}_{1}_{2}'.format(
+            self.model._meta.app_label, self.model._meta.model_name, 'make_report'
         )
         # 'polls_poll_statistics'
-        statistics_url_name = '{0}_{1}_{2}'.format(
+        statistics = '{0}_{1}_{2}'.format(
             self.model._meta.app_label, self.model._meta.model_name, 'statistics'
         )
 
         # add urls
         additional_urls = [
-            url(
-                r'^preview/$',
-                self.admin_site.admin_view(self.view_preview),
-                {},
-                preview_url_name
-            ),
-            url(
-                r'^make_excel_report/$',
-                self.admin_site.admin_view(self.view_make_excel_report),
-                {},
-                make_excel_report_url_name
-            ),
-            url(
-                r'^make_pdf_report/$',
-                self.admin_site.admin_view(self.view_make_pdf_report),
-                {},
-                make_pdf_report_url_name
-            ),
-            url(
-                r'^statistics/$',
-                self.admin_site.admin_view(self.view_statistics),
-                {},
-                statistics_url_name
-            ),
-        ]
+            url(r'^preview/$', self.admin_site.admin_view(self.view_preview), {}, preview),
+            url(r'^make_report/$', self.admin_site.admin_view(self.view_make_report), {}, make_report),
+            url(r'^statistics/$', self.admin_site.admin_view(self.view_statistics), {}, statistics), ]
         return additional_urls + urls
 
+    @add_current_app_to_request_in_admin_view
     def view_preview(self, request):
         """ """
 
         raise NotImplementedError
-
-    def _build_chart_polls_statistics(self):
-        """Return chart in SVG format on based statistics of count votes by year."""
-
-        # get a statistics data by votes
-        statistics_count_votes_by_year = get_statistics_count_objects_by_year(VoteInPoll, 'date_voting')
-
-        # create a line chart
-        chart_statistics_count_votes_by_year = pygal.Line()
-
-        # customization the chart
-        chart_statistics_count_votes_by_year.x_label_rotation = 20
-        chart_statistics_count_votes_by_year.show_legend = False
-        chart_statistics_count_votes_by_year.explicit_size = (1000, 800)
-        chart_statistics_count_votes_by_year.title = str(_('Dymanic an amount votes for past year'))
-        chart_statistics_count_votes_by_year.x_labels = list(i[0]for i in statistics_count_votes_by_year)
-
-        # add a data to the chart
-        chart_statistics_count_votes_by_year.add(
-            str(_("Count votes")),
-            list(i[1]for i in statistics_count_votes_by_year)
-        )
-
-        # return chart in SVG format
-        return chart_statistics_count_votes_by_year.render()
 
     @add_current_app_to_request_in_admin_view
     def view_statistics(self, request):
@@ -263,7 +214,7 @@ class PollAdmin(admin.ModelAdmin):
 
         # add detail about latest changes in polls, if is
         latest_vote = get_latest_or_none(VoteInPoll)
-        statistics['date_latest_vote'] = latest_vote.date_voting
+        statistics['date_latest_vote'] = getattr(latest_vote, 'date_voting', None)
         statistics['latest_active_poll'] = getattr(latest_vote, 'poll', None)
         statistics['latest_voter'] = getattr(latest_vote, 'account', None)
         statistics['latest_selected_choice'] = getattr(latest_vote, 'choice', None)
@@ -275,8 +226,9 @@ class PollAdmin(admin.ModelAdmin):
         # and a context, needed for any admin view
         context = dict(
             self.admin_site.each_context(request),
-            title=_('Statistics polls'),
+            title=_('Statistics'),
             statistics=statistics,
+            current_app=apps.get_app_config('polls'),
             chart_statistics_count_votes_by_year=chart_statistics_count_votes_by_year,
         )
 
@@ -284,7 +236,7 @@ class PollAdmin(admin.ModelAdmin):
         return TemplateResponse(request, "polls/admin/statistics.html", context)
 
     @add_current_app_to_request_in_admin_view
-    def view_make_pdf_report(self, request):
+    def view_make_report(self, request):
         """View for ability of creating an Pdf reports in the admin."""
 
         # if request`s method is GET,
@@ -292,10 +244,11 @@ class PollAdmin(admin.ModelAdmin):
         if request.method == 'GET':
             context = dict(
                 self.admin_site.each_context(request),
-                title=_('Make report in PDF'),
+                title=_('Make report'),
+                current_app=apps.get_app_config('polls'),
             )
 
-            return TemplateResponse(request, "polls/admin/pdf_report.html", context)
+            return TemplateResponse(request, "polls/admin/report.html", context)
 
         # if request`s method is POST,
         # then Pdf report as file
@@ -304,45 +257,29 @@ class PollAdmin(admin.ModelAdmin):
             # get subject of report
             subject = request.POST['subject']
 
-            # generate an needed report as Pdf file
-            # and return it in the response
-            pdf_report = PollPDFReport(request)
-            if subject == 'polls':
-                response = pdf_report.report_polls()
-            elif subject == 'choices':
-                response = pdf_report.report_choices()
-            elif subject == 'votes':
-                response = pdf_report.report_votes()
-            elif subject == 'results_polls':
-                response = pdf_report.report_polls_results()
+            # get type output of report: pdf or excel
+            output_report = request.POST['output_report']
+
+            # generate pdf-report by subject
+            if output_report == 'report_pdf':
+                report = PollPDFReport(request)
+
+                # choice subject for report
+                if subject == 'polls':
+                    response = report.report_polls()
+                elif subject == 'choices':
+                    response = report.report_choices()
+                elif subject == 'votes':
+                    response = report.report_votes()
+                elif subject == 'results_polls':
+                    response = report.report_polls_results()
+
+            # generate excel-report
+            elif output_report == 'report_excel':
+                report = ExcelReport()
+                response = report.make_report()
+
             return response
-
-    @add_current_app_to_request_in_admin_view
-    def view_make_excel_report(self, request):
-        """View for ability of creating an Excel reports in the admin."""
-
-        # if request`s method is GET,
-        # then return simple view for customization creating of Excel report
-        if request.method == 'GET':
-            context = dict(
-                self.admin_site.each_context(request),
-                title=_('Make Excel-report about a polls'),
-            )
-
-            return TemplateResponse(request, "polls/admin/excel_report.html", context)
-
-        # if request`s method is POST,
-        # then Excel report as file
-        elif request.method == 'POST':
-
-            # generate an Excel file and return it in the response
-            response = ExcelReport().create_report()
-            return response
-
-    def view_customization_generate_reports(self, request):
-        """ """
-
-        raise NotImplementedError
 
     def _build_chart_poll_result(self, object_id):
         """Return chart as SVG , what reveal result a poll."""
@@ -380,6 +317,31 @@ class PollAdmin(admin.ModelAdmin):
 
         # return chart as SVG
         return pie_chart.render()
+
+    def _build_chart_polls_statistics(self):
+        """Return chart in SVG format on based statistics of count votes by year."""
+
+        # get a statistics data by votes
+        statistics_count_votes_by_year = get_statistics_count_objects_by_year(VoteInPoll, 'date_voting')
+
+        # create a line chart
+        chart_statistics_count_votes_by_year = pygal.Line()
+
+        # customization the chart
+        chart_statistics_count_votes_by_year.x_label_rotation = 20
+        chart_statistics_count_votes_by_year.show_legend = False
+        chart_statistics_count_votes_by_year.explicit_size = (1000, 800)
+        chart_statistics_count_votes_by_year.title = str(_('Count votes for past year'))
+        chart_statistics_count_votes_by_year.x_labels = list(i[0]for i in statistics_count_votes_by_year)
+
+        # add a data to the chart
+        chart_statistics_count_votes_by_year.add(
+            str(_("Count votes")),
+            list(i[1]for i in statistics_count_votes_by_year)
+        )
+
+        # return chart in SVG format
+        return chart_statistics_count_votes_by_year.render()
 
     def get_listing_voters_with_admin_url_and_count_votes(self):
         """ """

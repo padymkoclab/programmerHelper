@@ -23,11 +23,11 @@ from mylabour import utils
 # from mylabour.fields_db import PhoneField
 from mylabour.fields_db import ConfiguredAutoSlugField
 
-from .managers import AccountManager
-from .querysets import AccountQuerySet
+from .managers import UserManager
+from .querysets import UserQuerySet
 
 
-class AccountLevel(models.Model):
+class UserLevel(models.Model):
     """
 
     """
@@ -56,7 +56,7 @@ class AccountLevel(models.Model):
     color = models.CharField(_('Color'), max_length=50)
 
     class Meta:
-        db_table = 'account_levels'
+        db_table = 'user_levels'
         verbose_name = _('Level')
         verbose_name_plural = _('Levels')
         ordering = ['name']
@@ -67,13 +67,13 @@ class AccountLevel(models.Model):
         return '{0.name}'.format(self)
 
     def save(self, *args, **kwargs):
-        super(AccountLevel, self).save(*args, **kwargs)
+        super(UserLevel, self).save(*args, **kwargs)
 
     def get_absolute_url(self):
-        return reverse('accounts:level', kwargs={'slug': self.slug})
+        return reverse('users:level', kwargs={'slug': self.slug})
 
 
-class Account(AbstractBaseUser, PermissionsMixin):
+class User(AbstractBaseUser, PermissionsMixin):
     """
     Custom auth user model with additional fields and username fields as email
     """
@@ -83,13 +83,13 @@ class Account(AbstractBaseUser, PermissionsMixin):
         ('woman', _('Woman')),
     )
 
-    # account detail
+    # user detail
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     email = models.EmailField(
         _('Email'),
         unique=True,
         error_messages={
-            'unique': _('Account with this email already exists.')
+            'unique': _('User with this email already exists.')
         }
     )
     username = models.CharField(_('Username'), max_length=200, help_text=_('Displayed name'))
@@ -101,10 +101,10 @@ class Account(AbstractBaseUser, PermissionsMixin):
     profile_views = models.IntegerField(_('Profile views'), default=0, editable=False)
     date_joined = models.DateTimeField(_('Date joined'), auto_now_add=True)
     level = models.ForeignKey(
-        'AccountLevel',
+        'UserLevel',
         verbose_name='Level',
-        related_name='accounts',
-        default=AccountLevel.CHOICES_LEVEL.regular,
+        related_name='users',
+        default=UserLevel.CHOICES_LEVEL.regular,
         to_field='name',
         on_delete=models.PROTECT,
     )
@@ -132,7 +132,7 @@ class Account(AbstractBaseUser, PermissionsMixin):
 
     # managers
     objects = models.Manager()
-    objects = AccountManager.from_queryset(AccountQuerySet)()
+    objects = UserManager.from_queryset(UserQuerySet)()
     # badges_manager = BadgeManager().
 
     # simple managers
@@ -140,9 +140,9 @@ class Account(AbstractBaseUser, PermissionsMixin):
     superusers = QueryManager(is_superuser=True)
 
     class Meta:
-        db_table = 'account'
-        verbose_name = _("Account")
-        verbose_name_plural = _("Accounts")
+        db_table = 'user'
+        verbose_name = _("User")
+        verbose_name_plural = _("Users")
         ordering = ['-last_login']  # not worked
         get_latest_by = 'date_joined'
 
@@ -150,10 +150,10 @@ class Account(AbstractBaseUser, PermissionsMixin):
         return '{0.email}'.format(self)
 
     def save(self, *args, **kwargs):
-        super(Account, self).save(*args, **kwargs)
+        super(User, self).save(*args, **kwargs)
 
     def get_absolute_url(self):
-        return reverse('accounts:detail', kwargs={'account_email': self.email})
+        return reverse('users:detail', kwargs={'user_email': self.email})
 
     def get_admin_url(self):
         return reverse(
@@ -181,10 +181,10 @@ class Account(AbstractBaseUser, PermissionsMixin):
         return self.__class__.objects.filter(pk=self.pk)
 
     def last_seen(self):
-        last_session_of_account = ExpandedSession.objects.filter(account_pk=self.pk).order_by('expire_date').last()
-        if last_session_of_account:
+        last_session_of_user = ExpandedSession.objects.filter(user_pk=self.pk).order_by('expire_date').last()
+        if last_session_of_user:
             SessionStore = import_module(settings.SESSION_ENGINE).SessionStore
-            session = SessionStore(session_key=last_session_of_account.session_key)
+            session = SessionStore(session_key=last_session_of_user.session_key)
             last_seen = session['last_seen']
             return last_seen
         return None
@@ -208,106 +208,106 @@ class Account(AbstractBaseUser, PermissionsMixin):
             return False
         raise ValueError('Count consecutive days must be 1 or more,')
 
-    def activity_with_accounts(self):
+    def activity_with_users(self):
         return self.activity.filter(flag=Activity.CHOICES_FLAGS.profiling).all()
 
     def check_badge(self, badge_name):
         instance = self._as_queryset()
-        return self.__class__.badges_manager.validate_badges(accounts=instance, badges_names=[badge_name])
+        return self.__class__.badges_manager.validate_badges(users=instance, badges_names=[badge_name])
 
     def has_badge(self, badge_name):
-        return self.__class__.badges_manager.has_badge(account=self, badge_name=badge_name)
+        return self.__class__.badges_manager.has_badge(user=self, badge_name=badge_name)
 
     def get_reputation(self):
-        """Getting reputation 1of account based on his activity, activity, badges."""
+        """Getting reputation 1of user based on his activity, activity, badges."""
         return sum([
             self.get_reputation_for_badges(),
             self.get_reputation_for_activity(),
         ])
 
     def get_reputation_for_badges(self):
-        """Getting reputation of account for badges."""
+        """Getting reputation of user for badges."""
         return self.badges.count() * 10
 
     def get_total_mark_for_answers(self):
-        """Getting total mark for answers of account."""
+        """Getting total mark for answers of user."""
         # getting instance as queryset
         queryset = self.__class__.objects.filter(email=self.email)
         # pass single queryset for execution once iteration in method of manager
-        account_with_total_mark_for_answers = self.__class__.objects.accounts_with_total_mark_for_answers(queryset=queryset)
+        user_with_total_mark_for_answers = self.__class__.objects.users_with_total_mark_for_answers(queryset=queryset)
         # getting back instance after processing
-        account_with_total_mark_for_answers = account_with_total_mark_for_answers.get()
+        user_with_total_mark_for_answers = user_with_total_mark_for_answers.get()
         # return total_mark_for_answers of instance
-        return account_with_total_mark_for_answers.total_mark_for_answers
+        return user_with_total_mark_for_answers.total_mark_for_answers
 
     def get_total_mark_for_questions(self):
-        """Getting total mark for questions of account."""
+        """Getting total mark for questions of user."""
         # getting instance as queryset
         queryset = self.__class__.objects.filter(email=self.email)
         # pass single queryset for execution once iteration in method of manager
-        account_with_total_mark_for_questions = self.__class__.objects.accounts_with_total_mark_for_questions(queryset=queryset)
+        user_with_total_mark_for_questions = self.__class__.objects.users_with_total_mark_for_questions(queryset=queryset)
         # getting back instance after processing
-        account_with_total_mark_for_questions = account_with_total_mark_for_questions.get()
+        user_with_total_mark_for_questions = user_with_total_mark_for_questions.get()
         # return total_mark_for_questions of instance
-        return account_with_total_mark_for_questions.total_mark_for_questions
+        return user_with_total_mark_for_questions.total_mark_for_questions
 
     def get_total_mark_for_solutions(self):
-        """Getting total mark for solutions of account."""
+        """Getting total mark for solutions of user."""
         # getting instance as queryset
         queryset = self.__class__.objects.filter(email=self.email)
         # pass single queryset for execution once iteration in method of manager
-        account_with_total_mark_for_solutions = self.__class__.objects.accounts_with_total_mark_for_solutions(queryset=queryset)
+        user_with_total_mark_for_solutions = self.__class__.objects.users_with_total_mark_for_solutions(queryset=queryset)
         # getting back instance after processing
-        account_with_total_mark_for_solutions = account_with_total_mark_for_solutions.get()
+        user_with_total_mark_for_solutions = user_with_total_mark_for_solutions.get()
         # return total_mark_for_solutions of instance
-        return account_with_total_mark_for_solutions.total_mark_for_solutions
+        return user_with_total_mark_for_solutions.total_mark_for_solutions
 
     def get_total_mark_for_snippets(self):
-        """Getting total mark for snippets of account."""
+        """Getting total mark for snippets of user."""
         # getting instance as queryset
         queryset = self.__class__.objects.filter(email=self.email)
         # pass single queryset for execution once iteration in method of manager
-        account_with_total_mark_for_snippets = self.__class__.objects.accounts_with_total_mark_for_snippets(queryset=queryset)
+        user_with_total_mark_for_snippets = self.__class__.objects.users_with_total_mark_for_snippets(queryset=queryset)
         # getting back instance after processing
-        account_with_total_mark_for_snippets = account_with_total_mark_for_snippets.get()
+        user_with_total_mark_for_snippets = user_with_total_mark_for_snippets.get()
         # return total_mark_for_snippets of instance
-        return account_with_total_mark_for_snippets.total_mark_for_snippets
+        return user_with_total_mark_for_snippets.total_mark_for_snippets
 
     def get_count_participate_in_polls(self):
-        """Getting how many polls of account participated."""
+        """Getting how many polls of user participated."""
         return self.votes_in_polls.count()
 
-    def get_percent_filled_account_profile(self):
-        """Getting percent filled profile of account."""
-        return self.__class__.objects.get_filled_accounts_profiles()[self.pk]
+    def get_percent_filled_user_profile(self):
+        """Getting percent filled profile of user."""
+        return self.__class__.objects.get_filled_users_profiles()[self.pk]
 
     def get_total_rating_for_articles(self):
-        """Getting total ratings of all articles of account."""
-        evaluation_total_rating_for_articles_of_account = Article.objects.articles_with_rating().filter(author=self).aggregate(
+        """Getting total ratings of all articles of user."""
+        evaluation_total_rating_for_articles_of_user = Article.objects.articles_with_rating().filter(author=self).aggregate(
             total_rating_for_articles=models.Sum('rating')
         )
-        # return 0 if account not have articles
-        total_rating_for_articles = evaluation_total_rating_for_articles_of_account['total_rating_for_articles'] or 0
+        # return 0 if user not have articles
+        total_rating_for_articles = evaluation_total_rating_for_articles_of_user['total_rating_for_articles'] or 0
         return total_rating_for_articles
         # 3.8
         # фотийодинцова@hotmail.com
 
     def get_count_popular_topics(self):
-        """Getting count popular topics of account."""
-        popular_topics_of_account = ForumTopic.objects.popular_topics().filter(author=self)
-        return popular_topics_of_account.count()
+        """Getting count popular topics of user."""
+        popular_topics_of_user = ForumTopic.objects.popular_topics().filter(author=self)
+        return popular_topics_of_user.count()
 
-    def get_count_testing_suits_in_which_account_involed(self):
-        """In creating, how many testing suit involved account."""
+    def get_count_testing_suits_in_which_user_involed(self):
+        """In creating, how many testing suit involved user."""
         return self.testing_suits.count()
 
-    def get_count_courses_in_which_account_involed(self):
-        """In creating, how many testSuit involved account."""
+    def get_count_courses_in_which_user_involed(self):
+        """In creating, how many testSuit involved user."""
         return self.courses.count()
 
     def get_reputation_for_activity(self):
         """
-        Getting reputation of account for activity on website:
+        Getting reputation of user for activity on website:
         marks of published snippets, answers, questions and rating of articles,
         participate in polls.
         ---------------------------------------
@@ -330,18 +330,18 @@ class Account(AbstractBaseUser, PermissionsMixin):
         reputation_for_questions = (self.get_total_mark_for_questions() or 0) * 1
         reputation_for_answers = (self.get_total_mark_for_answers() or 0) * 2
         reputation_for_polls = self.get_count_participate_in_polls() or 0
-        reputation_for_filled_account_profile = self.get_percent_filled_account_profile() or 0
+        reputation_for_filled_user_profile = self.get_percent_filled_user_profile() or 0
         reputation_for_polls = (self.get_total_rating_for_articles() or 0) * 4
         reputation_for_polls = (self.get_count_popular_topics() or 0) * 100
-        reputation_for_test_suits = (self.get_count_testing_suits_in_which_account_involed() or 0) * 100
-        reputation_for_courses = (self.get_count_courses_in_which_account_involed() or 0) * 200
+        reputation_for_test_suits = (self.get_count_testing_suits_in_which_user_involed() or 0) * 100
+        reputation_for_courses = (self.get_count_courses_in_which_user_involed() or 0) * 200
         return sum([
             reputation_for_snippets,
             reputation_for_solutions,
             reputation_for_questions,
             reputation_for_answers,
             reputation_for_polls,
-            reputation_for_filled_account_profile,
+            reputation_for_filled_user_profile,
             reputation_for_polls,
             reputation_for_polls,
             reputation_for_test_suits,
@@ -362,6 +362,23 @@ class Account(AbstractBaseUser, PermissionsMixin):
         """Return count votes in polls, where user has participated."""
 
         return self.votes.count()
+
+    def get_votes(self):
+        """ """
+
+        return self.votes.all()
+
+    def get_latest_vote(self):
+        """ """
+
+        if not self.get_count_votes():
+            return None
+        return self.votes.latest()
+
+    def get_report_votes(self):
+        """ """
+
+        return 1
 
     # https://www.digitalocean.com/community/users/jellingwood?primary_filter=upvotes_given
     # answer, queations, hearts, opinons and more

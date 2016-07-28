@@ -7,25 +7,25 @@ from django.utils.text import slugify
 import factory
 from factory import fuzzy
 
-from .models import Account, AccountLevel
+from .models import User, UserLevel
 
 
-class AccountLevelFactory(factory.DjangoModelFactory):
-
-    class Meta:
-        model = AccountLevel
-
-
-class AccountFactory(factory.DjangoModelFactory):
+class UserLevelFactory(factory.DjangoModelFactory):
 
     class Meta:
-        model = Account
+        model = UserLevel
+
+
+class UserFactory(factory.DjangoModelFactory):
+
+    class Meta:
+        model = User
 
     email = factory.Faker('email', locale='en')
     username = factory.Faker('name', locale='en')
     date_birthday = factory.Faker('date', locale='ru')
     real_name = factory.Faker('first_name', locale='ru')
-    gender = fuzzy.FuzzyChoice(Account.CHOICES_GENDER._db_values)
+    gender = fuzzy.FuzzyChoice(User.CHOICES_GENDER._db_values)
 
     password = factory.PostGenerationMethodCall('set_password', 'defaultpassword')
 
@@ -48,7 +48,7 @@ class AccountFactory(factory.DjangoModelFactory):
     @factory.lazy_attribute
     def presents_on_gmail(self):
         slug_name = self.username.lower().replace(' ', '_')
-        return 'http://google.com/accounts/{0}'.format(slug_name)
+        return 'http://google.com/users/{0}'.format(slug_name)
 
     @factory.lazy_attribute
     def presents_on_github(self):
@@ -58,7 +58,7 @@ class AccountFactory(factory.DjangoModelFactory):
     @factory.lazy_attribute
     def presents_on_stackoverflow(self):
         slug_name = self.username.lower().replace(' ', '_')
-        return 'http://stackoverflow.com/accounts/{0}'.format(slug_name)
+        return 'http://stackoverflow.com/users/{0}'.format(slug_name)
 
     @factory.lazy_attribute
     def personal_website(self):

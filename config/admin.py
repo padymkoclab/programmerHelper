@@ -3,8 +3,8 @@ from django.utils.translation import ugettext_lazy as _
 from django.contrib import admin
 
 # auth
-from apps.accounts.admin import AccountAdmin, AccountLevelAdmin
-from apps.accounts.models import Account, AccountLevel
+from apps.users.admin import UserAdmin, UserLevelAdmin
+from apps.users.models import User, UserLevel
 from django.contrib.auth.models import Group
 
 from mylabour.admin_actions import export_as_csv, export_as_json, export_as_xml, export_as_yaml, export_as_xlsx
@@ -68,9 +68,9 @@ ProgrammerHelperAdminSite.add_action(export_as_xlsx)
 
 ProgrammerHelperAdminSite.register(Group)
 
-# accounts
-ProgrammerHelperAdminSite.register(Account, AccountAdmin)
-ProgrammerHelperAdminSite.register(AccountLevel, AccountLevelAdmin)
+# users
+ProgrammerHelperAdminSite.register(User, UserAdmin)
+ProgrammerHelperAdminSite.register(UserLevel, UserLevelAdmin)
 
 # badges
 ProgrammerHelperAdminSite.register(Badge, BadgeAdmin)

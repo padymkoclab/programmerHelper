@@ -26,7 +26,7 @@ urlpatterns = [
     url(r'^django_js_reverse/$', cache_page(3600)(urls_js), name='django_js_reverse'),
 
     # apps
-    url(r'^accounts/', include('apps.accounts.urls')),
+    url(r'^users/', include('apps.users.urls')),
     url(r'^activity/', include('apps.activity.urls')),
     url(r'^articles/', include('apps.articles.urls')),
     url(r'^books/', include('apps.books.urls')),

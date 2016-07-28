@@ -1,0 +1,12 @@
+
+#content-main{
+    margin: 0 10px 0 0;
+}
+
+#content-summary table{
+    width: 150px;
+}
+
+    #content-summary table tr{
+        text-align: right;
+    }

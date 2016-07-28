@@ -1,11 +1,9 @@
-
-import functools
 from io import BytesIO
 import logging
 import random
 import textwrap
 
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext as _
 from django.utils import timezone
 from django.http import HttpResponse
 
@@ -54,10 +52,44 @@ class ExcelReport(object):
         # create workbook
         self.workbook = xlsxwriter.Workbook(self.output)
 
+        # count row for shift to objects on Excel sheet
+        self.objects_shift = 5
+
+        #
+        self.count_polls = Poll.objects.count()
+        self.count_choices = Choice.objects.count()
+        self.count_votes = VoteInPoll.objects.count()
+
     def get_filename(self):
         """Return a name of the file with an extension."""
 
         return get_filename_with_datetime(Poll._meta.verbose_name, 'xlsx')
+
+    def create_response(self):
+        """Create a response with attached a Excel file """
+
+        # create response for Excel
+        response = HttpResponse(content_type='application/application/vnd.ms-excel')
+
+        # get filename and attach it to the response
+        filename = self.get_filename()
+        response['Content-Disposition'] = 'attachment; filename=%s' % filename
+        return response
+
+    def add_document_property(self):
+        pass
+
+    def add_worksheets(self):
+        """Add worksheets."""
+
+        # required sheet
+        self.workbook.add_worksheet(_('Statistics'))
+
+        self.workbook.add_worksheet(_('Polls'))
+        self.workbook.add_worksheet(_('Choices'))
+        self.workbook.add_worksheet(_('Votes'))
+        self.workbook.add_worksheet(_('Results of polls'))
+        self.workbook.add_worksheet(_('Voters'))
 
     @property
     def get_formats(self):
@@ -70,6 +102,7 @@ class ExcelReport(object):
                 'fg_color': '#D7E4BC',
                 'align': 'center',
                 'valign': 'vcenter',
+                'font_size': 30,
             }),
             header=self.workbook.add_format({
                 'bg_color': '#F7F7F7',
@@ -83,11 +116,13 @@ class ExcelReport(object):
                 'border': 1,
                 'valign': 'vcenter',
                 'align': 'center',
+                'text_wrap': True,
             }),
             datetime=self.workbook.add_format({
                 'valign': 'vcenter',
                 'align': 'right',
                 'border': 1,
+                'text_wrap': True,
             }),
             text=self.workbook.add_format({
                 'valign': 'vcenter',
@@ -99,160 +134,170 @@ class ExcelReport(object):
                 'border': 2,
                 'align': 'right',
                 'bg_color': 'yellow',
-                'border_color': 'green',
             }),
+            empty_row=self.workbook.add_format({
+                'align': 'center',
+                'font_color': 'red',
+                'font_size': 17,
+                'bold': True,
+                'valign': 'vcenter',
+            })
         )
 
-    def write_title(self, sheet):
-        """Write title for passed sheet."""
-
-        title_text = 'All polls'
-        sheet.merge_range('A2:K3', title_text, self.get_formats['title'])
-
-    def write_field_name(self, sheet):
-        """Write a names of fields of the model Poll, with adding a style format."""
-
-        # all string, marked as translatable, directly convert to string
-        # because the Excel does not have a support objects with that type
-        sheet.write_row(
-            'A5',
-            map(str, [
-                '№',
-                _('Id (as UUID)'),
-                _('Title'),
-                _('Slug'),
-                _('Description'),
-                _('Count votes'),
-                _('Count choices'),
-                _('Status'),
-                _('Date latest changed of status'),
-                _('Date modified'),
-                _('Date added'),
-            ]),
-            self.get_formats['header']
-        )
-
-    def write_objects(self, sheet):
+    def write_polls(self, count_fields):
         """Write values of fields of objects on passed sheet.
         At the same time set a height of rows, where is wrote an each object."""
 
-        for num_obj, poll in enumerate(Poll.objects.iterator()):
+        # if polls yet not, write message about that
+        # othewise - write polls
 
-            # number row for writting inforation about object
-            num_row = num_obj + 5
+        sheet = self.workbook.get_worksheet_by_name('Polls')
 
-            # as num_obj is started from 0, than make it +1
-            num_obj += 1
+        if not self.count_polls:
+            count_fields -= 1
+            sheet.merge_range(
+                self.objects_shift, 0, self.objects_shift, count_fields,
+                _('Polls yet not.'),
+                self.get_formats['empty_row']
+            )
+            sheet.set_row(self.objects_shift, 50)
+        else:
+            sheet.set_row(self.objects_shift - 1, 30)
+            # number row for writting information about object
+            for num_obj, poll in enumerate(Poll.objects.prefetch_related('choices', 'votes', 'voteinpoll_set')):
+                num_row = num_obj + self.objects_shift
 
-            # write values of fields of poll, with adding, where it need, handy to display formats
-            sheet.write(num_row, 0, num_obj, self.get_formats['table'])
+                # as num_obj is started from 0, than make it +1
+                num_obj += 1
 
-            # convert UUID to str, because Excel doesn`t have support this type of data
-            # and write id as str
-            sheet.write(num_row, 1, str(poll.id), self.get_formats['table'])
+                # write values of fields of poll, with adding, where it need, handy to display formats
+                sheet.write(num_row, 0, num_obj, self.get_formats['table'])
 
-            sheet.write(num_row, 2, poll.title, self.get_formats['text'])
-            sheet.write(num_row, 3, poll.slug, self.get_formats['text'])
-            sheet.write(num_row, 4, poll.description, self.get_formats['text'])
-            sheet.write(num_row, 5, poll.get_count_votes(), self.get_formats['table'])
-            sheet.write(num_row, 6, poll.get_count_choices(), self.get_formats['table'])
+                # convert UUID to str, because Excel doesn`t have support this type of data
+                # and write id as str
+                sheet.write(num_row, 1, str(poll.pk), self.get_formats['table'])
 
-            # write displayed value of status
-            sheet.write(num_row, 7, poll.get_status_display(), self.get_formats['table'])
+                sheet.write(num_row, 2, poll.title, self.get_formats['text'])
+                sheet.write(num_row, 3, poll.slug, self.get_formats['text'])
+                sheet.write(num_row, 4, poll.description, self.get_formats['text'])
+                sheet.write(num_row, 5, poll.get_count_votes(), self.get_formats['table'])
+                sheet.write(num_row, 6, poll.get_count_choices(), self.get_formats['table'])
 
-            # write datatime as a string, but in a given format (localizated and timezone)
-            sheet.write(num_row, 8, poll.status_changed.strftime('%c %z (%Z)'), self.get_formats['datetime'])
-            sheet.write(num_row, 9, poll.date_modified.strftime('%c %z (%Z)'), self.get_formats['datetime'])
-            sheet.write(num_row, 10, poll.date_added.strftime('%c %z (%Z)'), self.get_formats['datetime'])
+                # write displayed value of status
+                sheet.write(num_row, 7, poll.get_status_display(), self.get_formats['table'])
 
-            # set a height of current row
-            self.set_rows_for_sheet_with_objects(sheet, poll, num_row)
+                # write datatime in django-project datetime format
+                sheet.write(
+                    num_row,
+                    8,
+                    convert_date_to_django_date_format(poll.status_changed),
+                    self.get_formats['datetime'])
+                sheet.write(
+                    num_row,
+                    9,
+                    convert_date_to_django_date_format(poll.date_modified),
+                    self.get_formats['datetime'])
+                sheet.write(
+                    num_row,
+                    10,
+                    convert_date_to_django_date_format(poll.date_added),
+                    self.get_formats['datetime'])
 
-    def set_rows_for_sheet_with_objects(self, sheet, poll, num_row):
+                # set a height of current row
+                self.set_rows_for_sheet_with_objects(sheet, poll, num_row)
+
+    def set_rows_for_sheet_with_objects(self, sheet, obj, num_row):
         """Set a height of rows, on based the Excel 2007 standarts,  """
 
-        # choice max count rows in that row and make incrementation it on 1
-        count_rows = max(
-            textwrap.fill(poll.title, 50).count('\n'),
-            textwrap.fill(poll.slug, 50).count('\n'),
-            textwrap.fill(poll.description, 50).count('\n'),
-        )
+        # get model
+        model = type(obj)
 
-        # for correct height of row, make incrementation count rows on 1
-        count_rows += 1
+        # choice max count rows in that row and make incrementation it on 1
+        all_field_names = model._meta.get_all_field_names()
+
+        # deternimate value of the object with max length
+        max_count_rows = 0
+        for field_name in all_field_names:
+            val = getattr(obj, field_name, '')
+            val = str(val)
+            count_rows = len(textwrap.wrap(val, 15))
+            if max_count_rows < count_rows:
+                max_count_rows = count_rows
+
+        # for correct display in Excel make next
+        # count_rows = max_length / 40
+        # count_rows = math.floor(count_rows) + 1
+        count_rows = count_rows * 20
 
         # a standart height of a single row is 20, thus make multiplication count_rows on 20
         # for get correct height in Excel
-        count_rows = count_rows * 20
         sheet.set_row(num_row, count_rows)
 
-    def set_columns_for_sheet_with_objects(self, sheet):
-        """Set a width of columns, by Excel 2007 standarts, on the sheet, where is wrote the objects."""
-
-        sheet.set_column('B1:B1', 37)
-        sheet.set_column('C1:E1', 50)
-        sheet.set_column('F1:G1', 15)
-        sheet.set_column('I1:K1', 34)
-
-    def add_formulas(self, sheet, num_row_after_all_objects):
+    def add_formulas_to_polls(self):
         """Add formulas on a passed sheed."""
+
+        num_row_after_all_objects = self.count_polls + self.objects_shift
+        sheet = self.workbook.get_worksheet_by_name('Polls')
 
         # add formula - Total count votes
         formula_total_count_votes = '=SUM(F6:F%d)' % num_row_after_all_objects
-        sheet.write_formula(num_row_after_all_objects, 5, formula_total_count_votes, self.get_formats['formula'])
+        sheet.write_formula(
+            num_row_after_all_objects,
+            5,
+            formula_total_count_votes,
+            self.get_formats['formula'],
+        )
 
         # add formula - Total count choices
         formula_total_count_choices = '=SUM(G6:G%d)' % num_row_after_all_objects
-        sheet.write_formula(num_row_after_all_objects, 6, formula_total_count_choices, self.get_formats['formula'])
+        sheet.write_formula(
+            num_row_after_all_objects,
+            6,
+            formula_total_count_choices,
+            self.get_formats['formula'],
+        )
 
-    def get_chart_statistics(self):
+    def get_chart_polls_by_status(self):
         """Build, customization and return a chart for display statistics about count votes by a months."""
 
-        # Create chart_statistics_count_votes_by_year on sheet2
-        chart_statistics_count_votes_by_year = self.workbook.add_chart({'type': 'line'})
+        # Create chart for display count polls by status, in view barchar
+        chart = self.workbook.add_chart({'type': 'column'})
+        sheet_statistics = self.workbook.get_worksheet_by_name('Statistics')
 
-        # make cutomization of chart
-        chart_statistics_count_votes_by_year.set_legend({'none': True})
-        chart_statistics_count_votes_by_year.set_title({
-            'name': str(_('Statistics count votes by year')),
-            'layout': {
-                'x': 0.3,
-                'y': 0.07,
-            }
+        # cutomization of the chart
+        chart.set_legend({'none': True})
+        # chart.set_title({
+        #     'layout': {
+        #         'x': 0.3,
+        #         'y': 0.07,
+        #     }
+        # })
+        chart.set_size({'x_scale': 1.5, 'y_scale': 1.5})
+        chart.add_series({
+            'values': '={0}!$B$11:$B$13'.format(sheet_statistics.name),
+            'categories': '={0}!$A$11:$A$13'.format(sheet_statistics.name),
+            'data_labels': {'value': True}
         })
-        chart_statistics_count_votes_by_year.set_size({'x_scale': 1.5, 'y_scale': 1.5})
-        chart_statistics_count_votes_by_year.set_x_axis({
-            'name': str(_('Month, year')),
+        chart.set_style(37)
+        chart.set_x_axis({
+            'name': _('Polls by status'),
             'name_font': {
-                'size': 13,
-                'rotation': 0,
+                'bold': True,
+                'size': 30,
             },
+            'label_position': 'high',
             'num_font': {
-                'italic': True,
-                'rotation': -45,
-            },
-            'text_axis': True,
-            'major_gridlines': {
-                'visible': True,
-                'line': {
-                    'width': 1.25,
-                    'dash_type': 'dash'
-                }
+                'name': 'Arial',
+                'color': 'green',
+                'underline': True,
+                'bold': True,
             },
         })
-        chart_statistics_count_votes_by_year.set_y_axis({
-            'name': str(_('Count votes')),
-            'name_font': {
-                'size': 13,
-                'rotation': -89,
-            },
-            'name_layout': {
-                'x': 0.05,
-                'y': 0.3,
-            }
+        chart.set_plotarea({
+            'gradient': {'colors': ['#FFEFD1', '#F0EBD5', '#B69F66']}
         })
 
-        return chart_statistics_count_votes_by_year
+        return chart
 
     def write_data_source_for_chart_statistics(self, sheet):
         """Write a data to sheet of Excel, needed for build the chart statistics."""
@@ -264,77 +309,383 @@ class ExcelReport(object):
         sheet.write_column('A2', list(date for date, count_votes in statistics_count_votes_by_year))
         sheet.write_column('B2', list(count_votes for date, count_votes in statistics_count_votes_by_year))
 
-    def add_series_to_chart_statistics(self, chart, sheet):
-        """Add a series data for the chart statistics."""
-
-        # add series to chart
-        chart.add_series({
-            'categories': [sheet.name, 1, 0, 12, 0],
-            'values': [sheet.name, 1, 1, 12, 1],
-        })
-
-    def create_response(self):
-        """Create a response with attached a Excel file """
-
-        # create response for Excel 2007
-        self.response = HttpResponse(content_type='application/application/vnd.ms-excel')
-
-        # get filename and attach it to the response
-        filename = self.get_filename()
-        self.response['Content-Disposition'] = 'attachment; filename=%s' % filename
-
-    def create_report(self):
+    def make_report(self):
         """Create a report, on based information, about an exists polls."""
 
         #
-        self.create_response()
+        response = self.create_response()
 
-        # create worksheets
-        sheet1 = self.workbook.add_worksheet(str(_('Summary')))
-        sheet2 = self.workbook.add_worksheet(str(_('Statistics count votes by year')))
+        # add worksheets
+        self.add_worksheets()
 
-        #
-        num_row_after_all_objects = Poll.objects.count() + 5
-
-        # working with sheet1
-        self.write_title(sheet1)
-        self.write_field_name(sheet1)
-        self.write_objects(sheet1)
-        self.add_formulas(sheet1, num_row_after_all_objects)
-
-        self.set_columns_for_sheet_with_objects(sheet1)
-
-        # # working with sheet2
-        sheet2.write('A1', str(_('Month, year')))
-        sheet2.write('B1', str(_('Count votes')))
-        sheet2.set_column('A:A', 10)
-        sheet2.set_column('B:B', 10)
-
-        #
-        chart_statistics_count_votes_by_year = self.get_chart_statistics()
-
-        #
-        self.write_data_source_for_chart_statistics(sheet2)
-
-        #
-        self.add_series_to_chart_statistics(chart_statistics_count_votes_by_year, sheet2)
-
-        # insert the chart in the Excel document
-        sheet2.insert_chart('D2', chart_statistics_count_votes_by_year)
+        # working with sheet_polls
+        self.fillup_sheet_polls()
+        self.fillup_sheet_statistics()
+        self.fillup_sheet_choices()
+        self.fillup_sheet_votes()
+        self.fillup_sheet_voters()
 
         # close the workbook, as well as to write the Excel document in the response and to return it
         self.workbook.close()
-        self.response.write(self.output.getvalue())
-        return self.response
+        response.write(self.output.getvalue())
+        return response
 
+    def fillup_sheet_statistics(self):
+        """ """
 
-def create_write_and_return_response(func):
-    functools.wraps(func)
+        self.write_statistics()
 
-    def wrapper(*args, **kwargs):
-        result = func(*args, **kwargs)
-        return result
-    return wrapper
+    def write_statistics(self):
+        """ """
+
+        sheet = self.workbook.get_worksheet_by_name('Statistics')
+        sheet.write(9, 0, _('Count polls'))
+        sheet.write(9, 1, self.count_polls)
+        sheet.write(10, 0, _('Count opened polls'))
+        sheet.write(10, 1, Poll.objects.opened_polls().count())
+        sheet.write(11, 0, _('Count closed polls'))
+        sheet.write(11, 1, Poll.objects.closed_polls().count())
+        sheet.write(12, 0, _('Count draft polls'))
+        sheet.write(12, 1, Poll.objects.draft_polls().count())
+
+    def fillup_sheet_polls(self):
+        """ """
+
+        title = _('All polls')
+        sheet = self.workbook.get_worksheet_by_name('Polls')
+        field_names = [
+            '№', _('Id (as UUID)'), _('Title'), _('Slug'),
+            _('Description'), _('Count\nvotes'), _('Count\nchoices'),
+            _('Status'), _('Latest changed\nof status'), _('Date modified'), _('Date added')
+        ]
+
+        count_fields = len(field_names)
+
+        self.write_title(title, sheet, count_fields)
+        self.write_field_names(field_names, sheet)
+
+        self.write_polls(count_fields)
+
+        if self.count_polls > 1:
+            self.add_formulas_to_polls()
+            chart = self.get_chart_polls_by_status()
+            sheet.insert_chart('M5', chart)
+
+        # set a width of columns
+        sheet.set_column('B1:B1', 20)
+        sheet.set_column('C1:E1', 25)
+        sheet.set_column('F1:G1', 7)
+        sheet.set_column('I1:K1', 15)
+
+    def fillup_sheet_choices(self):
+        """ """
+
+        title = _('All choices')
+        sheet = self.workbook.get_worksheet_by_name('Choices')
+        field_names = ['№', _('Id (as UUID)'), _('Text of choice'), _('Poll'), _('Count\nvotes')]
+
+        count_fields = len(field_names)
+
+        self.write_title(title, sheet, count_fields)
+        self.write_field_names(field_names, sheet)
+        self.write_choices(count_fields)
+
+        if self.count_choices > 1:
+            self.add_formulas_to_choices()
+
+        # set a width of columns
+        sheet.set_column('B1:B1', 20)
+        sheet.set_column('C1:C1', 30)
+        sheet.set_column('D1:D1', 25)
+        sheet.set_column('E1:E1', 10)
+
+    def fillup_sheet_votes(self):
+        """ """
+
+        title = _('All votes')
+        sheet = self.workbook.get_worksheet_by_name('Votes')
+        field_names = ['№', _('Id (as UUID)'), _('Voter'), _('Poll'), _('Choice'), _('Date\nvoting')]
+
+        count_fields = len(field_names)
+
+        self.write_title(title, sheet, count_fields)
+        self.write_field_names(field_names, sheet)
+        self.write_votes(count_fields)
+
+        if self.count_votes > 1:
+            self.write_count_votes_by_months_for_past_year()
+            chart = self.get_chart_votes_for_past_year()
+            sheet.insert_chart('H6', chart)
+
+        # set a width of columns
+        sheet.set_column('B1:B1', 20)
+        sheet.set_column('C1:E1', 30)
+        sheet.set_column('F1:F1', 10)
+
+    def write_title(self, title, sheet, count_fields):
+        """Write title for passed sheet."""
+
+        title = str(title)
+
+        # since numeration in Excel begin from 0, then a title`s length must be decrement on 1
+        title_length = count_fields - 1
+
+        sheet.set_row(1, 80)
+        sheet.merge_range(1, 0, 1, title_length, title, self.get_formats['title'])
+
+    def write_field_names(self, field_names, sheet):
+        """Write a names of fields of the model Poll, with adding a style format."""
+
+        # all string, marked as translatable, directly convert to string
+        # because the Excel does not have a support objects with that type
+        sheet.write_row(
+            'A5',
+            map(str, field_names),
+            self.get_formats['header']
+        )
+
+    def write_choices(self, count_fields):
+        """ """
+
+        # if polls yet not, write message about that
+        # othewise - write polls
+        sheet = self.workbook.get_worksheet_by_name('Choices')
+        sheet.set_row(4, 30)
+        if not self.count_choices:
+            count_fields -= 1
+            sheet.merge_range(
+                self.objects_shift, 0, self.objects_shift, count_fields,
+                _('Choices yet not.'),
+                self.get_formats['empty_row']
+            )
+            sheet.set_row(self.objects_shift, 50)
+        else:
+
+            # number row for writting information about object
+            for num_obj, choice in enumerate(Choice.objects.select_related('poll')):
+                num_row = num_obj + self.objects_shift
+
+                # as num_obj is started from 0, than make it +1
+                num_obj += 1
+
+                # write values of fields of choice, with adding, where it need, handy to display formats
+                sheet.write(num_row, 0, num_obj, self.get_formats['table'])
+
+                # convert UUID to str, because Excel doesn`t have support this type of data
+                # and write id as str
+                sheet.write(num_row, 1, str(choice.pk), self.get_formats['table'])
+
+                sheet.write(num_row, 2, choice.text_choice, self.get_formats['text'])
+                sheet.write(num_row, 3, str(choice.poll), self.get_formats['text'])
+                sheet.write(num_row, 4, choice.get_count_votes(), self.get_formats['table'])
+
+                # set a height of current row
+                self.set_rows_for_sheet_with_objects(sheet, choice, num_row)
+
+    def add_formulas_to_choices(self):
+        """ """
+
+        sheet = self.workbook.get_worksheet_by_name('Choices')
+        count_choices_with_shift = self.count_choices + self.objects_shift
+        sheet.write(
+            count_choices_with_shift,
+            4,
+            '=SUM($E$6:$E${0})'.format(count_choices_with_shift),
+            self.get_formats['formula'],
+        )
+
+    def write_votes(self, count_fields):
+        """ """
+
+        # if polls yet not, write message about that
+        # othewise - write polls
+        sheet = self.workbook.get_worksheet_by_name('Votes')
+        sheet.set_row(4, 30)
+        if not self.count_choices:
+            count_fields -= 1
+            sheet.merge_range(
+                self.objects_shift, 0, self.objects_shift, count_fields,
+                _('Votes yet not.'),
+                self.get_formats['empty_row']
+            )
+            sheet.set_row(self.objects_shift, 50)
+        else:
+
+            # number row for writting information about object
+            for num_obj, vote in enumerate(VoteInPoll.objects.select_related('poll', 'user', 'choice')):
+                num_row = num_obj + self.objects_shift
+
+                # as num_obj is started from 0, than make it +1
+                num_obj += 1
+
+                # write values of fields of vote, with adding, where it need, handy to display formats
+                sheet.write(num_row, 0, num_obj, self.get_formats['table'])
+
+                # convert UUID to str, because Excel doesn`t have support this type of data
+                # and write id as str
+                sheet.write(num_row, 1, str(vote.pk), self.get_formats['table'])
+
+                sheet.write(num_row, 2, str(vote.user), self.get_formats['text'])
+                sheet.write(num_row, 3, str(vote.poll), self.get_formats['text'])
+                sheet.write(num_row, 4, str(vote.choice), self.get_formats['text'])
+                sheet.write(
+                    num_row,
+                    5,
+                    convert_date_to_django_date_format(vote.date_voting),
+                    self.get_formats['datetime'],
+                )
+
+                # set a height of current row
+                self.set_rows_for_sheet_with_objects(sheet, vote, num_row)
+
+    def get_chart_votes_for_past_year(self):
+        """"""
+
+        chart = self.workbook.add_chart({'type': 'line'})
+
+        sheet = self.workbook.get_worksheet_by_name('Votes')
+
+        # cutomization of the chart
+        chart.set_legend({'none': True})
+        chart.set_title({
+            'layout': {
+                'x': 0.3,
+                'y': 0.07,
+            }
+        })
+        chart.set_size({'x_scale': 2, 'y_scale': 2})
+        chart.add_series({
+            'values': '={0}!$I$4:$T$4'.format(sheet.name),
+            'categories': '={0}!$I$3:$T$3'.format(sheet.name),
+            'marker': {'type': 'square'},
+            'data_labels': {'value': True}
+        })
+        chart.set_style(34)
+        chart.set_x_axis({
+            'text_axis': True,
+            'date_axis': False,
+            'name': _('Count votes for the past year'),
+            'label_position': 'low',
+            'name_font': {
+                'size': 14,
+                'rotation': 0,
+                'bold': True,
+            },
+            'num_font': {
+                'italic': True,
+                'rotation': -45,
+            },
+            'major_gridlines': {
+                'visible': True,
+                'line': {
+                    'width': 1.25,
+                    'dash_type': 'dash'
+                }
+            },
+        })
+        chart.set_y_axis({
+            'name': _('Count votes'),
+            'name_font': {
+                'size': 14,
+                'rotation': -89,
+            },
+            'name_layout': {
+                'x': 0.02,
+                'y': 0.3,
+            },
+            'label_position': 'low',
+        })
+
+        return chart
+
+    def write_count_votes_by_months_for_past_year(self):
+        """ """
+
+        sheet = self.workbook.get_worksheet_by_name('Votes')
+
+        stat = VoteInPoll.objects.get_statistics_count_votes_by_months_for_past_year()
+
+        dates, count_votes = zip(*stat)
+
+        sheet.write('H3', _('Month, year'), self.get_formats['header'])
+        sheet.write('H4', _('Count votes'), self.get_formats['header'])
+        sheet.merge_range('H2:T2', _('Count votes for the past year'), self.get_formats['title'])
+        sheet.set_column('H:H', 20)
+        sheet.set_row(2, 30)
+        sheet.set_row(3, 30)
+        sheet.write_row('I3', dates, self.get_formats['table'])
+        sheet.write_row('I4', count_votes, self.get_formats['table'])
+
+    def fillup_sheet_voters(self):
+        """ """
+
+        title = _('All voters')
+        sheet = self.workbook.get_worksheet_by_name('Voters')
+        field_names = ['№', _('Id (as UUID)'), _('Full name'), _('Count\nvotes'), _('Latest vote'), _('All votes')]
+
+        count_field = len(field_names)
+
+        self.write_title(title, sheet, count_field)
+        self.write_field_names(field_names, sheet)
+        self.write_voters(count_field)
+        # if self.count_votes > 1:
+        #     self.add_formulas_to_choices()
+
+        # set a width of columns
+        # sheet.set_column('B1:B1', 20)
+        # sheet.set_column('C1:C1', 30)
+        # sheet.set_column('D1:D1', 25)
+        # sheet.set_column('E1:E1', 10)
+
+    def write_voters(self, count_fields):
+        """ """
+
+        # if polls yet not, write message about that
+        # othewise - write polls
+
+        sheet = self.workbook.get_worksheet_by_name('Voters')
+
+        if not self.count_votes:
+            count_fields = count_fields - 1
+            sheet.merge_range(
+                self.objects_shift, 0, self.objects_shift, count_fields,
+                _('Voters yet not.'),
+                self.get_formats['empty_row']
+            )
+            sheet.set_row(self.objects_shift, 50)
+        else:
+            sheet.set_row(self.objects_shift - 1, 30)
+
+            # number row for writting information about object
+            for num_obj, voter in enumerate(Poll.objects.get_all_voters()):
+                num_row = num_obj + self.objects_shift
+
+                # as num_obj is started from 0, than make it +1
+                num_obj += 1
+
+                # write values of fields of voter, with adding, where it need, handy to display formats
+                sheet.write(num_row, 0, num_obj, self.get_formats['table'])
+
+                # convert UUID to str, because Excel doesn`t have support this type of data
+                # and write id as str
+                sheet.write(num_row, 1, str(voter.pk), self.get_formats['table'])
+
+                sheet.write(num_row, 2, voter.get_full_name(), self.get_formats['text'])
+                sheet.write(num_row, 3, voter.get_count_votes(), self.get_formats['table'])
+                sheet.write(
+                    num_row, 4,
+                    convert_date_to_django_date_format(voter.get_latest_vote().date_voting),
+                    self.get_formats['datetime'],
+                )
+
+                sheet.write(
+                    num_row, 5,
+                    voter.get_report_votes(),
+                    self.get_formats['table'],
+                )
+
+                # set a height of current row
+                self.set_rows_for_sheet_with_objects(sheet, voter, num_row)
 
 
 class PollPDFReport(SitePDFReportTemplate):
@@ -530,7 +881,7 @@ class PollPDFReport(SitePDFReportTemplate):
         self.response = self.create_response('Results of polls')
 
         # subject the report
-        self.subject = 'Results of polls'
+        self.subject = _('Results of polls')
 
         # move on to page`s template to draw statistics
         story.append(NextPageTemplate('Statistics'))
@@ -620,7 +971,7 @@ class PollPDFReport(SitePDFReportTemplate):
         # if votes is exists, then getting atributes of latest vote
         latest_vote = get_latest_or_none(VoteInPoll)
         if latest_vote is not None:
-            latest_voter = textwrap.fill(latest_vote.account.get_full_name(), 50)
+            latest_voter = textwrap.fill(latest_vote.user.get_full_name(), 50)
             latest_date_voting = convert_date_to_django_date_format(latest_vote.date_voting)
             latest_poll = textwrap.fill(str(latest_vote.poll), 50)
             latest_choice = textwrap.fill(str(latest_vote.choice), 50)
@@ -651,11 +1002,11 @@ class PollPDFReport(SitePDFReportTemplate):
 
         # if no votes yet
         try:
-            latest_date_voting = VoteInPoll.objects.latest().date_voting
+            latest_vote = VoteInPoll.objects.latest()
         except VoteInPoll.DoesNotExist:
-            latest_date_voting = self.ParagraphNoVotes
+            latest_date_voting = None
         else:
-            latest_date_voting = convert_date_to_django_date_format(latest_date_voting)
+            latest_date_voting = convert_date_to_django_date_format(latest_vote.date_voting)
 
         data = [
             ['Statictics'],
@@ -706,7 +1057,7 @@ class PollPDFReport(SitePDFReportTemplate):
     def get_table_all_votes(self):
         """ """
 
-        data = [['Primary\nkey', 'Poll', 'Choice', 'Account', 'Date\nvoting']]
+        data = [[_('Primary\nkey'), _('Poll'), _('Choice'), _('User'), _('Date\nvoting')]]
 
         # if objects does not exists yet, then
         # append a whole row with corresponding message
@@ -714,12 +1065,12 @@ class PollPDFReport(SitePDFReportTemplate):
         # as well as select corresponding style for table
         if VoteInPoll.objects.count():
             style = self.tblObjectsStyle
-            for vote in VoteInPoll.objects.select_related('poll', 'account', 'choice'):
+            for vote in VoteInPoll.objects.select_related('poll', 'user', 'choice'):
                 row = [
                     textwrap.fill(str(vote.pk), 10),
                     textwrap.fill(str(vote.poll), 20),
                     textwrap.fill(str(vote.choice), 20),
-                    textwrap.fill(vote.account.get_full_name(), 20),
+                    textwrap.fill(vote.user.get_full_name(), 20),
                     textwrap.fill(convert_date_to_django_date_format(vote.date_voting), 10),
                 ]
                 data.append(row)
@@ -738,7 +1089,7 @@ class PollPDFReport(SitePDFReportTemplate):
     def get_table_all_choices(self):
         """ """
 
-        data = [['Primary\nkey', 'Choice`s\ntext', 'Poll', 'Count\nvotes']]
+        data = [[_('Primary\nkey'), _('Choice`s\ntext'), _('Poll'), _('Count\nvotes')]]
 
         # if objects does not exists yet, then
         # append a whole row with corresponding message
@@ -795,7 +1146,7 @@ class PollPDFReport(SitePDFReportTemplate):
         chart.barSpacing = 1
         chart.barLabelFormat = '%d'
         chart.barLabels.nudge = 10
-        chart.valueAxis.labelTextFormat = '%d polls'
+        chart.valueAxis.labelTextFormat = _('%d polls')
         chart.valueAxis.valueMin = 0
 
         # add data to the chart
@@ -813,7 +1164,7 @@ class PollPDFReport(SitePDFReportTemplate):
         label.y = canvas.height - inch * 1.5
         label.fontSize = 20
         label.fontName = 'FreeSansBold'
-        label.setText('Count polls by status')
+        label.setText(_('Count polls by status'))
         label.textAnchor = 'middle'
 
         # create legend
@@ -867,7 +1218,7 @@ class PollPDFReport(SitePDFReportTemplate):
         chart.valueAxis.valueMin = valueMin
         chart.valueAxis.valueMax = valueMax
         chart.valueAxis.valueStep = self._eval_step_for_valueAxis_linechart(valueMin, valueMax)
-        chart.valueAxis.labelTextFormat = '%d votes '
+        chart.valueAxis.labelTextFormat = _('%d votes ')
         chart.lines[0].strokeWidth = 1
         chart.lines[0].strokeColor = colors.purple
         chart.lines.symbol = makeMarker('Circle')
@@ -876,7 +1227,7 @@ class PollPDFReport(SitePDFReportTemplate):
         label = Label()
         label.x = canvas.width / 2
         label.y = canvas.height - inch * 1.5
-        label.setText('Count votes for the past year')
+        label.setText(_('Count votes for the past year'))
         label.fontName = 'FreeSansBold'
         label.fontSize = 20
         label.textAnchor = 'middle'
