@@ -9,6 +9,7 @@ from mylabour.utils import create_logger_by_filename
 
 from apps.polls.factories import PollFactory, ChoiceFactory
 from apps.polls.models import Poll, Choice, VoteInPoll
+from apps.polls.constants import MIN_COUNT_CHOICES_IN_POLL, MAX_COUNT_CHOICES_IN_POLL
 
 
 logger = create_logger_by_filename(__name__)
@@ -25,9 +26,9 @@ class Command(ExtendedBaseCommand):
         count_polls = kwargs['count_polls'][0]
 
         # get access to user`s model
-        Account = get_user_model()
-        count_accounts = Account.objects.count()
-        assert count_accounts > 0, 'Not users for voting'
+        User = get_user_model()
+        count_users = User.objects.count()
+        assert count_users > 0, 'Not users for voting'
 
         # delete all polls, choices, votes
         Poll.objects.filter().delete()
@@ -43,22 +44,22 @@ class Command(ExtendedBaseCommand):
         choices = set()
         for poll in polls:
             count_random_choices = random.randint(
-                Poll.MIN_COUNT_CHOICES_IN_POLL,
-                Poll.MAX_COUNT_CHOICES_IN_POLL
+                MIN_COUNT_CHOICES_IN_POLL,
+                MAX_COUNT_CHOICES_IN_POLL
             )
             for i in range(count_random_choices):
                 choice = ChoiceFactory.build(poll=poll)
                 choices.add(choice)
         Choice.objects.bulk_create(choices)
 
-        # create votes, where unique account and poll
+        # create votes, where unique user and poll
         votes = set()
         for poll in polls:
-            random_count_accounts = random.randint(1, count_accounts)
-            accounts = Account.objects.random_accounts(random_count_accounts, True)
-            for account in accounts:
+            random_count_users = random.randint(1, count_users)
+            users = User.objects.random_users(random_count_users, True)
+            for user in users:
                 choice = random.choice(tuple(poll.choices.all()))
-                vote = VoteInPoll(account=account, poll=poll, choice=choice)
+                vote = VoteInPoll(user=user, poll=poll, choice=choice)
                 votes.add(vote)
         VoteInPoll.objects.bulk_create(votes)
 

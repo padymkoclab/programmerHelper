@@ -14,6 +14,7 @@ from django.conf import settings
 from model_utils import Choices
 from model_utils.managers import QueryManager
 
+from apps.polls.managers import PollsManager
 from apps.articles.models import Article
 from apps.activity.models import Activity
 from apps.forum.models import ForumTopic
@@ -133,7 +134,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     # managers
     objects = models.Manager()
     objects = UserManager.from_queryset(UserQuerySet)()
-    # badges_manager = BadgeManager().
+    polls = PollsManager()
+    badges = BadgeManager()
 
     # simple managers
     actives = QueryManager(is_active=True)
@@ -273,10 +275,6 @@ class User(AbstractBaseUser, PermissionsMixin):
         # return total_mark_for_snippets of instance
         return user_with_total_mark_for_snippets.total_mark_for_snippets
 
-    def get_count_participate_in_polls(self):
-        """Getting how many polls of user participated."""
-        return self.votes_in_polls.count()
-
     def get_percent_filled_user_profile(self):
         """Getting percent filled profile of user."""
         return self.__class__.objects.get_filled_users_profiles()[self.pk]
@@ -329,10 +327,10 @@ class User(AbstractBaseUser, PermissionsMixin):
         reputation_for_solutions = (self.get_total_mark_for_solutions() or 0) * 3
         reputation_for_questions = (self.get_total_mark_for_questions() or 0) * 1
         reputation_for_answers = (self.get_total_mark_for_answers() or 0) * 2
-        reputation_for_polls = self.get_count_participate_in_polls() or 0
+        # reputation_for_polls = self.get_count_participate_in_polls() or 0
         reputation_for_filled_user_profile = self.get_percent_filled_user_profile() or 0
-        reputation_for_polls = (self.get_total_rating_for_articles() or 0) * 4
-        reputation_for_polls = (self.get_count_popular_topics() or 0) * 100
+        # reputation_for_polls = (self.get_total_rating_for_articles() or 0) * 4
+        # reputation_for_polls = (self.get_count_popular_topics() or 0) * 100
         reputation_for_test_suits = (self.get_count_testing_suits_in_which_user_involed() or 0) * 100
         reputation_for_courses = (self.get_count_courses_in_which_user_involed() or 0) * 200
         return sum([
@@ -340,10 +338,10 @@ class User(AbstractBaseUser, PermissionsMixin):
             reputation_for_solutions,
             reputation_for_questions,
             reputation_for_answers,
-            reputation_for_polls,
+            # reputation_for_polls,
             reputation_for_filled_user_profile,
-            reputation_for_polls,
-            reputation_for_polls,
+            # reputation_for_polls,
+            # reputation_for_polls,
             reputation_for_test_suits,
             reputation_for_courses,
         ])
@@ -357,28 +355,6 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def count_comments(self):
         pass
-
-    def get_count_votes(self):
-        """Return count votes in polls, where user has participated."""
-
-        return self.votes.count()
-
-    def get_votes(self):
-        """ """
-
-        return self.votes.all()
-
-    def get_latest_vote(self):
-        """ """
-
-        if not self.get_count_votes():
-            return None
-        return self.votes.latest()
-
-    def get_report_votes(self):
-        """ """
-
-        return 1
 
     # https://www.digitalocean.com/community/users/jellingwood?primary_filter=upvotes_given
     # answer, queations, hearts, opinons and more

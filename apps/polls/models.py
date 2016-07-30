@@ -1,4 +1,5 @@
 
+import itertools
 import uuid
 
 from django.contrib.auth import get_user_model
@@ -16,7 +17,7 @@ from mylabour.fields_db import ConfiguredAutoSlugField
 from mylabour.models import TimeStampedModel
 from mylabour.decorators import ClassmethodProperty
 
-from .managers import PollManager, VotesManager
+from .managers import PollManager, VoteManager
 from .querysets import PollQuerySet, ChoiceQuerySet
 
 
@@ -24,9 +25,6 @@ class Poll(TimeStampedModel):
     """
     Model for poll.
     """
-
-    MIN_COUNT_CHOICES_IN_POLL = 2
-    MAX_COUNT_CHOICES_IN_POLL = 10
 
     CHOICES_STATUS = Choices(
         ('draft', _('Draft')),
@@ -53,7 +51,7 @@ class Poll(TimeStampedModel):
     votes = models.ManyToManyField(
         settings.AUTH_USER_MODEL,
         through='VoteInPoll',
-        through_fields=['poll', 'account'],
+        through_fields=['poll', 'user'],
         verbose_name=_('Voted users'),
     )
 
@@ -97,16 +95,21 @@ class Poll(TimeStampedModel):
     def get_result_poll(self):
         """Return as a sequnce details about result poll: (Choice, count votes)."""
 
-        # list with pk and count votes
-        pks_and_count_votes_need_choices = self.choices.choices_with_count_votes().values_list('id', 'count_votes')
+        # determinate count votes in each choices
+        # and make an order of choices by descending
+        choices_with_count_votes = self.choices.choices_with_count_votes().order_by('-count_votes')
 
-        # replace pk on itself object and return it as tuple
-        objects_and_count_votes_need_choices = (
-            (self.choices.get(pk=choice_pk), count_votes)
-            for choice_pk, count_votes in pks_and_count_votes_need_choices
-        )
+        # get count votes of an each choice
+        count_votes_of_choices = choices_with_count_votes.values_list('count_votes')
 
-        return tuple(objects_and_count_votes_need_choices)
+        # make as flatten list
+        count_votes_of_choices = itertools.chain.from_iterable(count_votes_of_choices)
+
+        # make two-nested list: (choice, count_votes)
+        result = zip(choices_with_count_votes, count_votes_of_choices)
+
+        # convert generator to tuple and to return it
+        return tuple(result)
 
     def get_count_votes(self):
         """Return count total votes in poll."""
@@ -130,9 +133,10 @@ class Poll(TimeStampedModel):
     def get_date_lastest_voting(self):
         """Return a datetime latest voting in that poll or None."""
 
-        votes = self.voteinpoll_set
-        if votes.count():
+        try:
             return self.voteinpoll_set.latest().date_voting
+        except VoteInPoll.DoesNotExist:
+            return None
     get_date_lastest_voting.admin_order_field = 'date_latest_voting'
     get_date_lastest_voting.short_description = _('Date latest voting')
 
@@ -187,12 +191,13 @@ class Choice(models.Model):
     def get_voters(self):
         """Return users, participated in this poll."""
 
-        return get_user_model().objects.filter(pk__in=self.votes.values('account'))
+        User = get_user_model()
+        return User.objects.filter(pk__in=self.votes.values('user'))
 
 
 class VoteInPoll(models.Model):
     """
-    A intermediate model for keeping a choice of a account in certain poll.
+    A intermediate model for keeping a choice of a user in certain poll.
     """
 
     id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
@@ -201,7 +206,7 @@ class VoteInPoll(models.Model):
         models.CASCADE,
         verbose_name=_('Poll'),
     )
-    account = models.ForeignKey(
+    user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         models.CASCADE,
         verbose_name=_('User'),
@@ -217,7 +222,7 @@ class VoteInPoll(models.Model):
     date_voting = models.DateTimeField(_('Date voting'), auto_now=True)
 
     objects = models.Manager()
-    objects = VotesManager()
+    objects = VoteManager()
 
     class Meta:
         db_table = 'votes_in_polls'
@@ -225,12 +230,12 @@ class VoteInPoll(models.Model):
         verbose_name_plural = "Votes in polls"
         ordering = ['poll', 'date_voting']
         get_latest_by = 'date_voting'
-        unique_together = ('poll', 'account')
+        unique_together = ('poll', 'user')
 
     def __str__(self):
-        return _('Vote of a user "{0.account}" in a poll "{0.poll}"').format(self)
+        return _('Vote of a user "{0.user}" in a poll "{0.poll}"').format(self)
 
     def unique_error_message(self, model_class, unique_check):
-        if model_class == type(self) and unique_check == ('poll', 'account'):
+        if model_class == type(self) and unique_check == ('poll', 'user'):
             return _('This user already participated in that poll.')
         return super(VoteInPoll, self).unique_error_message(model_class, unique_check)

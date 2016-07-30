@@ -9,6 +9,17 @@
     <link rel="stylesheet" href="{% static 'polls/css/admin.css' %}">
 {% endblock extrastyle %}
 
+{% block extrajs %}
+    {{ block.super }}
+
+    <!-- Add built-in django version jQuery, previously passed this variable in context of view-->
+    {{ media }}
+
+    <!-- Add own js script -->
+    <script src="{% static 'polls/js/admin/admin.js' %}" type="text/javascript" charset="utf-8"></script>
+
+{% endblock extrajs %}
+
 {% block breadcrumbs %}
     {% include "polls/admin/_own_admin_breadcrumbs.html" %}
 {% endblock %}
@@ -23,16 +34,16 @@
                     <tbody>
                         <tr>
                             <td class="section">
-                                <select name="output_report">
+                                <select name="output_report" id="select_output_report">
                                     <option value="report_pdf">{% trans "Report PDF" %}</option>
-                                    <option value="report_excel">{% trans "Report Excel" %}</option>
+                                    <option value="report_excel" selected>{% trans "Report Excel" %}</option>
                                 </select>
                             </td>
                         </tr>
                         <tr>
                             <td class="section">
                                 <label for="subject_polls">
-                                    <input type="radio" name="subject" value="polls" id="subject_polls">
+                                    <input type="checkbox" name="polls" value="polls" id="subject_polls">
                                     <span>{% trans "Polls" %}</span>
                                 </label>
                             </td>
@@ -40,7 +51,7 @@
                         <tr>
                             <td class="section">
                                 <label for="subject_choices">
-                                    <input type="radio" name="subject" value="choices" id="subject_choices">
+                                    <input type="checkbox" name="choices" value="choices" id="subject_choices">
                                     <span>{% trans "Choices" %}</span>
                                 </label>
                             </td>
@@ -48,15 +59,15 @@
                         <tr>
                             <td class="section">
                                 <label for="subject_votes">
-                                    <input type="radio" name="subject" value="votes" id="subject_votes">
+                                    <input type="checkbox" name="votes" value="votes" id="subject_votes">
                                     <span>{% trans "Votes" %}</span>
                                 </label>
                             </td>
                         </tr>
                         <tr>
                             <td class="section">
-                                <label for="subject_results_polls">
-                                    <input type="radio" name="subject" value="results_polls" id="subject_results_polls" checked="checked">
+                                <label for="subject_results">
+                                    <input type="checkbox" name="results" value="results" id="subject_results" checked="checked">
                                     <span>{% trans "Result of polls" %}</span>
                                 </label>
                             </td>
@@ -64,14 +75,14 @@
                         <tr>
                             <td class="section">
                                 <label for="subject_voters">
-                                    <input type="radio" name="subject" value="voters" id="subject_voters">
+                                    <input type="checkbox" name="voters" value="voters" id="subject_voters">
                                     <span>{% trans "Voters" %}</span>
                                 </label>
                             </td>
                         </tr>
                         <tr>
                             <td class="section">
-                                <input type="submit" name="submit" value="Make report">
+                                <input type="submit" name="submit" value="Make report" id="btn_submit_make_report_polls">
                             </td>
                         </tr>
                     </tbody>
@@ -80,3 +91,4 @@
         </div>
     </div>
 {% endblock content %}
+

@@ -48,12 +48,12 @@ class ChoiceModelForm(forms.ModelForm):
 class VoteInPollModelForm(forms.ModelForm):
     class Meta:
         model = VoteInPoll
-        fields = ('account', 'poll', 'choice')
+        fields = ('user', 'poll', 'choice')
 
     def __init__(self, *args, **kwargs):
         super(VoteInPollModelForm, self).__init__(*args, **kwargs)
 
         # It is not worked
-        self.fields['account'].widget.attrs['class'] = 'span1'
+        self.fields['user'].widget.attrs['class'] = 'span1'
         self.fields['poll'].widget.attrs['class'] = 'span1'
         self.fields['choice'].widget.attrs['class'] = 'span1'

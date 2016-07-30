@@ -1,6 +1,7 @@
 
 import functools
 
+from django.contrib.auth import get_user_model
 from django.apps import apps
 from django.template.response import TemplateResponse
 from django.conf.urls import url
@@ -23,6 +24,10 @@ from .forms import PollModelForm, ChoiceModelForm
 from .formsets import ChoiceInlineFormSet
 from .actions import make_closed, make_draft, make_opened
 from .reports import ExcelReport, PollPDFReport
+from .constants import MIN_COUNT_CHOICES_IN_POLL, MAX_COUNT_CHOICES_IN_POLL
+
+
+User = get_user_model()
 
 
 def add_current_app_to_request_in_admin_view(view):
@@ -50,8 +55,8 @@ class ChoiceInline(admin.StackedInline):
     model = Choice
     form = ChoiceModelForm
     formset = ChoiceInlineFormSet
-    min_num = Poll.MIN_COUNT_CHOICES_IN_POLL
-    max_num = Poll.MAX_COUNT_CHOICES_IN_POLL
+    min_num = MIN_COUNT_CHOICES_IN_POLL
+    max_num = MAX_COUNT_CHOICES_IN_POLL
     extra = 0
     list_select_related = ('poll',)
 
@@ -61,18 +66,18 @@ class VoteInPollInline(admin.TabularInline):
     Tabular Inline View for VoteInPoll
     '''
 
-    list_select_related = ('poll', 'account', 'choice')
+    list_select_related = ('poll', 'user', 'choice')
     model = VoteInPoll
     extra = 0
-    fields = ['choice', 'account']
-    # max_num = Account.objects,active_accounts()
+    fields = ['choice', 'user']
+    # max_num = Account.objects,active_users()
 
     def __init__(self, *args, **kwargs):
         super(VoteInPollInline, self).__init__(*args, **kwargs)
 
     def get_queryset(self, request):
         qs = super(VoteInPollInline, self).get_queryset(request)
-        return qs.select_related('poll', 'account', 'choice')
+        return qs.select_related('poll', 'user', 'choice')
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name == 'choice':
@@ -216,7 +221,7 @@ class PollAdmin(admin.ModelAdmin):
         latest_vote = get_latest_or_none(VoteInPoll)
         statistics['date_latest_vote'] = getattr(latest_vote, 'date_voting', None)
         statistics['latest_active_poll'] = getattr(latest_vote, 'poll', None)
-        statistics['latest_voter'] = getattr(latest_vote, 'account', None)
+        statistics['latest_voter'] = getattr(latest_vote, 'user', None)
         statistics['latest_selected_choice'] = getattr(latest_vote, 'choice', None)
 
         # get a chart statistics of count votes by year
@@ -228,6 +233,7 @@ class PollAdmin(admin.ModelAdmin):
             self.admin_site.each_context(request),
             title=_('Statistics'),
             statistics=statistics,
+            media=self.media,
             current_app=apps.get_app_config('polls'),
             chart_statistics_count_votes_by_year=chart_statistics_count_votes_by_year,
         )
@@ -246,37 +252,34 @@ class PollAdmin(admin.ModelAdmin):
                 self.admin_site.each_context(request),
                 title=_('Make report'),
                 current_app=apps.get_app_config('polls'),
+                media=self.media,
             )
-
             return TemplateResponse(request, "polls/admin/report.html", context)
 
         # if request`s method is POST,
         # then Pdf report as file
         elif request.method == 'POST':
 
-            # get subject of report
-            subject = request.POST['subject']
-
             # get type output of report: pdf or excel
             output_report = request.POST['output_report']
 
+            # get subjects of report
+            subjects = [
+                request.POST.get('polls', None),
+                request.POST.get('choices', None),
+                request.POST.get('votes', None),
+                request.POST.get('results', None),
+                request.POST.get('voters', None),
+            ]
+
             # generate pdf-report by subject
             if output_report == 'report_pdf':
-                report = PollPDFReport(request)
 
-                # choice subject for report
-                if subject == 'polls':
-                    response = report.report_polls()
-                elif subject == 'choices':
-                    response = report.report_choices()
-                elif subject == 'votes':
-                    response = report.report_votes()
-                elif subject == 'results_polls':
-                    response = report.report_polls_results()
+                report = PollPDFReport(request, subjects)
 
             # generate excel-report
             elif output_report == 'report_excel':
-                report = ExcelReport()
+                report = ExcelReport(request, subjects)
                 response = report.make_report()
 
             return response
@@ -360,7 +363,7 @@ class PollAdmin(admin.ModelAdmin):
         for voter in all_voters:
             admin_url = voter.get_admin_url()
             voter_full_name = voter.get_full_name()
-            count_votes = voter.get_count_votes()
+            count_votes = User.polls.get_count_votes(voter)
 
             # make a translatable text for a count votes
             translated_part = ungettext(
@@ -479,7 +482,7 @@ class ChoiceAdmin(admin.ModelAdmin):
         return truncatewords(obj, 5)
 
     def display_voters_with_get_admin_links(self, obj):
-        """Display voters with link to admin url for each account."""
+        """Display voters with link to admin url for each user."""
 
         voters = obj.get_voters()
         if not voters:
@@ -501,22 +504,22 @@ class VoteInPollAdmin(admin.ModelAdmin):
     change_list_template = 'polls/admin/vote_in_poll_changelist.html'
 
     # objects list
-    list_select_related = ('poll', 'account', 'choice')
-    list_display = ('poll', 'account', 'choice', 'date_voting')
+    list_select_related = ('poll', 'user', 'choice')
+    list_display = ('poll', 'user', 'choice', 'date_voting')
     list_filter = (
         ('poll', admin.RelatedOnlyFieldListFilter),
-        ('account', admin.RelatedOnlyFieldListFilter),
+        ('user', admin.RelatedOnlyFieldListFilter),
         ('choice', admin.RelatedOnlyFieldListFilter),
         'date_voting',
     )
 
     def get_fieldsets(self, request, obj=None):
 
-        fields = ['poll', 'account', 'choice', 'date_voting']
+        fields = ['poll', 'user', 'choice', 'date_voting']
 
         # if object does not exists then hide field 'date_voting'
         if obj is None:
-            fields = ['poll', 'account', 'choice']
+            fields = ['poll', 'user', 'choice']
 
         return [
             [

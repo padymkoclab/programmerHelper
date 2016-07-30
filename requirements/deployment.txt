@@ -1,5 +1,5 @@
 
-- r base.txt
+-r base.txt
 
 whitenoise==3.0
 dj-database-url==0.4.1

@@ -2,6 +2,7 @@
 import datetime
 import itertools
 
+from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils import timezone
@@ -11,9 +12,39 @@ from dateutil.relativedelta import relativedelta
 # from apps.users.models import User
 
 
+class PollsManager(models.Manager):
+    """
+    Manager for user models.
+    """
+
+    def get_report_votes(self, user):
+        """ """
+
+        votes = user.votes.all()
+        return '\n'.join(_('Choiced "{0}" in a poll "{1}"').format(vote.choice, vote.poll) for vote in votes)
+
+    def get_count_votes(self, user):
+        """ """
+
+        return user.votes.count()
+
+    def get_votes(self, user):
+        """ """
+
+        return user.votes.all()
+
+    def get_latest_vote(self, user):
+        """ """
+
+        try:
+            return user.votes.latest()
+        except user.votes.model.DoesNotExist:
+            return
+
+
 class PollManager(models.Manager):
     """
-    Custom model manager for polls
+    Manager for polls
     """
 
     def get_statistics_polls_by_status(self):
@@ -26,22 +57,27 @@ class PollManager(models.Manager):
             self.model.CHOICES_STATUS.draft: self.draft_polls().count(),
         }
 
-    def most_active_voters(self):
+    def get_most_active_voters(self):
         """A users participated in more than haft from all count polls."""
 
-        User = get_user_model()
         half_count_polls = self.count() // 2
-        users_with_count_votes = User.objects.users_with_count_votes()
+        users_with_count_votes = get_user_model().objects.users_with_count_votes()
         return users_with_count_votes.filter(count_votes__gt=half_count_polls)
 
     def get_all_voters(self):
         """ """
 
-        User = get_user_model()
-        users_with_count_votes = User.objects.users_with_count_votes()
+        users_with_count_votes = get_user_model().objects.users_with_count_votes()
         all_voters = users_with_count_votes.filter(count_votes__gt=0)
         all_voters = all_voters.order_by('-count_votes')
         return all_voters
+
+    def is_active_voter(self, user):
+        """ """
+
+        if user in self.get_most_active_voters():
+            return True
+        return False
 
     def get_count_voters(self):
         """ """
@@ -69,10 +105,16 @@ class PollManager(models.Manager):
         return avg_count_choices['avg_count_choices']
 
 
-class VotesManager(models.Manager):
-    """
-    Custom model manager for votes
-    """
+class VoteManager(models.Manager):
+    """ """
+
+    def get_latest_vote(self):
+        """ """
+
+        try:
+            return self.latest()
+        except self.model.DoesNotExist:
+            return
 
     def get_statistics_count_votes_by_months_for_past_year(self):
         """Return a statistics of count votes in an each month for past year in next format

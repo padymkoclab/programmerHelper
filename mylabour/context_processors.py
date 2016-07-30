@@ -8,7 +8,7 @@ def date_creating_website(requset):
 
     # trying getting setting DATE_CREATING_WEBSITE
     try:
-        date_creating_website = settings.DATE_CREATING_WEBSITE
+        date_creating_website = settings.DATE_CREATING_SITE
     except AttributeError:
         raise ImproperlyConfigured('Not found setting DATE_CREATING_WEBSITE.')
     return {'date_creating_website': date_creating_website}

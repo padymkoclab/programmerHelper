@@ -1,8 +1,6 @@
 
 from django.db import models
 
-from .constants import COUNT_VOTES_FOR_HIGH_ACTIVE_POLL, COUNT_VOTES_FOR_LOW_ACTIVE_POLL
-
 
 class PollQuerySet(models.QuerySet):
     """
@@ -42,18 +40,6 @@ class PollQuerySet(models.QuerySet):
         self = self.polls_with_date_lastest_voting()
         self = self.prefetch_related('voteinpoll_set', 'choices', 'votes')
         return self
-
-    def polls_with_high_activity(self):
-        """Polls with equal or great then 30 voters."""
-
-        self = self.polls_with_count_votes()
-        return self.filter(count_votes__gte=COUNT_VOTES_FOR_HIGH_ACTIVE_POLL)
-
-    def polls_with_low_activity(self):
-        """Polls with less then 5 voters."""
-
-        self = self.polls_with_count_votes()
-        return self.filter(count_votes__lt=COUNT_VOTES_FOR_LOW_ACTIVE_POLL)
 
     def polls_with_date_lastest_voting(self):
         """Return a queryset with determined last voting`s date for an each polls."""
