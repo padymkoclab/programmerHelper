@@ -56,3 +56,13 @@ class ChoiceQuerySet(models.QuerySet):
         """Return the queryset where each a choice have determined count a votes."""
 
         return self.annotate(count_votes=models.Count('votes', distinct=True))
+
+
+class UserPollQuerySet(models.QuerySet):
+    """ """
+
+    def users_with_count_votes(self):
+        """ """
+
+        self = self.annotate(count_votes=models.Count('votes', distinct=True))
+        return self

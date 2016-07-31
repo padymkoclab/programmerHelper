@@ -4,6 +4,66 @@
 		"selected_items":
 		[
 			[
+				"Definit",
+				"DefinitionUnicode"
+			],
+			[
+				"doc",
+				"doc_width	statement"
+			],
+			[
+				"Space",
+				"Spacer	class"
+			],
+			[
+				"from",
+				"from_queryset"
+			],
+			[
+				"obj",
+				"objects"
+			],
+			[
+				"Vote",
+				"VoteInPoll	import"
+			],
+			[
+				"text",
+				"textwrap	module"
+			],
+			[
+				"report",
+				"report_name	statement"
+			],
+			[
+				"djano",
+				"convert_date_to_django_date_format"
+			],
+			[
+				"empty",
+				"tblSingleEmptyRowStyle"
+			],
+			[
+				"style",
+				"styles"
+			],
+			[
+				"voters",
+				"voters_pages	function"
+			],
+			[
+				"choi",
+				"choices_pages"
+			],
+			[
+				"count",
+				"count_polls	statement"
+			],
+			[
+				"subj",
+				"subject"
+			],
+			[
 				"stat",
 				"staticmethod	class"
 			],
@@ -264,10 +324,6 @@
 				"getElementById(id)	Element"
 			],
 			[
-				"doc",
-				"document	Document"
-			],
-			[
 				"attr",
 				"attr	.attr() - single"
 			],
@@ -328,20 +384,8 @@
 				"AUTH_USER_MODEL"
 			],
 			[
-				"Vote",
-				"VoteInPollForm	class"
-			],
-			[
 				"MOdel",
 				"ModelForm	ModelForm"
-			],
-			[
-				"count",
-				"count_votes	forstmt"
-			],
-			[
-				"obj",
-				"objects	statement"
 			],
 			[
 				"ob",
@@ -376,10 +420,6 @@
 				"unique_check	param"
 			],
 			[
-				"text",
-				"text_choice"
-			],
-			[
 				"Ch",
 				"Choice	import"
 			],
@@ -394,10 +434,6 @@
 			[
 				"requ",
 				"request"
-			],
-			[
-				"choi",
-				"choice"
 			],
 			[
 				"po",
@@ -478,60 +514,32 @@
 			[
 				"__",
 				"__file__	instance"
-			],
-			[
-				"date",
-				"datetime_ago	statement"
-			],
-			[
-				"count_",
-				"count_snippets"
-			],
-			[
-				"timz",
-				"timezone	import"
-			],
-			[
-				"inner",
-				"innerHTML	Element"
-			],
-			[
-				"btns_",
-				"btns_prev_month"
-			],
-			[
-				"for",
-				"for	for (…) {…}"
-			],
-			[
-				"cons",
-				"console.log()"
-			],
-			[
-				"border",
-				"border-width"
-			],
-			[
-				"bac",
-				"background-color"
 			]
 		]
 	},
 	"buffers":
 	[
 		{
-			"file": "requirements/development.txt",
+			"file": "/media/wlysenko/66ABF2AC3D03BAAA/Web/A",
 			"settings":
 			{
-				"buffer_size": 473,
+				"buffer_size": 76664,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "project.sublime-project",
+			"file": "apps/polls/admin.py",
 			"settings":
 			{
-				"buffer_size": 435,
+				"buffer_size": 18823,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "apps/polls/reports.py",
+			"settings":
+			{
+				"buffer_size": 65015,
 				"line_ending": "Unix"
 			}
 		}
@@ -1149,19 +1157,34 @@
 	},
 	"expanded_folders":
 	[
-		"/home/wlysenko/.virtualenvs/programmerHelper/project"
+		"/home/wlysenko/.virtualenvs/programmerHelper/project",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/core",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/templates",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/templates/polls",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/templates/polls/admin",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/mylabour"
 	],
 	"file_history":
 	[
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/managers.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/mylabour/functions_db.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/models.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/querysets.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/models.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/querysets.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/managers.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/mylabour/utils.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/core/reports.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/templates/polls/admin/report.html",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/manage.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/requirements/base.txt",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/project.sublime-project",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/tasks.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/requirements/base.txt",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/requirements/development.txt",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/project.sublime-project",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/requirements.txt",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/requirements/deployment.txt",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/templates/polls/admin/report.html",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/querysets.py",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/constants.py",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/static/polls/js/admin/admin.js",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/.eslintrc.json",
@@ -1171,7 +1194,6 @@
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/templates/admin/base.html",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/templates/polls/admin/statistics.html",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/mylabour/context_processors.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/managers.py",
 		"/home/wlysenko/.virtualenvs/virtual_programmerHelper/project_programmerHelper/apps/export_import_models/views.py",
 		"/home/wlysenko/.virtualenvs/virtual_programmerHelper/project_programmerHelper/excel.py",
 		"/home/wlysenko/.virtualenvs/virtual_programmerHelper/project_programmerHelper/apps/export_import_models/static/export_import_models/js/export_import_models.js",
@@ -1273,14 +1295,7 @@
 		"/home/wlysenko/.virtualenvs/virtual_programmerHelper/project_programmerHelper/apps/snippets/tests/test_managers.py",
 		"/home/wlysenko/.virtualenvs/virtual_programmerHelper/project_programmerHelper/apps/snippets/managers.py",
 		"/home/wlysenko/.virtualenvs/virtual_programmerHelper/project_programmerHelper/apps/snippets/models.py",
-		"/home/wlysenko/.virtualenvs/virtual_programmerHelper/project_programmerHelper/apps/snippets/querysets.py",
-		"/home/wlysenko/.virtualenvs/virtual_programmerHelper/project_programmerHelper/apps/snippets/tests/test_views.py",
-		"/home/wlysenko/.virtualenvs/virtual_programmerHelper/project_programmerHelper/apps/articles/tests/test_querysets.py",
-		"/home/wlysenko/.virtualenvs/virtual_programmerHelper/project_programmerHelper/apps/marks/factories.py",
-		"/home/wlysenko/.virtualenvs/virtual_programmerHelper/project_programmerHelper/apps/accounts/admin.py",
-		"/home/wlysenko/.virtualenvs/virtual_programmerHelper/project_programmerHelper/apps/scopes/admin.py",
-		"/home/wlysenko/.virtualenvs/virtual_programmerHelper/project_programmerHelper/apps/scopes/apps.py",
-		"/home/wlysenko/.virtualenvs/virtual_programmerHelper/project_programmerHelper/config/tests_live.py"
+		"/home/wlysenko/.virtualenvs/virtual_programmerHelper/project_programmerHelper/apps/snippets/querysets.py"
 	],
 	"find":
 	{
@@ -1298,6 +1313,71 @@
 		"case_sensitive": true,
 		"find_history":
 		[
+			"DefinitionUnicode",
+			"record",
+			"Warning",
+			"Spacer",
+			"TitleUnicode",
+			"DefinitionUnicode",
+			", ",
+			"Round",
+			"Poll.objects.get_all_voters()",
+			"get_all_voters()",
+			"get_table_statistics_results_polls",
+			"get_all_voters",
+			"determination",
+			"related_model",
+			"count_polls",
+			"models.QuerySet",
+			"PollsManager",
+			"self.all_voters",
+			"Count voters",
+			"get_count_voters",
+			"get_latest_vote",
+			"date",
+			"date_voting",
+			"eed",
+			"report_name",
+			"Empt",
+			"tblObjectsStyle",
+			"User",
+			"yet not",
+			"Latest vote",
+			"_textwrap_long_text",
+			"ItalicCenter",
+			"object_page",
+			"get_table_statistics_results_polls",
+			"object_page",
+			"),",
+			"Empt",
+			"Polls",
+			"Poll.objects.count()",
+			"create_response",
+			"polls_page",
+			"objects_page",
+			"get_table_statistics_polls",
+			"get_latest_or_none",
+			"VoteInPoll.objects.latest()",
+			"story",
+			"write_statistics",
+			"subject",
+			"JustifyParagraph",
+			"current_timezone",
+			"content_title",
+			"title_page",
+			"Title",
+			"title_page",
+			"report_choices",
+			"self.subject",
+			"report_polls",
+			"get_ip_from_request",
+			"user_full_name",
+			"self.request",
+			"buffer",
+			"get_filename_with_datetime",
+			"self.buffer",
+			"make_r",
+			"self.log",
 			"btn_submit_make_report_polls",
 			"make_report_polls",
 			"btn_submit_make_report_polls",
@@ -1360,72 +1440,7 @@
 			"blue",
 			"black",
 			"blue",
-			"150",
-			"top_value",
-			"150",
-			"if (",
-			"grey",
-			"50",
-			"grey",
-			"black",
-			"value",
-			"determinated_lighten_day",
-			"deterninated_lighten_day",
-			"top_value",
-			"yellow",
-			"width_parent_sun_without_ten_percent_width_parent_sun",
-			"ten_percent_width_parent_sun",
-			"width_parent_sun",
-			"top_value",
-			"sun_move2",
-			"width_parent_sun",
-			"sun_move2",
-			"move_down_sun",
-			"move_up_sun",
-			"move_up",
-			"move_up_sun",
-			"sun_move_up",
-			"top_value",
-			"left_value",
-			"current_styles",
-			"left_value",
-			"top_value",
-			"left_value",
-			"top_value",
-			"sun_move",
-			"left_value",
-			"ten_percent_width_parent_sun",
-			"width_parent_sun",
-			"all_styles_parent_sun",
-			"sun",
-			"parent_sun",
-			"GENE",
-			"Ge",
-			"top",
-			"top_value",
-			"bottom",
-			"top",
-			"value_top_in_px",
-			"top_value",
-			"'];\n",
-			"sun_style",
-			"top",
-			"sun_styles",
-			"all_styles_sun",
-			"sun_style",
-			"all_styles",
-			"sun_style",
-			"all_styles",
-			"top",
-			"top_in_px",
-			"value_top_in_px",
-			"top",
-			"top_in_px",
-			"setAttribute",
-			"top",
-			"delay",
-			"jscs",
-			"ctx"
+			"150"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -1539,24 +1554,24 @@
 	"groups":
 	[
 		{
-			"selected": 0,
+			"selected": 2,
 			"sheets":
 			[
 				{
 					"buffer": 0,
-					"file": "requirements/development.txt",
+					"file": "/media/wlysenko/66ABF2AC3D03BAAA/Web/A",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 473,
+						"buffer_size": 76664,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								164,
-								164
+								355,
+								355
 							]
 						],
 						"settings":
@@ -1579,51 +1594,31 @@
 							},
 							"bracket_highlighter.regions":
 							[
-								"bh_c_define",
-								"bh_c_define_center",
-								"bh_c_define_open",
-								"bh_c_define_close",
-								"bh_c_define_content",
-								"bh_round",
-								"bh_round_center",
-								"bh_round_open",
-								"bh_round_close",
-								"bh_round_content",
-								"bh_default",
-								"bh_default_center",
-								"bh_default_open",
-								"bh_default_close",
-								"bh_default_content",
-								"bh_curly",
-								"bh_curly_center",
-								"bh_curly_open",
-								"bh_curly_close",
-								"bh_curly_content",
-								"bh_angle",
-								"bh_angle_center",
-								"bh_angle_open",
-								"bh_angle_close",
-								"bh_angle_content",
 								"bh_double_quote",
 								"bh_double_quote_center",
 								"bh_double_quote_open",
 								"bh_double_quote_close",
 								"bh_double_quote_content",
-								"bh_tag",
-								"bh_tag_center",
-								"bh_tag_open",
-								"bh_tag_close",
-								"bh_tag_content",
-								"bh_unmatched",
-								"bh_unmatched_center",
-								"bh_unmatched_open",
-								"bh_unmatched_close",
-								"bh_unmatched_content",
 								"bh_square",
 								"bh_square_center",
 								"bh_square_open",
 								"bh_square_close",
 								"bh_square_content",
+								"bh_tag",
+								"bh_tag_center",
+								"bh_tag_open",
+								"bh_tag_close",
+								"bh_tag_content",
+								"bh_c_define",
+								"bh_c_define_center",
+								"bh_c_define_open",
+								"bh_c_define_close",
+								"bh_c_define_content",
+								"bh_curly",
+								"bh_curly_center",
+								"bh_curly_open",
+								"bh_curly_close",
+								"bh_curly_content",
 								"bh_single_quote",
 								"bh_single_quote_center",
 								"bh_single_quote_open",
@@ -1633,33 +1628,55 @@
 								"bh_regex_center",
 								"bh_regex_open",
 								"bh_regex_close",
-								"bh_regex_content"
+								"bh_regex_content",
+								"bh_unmatched",
+								"bh_unmatched_center",
+								"bh_unmatched_open",
+								"bh_unmatched_close",
+								"bh_unmatched_content",
+								"bh_angle",
+								"bh_angle_center",
+								"bh_angle_open",
+								"bh_angle_close",
+								"bh_angle_content",
+								"bh_default",
+								"bh_default_center",
+								"bh_default_open",
+								"bh_default_close",
+								"bh_default_content",
+								"bh_round",
+								"bh_round_center",
+								"bh_round_open",
+								"bh_round_close",
+								"bh_round_content"
 							],
-							"is_xml": false,
-							"syntax": "Packages/Djaneiro/Syntaxes/HTML (Django).tmLanguage"
+							"color_scheme": "Packages/User/Color Highlighter/themes/Monokai Extended Bright (SL).tmTheme",
+							"syntax": "Packages/Text/Plain text.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 0,
+					"stack_index": 2,
 					"type": "text"
 				},
 				{
 					"buffer": 1,
-					"file": "project.sublime-project",
+					"file": "apps/polls/admin.py",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 435,
+						"buffer_size": 18823,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								257,
-								257
+								12440,
+								12440
 							]
 						],
 						"settings":
@@ -1669,27 +1686,12 @@
 							{
 								"close":
 								{
-									"1":
-									[
-										259,
-										260
-									]
 								},
 								"icon":
 								{
-									"1":
-									[
-										"Packages/BracketHighlighter/icons/square_bracket.png",
-										"brackethighlighter.default"
-									]
 								},
 								"open":
 								{
-									"1":
-									[
-										21,
-										22
-									]
 								},
 								"unmatched":
 								{
@@ -1697,51 +1699,31 @@
 							},
 							"bracket_highlighter.regions":
 							[
-								"bh_c_define",
-								"bh_c_define_center",
-								"bh_c_define_open",
-								"bh_c_define_close",
-								"bh_c_define_content",
-								"bh_round",
-								"bh_round_center",
-								"bh_round_open",
-								"bh_round_close",
-								"bh_round_content",
-								"bh_default",
-								"bh_default_center",
-								"bh_default_open",
-								"bh_default_close",
-								"bh_default_content",
-								"bh_curly",
-								"bh_curly_center",
-								"bh_curly_open",
-								"bh_curly_close",
-								"bh_curly_content",
-								"bh_angle",
-								"bh_angle_center",
-								"bh_angle_open",
-								"bh_angle_close",
-								"bh_angle_content",
 								"bh_double_quote",
 								"bh_double_quote_center",
 								"bh_double_quote_open",
 								"bh_double_quote_close",
 								"bh_double_quote_content",
-								"bh_tag",
-								"bh_tag_center",
-								"bh_tag_open",
-								"bh_tag_close",
-								"bh_tag_content",
-								"bh_unmatched",
-								"bh_unmatched_center",
-								"bh_unmatched_open",
-								"bh_unmatched_close",
-								"bh_unmatched_content",
 								"bh_square",
 								"bh_square_center",
 								"bh_square_open",
 								"bh_square_close",
 								"bh_square_content",
+								"bh_tag",
+								"bh_tag_center",
+								"bh_tag_open",
+								"bh_tag_close",
+								"bh_tag_content",
+								"bh_c_define",
+								"bh_c_define_center",
+								"bh_c_define_open",
+								"bh_c_define_close",
+								"bh_c_define_content",
+								"bh_curly",
+								"bh_curly_center",
+								"bh_curly_open",
+								"bh_curly_close",
+								"bh_curly_content",
 								"bh_single_quote",
 								"bh_single_quote_center",
 								"bh_single_quote_open",
@@ -1751,16 +1733,143 @@
 								"bh_regex_center",
 								"bh_regex_open",
 								"bh_regex_close",
-								"bh_regex_content"
+								"bh_regex_content",
+								"bh_unmatched",
+								"bh_unmatched_center",
+								"bh_unmatched_open",
+								"bh_unmatched_close",
+								"bh_unmatched_content",
+								"bh_angle",
+								"bh_angle_center",
+								"bh_angle_open",
+								"bh_angle_close",
+								"bh_angle_content",
+								"bh_default",
+								"bh_default_center",
+								"bh_default_open",
+								"bh_default_close",
+								"bh_default_content",
+								"bh_round",
+								"bh_round_center",
+								"bh_round_open",
+								"bh_round_close",
+								"bh_round_content"
 							],
-							"syntax": "Packages/JavaScript/JSON.sublime-syntax",
-							"translate_tabs_to_spaces": false
+							"color_scheme": "Packages/User/Color Highlighter/themes/Monokai Extended Bright (SL).tmTheme",
+							"syntax": "Packages/Djaneiro/Syntaxes/Python Django.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 4629.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "apps/polls/reports.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 65015,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								53948,
+								53948
+							]
+						],
+						"settings":
+						{
+							"bracket_highlighter.busy": false,
+							"bracket_highlighter.locations":
+							{
+								"close":
+								{
+								},
+								"icon":
+								{
+								},
+								"open":
+								{
+								},
+								"unmatched":
+								{
+								}
+							},
+							"bracket_highlighter.regions":
+							[
+								"bh_double_quote",
+								"bh_double_quote_center",
+								"bh_double_quote_open",
+								"bh_double_quote_close",
+								"bh_double_quote_content",
+								"bh_square",
+								"bh_square_center",
+								"bh_square_open",
+								"bh_square_close",
+								"bh_square_content",
+								"bh_tag",
+								"bh_tag_center",
+								"bh_tag_open",
+								"bh_tag_close",
+								"bh_tag_content",
+								"bh_c_define",
+								"bh_c_define_center",
+								"bh_c_define_open",
+								"bh_c_define_close",
+								"bh_c_define_content",
+								"bh_curly",
+								"bh_curly_center",
+								"bh_curly_open",
+								"bh_curly_close",
+								"bh_curly_content",
+								"bh_single_quote",
+								"bh_single_quote_center",
+								"bh_single_quote_open",
+								"bh_single_quote_close",
+								"bh_single_quote_content",
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
+								"bh_regex_content",
+								"bh_unmatched",
+								"bh_unmatched_center",
+								"bh_unmatched_open",
+								"bh_unmatched_close",
+								"bh_unmatched_content",
+								"bh_angle",
+								"bh_angle_center",
+								"bh_angle_open",
+								"bh_angle_close",
+								"bh_angle_content",
+								"bh_default",
+								"bh_default_center",
+								"bh_default_open",
+								"bh_default_close",
+								"bh_default_content",
+								"bh_round",
+								"bh_round_center",
+								"bh_round_open",
+								"bh_round_close",
+								"bh_round_content"
+							],
+							"color_scheme": "Packages/User/Color Highlighter/themes/Monokai Extended Bright (SL).tmTheme",
+							"syntax": "Packages/Djaneiro/Syntaxes/Python Django.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 4966.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
 					"type": "text"
 				}
 			]
@@ -1862,7 +1971,7 @@
 	"show_minimap": true,
 	"show_open_files": true,
 	"show_tabs": true,
-	"side_bar_visible": false,
+	"side_bar_visible": true,
 	"side_bar_width": 263.0,
 	"status_bar_visible": true,
 	"template_settings":

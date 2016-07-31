@@ -3,25 +3,27 @@ import datetime
 import itertools
 
 from django.utils.translation import ugettext_lazy as _
-from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils import timezone
 
 from dateutil.relativedelta import relativedelta
 
-# from apps.users.models import User
+from mylabour.functions_db import Round
 
 
 class PollsManager(models.Manager):
     """
-    Manager for user models.
+    Manager for the user model.
     """
 
     def get_report_votes(self, user):
         """ """
 
         votes = user.votes.all()
-        return '\n'.join(_('Choiced "{0}" in a poll "{1}"').format(vote.choice, vote.poll) for vote in votes)
+        return tuple(
+            _('Voted for a choice "{0}" in a poll "{1}"').format(vote.choice, vote.poll)
+            for vote in votes
+        )
 
     def get_count_votes(self, user):
         """ """
@@ -41,6 +43,43 @@ class PollsManager(models.Manager):
         except user.votes.model.DoesNotExist:
             return
 
+    def is_active_voter(self, user):
+        """ """
+
+        if user in self.get_most_active_voters():
+            return True
+        return False
+
+    def get_all_voters(self):
+        """ """
+
+        # annotate a count votes for an every user
+        users_with_count_votes = self.users_with_count_votes()
+
+        # filter users with votes
+        all_voters = users_with_count_votes.filter(count_votes__gt=0)
+
+        # order by users by count votes in a descending order
+        return all_voters.order_by('-count_votes')
+
+    def get_most_active_voters(self):
+        """A users participated in more than haft from all count polls."""
+
+        # make an access to a related model
+        related_model = self.model.votes.rel.related_model
+
+        # total count polls
+        count_polls = related_model.poll.get_queryset().count()
+
+        # half from count polls as integer
+        half_count_polls = count_polls // 2
+
+        # determination count votes for an each user
+        users_with_count_votes = self.users_with_count_votes()
+
+        # filter the users with the count votes more than the half from total count polls
+        return users_with_count_votes.filter(count_votes__gt=half_count_polls)
+
 
 class PollManager(models.Manager):
     """
@@ -57,33 +96,6 @@ class PollManager(models.Manager):
             self.model.CHOICES_STATUS.draft: self.draft_polls().count(),
         }
 
-    def get_most_active_voters(self):
-        """A users participated in more than haft from all count polls."""
-
-        half_count_polls = self.count() // 2
-        users_with_count_votes = get_user_model().objects.users_with_count_votes()
-        return users_with_count_votes.filter(count_votes__gt=half_count_polls)
-
-    def get_all_voters(self):
-        """ """
-
-        users_with_count_votes = get_user_model().objects.users_with_count_votes()
-        all_voters = users_with_count_votes.filter(count_votes__gt=0)
-        all_voters = all_voters.order_by('-count_votes')
-        return all_voters
-
-    def is_active_voter(self, user):
-        """ """
-
-        if user in self.get_most_active_voters():
-            return True
-        return False
-
-    def get_count_voters(self):
-        """ """
-
-        return self.get_all_voters().count()
-
     def get_average_count_votes_in_polls(self):
         """Return an average count votes on the polls.
 
@@ -91,7 +103,7 @@ class PollManager(models.Manager):
         """
 
         polls_with_count_votes = self.polls_with_count_votes()
-        avg_count_votes = polls_with_count_votes.aggregate(avg_count_votes=models.Avg('count_votes'))
+        avg_count_votes = polls_with_count_votes.aggregate(avg_count_votes=Round(models.Avg('count_votes')))
         return avg_count_votes['avg_count_votes']
 
     def get_average_count_choices_in_polls(self):
@@ -101,20 +113,17 @@ class PollManager(models.Manager):
         """
 
         polls_with_count_choices = self.polls_with_count_choices()
-        avg_count_choices = polls_with_count_choices.aggregate(avg_count_choices=models.Avg('count_choices'))
+        avg_count_choices = polls_with_count_choices.aggregate(avg_count_choices=Round(models.Avg('count_choices')))
         return avg_count_choices['avg_count_choices']
 
 
 class VoteManager(models.Manager):
     """ """
 
-    def get_latest_vote(self):
+    def get_count_voters(self):
         """ """
 
-        try:
-            return self.latest()
-        except self.model.DoesNotExist:
-            return
+        return self.values('user').distinct().count()
 
     def get_statistics_count_votes_by_months_for_past_year(self):
         """Return a statistics of count votes in an each month for past year in next format

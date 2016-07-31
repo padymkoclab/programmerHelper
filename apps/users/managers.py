@@ -2,7 +2,7 @@
 import itertools
 import collections
 
-# from django.db import models
+from django.db import models
 # from django.utils.translation import ugettext as _
 from django.contrib.auth.models import BaseUserManager
 
@@ -63,3 +63,9 @@ class UserManager(BaseUserManager):
             result[pk] = 100 / len(list_restictions) * value
         # return as dictioinary {instance.pk: percent}
         return result
+
+
+class ActiveUserManager(models.Manager):
+    """ """
+
+    pass

@@ -274,14 +274,13 @@ class PollAdmin(admin.ModelAdmin):
 
             # generate pdf-report by subject
             if output_report == 'report_pdf':
-
                 report = PollPDFReport(request, subjects)
 
             # generate excel-report
             elif output_report == 'report_excel':
                 report = ExcelReport(request, subjects)
-                response = report.make_report()
 
+            response = report.make_report()
             return response
 
     def _build_chart_poll_result(self, object_id):
@@ -350,7 +349,7 @@ class PollAdmin(admin.ModelAdmin):
         """ """
 
         # get all voters
-        all_voters = Poll.objects.get_all_voters()
+        all_voters = User.polls.get_all_voters()
 
         # if no voters - return corresponding message
         if not all_voters:

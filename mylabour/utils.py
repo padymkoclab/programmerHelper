@@ -643,7 +643,7 @@ def get_latest_or_none(model):
     try:
         return qs.latest()
     except model.DoesNotExist:
-        return None
+        return
 
 
 if __name__ == "__main__":

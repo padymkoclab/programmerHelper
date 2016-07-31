@@ -9,7 +9,7 @@ class Round(Func):
     """
 
     function = 'ROUND'
-    template = '%(function)s(%(expressions)s, 4)'
+    template = '%(function)s(%(expressions)s, 3)'
 
 
 class ToStr(Func):

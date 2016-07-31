@@ -15,6 +15,7 @@ from model_utils import Choices
 from model_utils.managers import QueryManager
 
 from apps.polls.managers import PollsManager
+from apps.polls.querysets import UserPollQuerySet
 from apps.articles.models import Article
 from apps.activity.models import Activity
 from apps.forum.models import ForumTopic
@@ -134,7 +135,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     # managers
     objects = models.Manager()
     objects = UserManager.from_queryset(UserQuerySet)()
-    polls = PollsManager()
+    polls = PollsManager.from_queryset(UserPollQuerySet)()
     badges = BadgeManager()
 
     # simple managers
