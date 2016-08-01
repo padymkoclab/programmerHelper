@@ -2,7 +2,7 @@
 import factory
 from factory import fuzzy
 
-from mylabour.utils import generate_text_by_min_length
+from mylabour.factories_utils import generate_text_by_min_length
 
 from .models import Poll, Choice
 

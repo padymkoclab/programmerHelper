@@ -3,7 +3,7 @@ import random
 
 from django.contrib.auth import get_user_model
 
-from mylabour.utils import get_random_date_from_days_ago_to_now
+from mylabour.datetime_utils import get_random_date_from_days_ago_to_now
 from mylabour.basecommands import ExtendedBaseCommand
 from mylabour.utils import create_logger_by_filename
 

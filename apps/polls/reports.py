@@ -1,7 +1,7 @@
+
 from io import BytesIO
 import random
 import textwrap
-import time
 
 from django.utils.translation import ugettext as _
 from django.utils import timezone
@@ -28,7 +28,7 @@ from reportlab.lib.pagesizes import A4
 from reportlab.lib import colors
 from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from reportlab.lib.units import inch
-from reportlab.graphics.shapes import Drawing, String
+from reportlab.graphics.shapes import Drawing
 from reportlab.graphics.charts.piecharts import Pie
 from reportlab.graphics.charts.linecharts import HorizontalLineChart
 from reportlab.graphics.charts.barcharts import VerticalBarChart
@@ -41,19 +41,29 @@ import xlsxwriter
 # from apps.core.reports import SitePDFReportTemplate
 from mylabour.utils import (
     get_filename_with_datetime,
-    convert_date_to_django_date_format,
     get_latest_or_none,
     create_logger_by_filename,
-    get_year_by_slavic_aryan_calendar,
-    get_ip_from_request,
-    get_location_from_ip,
+    get_location,
 )
-
+from mylabour.datetime_utils import (
+    convert_date_to_django_date_format,
+    get_year_by_slavic_aryan_calendar,
+    get_current_timezone_offset,
+)
 from apps.polls.models import Poll, Choice, VoteInPoll
 
 
 User = get_user_model()
 logger = create_logger_by_filename(__name__)
+
+
+SUBJECTS_HUMAN_NAMES = {
+    'polls': _('Polls'),
+    'choices': _('Choises'),
+    'votes': _('Votes'),
+    'voters': _('Voters'),
+    'results': _('Results of polls'),
+}
 
 
 class ExcelReport(object):
@@ -874,7 +884,7 @@ class PollPDFReport(object):
         self.subjects = tuple(subject for subject in subjects if subject is not None)
         self.styles = getSampleStyleSheet()
         self.slavic_aryan_year = get_year_by_slavic_aryan_calendar(self.now)
-        # self.request = args[0]
+        self.request = request
         self.buffer = BytesIO()
         self.report_name = _('Report about polls')
         self.doc = self.get_doc()
@@ -921,16 +931,16 @@ class PollPDFReport(object):
             PageTemplate('Content', frames=[frame], onPage=self.content_page),
             PageTemplate('Statistics', frames=[frame], onPage=self.statisctics_page),
             PageTemplate('Polls', frames=[frame], onPage=self.polls_pages),
-            PageTemplate('Choices', frames=[frame], onPage=self.polls_pages),
+            PageTemplate('Choices', frames=[frame], onPage=self.choices_pages),
             PageTemplate('Votes', frames=[frame], onPage=self.voters_pages),
-            PageTemplate('Results', frames=[frame], onPage=self.polls_pages),
-            PageTemplate('Voters', frames=[frame], onPage=self.voters_pages),
+            PageTemplate('Results', frames=[frame], onPage=self.results_pages),
+            PageTemplate('Voters', frames=[frame], onPage=self.votes_pages),
         ])
 
     def add_styles(self):
         """Add styles specific for polls."""
 
-        # super(self.__class__, self).add_styles()
+        # Styles for paragraphs
 
         self.styles.add(ParagraphStyle(
             'RightParagraph',
@@ -938,6 +948,7 @@ class PollPDFReport(object):
             parent=self.styles['Normal'],
             fontName='FreeSans',
             fontSize=12,
+            spaceAfter=inch / 4,
         ))
         self.styles.add(ParagraphStyle(
             'JustifyParagraph',
@@ -959,6 +970,12 @@ class PollPDFReport(object):
             fontSize=28,
             fontName='FreeSansBold',
             leading=inch / 2,
+        ))
+        self.styles.add(ParagraphStyle(
+            'TitlePage',
+            alignment=TA_CENTER,
+            fontSize=15,
+            fontName='FreeSansBold',
         ))
         self.styles.add(ParagraphStyle(
             'SubjectHeader',
@@ -986,22 +1003,17 @@ class PollPDFReport(object):
             leftIndent=4,
         ))
 
+        # Styles for tables
+
+        # a table`s style for table of statistics
         self.tblStaticticsStyle = TableStyle([
-            #
-            ('SPAN', (0, 0), (1, 0)),
-            ('ALIGN', (0, 0), (1, 0), 'CENTRE'),
-            ('FONTNAME', (0, 0), (1, 0), 'FreeSansBold'),
-            ('FONTSIZE', (0, 0), (1, 0), 25),
-            ('TOPPADDING', (0, 0), (1, 0), inch),
-            ('BOTTOMPADDING', (0, 0), (1, 0), inch),
-            ('TEXTCOLOR', (0, 0), (1, 0), colors.black),
-            #
-            ('ALIGN', (1, 1), (1, -1), 'RIGHT'),
-            ('LINEBELOW', (0, 1), (-1, -1), .2, colors.black),
-            ('TOPPADDING', (0, 1), (-1, -1), inch / 5),
-            ('FONTNAME', (0, 1), (-1, -1), 'FreeSans'),
+            ('ALIGN', (1, 0), (1, -1), 'RIGHT'),
+            ('LINEBELOW', (0, 0), (-1, -1), .2, colors.black),
+            ('TOPPADDING', (0, 0), (-1, -1), inch / 5),
+            ('FONTNAME', (0, 0), (-1, -1), 'FreeSans'),
         ])
 
+        # a table`s style for a table of objects
         self.tblObjectsStyle = TableStyle([
             ('FONTNAME', (0, 0), (-1, 0), 'FreeSansBold'),
             ('FONTNAME', (0, 1), (-1, -1), 'FreeSans'),
@@ -1010,21 +1022,11 @@ class PollPDFReport(object):
             ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
         ])
 
-        self.tblSingleEmptyRowStyle = TableStyle(self.tblObjectsStyle.getCommands())
-        self.tblSingleEmptyRowStyle.add('SPAN', (0, -1), (-1, -1))
-        self.tblSingleEmptyRowStyle.add('TEXTCOLOR', (0, -1), (-1, -1), colors.red)
-        self.tblSingleEmptyRowStyle.add('TOPPADDING', (0, -1), (-1, -1), 20)
-        self.tblSingleEmptyRowStyle.add('BOTTOMPADDING', (0, -1), (-1, -1), 20)
-        self.tblSingleEmptyRowStyle.add('FONTSIZE', (0, -1), (-1, -1), 17)
-
-        # a style for a table of polls
-        # when poll doesn`t have votes at all
-        self.ParagraphNoVotes = Paragraph(_('No votes'), self.styles['ItalicCenter'])
-
+        # a table`s style for a single poll
         self.PollTableStyle = TableStyle([
-            # all cells
-            ('GRID', (0, 1), (-1, -1), 0.2, colors.burlywood),
-            ('FONTNAME', (0, 0), (-1, -1), 'FreeSans'),
+            ('GRID', (0, 0), (-1, -1), 0.2, colors.black),
+            ('FONTNAME', (0, 0), (0, -1), 'FreeSansBold'),
+            ('FONTNAME', (1, 0), (1, -1), 'FreeSans'),
             ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
             ('ALIGN', (0, 0), (-1, -1), 'CENTRE'),
             ('TOPPADDING', (0, 0), (-1, -1), 10),
@@ -1032,30 +1034,6 @@ class PollPDFReport(object):
             ('RIGHTPADDING', (0, 0), (-1, -1), 10),
             ('BOTTOMPADDING', (0, 0), (-1, -1), 10),
             ('FONTSIZE', (0, 0), (-1, -1), 14),
-            # fields and table`s title names
-            ('FONTNAME', (0, 0), (0, 0), 'FreeSansBold'),
-            ('FONTNAME', (0, 1), (0, 1), 'FreeSansBold'),
-            ('FONTNAME', (0, 3), (0, 3), 'FreeSansBold'),
-            ('FONTNAME', (0, 5), (0, 5), 'FreeSansBold'),
-            ('FONTNAME', (0, 7), (0, 7), 'FreeSansBold'),
-            ('FONTNAME', (0, 8), (0, 8), 'FreeSansBold'),
-            ('FONTNAME', (0, 9), (0, 9), 'FreeSansBold'),
-            ('FONTNAME', (0, 10), (0, 10), 'FreeSansBold'),
-            ('FONTNAME', (0, 11), (0, 11), 'FreeSansBold'),
-            ('FONTNAME', (0, 12), (0, 12), 'FreeSansBold'),
-            # span cells
-            ('SPAN', (0, 0), (-1, 0)),
-            ('SPAN', (0, 1), (-1, 1)),
-            ('SPAN', (0, 2), (-1, 2)),
-            ('SPAN', (0, 3), (-1, 3)),
-            ('SPAN', (0, 4), (-1, 4)),
-            ('SPAN', (0, 5), (-1, 5)),
-            ('SPAN', (0, 6), (-1, 6)),
-            # table`s title
-            ('FONTSIZE', (0, 0), (0, 0), 20),
-            ('LEADING', (0, 0), (0, 0), 30),
-            ('TOPPADDING', (0, 0), (0, 0), 75),
-            ('BOTTOMPADDING', (0, 0), (0, 0), 25),
         ])
 
     def create_response(self):
@@ -1087,6 +1065,8 @@ class PollPDFReport(object):
 
         # create a response, passing a string as begin of filename
         self.response = self.create_response()
+
+        self.write_title(story)
 
         # draw title page and go to next page template
         # draw statistics about all the polls
@@ -1123,7 +1103,7 @@ class PollPDFReport(object):
         canv.saveState()
 
         header = Paragraph(settings.SITE_NAME, self.styles['CenterNormal'])
-        w, h = header.wrap(doc.width, doc.topMargin)
+        header.wrap(doc.width, doc.topMargin)
         header.drawOn(canv, doc.leftMargin, self.doc_height - self.doc.topMargin)
 
         footer = Paragraph(
@@ -1133,60 +1113,13 @@ class PollPDFReport(object):
         footer.wrap(doc.width, doc.bottomMargin)
         footer.drawOn(canv, doc.leftMargin, inch / 2)
 
-        title = Paragraph(_('Report'), self.styles['TitleReport'])
-        title.wrap(doc.width, doc.height)
-        title.drawOn(canv, doc.leftMargin, self.doc_height / 1.6)
-
-        subject = Paragraph('\"Report about polls\"', self.styles['TitleReport'])
-        subject.wrap(doc.width, doc.height)
-        subject.drawOn(canv, doc.leftMargin, self.doc_height / 1.8)
-
-        # get an IP-address from the request
-        # ip = get_ip_from_request(self.request)
-
-        # get details about a location, from the IP-address
-        # GeoLocation = get_location_from_ip(ip)
-
-        logger.critical('Dont worked IP determination of user')
-
-        # location = Paragraph(
-        #     _('Location: {0}, {1}').format(GeoLocation['city'], GeoLocation['country_name']),
-        #     self.styles['RightParagraph']
-        # )
-        # location.wrap(doc.width, doc.height)
-        # location.drawOn(canv, self.doc.leftMargin, self.doc.bottomMargin + inch * 2)
-
-        author = Paragraph(_('Author: %s') % self.author, self.styles['RightParagraph'])
-        author.wrap(doc.width, doc.height)
-        author.drawOn(canv, self.doc.leftMargin, self.doc.bottomMargin + inch * 1.5)
-
-        date_generation = Paragraph(
-            _('Generated: %s') % convert_date_to_django_date_format(self.now),
-            self.styles['RightParagraph']
-        )
-        date_generation.wrap(doc.width, doc.height)
-        date_generation.drawOn(canv, self.doc.leftMargin, self.doc.bottomMargin + inch)
-
-        offset_hours = -time.timezone / 3600
-
-        current_timezone = Paragraph(
-            _('Timezone: {0} ({1:+} hour/s to UTC)').format(settings.TIME_ZONE, offset_hours),
-            self.styles['RightParagraph']
-        )
-        current_timezone.wrap(doc.width, doc.height)
-        current_timezone.drawOn(canv, self.doc.leftMargin, self.doc.bottomMargin + inch / 2)
-
         canv.restoreState()
 
     def content_page(self, canv, doc):
         """ """
 
         canv.saveState()
-
-        content_title = Paragraph(_('Report`s content:'), self.styles['RightParagraph'])
-        content_title.wrap(doc.width, doc.height)
-        content_title.drawOn(canv, self.doc.leftMargin, self.doc.bottomMargin + inch / 2)
-
+        self._draw_header_and_footer_later_pages(canv, doc, _('Content'))
         canv.restoreState()
 
     def statisctics_page(self, canv, doc):
@@ -1202,28 +1135,90 @@ class PollPDFReport(object):
         """ """
 
         canv.saveState()
-        self._draw_header_and_footer_later_pages(canv, doc, _('Polls'))
+        self._draw_header_and_footer_later_pages(canv, doc, SUBJECTS_HUMAN_NAMES['polls'])
+        canv.restoreState()
+
+    def choices_pages(self, canv, doc):
+        """ """
+
+        canv.saveState()
+        self._draw_header_and_footer_later_pages(canv, doc, SUBJECTS_HUMAN_NAMES['choices'])
+        canv.restoreState()
+
+    def votes_pages(self, canv, doc):
+        """ """
+
+        canv.saveState()
+        self._draw_header_and_footer_later_pages(canv, doc, SUBJECTS_HUMAN_NAMES['votes'])
+        canv.restoreState()
+
+    def results_pages(self, canv, doc):
+        """ """
+
+        canv.saveState()
+        self._draw_header_and_footer_later_pages(canv, doc, SUBJECTS_HUMAN_NAMES['results'])
         canv.restoreState()
 
     def voters_pages(self, canv, doc):
         """ """
 
         canv.saveState()
-        self._draw_header_and_footer_later_pages(canv, doc, _('Voters'))
+        self._draw_header_and_footer_later_pages(canv, doc, SUBJECTS_HUMAN_NAMES['voters'])
         canv.restoreState()
+
+    def write_title(self, story):
+        """ """
+
+        # write the report`s title
+        story.append(Spacer(self.doc_width, inch * 3))
+        title = Paragraph(_('Report<br />\"Report about polls\"'), self.styles['TitleReport'])
+        story.append(title)
+        story.append(Spacer(self.doc_width, inch * 3.5))
+
+        # write location on time report`s generation
+        location = get_location(self.request)
+        if location is None:
+            location = _('(Not possible determinate location)')
+        story.append(Paragraph(
+            _('Location: {0}').format(location),
+            self.styles['RightParagraph']
+        ))
+
+        # write an author of the report
+        author = Paragraph(_('Author: {0}').format(self.author), self.styles['RightParagraph'])
+        story.append(author)
+
+        # write datetime of report`s creating
+        now = convert_date_to_django_date_format(self.now)
+        story.append(Paragraph(_('Generated: {0}').format(now), self.styles['RightParagraph']))
+
+        # write timezone and time offset
+        timezone_name = timezone.get_current_timezone_name()
+        timezone_offset = get_current_timezone_offset()
+        story.append(Paragraph(
+            'Timezone: {0} ({1})'.format(timezone_name, timezone_offset),
+            self.styles['RightParagraph']
+        ))
 
     def write_content(self, story):
         """ """
 
-        p = Paragraph(_('Content of report'), self.styles['Heading1'])
-        story.append(p)
-        for i, subject in enumerate(self.subjects):
-            i += 1
-            p = Paragraph('{0}. {1}'.format(i, subject), self.styles['DefinitionUnicode'])
-            story.append(p)
+        story.append(Spacer(self.doc_width, inch / 2))
+        story.append(Paragraph(_('Content of report'), self.styles['TitlePage']))
+        story.append(Spacer(self.doc_width, inch / 2))
+
+        story.append(Paragraph(_('This report contains a next subject:'), self.styles['Normal']))
+
+        for subject in self.subjects:
+            subject = SUBJECTS_HUMAN_NAMES[subject]
+            story.append(Paragraph(subject, self.styles['DefinitionUnicode']))
 
     def write_statistics(self, story):
         """ """
+
+        story.append(Spacer(self.doc_width, inch / 2))
+        story.append(Paragraph(_('Statictics'), self.styles['TitlePage']))
+        story.append(Spacer(self.doc_width, inch / 2))
 
         # get a latest vote or none, if votes still do not have
         latest_vote = get_latest_or_none(VoteInPoll)
@@ -1240,7 +1235,6 @@ class PollPDFReport(object):
             latest_choice = ''
 
         data = [
-            ['Statictics'],
             ['Count polls', self.count_polls],
             ['Count opened polls', Poll.objects.opened_polls().count()],
             ['Count closed polls', Poll.objects.closed_polls().count()],
@@ -1265,22 +1259,23 @@ class PollPDFReport(object):
 
         # move on to the suitable page`s template
         story.append(NextPageTemplate('Polls'))
+        story.append(PageBreak())
 
-        data = [['Primary\nkey', 'Title', 'Description', 'Status', 'Count\nchoices', 'Count\nvotes', 'Date\nadded']]
+        self._write_subject_header(story, SUBJECTS_HUMAN_NAMES['polls'])
 
         if self.count_polls > 1:
-            story.append(PageBreak())
             canvas = self.get_canvas_with_piechart_statistics_status_polls()
             story.append(canvas)
-
-        story.append(PageBreak())
+            story.append(PageBreak())
 
         # if objects does not exists yet, then
         # append a whole row with corresponding message
         # else to append objects as rows of table.
         # as well as select corresponding style for table
         if self.count_polls:
-            style = self.tblObjectsStyle
+
+            data = [['Primary\nkey', 'Title', 'Description', 'Status', 'Count\nchoices', 'Count\nvotes', 'Date\nadded']]
+
             for poll in Poll.objects.all().prefetch_related('choices', 'votes', 'voteinpoll_set'):
                 row = [
                     textwrap.fill(str(poll.pk), 10),
@@ -1292,18 +1287,16 @@ class PollPDFReport(object):
                     textwrap.fill(convert_date_to_django_date_format(poll.date_added), 10),
                 ]
                 data.append(row)
+
+            tbl = Table(
+                data,
+                colWidths=[inch / 1.2, inch * 1.5, inch * 1.5, inch / 1.6, inch / 1.8, inch / 1.9, inch / 1.4],
+                style=self.tblObjectsStyle,
+            )
+            story.append(tbl)
+
         else:
-            style = self.tblSingleEmptyRowStyle
-            data.append([_('Polls still do not have exists')])
-
-        tbl = Table(
-            data,
-            colWidths=[inch / 1.2, inch * 1.5, inch * 1.5, inch / 1.6, inch / 1.8, inch / 1.9, inch / 1.4],
-            style=style,
-        )
-
-        story.append(tbl)
-        return story
+            story.append(Paragraph(_('Polls still do not have'), self.styles['Warning']))
 
     def write_choices(self, story):
         """ """
@@ -1312,14 +1305,16 @@ class PollPDFReport(object):
         story.append(NextPageTemplate('Choices'))
         story.append(PageBreak())
 
-        data = [[_('Primary\nkey'), _('Choice`s\ntext'), _('Poll'), _('Count\nvotes')]]
+        self._write_subject_header(story, SUBJECTS_HUMAN_NAMES['choices'])
 
         # if objects does not exists yet, then
         # append a whole row with corresponding message
         # else to append objects as rows of table.
         # as well as select corresponding style for table
         if self.count_choices:
-            style = self.tblObjectsStyle
+
+            data = [[_('Primary\nkey'), _('Choice`s\ntext'), _('Poll'), _('Count\nvotes')]]
+
             for choice in Choice.objects.select_related('poll').prefetch_related('votes'):
                 row = [
                     textwrap.fill(str(choice.pk), 10),
@@ -1328,37 +1323,40 @@ class PollPDFReport(object):
                     choice.get_count_votes(),
                 ]
                 data.append(row)
-        else:
-            style = self.tblSingleEmptyRowStyle
-            data.append([_('Choices does not exists')])
 
-        tbl = Table(
-            data,
-            colWidths=[inch / 1.3, inch * 2.4, inch * 2.4, inch / 1.5],
-            style=style,
-        )
-        story.append(tbl)
+            tbl = Table(
+                data,
+                colWidths=[inch / 1.3, inch * 2.4, inch * 2.4, inch / 1.5],
+                style=self.tblObjectsStyle,
+            )
+            story.append(tbl)
+
+        else:
+            story.append(Paragraph(_('Choices still do not have'), self.styles['Warning']))
 
     def write_votes(self, story):
         """ """
 
         story.append(NextPageTemplate('Votes'))
+        story.append(PageBreak())
 
-        if self.count_votes:
-            story.append(PageBreak())
-            canvas_with_linechart_count_votes_for_past_year = self.get_canvas_with_linechart_count_votes_for_past_year()
-            story.append(canvas_with_linechart_count_votes_for_past_year)
+        self._write_subject_header(story, SUBJECTS_HUMAN_NAMES['votes'])
+
+        canvas_with_linechart_count_votes_for_past_year = self.get_canvas_with_linechart_count_votes_for_past_year()
+        story.append(canvas_with_linechart_count_votes_for_past_year)
+        story.append(PageBreak())
 
         # Draw table of the all choices
 
-        data = [[_('Primary\nkey'), _('Poll'), _('Choice'), _('User'), _('Date\nvoting')]]
         # if objects does not exists yet, then
         # append a whole row with corresponding message
         # else to append objects as rows of table.
         # as well as select corresponding style for table
-        story.append(PageBreak())
-        if VoteInPoll.objects.count():
-            style = self.tblObjectsStyle
+
+        if self.count_votes:
+
+            data = [[_('Primary\nkey'), _('Poll'), _('Choice'), _('User'), _('Date\nvoting')]]
+
             for vote in VoteInPoll.objects.select_related('poll', 'user', 'choice'):
                 row = [
                     textwrap.fill(str(vote.pk), 10),
@@ -1368,17 +1366,17 @@ class PollPDFReport(object):
                     textwrap.fill(convert_date_to_django_date_format(vote.date_voting), 10),
                 ]
                 data.append(row)
+
+            tbl = Table(
+                data,
+                colWidths=[inch / 1.2, inch * 1.6, inch * 1.6, inch * 1.5, inch / 1.3],
+                style=self.tblObjectsStyle,
+            )
+
+            story.append(tbl)
+
         else:
-            style = self.tblSingleEmptyRowStyle
-            data.append([_('Votes does not exists')])
-
-        tbl = Table(
-            data,
-            colWidths=[inch / 1.2, inch * 1.6, inch * 1.6, inch * 1.5, inch / 1.3],
-            style=style,
-        )
-
-        story.append(tbl)
+            story.append(Paragraph(_('Votes still do not have'), self.styles['Warning']))
 
     def write_results(self, story):
         """ """
@@ -1386,6 +1384,8 @@ class PollPDFReport(object):
         # move on to page`s template to draw tables
         story.append(NextPageTemplate('Results'))
         story.append(PageBreak())
+
+        self._write_subject_header(story, SUBJECTS_HUMAN_NAMES['results'])
 
         if self.count_polls:
             # draw results all of the polls by PieChart
@@ -1397,28 +1397,22 @@ class PollPDFReport(object):
                 story.append(tbl)
                 story.append(PageBreak())
 
-                # # add canvas with result of poll in the form of table
-                canvas_chart_result_poll = self.get_canvas_chart_result_poll(poll)
-                story.append(canvas_chart_result_poll)
-                story.append(PageBreak())
+                # add canvas with result of poll in the form of table
+                if poll.get_count_votes():
+                    canvas_chart_result_poll = self.get_canvas_chart_result_poll(poll)
+                    story.append(canvas_chart_result_poll)
+                    story.append(PageBreak())
         else:
-            p = Paragraph(_('Polls still do not have'), self.styles['Warning'])
-            story.append(p)
+            story.append(Paragraph(_('Polls still do not have'), self.styles['Warning']))
 
     def write_voters(self, story):
         """ """
 
         story.append(NextPageTemplate('Voters'))
-        story.append(PageBreak())
 
-        header = Paragraph(_('Subject: <u>Voters</u>'), self.styles['SubjectHeader'])
-
-        story.append(Spacer(self.doc_width, inch / 2))
-        story.append(header)
+        self._write_subject_header(story, SUBJECTS_HUMAN_NAMES['voters'])
 
         if self.count_votes:
-
-            style = self.tblObjectsStyle
 
             for voter in User.polls.get_all_voters():
 
@@ -1445,7 +1439,7 @@ class PollPDFReport(object):
                 tbl = Table(
                     data,
                     colWidths=[inch * 1.25, inch * 2.25, inch, inch, inch / 1.5],
-                    style=style,
+                    style=self.tblObjectsStyle,
                 )
 
                 story.append(tbl)
@@ -1457,6 +1451,7 @@ class PollPDFReport(object):
                     story.append(Paragraph(text, self.styles['DefinitionUnicode']))
 
                 story.append(Spacer(self.doc_width, inch / 2))
+                story.append(PageBreak())
 
         else:
             story.append(Paragraph(_('Votes still do not have'), self.styles['Warning']))
@@ -1547,7 +1542,7 @@ class PollPDFReport(object):
         chart.categoryAxis.joinAxisMode = 'bottom'
         chart.valueAxis.valueMin = valueMin
         chart.valueAxis.valueMax = valueMax
-        chart.valueAxis.valueStep = self._eval_step_for_valueAxis_linechart(valueMin, valueMax)
+        chart.valueAxis.valueStep = (valueMax - valueMin) / 10
         chart.valueAxis.labelTextFormat = _('%d votes ')
         chart.lines[0].strokeWidth = 1
         chart.lines[0].strokeColor = colors.purple
@@ -1572,20 +1567,6 @@ class PollPDFReport(object):
 
         # create canvas place on page
         canvas = Drawing(self.doc.width, 300 + self.doc.topMargin)
-
-        # if poll does not have votes at all
-        if not poll.votes.count():
-            msg_part1 = String(canvas.width / 6, canvas.height / 2, "Result has not a graphic representation,")
-            msg_part1.fillColor = colors.red
-            msg_part1.fontName = 'FreeSans'
-            msg_part1.fontSize = 18
-            msg_part1.text = "Result has not a graphic representation,"
-            canvas.add(msg_part1)
-            msg_part2 = String(**msg_part1.getProperties())
-            msg_part2.text = "because all the choices has not votes."
-            msg_part2.y = canvas.height / 2.2
-            canvas.add(msg_part2)
-            return canvas
 
         # create pie chart
         chart = Pie()
@@ -1615,16 +1596,13 @@ class PollPDFReport(object):
         colors_for_chart = self._get_colors_for_chart(count_choices)
 
         # get a string representation of the each choice and break it on lines, if need
-        choices = (textwrap.shorten(str(choice), 70) for choice in choices)
+        choices = self._wrap_text_choice_for_legend(choices)
 
         # make two-nested list as next: (color, object)
         objects_with_colors = tuple(zip(colors_for_chart, choices))
 
         # add a data to the chart
         data = votes
-        logger.debug(data)
-        if data == (0, ):
-            data = [1, 3, 4, 5, 5]
         chart.data = data
 
         # add a labels to the chart
@@ -1652,7 +1630,7 @@ class PollPDFReport(object):
         label.y = canvas.height - inch / 2
         label.fontSize = 20
         label.fontName = 'FreeSansBold'
-        label.setText('Result poll')
+        label.setText('Result of the poll')
         label.textAnchor = 'middle'
         canvas.add(label)
 
@@ -1681,55 +1659,22 @@ class PollPDFReport(object):
 
         data = []
 
-        # add table`s title
-        data.append([_('Poll with primary key\n%s') % poll.pk])
-
         # add labels of the fields and their values
-        data.append([Poll._meta.get_field('title').verbose_name])
-        data.append([poll.title])
-        data.append([Poll._meta.get_field('slug').verbose_name])
-        data.append([poll.slug])
-        data.append([Poll._meta.get_field('description').verbose_name])
-        data.append([Paragraph(poll.description, self.styles['JustifyParagraph'])])
-
-        # add field "status" with label and value
-        # as well as make changes to the styles of table,
-        # namely backlight value of field "status"
-        data.append([Poll._meta.get_field('status').verbose_name, poll.get_status_display()])
-        if poll.status == Poll.CHOICES_STATUS.opened:
-            self.PollTableStyle.add('TEXTCOLOR', (1, 7), (1, 7), colors.green)
-        elif poll.status == Poll.CHOICES_STATUS.closed:
-            self.PollTableStyle.add('TEXTCOLOR', (1, 7), (1, 7), colors.red)
-        elif poll.status == Poll.CHOICES_STATUS.draft:
-            self.PollTableStyle.add('TEXTCOLOR', (1, 7), (1, 7), colors.blue)
+        data.append([_('Title'), Paragraph(poll.title, self.styles['JustifyParagraph'])])
+        data.append([_('Description'), Paragraph(poll.description, self.styles['JustifyParagraph'])])
 
         # add date latest status changing, date modified and date adding
         # with a project`s date/datetime format
-        data.append(
-            [
-                Poll._meta.get_field('status_changed').verbose_name,
-                convert_date_to_django_date_format(poll.status_changed),
-            ],
-        )
-        data.append(
-            [
-                Poll._meta.get_field('date_modified').verbose_name,
-                convert_date_to_django_date_format(poll.date_modified),
-            ]
-        )
-        data.append(
-            [
-                Poll._meta.get_field('date_added').verbose_name,
-                convert_date_to_django_date_format(poll.date_added),
-            ]
-        )
+        data.append([_('Status changed'), convert_date_to_django_date_format(poll.status_changed)])
+        data.append([_('Date modified'), convert_date_to_django_date_format(poll.date_modified)])
+        data.append([_('Date added'), convert_date_to_django_date_format(poll.date_added)])
 
         # add count choices and votes of the poll
         data.append([_('Count votes'), poll.get_count_votes()])
         data.append([_('Count choices'), poll.get_count_choices()])
 
         # creating and return table
-        tbl = Table(data, style=self.PollTableStyle, colWidths=[inch * 3, inch * 3])
+        tbl = Table(data, style=self.PollTableStyle, colWidths=[inch * 2, inch * 4])
         return tbl
 
     def _get_colors_for_chart(self, count_colors):
@@ -1765,9 +1710,18 @@ class PollPDFReport(object):
         canv.drawCentredString(self.doc_width / 2, self.doc.bottomMargin - 15, 'Page {0}'.format(doc.page))
 
     @staticmethod
-    def _eval_step_for_valueAxis_linechart(minvalue, maxvalue):
+    def _wrap_text_choice_for_legend(choices):
         """ """
 
-        step = (maxvalue - minvalue) / 10
+        for choice in choices:
+            choice = str(choice)
+            choice = textwrap.shorten(choice, 100)
+            choice = textwrap.fill(choice, 55)
+            yield choice
 
-        return step
+    def _write_subject_header(self, story, text_header):
+        """ """
+
+        header = Paragraph(_('Subject: <u>{0}</u>').format(text_header), self.styles['SubjectHeader'])
+        story.append(Spacer(self.doc_width, inch / 2))
+        story.append(header)
