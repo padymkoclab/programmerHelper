@@ -693,10 +693,10 @@ class ExcelReport(object):
         sheet.write(num_row, 1, str(voter.pk), self.get_formats['table_cell_centered'])
 
         sheet.write(num_row, 2, voter.get_full_name(), self.get_formats['table_cell_centered'])
-        sheet.write(num_row, 3, User.polls.get_count_votes(voter), self.get_formats['table_cell_centered'])
+        sheet.write(num_row, 3, User.polls.get_count_votes_of_user(voter), self.get_formats['table_cell_centered'])
         sheet.write(
             num_row, 4,
-            convert_date_to_django_date_format(User.polls.get_latest_vote(voter).date_voting),
+            convert_date_to_django_date_format(User.polls.get_latest_vote_of_user(voter).date_voting),
             self.get_formats['table_cell_datetime'],
         )
 
@@ -708,7 +708,7 @@ class ExcelReport(object):
 
         sheet.write(
             num_row, 6,
-            User.polls.get_report_votes(voter),
+            User.polls.get_report_votes_of_user(voter),
             self.get_formats['table_cell_justify_text'],
         )
 
@@ -897,11 +897,16 @@ class PollPDFReport(object):
     def get_doc(self):
         """ """
 
+        # set properties on document
+
         doc = BaseDocTemplate(
             self.buffer,
             pagesize=A4,
             title=self.report_name,
             author=self.author,
+            subject=self.get_subjects(),
+            keywords=('Polls, votes, voters'),
+            creator=settings.SITE_NAME,
             showBoundary=False,
         )
         self.doc_width = doc.pagesize[0]
@@ -914,6 +919,16 @@ class PollPDFReport(object):
         self.add_styles()
 
         return doc
+
+    def get_subjects(self):
+        """ """
+
+        subjects = (SUBJECTS_HUMAN_NAMES[subject] for subject in self.subjects)
+        subjects = ', '.join(subjects)
+        return subjects.capitalize()
+
+    def function(self):
+        pass
 
     def add_page_templates(self, doc):
         """ """
@@ -1424,14 +1439,14 @@ class PollPDFReport(object):
                     _('Is active\nvoter?')
                 ]]
 
-                date_voting = User.polls.get_latest_vote(voter).date_voting
+                date_voting = User.polls.get_latest_vote_of_user(voter).date_voting
                 date_voting = convert_date_to_django_date_format(date_voting)
                 date_voting = textwrap.fill(date_voting, 10)
 
                 row = [
                     textwrap.fill(str(voter.pk), 15),
                     textwrap.fill(voter.get_full_name(), 30),
-                    User.polls.get_count_votes(voter),
+                    User.polls.get_count_votes_of_user(voter),
                     date_voting,
                     User.polls.is_active_voter(voter),
                 ]
@@ -1446,7 +1461,7 @@ class PollPDFReport(object):
                 story.append(Spacer(self.doc_width, inch / 4))
 
                 story.append(Paragraph(_('Votes:'), self.styles['Normal']))
-                for num, record in enumerate(User.polls.get_report_votes(voter)):
+                for num, record in enumerate(User.polls.get_report_votes_of_user(voter)):
                     text = '{0}. {1}'.format(num + 1, record)
                     story.append(Paragraph(text, self.styles['DefinitionUnicode']))
 

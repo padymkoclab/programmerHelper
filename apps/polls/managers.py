@@ -16,7 +16,7 @@ class PollsManager(models.Manager):
     Manager for the user model.
     """
 
-    def get_report_votes(self, user):
+    def get_report_votes_of_user(self, user):
         """ """
 
         votes = user.votes.all()
@@ -25,17 +25,17 @@ class PollsManager(models.Manager):
             for vote in votes
         )
 
-    def get_count_votes(self, user):
+    def get_count_votes_of_user(self, user):
         """ """
 
         return user.votes.count()
 
-    def get_votes(self, user):
+    def get_votes_of_user(self, user):
         """ """
 
         return user.votes.all()
 
-    def get_latest_vote(self, user):
+    def get_latest_vote_of_user(self, user):
         """ """
 
         try:
