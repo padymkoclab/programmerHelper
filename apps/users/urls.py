@@ -7,7 +7,7 @@ from .views import UserDetailView
 app_name = 'users'
 
 urlpatterns = [
-    url(r'detail/(?P<account_email>\w+@[-_\w]+.\w+)/$', UserDetailView.as_view(), {}, 'detail'),
+    url(r'detail/(?P<email>\w+@[-_\w]+.\w+)/$', UserDetailView.as_view(), {}, 'detail'),
     url(r'create/$', UserDetailView.as_view(), {}, 'create'),
     url(r'update/$', UserDetailView.as_view(), {}, 'update'),
     url(r'delete/$', UserDetailView.as_view(), {}, 'delete'),

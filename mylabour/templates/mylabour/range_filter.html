@@ -1,5 +1,7 @@
 
 {% load i18n %}
+{% load static %}
+
 
 <style>
     div.wrapper_for_range_list_filter{
@@ -7,8 +9,39 @@
     }
 </style>
 
+
 <div class="wrapper_for_range_list_filter">
-    <input type="number" pattern="^[0-9]" title='Only Number' min="1" step="1" placeholder="Enter max count votes" class="span2">
-    &nbsp;
-    <input type="number" pattern="^[0-9]" title='Only Number' min="1" step="1" placeholder="Enter max count votes" class="span2">
+
+    <!-- Select theme jQuery UI and add own styles for the jqueryui-timepicker-addon -->
+    <link rel="stylesheet" href="{% static 'components/jquery-ui/themes/cupertino/jquery-ui.min.css' %}" />
+    <link rel="stylesheet" href="{% static 'mylabour/components/jqueryui-timepicker-addon/jquery-ui-timepicker-addon.css' %}" />
+
+    <!-- Add jQuery and jQuery UI -->
+    <script type="text/javascript" src="{% static 'components/jquery/dist/jquery.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'components/jquery-ui/jquery-ui.min.js' %}"></script>
+
+    <!-- Add plugin jqueryui-datetime with localization -->
+    <script type="text/javascript" src="{% static 'mylabour/components/jqueryui-timepicker-addon/jquery-ui-timepicker-addon.js' %}"></script>
+    <script type="text/javascript" src="{% static 'mylabour/components/jqueryui-timepicker-addon/jquery-ui-timepicker-addon.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'mylabour/components/jqueryui-timepicker-addon/i18n/jquery-ui-timepicker-addon-i18n.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'mylabour/components/jqueryui-timepicker-addon/jquery-ui-sliderAccess.js' %}"></script>
+
+    <!-- Elements for input datetime range  -->
+    {# {{ choices }} #}
+    <input type="text" name="{{ field_name }}__range_gte" value="" placeholder="{% trans 'Start datetime' %}" class="datetime_range_start_datetime">
+    <input type="text" name="{{ field_name }}__range_lt" value="" placeholder="{% trans 'End datetime' %}" class="datetime_range_end_datetime">
+
 </div>
+
+<script>
+$(function() {
+
+    // Attach datetime-picker to input
+    $("input[class^='datetime_range_']").datetimepicker({
+        timeInput: true,
+        timeFormat: 'HH:mm:ss',
+        dateFormat: 'yy-mm-dd',
+    });
+
+});
+</script>

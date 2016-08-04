@@ -156,7 +156,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         super(User, self).save(*args, **kwargs)
 
     def get_absolute_url(self):
-        return reverse('users:detail', kwargs={'user_email': self.email})
+        return reverse('users:detail', kwargs={'email': self.email})
 
     def get_admin_url(self):
         return reverse(
@@ -166,6 +166,8 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def get_full_name(self):
         return '{0.username} ({0.email})'.format(self)
+    get_full_name.admin_order_field = 'username'
+    get_full_name.short_description = _('Full name')
 
     def get_short_name(self):
         return '{0.email}'.format(self)
@@ -179,9 +181,6 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def has_module_perms(self, label):
         return True
-
-    def _as_queryset(self):
-        return self.__class__.objects.filter(pk=self.pk)
 
     def last_seen(self):
         last_session_of_user = ExpandedSession.objects.filter(user_pk=self.pk).order_by('expire_date').last()
@@ -349,13 +348,16 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def get_top_tags(self):
         """Return dict as couple: 'tag': percent_usage % """
+
         return NotImplementedError
 
     def comments(self):
-        pass
+
+        return NotImplementedError
 
     def count_comments(self):
-        pass
+
+        return NotImplementedError
 
     # https://www.digitalocean.com/community/users/jellingwood?primary_filter=upvotes_given
     # answer, queations, hearts, opinons and more

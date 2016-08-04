@@ -15,7 +15,6 @@ from model_utils import Choices
 
 from mylabour.fields_db import ConfiguredAutoSlugField
 from mylabour.models import TimeStampedModel
-from mylabour.decorators import ClassmethodProperty
 
 from .managers import PollManager, VoteManager
 from .querysets import PollQuerySet, ChoiceQuerySet
@@ -48,9 +47,9 @@ class Poll(TimeStampedModel):
     slug = ConfiguredAutoSlugField(_('Slug'), populate_from='title', unique=True)
     status = StatusField(verbose_name=_('Status'), choices_name='CHOICES_STATUS', default=CHOICES_STATUS.draft)
     status_changed = MonitorField(_('Date latest status changed'), monitor='status')
-    votes = models.ManyToManyField(
+    voters = models.ManyToManyField(
         settings.AUTH_USER_MODEL,
-        through='VoteInPoll',
+        through='Vote',
         through_fields=['poll', 'user'],
         verbose_name=_('Voted users'),
     )
@@ -128,24 +127,17 @@ class Poll(TimeStampedModel):
     def get_voters(self):
         """Return users, participated in this poll."""
 
-        return self.votes.all()
+        return self.voters.all()
 
     def get_date_lastest_voting(self):
         """Return a datetime latest voting in that poll or None."""
 
         try:
-            return self.voteinpoll_set.latest().date_voting
-        except VoteInPoll.DoesNotExist:
-            return None
+            return self.votes.latest().date_voting
+        except Vote.DoesNotExist:
+            return
     get_date_lastest_voting.admin_order_field = 'date_latest_voting'
     get_date_lastest_voting.short_description = _('Date latest voting')
-
-    @ClassmethodProperty
-    @classmethod
-    def get_statuses_for_display(cls):
-        """ """
-
-        return cls.CHOICES_STATUS._display_map
 
 
 class Choice(models.Model):
@@ -179,6 +171,8 @@ class Choice(models.Model):
         return '{0.text_choice}'.format(self)
 
     def unique_error_message(self, model_class, unique_check):
+        """A custom text for fields in meta-attribute unique_together."""
+
         if model_class == type(self) and unique_check == ('poll', 'text_choice'):
             raise ValidationError(self.UNIQUE_ERROR_MESSAGE_FOR_TEXT_CHOICE_AND_POLL)
         return super(Choice, self).unique_error_message(model_class, unique_check)
@@ -191,13 +185,12 @@ class Choice(models.Model):
     def get_voters(self):
         """Return users, participated in this poll."""
 
-        User = get_user_model()
-        return User.objects.filter(pk__in=self.votes.values('user'))
+        return get_user_model().objects.filter(pk__in=self.votes.values('user'))
 
 
-class VoteInPoll(models.Model):
+class Vote(models.Model):
     """
-    A intermediate model for keeping a choice of a user in certain poll.
+    Model of vote. This model is intermediate model for keeping a choice of a user in certain poll.
     """
 
     id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
@@ -205,6 +198,7 @@ class VoteInPoll(models.Model):
         'Poll',
         models.CASCADE,
         verbose_name=_('Poll'),
+        related_name='votes',
     )
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -225,9 +219,9 @@ class VoteInPoll(models.Model):
     objects = VoteManager()
 
     class Meta:
-        db_table = 'votes_in_polls'
-        verbose_name = "Vote in poll"
-        verbose_name_plural = "Votes in polls"
+        db_table = 'votes'
+        verbose_name = "Vote"
+        verbose_name_plural = "Votes"
         ordering = ['poll', 'date_voting']
         get_latest_by = 'date_voting'
         unique_together = ('poll', 'user')
@@ -236,6 +230,8 @@ class VoteInPoll(models.Model):
         return _('Vote of a user "{0.user}" in a poll "{0.poll}"').format(self)
 
     def unique_error_message(self, model_class, unique_check):
+        """A custom text for fields in meta-attribute unique_together."""
+
         if model_class == type(self) and unique_check == ('poll', 'user'):
             return _('This user already participated in that poll.')
-        return super(VoteInPoll, self).unique_error_message(model_class, unique_check)
+        return super(Vote, self).unique_error_message(model_class, unique_check)

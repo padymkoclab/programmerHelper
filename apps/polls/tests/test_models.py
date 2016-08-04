@@ -3,9 +3,9 @@ from django.utils.text import slugify
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 
-from apps.accounts.factories import AccountFactory, levels_accounts_factory
-from apps.accounts.models import Account
-from apps.polls.models import Poll, Choice, VoteInPoll
+from apps.users.factories import UserFactory
+from apps.users.models import User
+from apps.polls.models import Poll, Choice, Vote
 from apps.polls.factories import PollFactory, ChoiceFactory
 
 
@@ -16,9 +16,12 @@ class PollTest(TestCase):
 
     @classmethod
     def setUpTestData(self):
-        levels_accounts_factory()
-        for i in range(15):
-            AccountFactory(is_active=True)
+        for i in range(7):
+            UserFactory(is_active=True)
+
+        self.user1 = UserFactory(is_active=True)
+        self.user2 = UserFactory(is_active=True)
+        self.user3 = UserFactory(is_active=True)
 
     def setUp(self):
         self.poll = PollFactory()
@@ -51,8 +54,6 @@ class PollTest(TestCase):
         self.assertEqual(poll.description, data['description'])
 
     def test_create_draft_poll(self):
-        """Test creating draft poll."""
-
         data = dict(
             title='Where do you live?',
             description='Now, we collecting location information about a visitors our site. And so, where you is?',
@@ -111,13 +112,18 @@ class PollTest(TestCase):
     def test_delete_poll(self):
         self.poll.delete()
 
+    def test_str(self):
+        title = 'Почему так важно уметь думать самому?'
+        poll = PollFactory(title=title)
+        self.assertEqual(str(poll), title)
+
     def test_get_absolute_url(self):
         response = self.client.get(self.poll.get_absolute_url())
         self.assertEqual(response.status_code, 200)
 
     def test_get_admin_url(self):
         #
-        superuser = AccountFactory(is_active=True, is_superuser=True)
+        superuser = UserFactory(is_active=True, is_superuser=True)
         #
         self.client.force_login(superuser)
         #
@@ -132,9 +138,9 @@ class PollTest(TestCase):
         choice = ChoiceFactory(poll=self.poll)
         self.assertEqual(self.poll.choices.count(), 1)
         #
-        accounts = Account.objects.random_accounts(2)
-        VoteInPoll.objects.create(account=accounts[0], poll=self.poll, choice=choice)
-        VoteInPoll.objects.create(account=accounts[1], poll=self.poll, choice=choice)
+        users = User.objects.random_users(2)
+        Vote.objects.create(user=users[0], poll=self.poll, choice=choice)
+        Vote.objects.create(user=users[1], poll=self.poll, choice=choice)
         self.assertCountEqual(self.poll.get_most_popular_choice_or_choices(), [choice])
 
     def test_get_most_popular_choice_or_choices_if_have_several_choices_with_equal_count_votes(self):
@@ -143,13 +149,15 @@ class PollTest(TestCase):
         choice3 = ChoiceFactory(poll=self.poll)
         self.assertEqual(self.poll.choices.count(), 3)
         #
-        accounts = Account.objects.random_accounts(6)
-        VoteInPoll.objects.create(account=accounts[0], poll=self.poll, choice=choice1)
-        VoteInPoll.objects.create(account=accounts[1], poll=self.poll, choice=choice1)
-        VoteInPoll.objects.create(account=accounts[2], poll=self.poll, choice=choice2)
-        VoteInPoll.objects.create(account=accounts[3], poll=self.poll, choice=choice2)
-        VoteInPoll.objects.create(account=accounts[4], poll=self.poll, choice=choice3)
-        VoteInPoll.objects.create(account=accounts[5], poll=self.poll, choice=choice3)
+        users = User.objects.random_users(6)
+        Vote.objects.bulk_create([
+            Vote(user=users[0], poll=self.poll, choice=choice1),
+            Vote(user=users[1], poll=self.poll, choice=choice1),
+            Vote(user=users[2], poll=self.poll, choice=choice2),
+            Vote(user=users[3], poll=self.poll, choice=choice2),
+            Vote(user=users[4], poll=self.poll, choice=choice3),
+            Vote(user=users[5], poll=self.poll, choice=choice3),
+        ])
         self.assertCountEqual(self.poll.get_most_popular_choice_or_choices(), [choice1, choice2, choice3])
 
     def test_get_most_popular_choice_or_choices_if_have_several_choices_with_different_count_votes(self):
@@ -158,13 +166,15 @@ class PollTest(TestCase):
         choice3 = ChoiceFactory(poll=self.poll)
         self.assertEqual(self.poll.choices.count(), 3)
         #
-        accounts = Account.objects.random_accounts(6)
-        VoteInPoll.objects.create(account=accounts[0], poll=self.poll, choice=choice1)
-        VoteInPoll.objects.create(account=accounts[1], poll=self.poll, choice=choice1)
-        VoteInPoll.objects.create(account=accounts[2], poll=self.poll, choice=choice2)
-        VoteInPoll.objects.create(account=accounts[3], poll=self.poll, choice=choice2)
-        VoteInPoll.objects.create(account=accounts[4], poll=self.poll, choice=choice2)
-        VoteInPoll.objects.create(account=accounts[5], poll=self.poll, choice=choice3)
+        users = User.objects.random_users(6)
+        Vote.objects.bulk_create([
+            Vote(user=users[0], poll=self.poll, choice=choice1),
+            Vote(user=users[1], poll=self.poll, choice=choice1),
+            Vote(user=users[2], poll=self.poll, choice=choice2),
+            Vote(user=users[3], poll=self.poll, choice=choice2),
+            Vote(user=users[4], poll=self.poll, choice=choice2),
+            Vote(user=users[5], poll=self.poll, choice=choice3),
+        ])
         self.assertCountEqual(self.poll.get_most_popular_choice_or_choices(), [choice2])
 
     def test_get_result_poll_if_poll_does_not_have_choices(self):
@@ -176,9 +186,9 @@ class PollTest(TestCase):
         self.assertEqual(self.poll.choices.count(), 1)
         self.assertCountEqual(self.poll.get_result_poll(), ((choice, 0),))
         #
-        accounts = Account.objects.random_accounts(2)
-        VoteInPoll.objects.create(account=accounts[0], poll=self.poll, choice=choice)
-        VoteInPoll.objects.create(account=accounts[1], poll=self.poll, choice=choice)
+        users = User.objects.random_users(2)
+        Vote.objects.create(user=users[0], poll=self.poll, choice=choice)
+        Vote.objects.create(user=users[1], poll=self.poll, choice=choice)
         self.assertCountEqual(self.poll.get_result_poll(), ((choice, 2),))
 
     def test_get_result_poll_if_poll_have_two_choices_with_equal_count_votes(self):
@@ -190,11 +200,13 @@ class PollTest(TestCase):
             ((choice1, 0), (choice2, 0))
         )
         #
-        accounts = Account.objects.random_accounts(4)
-        VoteInPoll.objects.create(account=accounts[0], poll=self.poll, choice=choice1)
-        VoteInPoll.objects.create(account=accounts[1], poll=self.poll, choice=choice1)
-        VoteInPoll.objects.create(account=accounts[2], poll=self.poll, choice=choice2)
-        VoteInPoll.objects.create(account=accounts[3], poll=self.poll, choice=choice2)
+        users = User.objects.random_users(4)
+        Vote.objects.bulk_create([
+            Vote(user=users[0], poll=self.poll, choice=choice1),
+            Vote(user=users[1], poll=self.poll, choice=choice1),
+            Vote(user=users[2], poll=self.poll, choice=choice2),
+            Vote(user=users[3], poll=self.poll, choice=choice2),
+        ])
         self.assertCountEqual(
             self.poll.get_result_poll(),
             ((choice1, 2), (choice2, 2))
@@ -209,10 +221,12 @@ class PollTest(TestCase):
             ((choice1, 0), (choice2, 0))
         )
         #
-        accounts = Account.objects.random_accounts(3)
-        VoteInPoll.objects.create(account=accounts[0], poll=self.poll, choice=choice1)
-        VoteInPoll.objects.create(account=accounts[1], poll=self.poll, choice=choice1)
-        VoteInPoll.objects.create(account=accounts[2], poll=self.poll, choice=choice2)
+        users = User.objects.random_users(3)
+        Vote.objects.bulk_create([
+            Vote(user=users[0], poll=self.poll, choice=choice1),
+            Vote(user=users[1], poll=self.poll, choice=choice1),
+            Vote(user=users[2], poll=self.poll, choice=choice2),
+        ])
         self.assertCountEqual(
             self.poll.get_result_poll(),
             ((choice1, 2), (choice2, 1))
@@ -228,16 +242,18 @@ class PollTest(TestCase):
             ((choice1, 0), (choice3, 0), (choice2, 0))
         )
         #
-        accounts = Account.objects.random_accounts(9)
-        VoteInPoll.objects.create(account=accounts[0], poll=self.poll, choice=choice1)
-        VoteInPoll.objects.create(account=accounts[1], poll=self.poll, choice=choice1)
-        VoteInPoll.objects.create(account=accounts[2], poll=self.poll, choice=choice1)
-        VoteInPoll.objects.create(account=accounts[3], poll=self.poll, choice=choice2)
-        VoteInPoll.objects.create(account=accounts[4], poll=self.poll, choice=choice2)
-        VoteInPoll.objects.create(account=accounts[5], poll=self.poll, choice=choice2)
-        VoteInPoll.objects.create(account=accounts[6], poll=self.poll, choice=choice3)
-        VoteInPoll.objects.create(account=accounts[7], poll=self.poll, choice=choice3)
-        VoteInPoll.objects.create(account=accounts[8], poll=self.poll, choice=choice3)
+        users = User.objects.random_users(9)
+        Vote.objects.bulk_create([
+            Vote(user=users[0], poll=self.poll, choice=choice1),
+            Vote(user=users[1], poll=self.poll, choice=choice1),
+            Vote(user=users[2], poll=self.poll, choice=choice1),
+            Vote(user=users[3], poll=self.poll, choice=choice2),
+            Vote(user=users[4], poll=self.poll, choice=choice2),
+            Vote(user=users[5], poll=self.poll, choice=choice2),
+            Vote(user=users[6], poll=self.poll, choice=choice3),
+            Vote(user=users[7], poll=self.poll, choice=choice3),
+            Vote(user=users[8], poll=self.poll, choice=choice3),
+        ])
         self.assertCountEqual(
             self.poll.get_result_poll(),
             ((choice3, 3), (choice1, 3), (choice2, 3))
@@ -253,13 +269,15 @@ class PollTest(TestCase):
             ((choice1, 0), (choice3, 0), (choice2, 0))
         )
         #
-        accounts = Account.objects.random_accounts(6)
-        VoteInPoll.objects.create(account=accounts[0], poll=self.poll, choice=choice1)
-        VoteInPoll.objects.create(account=accounts[1], poll=self.poll, choice=choice1)
-        VoteInPoll.objects.create(account=accounts[2], poll=self.poll, choice=choice2)
-        VoteInPoll.objects.create(account=accounts[3], poll=self.poll, choice=choice3)
-        VoteInPoll.objects.create(account=accounts[4], poll=self.poll, choice=choice3)
-        VoteInPoll.objects.create(account=accounts[5], poll=self.poll, choice=choice3)
+        users = User.objects.random_users(6)
+        Vote.objects.bulk_create([
+            Vote(user=users[0], poll=self.poll, choice=choice1),
+            Vote(user=users[1], poll=self.poll, choice=choice1),
+            Vote(user=users[2], poll=self.poll, choice=choice2),
+            Vote(user=users[3], poll=self.poll, choice=choice3),
+            Vote(user=users[4], poll=self.poll, choice=choice3),
+            Vote(user=users[5], poll=self.poll, choice=choice3),
+        ])
         self.assertCountEqual(
             self.poll.get_result_poll(),
             ((choice3, 3), (choice1, 2), (choice2, 1))
@@ -281,9 +299,9 @@ class PollTest(TestCase):
         ChoiceFactory(poll=self.poll)
         choice = ChoiceFactory(poll=self.poll)
         #
-        accounts = Account.objects.random_accounts(2)
-        VoteInPoll.objects.create(account=accounts[0], poll=self.poll, choice=choice)
-        VoteInPoll.objects.create(account=accounts[1], poll=self.poll, choice=choice)
+        users = User.objects.random_users(2)
+        Vote.objects.create(user=users[0], poll=self.poll, choice=choice)
+        Vote.objects.create(user=users[1], poll=self.poll, choice=choice)
         #
         self.assertEqual(self.poll.choices.count(), 3)
         self.assertEqual(self.poll.get_count_votes(), 2)
@@ -293,14 +311,16 @@ class PollTest(TestCase):
         choice2 = ChoiceFactory(poll=self.poll)
         choice3 = ChoiceFactory(poll=self.poll)
         #
-        accounts = Account.objects.random_accounts(7)
-        VoteInPoll.objects.create(account=accounts[0], poll=self.poll, choice=choice1)
-        VoteInPoll.objects.create(account=accounts[1], poll=self.poll, choice=choice2)
-        VoteInPoll.objects.create(account=accounts[2], poll=self.poll, choice=choice3)
-        VoteInPoll.objects.create(account=accounts[3], poll=self.poll, choice=choice2)
-        VoteInPoll.objects.create(account=accounts[4], poll=self.poll, choice=choice3)
-        VoteInPoll.objects.create(account=accounts[5], poll=self.poll, choice=choice1)
-        VoteInPoll.objects.create(account=accounts[6], poll=self.poll, choice=choice2)
+        users = User.objects.random_users(7)
+        Vote.objects.bulk_create([
+            Vote(user=users[0], poll=self.poll, choice=choice1),
+            Vote(user=users[1], poll=self.poll, choice=choice2),
+            Vote(user=users[2], poll=self.poll, choice=choice3),
+            Vote(user=users[3], poll=self.poll, choice=choice2),
+            Vote(user=users[4], poll=self.poll, choice=choice3),
+            Vote(user=users[5], poll=self.poll, choice=choice1),
+            Vote(user=users[6], poll=self.poll, choice=choice2),
+        ])
         #
         self.assertEqual(self.poll.choices.count(), 3)
         self.assertEqual(self.poll.get_count_votes(), 7)
@@ -313,8 +333,41 @@ class PollTest(TestCase):
         ChoiceFactory(poll=self.poll)
         self.assertEqual(self.poll.get_count_choices(), 2)
 
-    def test_get_voters(self):
-        raise NotImplementedError
+    def test_get_voters_if_non_choices(self):
+        self.assertFalse(self.poll.get_voters().exists())
+
+    def test_get_voters_if_is_choices_but_not_votes(self):
+        ChoiceFactory(poll=self.poll)
+        ChoiceFactory(poll=self.poll)
+        self.assertFalse(self.poll.get_voters().exists())
+
+    def test_get_voters_if_is_votes(self):
+        choice1 = ChoiceFactory(poll=self.poll)
+        choice2 = ChoiceFactory(poll=self.poll)
+        Vote.objects.bulk_create([
+            Vote(poll=self.poll, choice=choice1, user=self.user1),
+            Vote(poll=self.poll, choice=choice1, user=self.user2),
+            Vote(poll=self.poll, choice=choice2, user=self.user3),
+        ])
+        self.assertCountEqual(self.poll.get_voters(), [self.user1, self.user2, self.user3])
+
+    def test_get_date_lastest_voting_if_no_choices(self):
+        self.assertIsNone(self.poll.get_date_lastest_voting())
+
+    def test_get_date_lastest_voting_if_is_choices_without_votes(self):
+        ChoiceFactory(poll=self.poll)
+        ChoiceFactory(poll=self.poll)
+        self.assertIsNone(self.poll.get_date_lastest_voting())
+
+    def test_get_date_lastest_voting_if_is_choices_with_votes(self):
+        choice1 = ChoiceFactory(poll=self.poll)
+        choice2 = ChoiceFactory(poll=self.poll)
+        Vote.objects.bulk_create([
+            Vote(poll=self.poll, choice=choice2, user=self.user1),
+            Vote(poll=self.poll, choice=choice1, user=self.user2),
+        ])
+        vote3 = Vote.objects.create(poll=self.poll, choice=choice2, user=self.user3)
+        self.assertEqual(self.poll.get_date_lastest_voting(), vote3.date_voting)
 
 
 class ChoiceTest(TestCase):
@@ -324,10 +377,9 @@ class ChoiceTest(TestCase):
 
     @classmethod
     def setUpTestData(self):
-        levels_accounts_factory()
-        self.account1 = AccountFactory(is_active=True)
-        self.account2 = AccountFactory(is_active=True)
-        self.account3 = AccountFactory(is_active=True)
+        self.user1 = UserFactory(is_active=True)
+        self.user2 = UserFactory(is_active=True)
+        self.user3 = UserFactory(is_active=True)
 
     def setUp(self):
         self.poll = PollFactory(status=Poll.CHOICES_STATUS.opened)
@@ -361,29 +413,48 @@ class ChoiceTest(TestCase):
     def test_delete_choice(self):
         self.choice.delete()
 
+    def test_str(self):
+        text_choice = 'Думать самому значит нести ответственность за самого себя'
+        choice = ChoiceFactory(text_choice=text_choice, poll=self.poll)
+        self.assertEqual(str(choice), text_choice)
+
     def test_unique_error_message_for_text_choice_and_poll(self):
-        text_choice = 'Same text as in all'
+        text_choice = 'The same text as in all polls'
         choice2 = ChoiceFactory(poll=self.poll, text_choice=text_choice)
         choice2.full_clean()
         choice3 = Choice(poll=self.poll, text_choice=text_choice)
-        self.assertRaisesMessage(ValidationError, 'Poll does not have more than one choice with this text', choice3.full_clean)
+        self.assertRaisesMessage(
+            ValidationError,
+            'Poll does not have more than one choice with this text',
+            choice3.full_clean
+        )
 
-    def test_get_count_votes(self):
-        # no votes
+    def test_get_count_votes_if_non_votes(self):
         self.assertEqual(self.choice.get_count_votes(), 0)
-        # added votes
-        VoteInPoll.objects.create(poll=self.poll, choice=self.choice, account=self.account1)
-        VoteInPoll.objects.create(poll=self.poll, choice=self.choice, account=self.account2)
-        VoteInPoll.objects.create(poll=self.poll, choice=self.choice, account=self.account3)
+
+    def test_get_count_votes_if_is_votes(self):
+        Vote.objects.bulk_create([
+            Vote(poll=self.poll, choice=self.choice, user=self.user1),
+            Vote(poll=self.poll, choice=self.choice, user=self.user2),
+            Vote(poll=self.poll, choice=self.choice, user=self.user3),
+        ])
         self.assertEqual(self.choice.get_count_votes(), 3)
 
-    def test_get_voters(self):
-        raise NotImplementedError
+    def test_get_voters_if_non_voters(self):
+        self.assertFalse(self.choice.get_voters().exists())
+
+    def test_get_voters_if_is_voters(self):
+        Vote.objects.bulk_create([
+            Vote(poll=self.poll, choice=self.choice, user=self.user1),
+            Vote(poll=self.poll, choice=self.choice, user=self.user2),
+            Vote(poll=self.poll, choice=self.choice, user=self.user3),
+        ])
+        self.assertCountEqual(self.choice.get_voters(), [self.user1, self.user2, self.user3])
 
 
-class VoteInPollTest(TestCase):
+class VoteTest(TestCase):
     """
-    Tests for model VoteInPoll.
+    Tests for model Vote.
     """
 
     @classmethod
@@ -392,17 +463,16 @@ class VoteInPollTest(TestCase):
         self.choice1 = ChoiceFactory(poll=self.poll)
         self.choice2 = ChoiceFactory(poll=self.poll)
         self.choice3 = ChoiceFactory(poll=self.poll)
-        levels_accounts_factory()
-        self.account1 = AccountFactory(is_active=True)
-        self.account2 = AccountFactory(is_active=True)
+        self.user1 = UserFactory(is_active=True)
+        self.user2 = UserFactory(is_active=True)
 
     def setUp(self):
-        self.vote = VoteInPoll(poll=self.poll, account=self.account2, choice=self.choice3)
+        self.vote = Vote(poll=self.poll, user=self.user2, choice=self.choice3)
         self.vote.full_clean()
         self.vote.save()
 
     def test_add_vote(self):
-        vote = VoteInPoll(poll=self.poll, account=self.account1, choice=self.choice1)
+        vote = Vote(poll=self.poll, user=self.user1, choice=self.choice1)
         vote.full_clean()
         vote.save()
 
@@ -414,12 +484,12 @@ class VoteInPollTest(TestCase):
     def test_delete_vote(self):
         self.vote.delete()
 
-    def test_string_representation(self):
+    def test_str(self):
         self.assertEqual(
             self.vote.__str__(),
-            'Vote of a user "{0}" in a poll "{1}"'.format(self.vote.account, self.vote.poll)
+            'Vote of a user "{0}" in a poll "{1}"'.format(self.vote.user, self.vote.poll)
         )
 
-    def test_unique_account_and_poll(self):
-        self.vote = VoteInPoll(poll=self.poll, account=self.account2, choice=self.choice1)
+    def test_unique_user_and_poll(self):
+        self.vote = Vote(poll=self.poll, user=self.user2, choice=self.choice1)
         self.assertRaisesMessage(ValidationError, 'This user already participated in that poll.', self.vote.full_clean)

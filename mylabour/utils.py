@@ -22,6 +22,13 @@ from pygments import lexers
 __all__ = []
 
 
+def join_enumarate(sep, iterable) -> str:
+    """ """
+
+    iterable = ('{0}. {1}'.format(i + 1, str(obj)) for i, obj in enumerate(iterable))
+    return sep.join(iterable)
+
+
 def get_statistics_count_objects_by_year(model, date_field_name):
     """ """
 

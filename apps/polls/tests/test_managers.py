@@ -4,9 +4,9 @@ import random
 from django.test import TestCase
 
 from apps.polls.factories import PollFactory, ChoiceFactory
-from apps.polls.models import Poll, VoteInPoll
-from apps.accounts.factories import levels_accounts_factory, AccountFactory
-from apps.accounts.models import Account
+from apps.polls.models import Poll, Vote
+from apps.users.factories import UserFactory
+from apps.users.models import User
 
 
 class PollManagerTest(TestCase):
@@ -41,29 +41,28 @@ class PollManagerTest(TestCase):
             for i in range(count_choices):
                 ChoiceFactory(poll=poll)
 
-        # iteration as poll, count votes by unique accounts
-        for poll, accounts in (
-            (self.poll1, Account.objects.active_accounts().random_accounts(4)),
-            (self.poll3, Account.objects.active_accounts().random_accounts(6)),
-            (self.poll4, Account.objects.active_accounts().random_accounts(30)),
-            (self.poll5, Account.objects.active_accounts().random_accounts(29)),
-            (self.poll6, Account.objects.active_accounts().random_accounts(31)),
-            (self.poll7, Account.objects.active_accounts().random_accounts(5)),
-            (self.poll8, Account.objects.active_accounts().random_accounts(10)),
-            (self.poll9, [Account.objects.active_accounts().random_accounts(1)]),
+        # iteration as poll, count votes by unique users
+        for poll, users in (
+            (self.poll1, User.objects.active_users().random_users(4)),
+            (self.poll3, User.objects.active_users().random_users(6)),
+            (self.poll4, User.objects.active_users().random_users(30)),
+            (self.poll5, User.objects.active_users().random_users(29)),
+            (self.poll6, User.objects.active_users().random_users(31)),
+            (self.poll7, User.objects.active_users().random_users(5)),
+            (self.poll8, User.objects.active_users().random_users(10)),
+            (self.poll9, [User.objects.active_users().random_users(1)]),
         ):
-            for account in accounts:
-                vote = VoteInPoll(poll=poll, account=account, choice=random.choice(poll.choices.all()))
+            for user in users:
+                vote = Vote(poll=poll, user=user, choice=random.choice(poll.choices.all()))
                 vote.full_clean()
                 vote.save()
 
     @classmethod
     def setUpTestData(cls):
 
-        # create accounts
-        levels_accounts_factory()
+        # create users
         for i in range(40):
-            AccountFactory(is_active=True)
+            UserFactory(is_active=True)
 
         #
         cls._generate_polls_choices_votes(cls)
@@ -82,7 +81,7 @@ class PollManagerTest(TestCase):
         #
         self.assertCountEqual(
             Poll.objects.most_activity_voters(),
-            Account.objects.accounts_with_count_votes().filter(count_votes__gt=0)
+            User.objects.users_with_count_votes().filter(count_votes__gt=0)
         )
         # restore initialization polls, choices and votes
         self._generate_polls_choices_votes()
@@ -94,7 +93,7 @@ class PollManagerTest(TestCase):
         #
         self.assertCountEqual(
             Poll.objects.most_activity_voters(),
-            Account.objects.accounts_with_count_votes().filter(count_votes__gt=1)
+            User.objects.users_with_count_votes().filter(count_votes__gt=1)
         )
 
         # restore initialization polls, choices and votes
@@ -107,7 +106,7 @@ class PollManagerTest(TestCase):
         #
         self.assertCountEqual(
             Poll.objects.most_activity_voters(),
-            Account.objects.accounts_with_count_votes().filter(count_votes__gt=4)
+            User.objects.users_with_count_votes().filter(count_votes__gt=4)
         )
 
         # restore initialization polls, choices and votes
@@ -119,7 +118,7 @@ class PollManagerTest(TestCase):
         #
         self.assertCountEqual(
             Poll.objects.most_activity_voters(),
-            Account.objects.accounts_with_count_votes().filter(count_votes__gt=4)
+            User.objects.users_with_count_votes().filter(count_votes__gt=4)
         )
 
         # restore initialization polls, choices and votes
@@ -128,5 +127,5 @@ class PollManagerTest(TestCase):
     def test_get_all_voters(self):
         self.assertCountEqual(
             Poll.objects.get_all_voters(),
-            Account.objects.accounts_with_count_votes().filter(count_votes__gt=0),
+            User.objects.users_with_count_votes().filter(count_votes__gt=0),
         )

@@ -4,9 +4,9 @@ import random
 from django.test import TestCase
 
 from apps.polls.factories import PollFactory, ChoiceFactory
-from apps.polls.models import Poll, Choice, VoteInPoll
-from apps.accounts.factories import levels_accounts_factory, AccountFactory
-from apps.accounts.models import Account
+from apps.polls.models import Poll, Choice, Vote
+from apps.users.factories import UserFactory
+from apps.users.models import User
 
 
 class PollQuerySetTest(TestCase):
@@ -17,10 +17,9 @@ class PollQuerySetTest(TestCase):
     @classmethod
     def setUpTestData(cls):
 
-        # create accounts
-        levels_accounts_factory()
+        # create users
         for i in range(35):
-            AccountFactory(is_active=True)
+            UserFactory(is_active=True)
 
         # create polls
         cls.poll1 = PollFactory(status=Poll.CHOICES_STATUS.closed)
@@ -48,19 +47,19 @@ class PollQuerySetTest(TestCase):
             for i in range(count_choices):
                 ChoiceFactory(poll=poll)
 
-        # iteration as poll, count votes by unique accounts
-        for poll, accounts in (
-            (cls.poll1, Account.objects.active_accounts().random_accounts(4)),
-            (cls.poll3, Account.objects.active_accounts().random_accounts(6)),
-            (cls.poll4, Account.objects.active_accounts().random_accounts(30)),
-            (cls.poll5, Account.objects.active_accounts().random_accounts(29)),
-            (cls.poll6, Account.objects.active_accounts().random_accounts(31)),
-            (cls.poll7, Account.objects.active_accounts().random_accounts(5)),
-            (cls.poll8, Account.objects.active_accounts().random_accounts(10)),
-            (cls.poll9, [Account.objects.active_accounts().random_accounts(1)]),
+        # iteration as poll, count votes by unique users
+        for poll, users in (
+            (cls.poll1, User.objects.active_users().random_users(4)),
+            (cls.poll3, User.objects.active_users().random_users(6)),
+            (cls.poll4, User.objects.active_users().random_users(30)),
+            (cls.poll5, User.objects.active_users().random_users(29)),
+            (cls.poll6, User.objects.active_users().random_users(31)),
+            (cls.poll7, User.objects.active_users().random_users(5)),
+            (cls.poll8, User.objects.active_users().random_users(10)),
+            (cls.poll9, [User.objects.active_users().random_users(1)]),
         ):
-            for account in accounts:
-                vote = VoteInPoll(poll=poll, account=account, choice=random.choice(poll.choices.all()))
+            for user in users:
+                vote = Vote(poll=poll, user=user, choice=random.choice(poll.choices.all()))
                 vote.full_clean()
                 vote.save()
 
@@ -156,9 +155,8 @@ class ChoiceQuerySetTest(TestCase):
     @classmethod
     def setUpTestData(self):
 
-        levels_accounts_factory()
         for i in range(40):
-            AccountFactory(is_active=True)
+            UserFactory(is_active=True)
 
         # create polls
         poll1 = PollFactory(status=Poll.CHOICES_STATUS.opened)
@@ -177,40 +175,40 @@ class ChoiceQuerySetTest(TestCase):
         self.choice34 = ChoiceFactory(poll=poll3)
 
         #
-        accounts = Account.objects.active_accounts().random_accounts(10)
-        for account in accounts[0:3]:
-            vote = VoteInPoll(poll=self.choice11.poll, account=account, choice=self.choice11)
+        users = User.objects.active_users().random_users(10)
+        for user in users[0:3]:
+            vote = Vote(poll=self.choice11.poll, user=user, choice=self.choice11)
             vote.full_clean()
             vote.save()
-        for account in accounts[3:6]:
-            vote = VoteInPoll(poll=self.choice12.poll, account=account, choice=self.choice12)
+        for user in users[3:6]:
+            vote = Vote(poll=self.choice12.poll, user=user, choice=self.choice12)
             vote.full_clean()
             vote.save()
-        for account in accounts[6:11]:
-            vote = VoteInPoll(poll=self.choice13.poll, account=account, choice=self.choice13)
-            vote.full_clean()
-            vote.save()
-        #
-        accounts = Account.objects.active_accounts().random_accounts(20)
-        for account in accounts[0:4]:
-            vote = VoteInPoll(poll=self.choice21.poll, account=account, choice=self.choice21)
-            vote.full_clean()
-            vote.save()
-        for account in accounts[4:21]:
-            vote = VoteInPoll(poll=self.choice22.poll, account=account, choice=self.choice22)
+        for user in users[6:11]:
+            vote = Vote(poll=self.choice13.poll, user=user, choice=self.choice13)
             vote.full_clean()
             vote.save()
         #
-        accounts = Account.objects.active_accounts().random_accounts(30)
-        vote = VoteInPoll(poll=self.choice31.poll, account=accounts[0], choice=self.choice31)
+        users = User.objects.active_users().random_users(20)
+        for user in users[0:4]:
+            vote = Vote(poll=self.choice21.poll, user=user, choice=self.choice21)
+            vote.full_clean()
+            vote.save()
+        for user in users[4:21]:
+            vote = Vote(poll=self.choice22.poll, user=user, choice=self.choice22)
+            vote.full_clean()
+            vote.save()
+        #
+        users = User.objects.active_users().random_users(30)
+        vote = Vote(poll=self.choice31.poll, user=users[0], choice=self.choice31)
         vote.full_clean()
         vote.save()
-        for account in accounts[1:20]:
-            vote = VoteInPoll(poll=self.choice33.poll, account=account, choice=self.choice33)
+        for user in users[1:20]:
+            vote = Vote(poll=self.choice33.poll, user=user, choice=self.choice33)
             vote.full_clean()
             vote.save()
-        for account in accounts[20:31]:
-            vote = VoteInPoll(poll=self.choice34.poll, account=account, choice=self.choice34)
+        for user in users[20:31]:
+            vote = Vote(poll=self.choice34.poll, user=user, choice=self.choice34)
             vote.full_clean()
             vote.save()
 

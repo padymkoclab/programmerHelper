@@ -65,6 +65,17 @@ class PollsManager(models.Manager):
     def get_most_active_voters(self):
         """A users participated in more than haft from all count polls."""
 
+        half_count_polls = self.get_half_from_count_polls()
+
+        # determination count votes for an each user
+        users_with_count_votes = self.users_with_count_votes()
+
+        # filter the users with the count votes more than the half from total count polls
+        return users_with_count_votes.filter(count_votes__gt=half_count_polls)
+
+    def get_half_from_count_polls(self):
+        """ """
+
         # make an access to a related model
         related_model = self.model.votes.rel.related_model
 
@@ -72,13 +83,7 @@ class PollsManager(models.Manager):
         count_polls = related_model.poll.get_queryset().count()
 
         # half from count polls as integer
-        half_count_polls = count_polls // 2
-
-        # determination count votes for an each user
-        users_with_count_votes = self.users_with_count_votes()
-
-        # filter the users with the count votes more than the half from total count polls
-        return users_with_count_votes.filter(count_votes__gt=half_count_polls)
+        return count_polls // 2
 
 
 class PollManager(models.Manager):
@@ -179,3 +184,11 @@ class VoteManager(models.Manager):
             result.append((month_year_name, objs_count))
 
         return result
+
+    def get_latest_vote(self):
+        """ """
+
+        try:
+            return self.latest()
+        except self.model.DoesNotExist:
+            return

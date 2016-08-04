@@ -38,13 +38,13 @@ class PollQuerySet(models.QuerySet):
         self = self.polls_with_count_votes()
         self = self.polls_with_count_choices()
         self = self.polls_with_date_lastest_voting()
-        self = self.prefetch_related('voteinpoll_set', 'choices', 'votes')
+        self = self.prefetch_related('voters', 'choices', 'votes')
         return self
 
     def polls_with_date_lastest_voting(self):
         """Return a queryset with determined last voting`s date for an each polls."""
 
-        return self.annotate(date_latest_voting=models.Max('voteinpoll__date_voting'))
+        return self.annotate(date_latest_voting=models.Max('votes__date_voting'))
 
 
 class ChoiceQuerySet(models.QuerySet):
@@ -64,5 +64,32 @@ class UserPollQuerySet(models.QuerySet):
     def users_with_count_votes(self):
         """ """
 
-        self = self.annotate(count_votes=models.Count('votes', distinct=True))
+        return self.annotate(count_votes=models.Count('votes', distinct=True))
+
+    def users_with_date_latest_voting(self):
+        """ """
+
+        return self.annotate(date_latest_voting=models.Max('votes__date_voting'))
+
+    def users_with_active_voters_status(self):
+        """ """
+
+        # make determination of count votes of each user
+        self = self.users_with_count_votes()
+
+        # get a half from count polls
+        half_from_count_polls = self.model.polls.get_half_from_count_polls()
+
+        #
+        return self.annotate(is_active_voter=models.Case(
+            models.When(count_votes__gte=half_from_count_polls, then=True),
+            models.When(count_votes__lt=half_from_count_polls, then=False),
+            output_field=models.BooleanField()
+        ))
+
+    def users_as_voters(self):
+        """ """
+
+        self = self.users_with_date_latest_voting()
+        self = self.users_with_active_voters_status()
         return self

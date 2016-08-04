@@ -44,13 +44,14 @@ from mylabour.utils import (
     get_latest_or_none,
     create_logger_by_filename,
     get_location,
+    join_enumarate,
 )
 from mylabour.datetime_utils import (
     convert_date_to_django_date_format,
     get_year_by_slavic_aryan_calendar,
     get_current_timezone_offset,
 )
-from apps.polls.models import Poll, Choice, VoteInPoll
+from apps.polls.models import Poll, Choice, Vote
 
 
 User = get_user_model()
@@ -79,6 +80,8 @@ class ExcelReport(object):
         # subjects for a report
         self.subjects = subjects
 
+        self.request = request
+
         # author report
         self.author = request.user.get_full_name()
 
@@ -89,14 +92,16 @@ class ExcelReport(object):
         self.objects_shift = 5
 
         #
-        self.all_polls = Poll.objects.prefetch_related('choices', 'votes', 'voteinpoll_set')
-        self.all_votes = VoteInPoll.objects.select_related('poll', 'user', 'choice')
-        self.all_choices = Choice.objects.select_related('poll')
+        self.all_polls = Poll.objects.prefetch_related('choices', 'votes', 'voters')
+        self.all_votes = Vote.objects.select_related('poll', 'user', 'choice')
+        self.all_choices = Choice.objects.select_related('poll').prefetch_related('votes')
+
+        #
         self.count_polls = self.all_polls.count()
         self.count_choices = Choice.objects.count()
         self.count_votes = self.all_votes.count()
 
-    # Set up document
+    # Set up the document
 
     def get_workbook(self, request):
         """ """
@@ -112,25 +117,33 @@ class ExcelReport(object):
         # add properties to document
         logger.critical('A subject of the workbook is not correct')
 
-        list_subjects = ', '.join(subject for subject in self.subjects if subject is not None)
-        list_subjects = 'Statistics, {0}'.format(list_subjects)
         workbook.set_properties({
             'title': _('A report about polls'),
-            'subject': list_subjects,
-            'keywords': _('Polls, choices, votes, voters, results, statistics'),
+            'subject': self.get_subjects(),
+            'keywords': _('Polls, votes, voters'),
             'comments': _('Report created with help library XlsxWriter 0.8.7.'),
             'author': self.author,
             'company': settings.SITE_NAME,
         })
+
+        workbook.set_custom_property('timezone', timezone.get_current_timezone_name())
+
+        location = get_location(self.request)
+        if location is None:
+            location = _('(Not possible determinate location)')
+
+        workbook.set_custom_property('location', location)
+
         logger.debug('Added properties to the workbook')
 
         return workbook
 
-    @staticmethod
-    def get_filename():
-        """Return a name of the file with an extension."""
+    def get_subjects(self):
+        """ """
 
-        return get_filename_with_datetime(Poll._meta.verbose_name, 'xlsx')
+        subjects = (SUBJECTS_HUMAN_NAMES[subject] for subject in self.subjects)
+        subjects = ', '.join(subjects)
+        return subjects.capitalize()
 
     def create_response(self):
         """Create a response with attached a Excel file """
@@ -139,7 +152,7 @@ class ExcelReport(object):
         response = HttpResponse(content_type='application/application/vnd.ms-excel')
 
         # get filename and attach it to the response
-        filename = self.get_filename()
+        filename = get_filename_with_datetime(_('Polls'), 'xlsx')
         response['Content-Disposition'] = 'attachment; filename=%s' % filename
         logger.debug('Created response for Excel report')
         return response
@@ -350,7 +363,7 @@ class ExcelReport(object):
         sheet.write('A8', _('Count votes'), self.get_formats['table_cell_header'])
         sheet.write('B8', self.count_votes, self.get_formats['table_cell_centered'])
         sheet.write('A9', _('Count voters'), self.get_formats['table_cell_header'])
-        sheet.write('B9', VoteInPoll.objects.get_count_voters(), self.get_formats['table_cell_centered'])
+        sheet.write('B9', Vote.objects.get_count_voters(), self.get_formats['table_cell_centered'])
         sheet.write('A10', _('Count opened\npolls'), self.get_formats['table_cell_header'])
         sheet.write('B10', Poll.objects.opened_polls().count(), self.get_formats['table_cell_centered'])
         sheet.write('A11', _('Count closed\npolls'), self.get_formats['table_cell_header'])
@@ -363,7 +376,7 @@ class ExcelReport(object):
         sheet.write('B14', Poll.objects.get_average_count_votes_in_polls(), self.get_formats['table_cell_centered'])
 
         sheet.merge_range('A16:B16', _('Latest vote'), self.get_formats['table_cell_title'])
-        latest_vote = VoteInPoll.objects.get_latest_vote()
+        latest_vote = Vote.objects.get_latest_vote()
         if latest_vote:
             sheet.write('A17', _('User'), self.get_formats['table_cell_header'])
             sheet.write('B17', latest_vote.user.get_full_name(), self.get_formats['table_cell_centered'])
@@ -463,10 +476,9 @@ class ExcelReport(object):
         self.write_field_names(field_names, sheet)
         self.write_objects(sheet, count_fields, 'Votes still do not have.', qs, func)
 
-        if self.count_votes > 0:
-            self.write_count_votes_by_months_for_past_year()
-            chart = self.get_chart_votes_for_past_year()
-            sheet.insert_chart('H6', chart)
+        self.write_count_votes_by_months_for_past_year()
+        chart = self.get_chart_votes_for_past_year()
+        sheet.insert_chart('H6', chart)
 
         # set a width of columns
         sheet.set_column('B1:B1', 20)
@@ -486,6 +498,7 @@ class ExcelReport(object):
 
         # if polls still do not have
         if not self.count_polls:
+            sheet.set_column('A:C', 15)
             sheet.merge_range('A4:C6', _('Polls still do not have'), self.get_formats['empty_row'])
             return
 
@@ -702,13 +715,14 @@ class ExcelReport(object):
 
         sheet.write(
             num_row, 5,
-            Poll.objects.is_active_voter(voter),
+            User.polls.is_active_voter(voter),
             self.get_formats['table_cell_centered'],
         )
 
+        report_votes_of_user = join_enumarate('\n', User.polls.get_report_votes_of_user(voter))
         sheet.write(
             num_row, 6,
-            User.polls.get_report_votes_of_user(voter),
+            report_votes_of_user,
             self.get_formats['table_cell_justify_text'],
         )
 
@@ -717,7 +731,7 @@ class ExcelReport(object):
 
         sheet = self.workbook.get_worksheet_by_name('Votes')
 
-        stat = VoteInPoll.objects.get_statistics_count_votes_by_months_for_past_year()
+        stat = Vote.objects.get_statistics_count_votes_by_months_for_past_year()
 
         dates, count_votes = zip(*stat)
 
@@ -824,7 +838,7 @@ class ExcelReport(object):
         chart.set_size({'x_scale': 2, 'y_scale': 2})
         chart.add_series({
             'values': '={0}!$I$4:$T$4'.format(sheet.name),
-            'categoriesries': '={0}!$I$3:$T$3'.format(sheet.name),
+            'categories': '={0}!$I$3:$T$3'.format(sheet.name),
             'marker': {'type': 'square'},
             'data_labels': {'value': True}
         })
@@ -892,7 +906,12 @@ class PollPDFReport(object):
         #
         self.count_polls = Poll.objects.count()
         self.count_choices = Choice.objects.count()
-        self.count_votes = VoteInPoll.objects.count()
+        self.count_votes = Vote.objects.count()
+
+        #
+        self.all_polls = Poll.objects.prefetch_related('choices', 'votes', 'voters')
+        self.all_votes = Vote.objects.select_related('poll', 'user', 'choice')
+        self.all_choices = Choice.objects.select_related('poll').prefetch_related('votes')
 
     def get_doc(self):
         """ """
@@ -926,9 +945,6 @@ class PollPDFReport(object):
         subjects = (SUBJECTS_HUMAN_NAMES[subject] for subject in self.subjects)
         subjects = ', '.join(subjects)
         return subjects.capitalize()
-
-    def function(self):
-        pass
 
     def add_page_templates(self, doc):
         """ """
@@ -1236,7 +1252,7 @@ class PollPDFReport(object):
         story.append(Spacer(self.doc_width, inch / 2))
 
         # get a latest vote or none, if votes still do not have
-        latest_vote = get_latest_or_none(VoteInPoll)
+        latest_vote = get_latest_or_none(Vote)
 
         if latest_vote is not None:
             latest_voter = textwrap.fill(latest_vote.user.get_full_name(), 50)
@@ -1256,7 +1272,7 @@ class PollPDFReport(object):
             ['Count draft polls', Poll.objects.draft_polls().count()],
             ['Count choices', self.count_choices],
             ['Count votes', self.count_votes],
-            ['Count voters', VoteInPoll.objects.get_count_voters()],
+            ['Count voters', Vote.objects.get_count_voters()],
             ['Average a count votes in the polls', Poll.objects.get_average_count_votes_in_polls()],
             ['Average a count choices in the polls', Poll.objects.get_average_count_choices_in_polls()],
             ['Date a latest vote', latest_date_voting],
@@ -1291,7 +1307,7 @@ class PollPDFReport(object):
 
             data = [['Primary\nkey', 'Title', 'Description', 'Status', 'Count\nchoices', 'Count\nvotes', 'Date\nadded']]
 
-            for poll in Poll.objects.all().prefetch_related('choices', 'votes', 'voteinpoll_set'):
+            for poll in self.all_polls:
                 row = [
                     textwrap.fill(str(poll.pk), 10),
                     textwrap.fill(poll.title, 20),
@@ -1330,7 +1346,7 @@ class PollPDFReport(object):
 
             data = [[_('Primary\nkey'), _('Choice`s\ntext'), _('Poll'), _('Count\nvotes')]]
 
-            for choice in Choice.objects.select_related('poll').prefetch_related('votes'):
+            for choice in self.all_choices:
                 row = [
                     textwrap.fill(str(choice.pk), 10),
                     textwrap.fill(choice.text_choice, 30),
@@ -1372,7 +1388,7 @@ class PollPDFReport(object):
 
             data = [[_('Primary\nkey'), _('Poll'), _('Choice'), _('User'), _('Date\nvoting')]]
 
-            for vote in VoteInPoll.objects.select_related('poll', 'user', 'choice'):
+            for vote in self.all_votes:
                 row = [
                     textwrap.fill(str(vote.pk), 10),
                     textwrap.fill(str(vote.poll), 20),
@@ -1405,7 +1421,7 @@ class PollPDFReport(object):
         if self.count_polls:
             # draw results all of the polls by PieChart
             # where a each chart will be placed on a separated page
-            for poll in Poll.objects.prefetch_related('choices', 'voteinpoll_set', 'votes'):
+            for poll in self.all_polls:
 
                 # add detail about poll
                 tbl = self.get_table_poll_details(poll)
@@ -1424,6 +1440,7 @@ class PollPDFReport(object):
         """ """
 
         story.append(NextPageTemplate('Voters'))
+        story.append(PageBreak())
 
         self._write_subject_header(story, SUBJECTS_HUMAN_NAMES['voters'])
 
@@ -1432,28 +1449,25 @@ class PollPDFReport(object):
             for voter in User.polls.get_all_voters():
 
                 data = [[
-                    _('Primary key'),
                     _('Full name'),
                     _('Count votes'),
-                    _('Date a\nlatest vote'),
-                    _('Is active\nvoter?')
+                    _('Is active\nvoter?'),
+                    _('Date of latest vote'),
                 ]]
 
                 date_voting = User.polls.get_latest_vote_of_user(voter).date_voting
                 date_voting = convert_date_to_django_date_format(date_voting)
-                date_voting = textwrap.fill(date_voting, 10)
 
                 row = [
-                    textwrap.fill(str(voter.pk), 15),
-                    textwrap.fill(voter.get_full_name(), 30),
+                    textwrap.fill(voter.get_full_name(), 40),
                     User.polls.get_count_votes_of_user(voter),
-                    date_voting,
                     User.polls.is_active_voter(voter),
+                    date_voting,
                 ]
                 data.append(row)
                 tbl = Table(
                     data,
-                    colWidths=[inch * 1.25, inch * 2.25, inch, inch, inch / 1.5],
+                    colWidths=[inch * 2.25, inch, inch / 1.5, inch * 2],
                     style=self.tblObjectsStyle,
                 )
 
@@ -1510,9 +1524,9 @@ class PollPDFReport(object):
         # create legend
         legend = Legend()
         legend.colorNamePairs = [
-            (colors.red, str(Poll.get_statuses_for_display['closed'])),
-            (colors.green, str(Poll.get_statuses_for_display['opened'])),
-            (colors.blue, str(Poll.get_statuses_for_display['draft'])),
+            (colors.red, str(Poll.CHOICES_STATUS._display_map['closed'])),
+            (colors.green, str(Poll.CHOICES_STATUS._display_map['opened'])),
+            (colors.blue, str(Poll.CHOICES_STATUS._display_map['draft'])),
         ]
         legend.x = canvas.width / 4
         legend.y = 0
@@ -1534,7 +1548,7 @@ class PollPDFReport(object):
     def get_canvas_with_linechart_count_votes_for_past_year(self):
         """ """
 
-        data = VoteInPoll.objects.get_statistics_count_votes_by_months_for_past_year()
+        data = Vote.objects.get_statistics_count_votes_by_months_for_past_year()
 
         dates, values = zip(*data)
 

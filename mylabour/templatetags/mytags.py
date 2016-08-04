@@ -3,6 +3,7 @@ import warnings
 import random
 from calendar import LocaleHTMLCalendar
 
+from django.utils.http import urlencode
 from django.utils.translation import get_language, activate, to_locale
 from django.utils import timezone
 from django.utils.safestring import mark_safe
@@ -10,6 +11,7 @@ from django.utils.html import format_html_join, format_html, remove_tags
 from django.template import Library, Node, resolve_variable
 from django import template
 from django.conf import settings
+from django.core.urlresolvers import reverse
 
 from bs4 import BeautifulSoup
 from pygments import highlight
@@ -91,8 +93,17 @@ stylize = register.tag(stylize)
 
 
 @register.simple_tag(takes_context=True)
-def name(context, a):
-    return mark_safe('My name user: {0}, and I am wrote a next<b>{1}</b>'.format(context['user'], a))
+def url_get_kwargs(context, url_for_reverse, **kwargs):
+    """ """
+
+    # make reverse from url
+    url = reverse(url_for_reverse)
+
+    # convert dict to urlencode
+    get_kwargs = urlencode(kwargs)
+
+    # return full url
+    return '{0}?{1}'.format(url, get_kwargs)
 
 
 @register.inclusion_tag('snippets/temp.html', takes_context=True)
@@ -124,12 +135,12 @@ def tag_cloud_as_listing(parser, token):
             )
         )
     if show_url not in ['None', 'Admin', 'Absolute']:
-        raise template.TemplateSyntaxError("Parameter 'show_url' must be 'None', 'Admin' or 'Absolute', not {0}".format(
-            show_url)
+        raise template.TemplateSyntaxError(
+            "Parameter 'show_url' must be 'None', 'Admin' or 'Absolute', not {0}".format(show_url)
         )
     if colors not in ['Black', 'Standart', 'Colored']:
-        raise template.TemplateSyntaxError("Parameter 'colors' must be 'Black', 'Standart' or 'Colored', not {0}".format(
-            show_url)
+        raise template.TemplateSyntaxError(
+            "Parameter 'colors' must be 'Black', 'Standart' or 'Colored', not {0}".format(show_url)
         )
     return TagNode(variable_name, show_url, colors)
 
@@ -147,8 +158,7 @@ class TagNode(template.Node):
             value_variable_name = self.variable_name.resolve(context)
             #
             html_spans = list()
-            pattern = '<span style="font-size: {size}em;color: {color};">\
-<a href="{url}" style="color: {color};">{name} ({number})</a></span>'
+            pattern = '<span style="font-size: {size}em;color: {color};"><a href="{url}" style="color: {color};">{name} ({number})</a></span>'
             for obj, number in value_variable_name:
 
                 if self.colors == 'Black':

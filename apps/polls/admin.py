@@ -1,4 +1,5 @@
 
+import re
 import functools
 
 from django.contrib.auth import get_user_model
@@ -16,10 +17,9 @@ from django.contrib import admin
 import pygal
 
 from mylabour.utils import get_statistics_count_objects_by_year, get_latest_or_none
-from mylabour.admin_listfilters import PositiveIntegerRangeListFilter
 from apps.export_import_models.actions import advanced_export, export_as_json
 
-from .models import Poll, Choice, VoteInPoll
+from .models import Poll, Choice, Vote
 from .forms import PollModelForm, ChoiceModelForm
 from .formsets import ChoiceInlineFormSet
 from .actions import make_closed, make_draft, make_opened
@@ -61,22 +61,22 @@ class ChoiceInline(admin.StackedInline):
     list_select_related = ('poll',)
 
 
-class VoteInPollInline(admin.TabularInline):
+class VoteInline(admin.TabularInline):
     '''
-    Tabular Inline View for VoteInPoll
+    Tabular Inline View for Vote
     '''
 
     list_select_related = ('poll', 'user', 'choice')
-    model = VoteInPoll
+    model = Vote
     extra = 0
     fields = ['choice', 'user']
     # max_num = Account.objects,active_users()
 
     def __init__(self, *args, **kwargs):
-        super(VoteInPollInline, self).__init__(*args, **kwargs)
+        super(VoteInline, self).__init__(*args, **kwargs)
 
     def get_queryset(self, request):
-        qs = super(VoteInPollInline, self).get_queryset(request)
+        qs = super(VoteInline, self).get_queryset(request)
         return qs.select_related('poll', 'user', 'choice')
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
@@ -85,7 +85,7 @@ class VoteInPollInline(admin.TabularInline):
             if args:
                 pk = args[0]
                 kwargs['queryset'] = Choice.objects.filter(poll__pk=pk)
-        return super(VoteInPollInline, self).formfield_for_foreignkey(db_field, request, **kwargs)
+        return super(VoteInline, self).formfield_for_foreignkey(db_field, request, **kwargs)
 
 
 class PollAdmin(admin.ModelAdmin):
@@ -148,7 +148,7 @@ class PollAdmin(admin.ModelAdmin):
 
         # add ability CRUD with votes if poll exists and yet not added early
         if obj is not None:
-            self.inlines = [ChoiceInline, VoteInPollInline]
+            self.inlines = [ChoiceInline, VoteInline]
 
         return [inline(self.model, self.admin_site) for inline in self.inlines]
 
@@ -211,14 +211,14 @@ class PollAdmin(admin.ModelAdmin):
             'count_closed_polls': Poll.objects.closed_polls().count(),
             'count_draft_polls': Poll.objects.draft_polls().count(),
             'count_choices': Choice.objects.count(),
-            'count_votes': VoteInPoll.objects.count(),
-            'count_voters': Poll.objects.get_count_voters(),
+            'count_votes': Vote.objects.count(),
+            'count_voters': Vote.objects.get_count_voters(),
             'latest_poll': get_latest_or_none(Poll),
             'all_voters': self.get_listing_voters_with_admin_url_and_count_votes(),
         }
 
         # add detail about latest changes in polls, if is
-        latest_vote = get_latest_or_none(VoteInPoll)
+        latest_vote = get_latest_or_none(Vote)
         statistics['date_latest_vote'] = getattr(latest_vote, 'date_voting', None)
         statistics['latest_active_poll'] = getattr(latest_vote, 'poll', None)
         statistics['latest_voter'] = getattr(latest_vote, 'user', None)
@@ -250,7 +250,7 @@ class PollAdmin(admin.ModelAdmin):
         if request.method == 'GET':
             context = dict(
                 self.admin_site.each_context(request),
-                title=_('Make report'),
+                title=_('Make a report about polls'),
                 current_app=apps.get_app_config('polls'),
                 media=self.media,
             )
@@ -324,7 +324,7 @@ class PollAdmin(admin.ModelAdmin):
         """Return chart in SVG format on based statistics of count votes by year."""
 
         # get a statistics data by votes
-        statistics_count_votes_by_year = get_statistics_count_objects_by_year(VoteInPoll, 'date_voting')
+        statistics_count_votes_by_year = get_statistics_count_objects_by_year(Vote, 'date_voting')
 
         # create a line chart
         chart_statistics_count_votes_by_year = pygal.Line()
@@ -362,7 +362,7 @@ class PollAdmin(admin.ModelAdmin):
         for voter in all_voters:
             admin_url = voter.get_admin_url()
             voter_full_name = voter.get_full_name()
-            count_votes = User.polls.get_count_votes(voter)
+            count_votes = User.polls.get_count_votes_of_user(voter)
 
             # make a translatable text for a count votes
             translated_part = ungettext(
@@ -438,7 +438,7 @@ class ChoiceAdmin(admin.ModelAdmin):
     list_display = ('__str__', 'poll', 'get_count_votes')
     list_filter = (
         ('poll', admin.RelatedOnlyFieldListFilter),
-        PositiveIntegerRangeListFilter,
+        # PositiveIntegerRangeListFilter,
     )
     search_fields = ('text_choice',)
     list_select_related = ('poll',)
@@ -494,13 +494,10 @@ class ChoiceAdmin(admin.ModelAdmin):
     display_voters_with_get_admin_links.short_description = _('Voters')
 
 
-class VoteInPollAdmin(admin.ModelAdmin):
+class VoteAdmin(admin.ModelAdmin):
     '''
-    Admin View for VoteInPoll
+    Admin View for Vote
     '''
-
-    # templates
-    change_list_template = 'polls/admin/vote_in_poll_changelist.html'
 
     # objects list
     list_select_related = ('poll', 'user', 'choice')
@@ -522,14 +519,20 @@ class VoteInPollAdmin(admin.ModelAdmin):
 
         return [
             [
-                VoteInPoll._meta.verbose_name, {'fields': fields}
+                Vote._meta.verbose_name, {'fields': fields}
             ]
         ]
 
     def get_urls(self):
 
-        urls = super(VoteInPollAdmin, self).get_urls()
+        urls = super(VoteAdmin, self).get_urls()
 
-        # remove urls for add, change and delete a vote, leaved only url changelist
-        urls = list(url for url in urls if url.name == 'polls_voteinpoll_changelist')
-        return urls
+        # remove urls for add and change vote
+        urls = filter(
+            lambda url:
+                not (url.name is None or re.match(r'\w*(_add|_change)$', url.name)),
+            urls
+        )
+
+        # return URLs as list
+        return list(urls)

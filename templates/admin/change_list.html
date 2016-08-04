@@ -1,2 +1,21 @@
-
 {% extends "admin/change_list.html" %}
+
+{% load i18n %}
+{% load myfilters %}
+{% comment %}
+Load library of tags for filter 'admin_urlname' and localization
+{% endcomment %}
+{% load admin_urls %}
+{% block object-tools-items %}
+{% if has_add_permission %}
+    {% comment %}
+        Display button "Add object" if only that model admin class has url for add object.
+    {% endcomment %}
+    {% if cl.model_admin|has_admin_url:'add' %}
+        <a href="{% url cl.opts|admin_urlname:'add' %}{% if is_popup %}?_popup=1{% endif %}" class="btn btn-success">
+            <i class="icon-plus-sign icon-white"></i>&nbsp;
+            {% blocktrans with cl.opts.verbose_name as name %}Add {{ name }}{% endblocktrans %}
+        </a>
+    {% endif %}
+{% endif %}
+{% endblock object-tools-items %}

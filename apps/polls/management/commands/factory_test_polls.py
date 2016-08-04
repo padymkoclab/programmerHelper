@@ -8,9 +8,12 @@ from mylabour.basecommands import ExtendedBaseCommand
 from mylabour.utils import create_logger_by_filename
 
 from apps.polls.factories import PollFactory, ChoiceFactory
-from apps.polls.models import Poll, Choice, VoteInPoll
+from apps.polls.models import Poll, Choice, Vote
 from apps.polls.constants import MIN_COUNT_CHOICES_IN_POLL, MAX_COUNT_CHOICES_IN_POLL
 
+
+# get access to user`s model
+User = get_user_model()
 
 logger = create_logger_by_filename(__name__)
 
@@ -25,8 +28,6 @@ class Command(ExtendedBaseCommand):
     def handle(self, *args, **kwargs):
         count_polls = kwargs['count_polls'][0]
 
-        # get access to user`s model
-        User = get_user_model()
         count_users = User.objects.count()
         assert count_users > 0, 'Not users for voting'
 
@@ -55,19 +56,19 @@ class Command(ExtendedBaseCommand):
         # create votes, where unique user and poll
         votes = set()
         for poll in polls:
-            random_count_users = random.randint(1, count_users)
+            random_count_users = random.randint(0, count_users)
             users = User.objects.random_users(random_count_users, True)
             for user in users:
                 choice = random.choice(tuple(poll.choices.all()))
-                vote = VoteInPoll(user=user, poll=poll, choice=choice)
+                vote = Vote(user=user, poll=poll, choice=choice)
                 votes.add(vote)
-        VoteInPoll.objects.bulk_create(votes)
+        Vote.objects.bulk_create(votes)
 
         # make a report
         logger.debug('Made factory polls ({0}), choices ({1}) and votes ({2}).'.format(
             Poll.objects.count(),
             Choice.objects.count(),
-            VoteInPoll.objects.count(),
+            Vote.objects.count(),
         ))
 
         # make shuffle a dates in newly-created objects
@@ -78,7 +79,7 @@ class Command(ExtendedBaseCommand):
     def _shuffle_dates(self):
         """ """
 
-        for poll in Poll.objects.all().prefetch_related('voteinpoll_set'):
+        for poll in Poll.objects.prefetch_related('voters', 'choices', 'votes'):
 
             # change dates added of polls
             new_date_added = get_random_date_from_days_ago_to_now()
@@ -91,6 +92,6 @@ class Command(ExtendedBaseCommand):
 
             # change dates of voting in votes
             # given that it must be more than date added of a corresponding poll
-            for vote in poll.voteinpoll_set.iterator():
+            for vote in poll.votes.iterator():
                 new_date_voting = get_random_date_from_days_ago_to_now(new_date_added)
-                poll.voteinpoll_set.filter(pk=vote.pk).update(date_voting=new_date_voting)
+                poll.votes.filter(pk=vote.pk).update(date_voting=new_date_voting)

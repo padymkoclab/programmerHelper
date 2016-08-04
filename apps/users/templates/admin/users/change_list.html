@@ -1,0 +1,25 @@
+
+{% extends "admin/change_list.html" %}
+
+
+{% load i18n %}
+
+{% block date_hierarchy %}
+    {% comment %}
+    A select for change users displaing in a table, as well as change fields in the users table
+    {% endcomment %}
+
+    {% block users_display %}
+
+        {% url 'admin:users_user_changelist' as users_changelist %}
+        {% url 'admin:users_user_voters' as voters_changelist %}
+
+         <select name="changelist_users_display" id="changelist_users_display" onchange="location = this.value;">
+            <option value="{{ users_changelist }}" {% if request.path == users_changelist %}selected="selected"{% endif %}>{% trans "All users" %}</option>
+            <option value="{{ voters_changelist }}" {% if request.path == voters_changelist %}selected="selected"{% endif %}>{% trans "Voters" %}</option>
+         </select>
+
+    {% endblock users_display %}
+
+    {{ block.super }}
+{% endblock date_hierarchy %}

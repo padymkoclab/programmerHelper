@@ -119,3 +119,9 @@ def ipdb(element):
         warnings.warn('Module "ipdb" not found, then will be use module "pdb"', ImportWarning)
         pdb.set_trace()
     return element
+
+
+@register.filter(name='has_admin_url')
+def has_admin_url(model_admin, url_name):
+    """ """
+    return any(url for url in model_admin.urls if str(url.name).endswith('_{0}'.format(url_name)))

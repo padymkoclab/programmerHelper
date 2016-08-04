@@ -1,6 +1,11 @@
 
-from django.utils.translation import ugettext_lazy as _
+import datetime
+
+from django.db import models
+from django.core.exceptions import ImproperlyConfigured
 from django.contrib import admin
+from django.utils.translation import ugettext_lazy as _
+from django.utils.encoding import force_text
 from django.utils import timezone
 
 from dateutil.relativedelta import relativedelta
@@ -81,17 +86,97 @@ class LatestActivityListFilter(admin.SimpleListFilter):
             return queryset.filter(latest_activity__gte=tonow - timezone.timedelta(days=365))
 
 
-class PositiveIntegerRangeListFilter(admin.SimpleListFilter):
-    """
+class RangeSimpleListFilter(admin.ListFilter):
+    # The parameter that should be used in the query string for that filter.
+    parameter_name = None
 
-    """
+    def __init__(self, request, params, model, model_admin):
+        super(RangeSimpleListFilter, self).__init__(
+            request, params, model, model_admin)
+        if self.parameter_name is None:
+            raise ImproperlyConfigured(
+                "The list filter '%s' does not specify "
+                "a 'parameter_name'." % self.__class__.__name__)
+        if self.parameter_name in params:
+            value = params.pop(self.parameter_name)
+            self.used_parameters[self.parameter_name] = value
+        lookup_choices = self.lookups(request, model_admin)
+        if lookup_choices is None:
+            lookup_choices = ()
+        self.lookup_choices = list(lookup_choices)
 
-    title = _('positive integer range')
-    parameter_name = 'positiveintegerrange'
-    template = 'mylabour/range_filter.html'
+    def has_output(self):
+        return len(self.lookup_choices) > 0
+
+    def value(self):
+        """
+        Returns the value (in string format) provided in the request's
+        query string for this filter, if any. If the value wasn't provided then
+        returns None.
+        """
+        return self.used_parameters.get(self.parameter_name)
 
     def lookups(self, request, model_admin):
-        return (('1', '1'), )
+        """
+        Must be overridden to return a list of tuples (value, verbose value)
+        """
+        raise NotImplementedError(
+            'The RangeSimpleListFilter.lookups() method must be overridden to '
+            'return a list of tuples (value, verbose value)')
 
-    def queryset(self, request, queryset):
-        return queryset
+    def expected_parameters(self):
+        return [self.parameter_name]
+
+    def choices(self, cl):
+        yield {
+            'selected': self.value() is None,
+            'query_string': cl.get_query_string({}, [self.parameter_name]),
+            'display': _('All'),
+        }
+        for lookup, title in self.lookup_choices:
+            yield {
+                'selected': self.value() == force_text(lookup),
+                'query_string': cl.get_query_string({
+                    self.parameter_name: lookup,
+                }, []),
+                'display': title,
+            }
+
+
+class DateRangeFieldListFilter(admin.FieldListFilter):
+
+    template = 'mylabour/range_filter.html'
+
+    def __init__(self, field, request, params, model, model_admin, field_path):
+
+        self.field_generic_lookup = '%s__' % field_path
+
+        self.lookup_kwarg_since = '%s__range_gte' % field_path
+        self.lookup_kwarg_until = '%s__range_lt' % field_path
+
+        super(DateRangeFieldListFilter, self).__init__(field, request, params, model, model_admin, field_path)
+
+    def expected_parameters(self):
+        return [self.lookup_kwarg_since, self.lookup_kwarg_until]
+
+    def choices(self, cl):
+        raise NotImplementedError('Not worked URL replace')
+        return (
+            # '1', '2', '3'
+            # (1, 'start_date', 2),
+            # (2, 'end_date', 2),
+        )
+
+    def queryset(self, request, qs):
+
+        # remove keys with empty values
+        self.used_parameters = {k: v for k, v in self.used_parameters.items() if v}
+
+        # replace key name on corresponding for filter in Django ORM
+        self.used_parameters = {k.replace('range_', ''): v for k, v in self.used_parameters.items()}
+
+        # make filter by parameters, if is
+        return qs.filter(**self.used_parameters)
+
+
+admin.FieldListFilter.register(lambda f: isinstance(f, models.DateField), DateRangeFieldListFilter)

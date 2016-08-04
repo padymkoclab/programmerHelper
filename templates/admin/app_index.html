@@ -23,23 +23,58 @@
 {% endif %}
 
 {% block content %}
-    {{ block.super }}
-    <div id="content-summary">
-        {% if app_list %}
+    {% if app_list %}
+      <div id="content-main">
+          {% for app in app_list %}
+            <div class="module">
+              <table class="table-overview applist" summary="{% blocktrans with name=app.name %}Models available in the {{ name }} application.{% endblocktrans %}">
+                <caption><a href="{{ app.app_url }}" class="section">{% trans app.name %}</a></caption>
+                {% for model in app.models %}
+                  <tr>
+                    <th scope="row">{{ model.name }}</th>
+                    {% if model.admin_url %}
+                      <td>
+                        <a href="{{ model.admin_url }}" class="changelink icon">{% if model.add_url %}{% trans 'Change' %}{% else %}{% trans 'Show' %}{% endif %}</a>
+                      </td>
+                    {% else %}
+                      <td>&nbsp;</td>
+                    {% endif %}
+
+                    {% if model.add_url %}
+                      <td><a href="{{ model.add_url }}" class="addlink icon"><i
+                              class="icon-plus-sign icon-alpha75"></i>{% trans 'Add' %}
+                      </a></td>
+                    {% else %}
+                      <td>&nbsp;</td>
+                    {% endif %}
+                  </tr>
+                {% endfor %}
+
+                {% comment %} A place for fake models for an each app {% endcomment %}
+                {% block fake_models %}{% endblock fake_models %}
+
+              </table>
+            </div>
+          {% endfor %}
+      </div>
+      <div id="content-summary">
             <table class="table-overview applist">
                 <caption><a class="section">{% trans 'Summary' %}</a></caption>
                 <tr>
-                    <td scope="row"><a href="{% url 'admin:polls_poll_make_report' %}">{% trans "Make report" %}</a></td>
+                    {% comment %} Will be replace url for make report in an each app {% endcomment %}
+                    <td scope="row"><a href="{% block url_make_report %}{% endblock url_make_report %}">{% trans "Make report" %}</a></td>
                     <td><i class="icon-file icon-alpha75" aria-hidden="true"></i></td>
                 </tr>
                 <tr>
-                    <td scope="row"><a href="{% url 'admin:polls_poll_statistics' %}">{% trans "Statistics" %}</a></td>
+                    {% comment %} Will be replace url for show statistics in an each app {% endcomment %}
+                    <td scope="row"><a href="{% block url_statistics %}{% endblock url_statistics %}">{% trans "Statistics" %}</a></td>
+                    <td><i class="icon-th-list icon-alpha75" aria-hidden="true"></i></td>
                 </tr>
             </table>
-        {% else %}
-            <p>{% trans "You don't have permission to make reports." %}</p>
-        {% endif %}
-    </div>
+      </div>
+    {% else %}
+      <p>{% trans "You don't have permission to actions on this page." %}</p>
+    {% endif %}
 {% endblock content %}
 
 {% block sidebar %}{% endblock %}

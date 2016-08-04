@@ -1,0 +1,25 @@
+
+{% extends "admin/app_index.html" %}
+
+{% load i18n %}
+
+
+{% block fake_models %}
+    <tr>
+        {% comment %}
+            Must be three row, for good styling
+        {% endcomment %}
+        <th>{% trans "Voters" %}</th>
+        {% url 'admin:users_user_voters' as voters_changelist %}
+        <td><a href="{{ voters_changelist }}">{% trans "Show" %}</a></td>
+        <td></td>
+    </tr>
+{% endblock fake_models %}
+
+{% block url_make_report %}
+    {% url 'admin:polls_poll_make_report' %}
+{% endblock url_make_report %}
+
+{% block url_statistics %}
+    {% url 'admin:polls_poll_statistics' %}
+{% endblock url_statistics %}
