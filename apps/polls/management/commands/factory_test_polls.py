@@ -25,11 +25,16 @@ class Command(ExtendedBaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('count_polls', nargs=1, type=self._positive_integer_from_1_to_999)
 
+        parser.add_argument(
+            '--without-votes',
+            action='store_true',
+            dest='without-votes',
+            default=False,
+            help='Creating polls and choices without votes.'
+        )
+
     def handle(self, *args, **kwargs):
         count_polls = kwargs['count_polls'][0]
-
-        count_users = User.objects.count()
-        assert count_users > 0, 'Not users for voting'
 
         # delete all polls, choices, votes
         Poll.objects.filter().delete()
@@ -53,16 +58,23 @@ class Command(ExtendedBaseCommand):
                 choices.add(choice)
         Choice.objects.bulk_create(choices)
 
-        # create votes, where unique user and poll
-        votes = set()
-        for poll in polls:
-            random_count_users = random.randint(0, count_users)
-            users = User.objects.random_users(random_count_users, True)
-            for user in users:
-                choice = random.choice(tuple(poll.choices.all()))
-                vote = Vote(user=user, poll=poll, choice=choice)
-                votes.add(vote)
-        Vote.objects.bulk_create(votes)
+        # if needed, creating votes
+        if not kwargs['without-votes']:
+
+            # check up an existence of users
+            count_users = User.objects.count()
+            assert count_users > 0, 'Not users for voting'
+
+            # create votes, where unique user and poll
+            votes = set()
+            for poll in polls:
+                random_count_users = random.randint(0, count_users)
+                users = User.objects.random_users(random_count_users, True)
+                for user in users:
+                    choice = random.choice(tuple(poll.choices.all()))
+                    vote = Vote(user=user, poll=poll, choice=choice)
+                    votes.add(vote)
+            Vote.objects.bulk_create(votes)
 
         # make a report
         logger.debug('Made factory polls ({0}), choices ({1}) and votes ({2}).'.format(

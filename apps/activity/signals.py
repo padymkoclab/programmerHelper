@@ -275,28 +275,3 @@ def signal_creating_updating_of_account(sender, instance, created, **kwargs):
             message=message,
         )
     CHANGE_STATUS_ACCOUNT = False
-
-
-class ProtectDeleteAccount(Exception):
-    pass
-
-
-@receiver(pre_delete, sender=Account)
-def signal_deleted_account(sender, instance, **kwargs):
-    """Signal deleting account of user."""
-
-    raise ProtectDeleteAccount(
-        _(
-            """
-            Sorry, but features our the website not allow deleting account.
-            If you want, you can made account as non-active. Sorry again.
-            """
-        )
-    )
-
-    # message = 'Deleted account.'
-    # Action.objects.create(
-    #     account=instance,
-    #     flag=Action.CHOICES_FLAGS.USER,
-    #     message=message,
-    # )

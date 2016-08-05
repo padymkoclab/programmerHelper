@@ -4,6 +4,8 @@ import datetime
 
 SITE_NAME = 'ProgrammerHelper.com'
 
+CAN_DELETE_USER = False
+
 COUNT_DAYS_DISTINGUISH_ELEMENTS_AS_NEW = 7
 
 MIN_LENGTH_FOR_NAME_OR_TITLE_OBJECT = 10

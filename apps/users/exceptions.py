@@ -1,0 +1,3 @@
+
+class ProtectDeleteUser(Exception):
+    pass

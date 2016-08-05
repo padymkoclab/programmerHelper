@@ -17,7 +17,8 @@ class PollsManager(models.Manager):
     """
 
     def get_report_votes_of_user(self, user):
-        """ """
+        """Return report about votes of a user as tuple of records.
+        An each record is string contains information about vote, namely: choice and poll."""
 
         votes = user.votes.all()
         return tuple(
@@ -26,17 +27,17 @@ class PollsManager(models.Manager):
         )
 
     def get_count_votes_of_user(self, user):
-        """ """
+        """Return a count votes """
 
         return user.votes.count()
 
     def get_votes_of_user(self, user):
-        """ """
+        """Return all votes of a user."""
 
         return user.votes.all()
 
     def get_latest_vote_of_user(self, user):
-        """ """
+        """Return latest vote of a user or None."""
 
         try:
             return user.votes.latest()
@@ -44,37 +45,38 @@ class PollsManager(models.Manager):
             return
 
     def is_active_voter(self, user):
-        """ """
+        """Check up, a user is an active voter."""
 
         if user in self.get_most_active_voters():
             return True
         return False
 
     def get_all_voters(self):
-        """ """
+        """Return all voters (users with at least 1 vote) in a descending order."""
 
         # annotate a count votes for an every user
         users_with_count_votes = self.users_with_count_votes()
 
         # filter users with votes
-        all_voters = users_with_count_votes.filter(count_votes__gt=0)
+        all_voters = users_with_count_votes.filter(count_votes__gte=1)
 
         # order by users by count votes in a descending order
         return all_voters.order_by('-count_votes')
 
     def get_most_active_voters(self):
-        """A users participated in more than haft from all count polls."""
+        """Return users, participated in more than a haft of polls in a descending order."""
 
-        half_count_polls = self.get_half_from_count_polls()
+        # get a number which is equal to half of total count polls
+        half_count_polls = self._get_half_from_total_count_polls()
 
-        # determination count votes for an each user
-        users_with_count_votes = self.users_with_count_votes()
+        # get all voters
+        all_voters = self.get_all_voters()
 
         # filter the users with the count votes more than the half from total count polls
-        return users_with_count_votes.filter(count_votes__gt=half_count_polls)
+        return all_voters.filter(count_votes__gt=half_count_polls)
 
-    def get_half_from_count_polls(self):
-        """ """
+    def _get_half_from_total_count_polls(self):
+        """Return integer number, rounded to floor, corresponding to a half from total count polls."""
 
         # make an access to a related model
         related_model = self.model.votes.rel.related_model
@@ -82,7 +84,7 @@ class PollsManager(models.Manager):
         # total count polls
         count_polls = related_model.poll.get_queryset().count()
 
-        # half from count polls as integer
+        # a half from count polls as integer
         return count_polls // 2
 
 
@@ -91,10 +93,16 @@ class PollManager(models.Manager):
     Manager for polls
     """
 
-    def get_statistics_polls_by_status(self):
-        """ """
+    def change_status_poll(self, poll, status_name):
+        """Change status of poll in place."""
 
-        # return dictionary, where key is status`s display name, value - count that polls
+        poll.status = status_name
+        poll.full_clean()
+        poll.save()
+
+    def get_statistics_polls_by_status(self):
+        """Return dictionary, where key is status`s name, value - number of polls with this status."""
+
         return {
             self.model.CHOICES_STATUS.opened: self.opened_polls().count(),
             self.model.CHOICES_STATUS.closed: self.closed_polls().count(),
@@ -102,23 +110,25 @@ class PollManager(models.Manager):
         }
 
     def get_average_count_votes_in_polls(self):
-        """Return an average count votes on the polls.
-
-        [description]
-        """
+        """Return an average count votes on the polls."""
 
         polls_with_count_votes = self.polls_with_count_votes()
-        avg_count_votes = polls_with_count_votes.aggregate(avg_count_votes=Round(models.Avg('count_votes')))
+        avg_count_votes = polls_with_count_votes.aggregate(
+            avg_count_votes=models.functions.Coalesce(
+                Round(models.Avg('count_votes')), 0
+            )
+        )
         return avg_count_votes['avg_count_votes']
 
     def get_average_count_choices_in_polls(self):
-        """Return an average count choices in the polls.
-
-        [description]
-        """
+        """Return an average count choices in the polls."""
 
         polls_with_count_choices = self.polls_with_count_choices()
-        avg_count_choices = polls_with_count_choices.aggregate(avg_count_choices=Round(models.Avg('count_choices')))
+        avg_count_choices = polls_with_count_choices.aggregate(
+            avg_count_choices=models.functions.Coalesce(
+                Round(models.Avg('count_choices')), 0
+            )
+        )
         return avg_count_choices['avg_count_choices']
 
 

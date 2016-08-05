@@ -27,6 +27,7 @@ from mylabour.fields_db import ConfiguredAutoSlugField
 
 from .managers import UserManager
 from .querysets import UserQuerySet
+from .exceptions import ProtectDeleteUser
 
 
 class UserLevel(models.Model):
@@ -154,6 +155,21 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def save(self, *args, **kwargs):
         super(User, self).save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+
+        # Protect a user from removal, if web application has this restriction
+        if not settings.CAN_DELETE_USER:
+            raise ProtectDeleteUser(
+                _(
+                    """
+                    Sorry, but features our the site not allow removal profile of user.
+                    If you want, you can made user as non-active.
+                    """
+                )
+            )
+
+        super(User, self).delete(*args, **kwargs)
 
     def get_absolute_url(self):
         return reverse('users:detail', kwargs={'email': self.email})
