@@ -157,8 +157,7 @@ class VoteManager(models.Manager):
             (current_month, count_votes),
         ]
 
-        month return as localized format - month_name, year
-
+        month return as localized format - (month_name, year)
         """
 
         now = timezone.now()
