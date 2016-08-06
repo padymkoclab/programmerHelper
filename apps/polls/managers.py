@@ -66,14 +66,14 @@ class PollsManager(models.Manager):
     def get_most_active_voters(self):
         """Return users, participated in more than a haft of polls in a descending order."""
 
-        # get a number which is equal to half of total count polls
-        half_count_polls = self._get_half_from_total_count_polls()
+        # determinate statuses of voters by activity in polls
+        users_with_active_voters_status = self.model.polls.users_with_active_voters_status()
 
-        # get all voters
-        all_voters = self.get_all_voters()
+        # filter only active voters
+        active_voters = users_with_active_voters_status.filter(is_active_voter=True)
 
-        # filter the users with the count votes more than the half from total count polls
-        return all_voters.filter(count_votes__gt=half_count_polls)
+        # return active voters in a descending order
+        return active_voters.order_by('-count_votes')
 
     def _get_half_from_total_count_polls(self):
         """Return integer number, rounded to floor, corresponding to a half from total count polls."""

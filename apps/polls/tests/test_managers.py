@@ -161,6 +161,7 @@ class PollsManagerSingleUserTest(TestCase):
 
         # now is 1 poll, the user participated in 0
         leave_only_predetermined_number_of_objects(Poll, 1)
+        self.assertEqual(Poll.objects.count(), 1)
 
         # so he is not an active voter
         self.assertFalse(User.polls.is_active_voter(self.user))
@@ -169,6 +170,7 @@ class PollsManagerSingleUserTest(TestCase):
 
         # now is 1 poll, the user participated in 1
         leave_only_predetermined_number_of_objects(Poll, 1)
+        self.assertEqual(Poll.objects.count(), 1)
 
         # add a vote
         self.user.votes.create(poll=self.poll, choice=self.choice)
@@ -179,6 +181,7 @@ class PollsManagerSingleUserTest(TestCase):
 
         # now is 2 polls, the user participated in 0
         leave_only_predetermined_number_of_objects(Poll, 0)
+        self.assertEqual(Poll.objects.count(), 0)
 
         self.assertFalse(User.polls.is_active_voter(self.user))
 
@@ -186,6 +189,7 @@ class PollsManagerSingleUserTest(TestCase):
 
         # now is 2 polls, the user participated in 1
         leave_only_predetermined_number_of_objects(Poll, 2)
+        self.assertEqual(Poll.objects.count(), 2)
 
         # add a vote
         self.user.votes.create(poll=self.poll, choice=self.choice)
@@ -196,6 +200,7 @@ class PollsManagerSingleUserTest(TestCase):
 
         # now is 2 polls, the user participated in 2
         leave_only_predetermined_number_of_objects(Poll, 2)
+        self.assertEqual(Poll.objects.count(), 2)
 
         # adding votes of the user
         for poll in Poll.objects.all()[:2]:
@@ -209,6 +214,7 @@ class PollsManagerSingleUserTest(TestCase):
 
         # now is 3 polls, the user participated in 1
         leave_only_predetermined_number_of_objects(Poll, 3)
+        self.assertEqual(Poll.objects.count(), 3)
 
         # add a vote
         self.user.votes.create(poll=self.poll, choice=self.choice)
@@ -219,6 +225,7 @@ class PollsManagerSingleUserTest(TestCase):
 
         # now is 3 polls, the user participated in 2
         leave_only_predetermined_number_of_objects(Poll, 3)
+        self.assertEqual(Poll.objects.count(), 3)
 
         # adding votes of the user
         for poll in Poll.objects.all()[:2]:
@@ -232,6 +239,7 @@ class PollsManagerSingleUserTest(TestCase):
 
         # now is 4 polls, the user participated in 1
         leave_only_predetermined_number_of_objects(Poll, 4)
+        self.assertEqual(Poll.objects.count(), 4)
 
         # add a vote
         self.user.votes.create(poll=self.poll, choice=self.choice)
@@ -242,6 +250,7 @@ class PollsManagerSingleUserTest(TestCase):
 
         # now is 4 polls, the user participated in 2
         leave_only_predetermined_number_of_objects(Poll, 4)
+        self.assertEqual(Poll.objects.count(), 4)
 
         # adding votes of the user
         for poll in Poll.objects.all()[:2]:
@@ -255,6 +264,7 @@ class PollsManagerSingleUserTest(TestCase):
 
         # now is 4 polls, the user participated in 3
         leave_only_predetermined_number_of_objects(Poll, 4)
+        self.assertEqual(Poll.objects.count(), 4)
 
         # adding votes of the user
         for poll in Poll.objects.all()[:3]:
@@ -267,24 +277,28 @@ class PollsManagerSingleUserTest(TestCase):
     def test_get_half_from_total_count_polls_if_no_polls(self):
 
         leave_only_predetermined_number_of_objects(Poll, 0)
+        self.assertEqual(Poll.objects.count(), 0)
 
         self.assertEqual(User.polls._get_half_from_total_count_polls(), 0)
 
     def test_get_half_from_total_count_polls_if_exist_one_poll(self):
 
         leave_only_predetermined_number_of_objects(Poll, 1)
+        self.assertEqual(Poll.objects.count(), 1)
 
         self.assertEqual(User.polls._get_half_from_total_count_polls(), 0)
 
     def test_get_half_from_total_count_polls_if_exist_two_polls(self):
 
         leave_only_predetermined_number_of_objects(Poll, 2)
+        self.assertEqual(Poll.objects.count(), 2)
 
         self.assertEqual(User.polls._get_half_from_total_count_polls(), 1)
 
     def test_get_half_from_total_count_polls_if_exist_three_polls(self):
 
         leave_only_predetermined_number_of_objects(Poll, 3)
+        self.assertEqual(Poll.objects.count(), 3)
 
         self.assertEqual(User.polls._get_half_from_total_count_polls(), 1)
 
