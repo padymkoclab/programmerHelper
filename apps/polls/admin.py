@@ -80,6 +80,8 @@ class VoteInline(admin.TabularInline):
         return qs.select_related('poll', 'user', 'choice')
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
+
+        # filter choices for only this poll
         if db_field.name == 'choice':
             args = request.resolver_match.args
             if args:

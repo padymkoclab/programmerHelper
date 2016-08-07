@@ -59,9 +59,9 @@ class SolutionAdmin(admin.ModelAdmin):
     """
 
     list_display = (
-        'title',
+        'problem',
         'category',
-        'account',
+        'user',
         'get_scope',
         'colored_quality',
         'get_count_links',
@@ -74,12 +74,12 @@ class SolutionAdmin(admin.ModelAdmin):
     )
     list_filter = (
         ('category', admin.RelatedOnlyFieldListFilter),
-        ('account', admin.RelatedOnlyFieldListFilter),
+        ('user', admin.RelatedOnlyFieldListFilter),
         QualityListFilter,
         'date_modified',
         'date_added',
     )
-    search_fields = ('title',)
+    search_fields = ('problem',)
     date_hierarchy = 'date_added'
     inlines = [
         OpinionInline,
@@ -88,13 +88,13 @@ class SolutionAdmin(admin.ModelAdmin):
     fieldsets = [
         [
             Solution._meta.verbose_name, {
-                'fields': ['title', 'slug', 'category', 'account', 'body', 'tags', 'links'],
+                'fields': ['problem', 'slug', 'category', 'user', 'body', 'tags', 'links'],
             }
         ],
     ]
     filter_horizontal = ['tags']
     # filter_vertical = ['links']
-    prepopulated_fields = {'slug': ['title']}
+    prepopulated_fields = {'slug': ['problem']}
     form = SolutionForm
 
     def get_queryset(self, request):

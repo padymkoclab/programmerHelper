@@ -17,8 +17,15 @@ class ChoiceInlineFormSet(BaseInlineFormSet):
         # make additional validations if form is valid
         if self.is_valid():
 
+            # get all text input,
+            all_texts = list()
+            for form in self.forms:
+                text_choice = form.cleaned_data.get('text_choice', None)
+                if text_choice is not None:
+                    all_texts.append(text_choice)
+
             # count all a texts
-            counter_texts = collections.Counter(form.cleaned_data['text_choice'] for form in self.forms)
+            counter_texts = collections.Counter(all_texts)
 
             # filter only dublicated texts
             # made a iterator as a tuple, because any iterator have a habit use up for once
@@ -30,8 +37,9 @@ class ChoiceInlineFormSet(BaseInlineFormSet):
             # again make iteration on all forms
             # and add error message, if need, to the forms with dublicate texts
             for form in self.forms:
-                if form.cleaned_data['text_choice'] in duplicated_text:
+                if form.cleaned_data.get('text_choice', None) in duplicated_text:
                     form.add_error('text_choice', Choice.UNIQUE_ERROR_MESSAGE_FOR_TEXT_CHOICE_AND_POLL)
+
         if self.deleted_forms:
             # import ipdb; ipdb.set_trace()
             for form in self.deleted_forms:

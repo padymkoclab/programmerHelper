@@ -26,5 +26,5 @@ def signal_login_failed_user(sender, credentials, **kwargs):
 
 def signal_post_migrate_model_levels_of_users(sender, **kwargs):
     call_command('create_levels_of_users')
-    call_command('create_default_superuser')
+    call_command('create_test_superuser')
     logger.debug('A signal post_migration for app Users was called')

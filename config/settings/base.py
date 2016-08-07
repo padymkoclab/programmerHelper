@@ -21,7 +21,7 @@ SECRET_KEY = get_secret_value_for_setting_from_file(filename='secrets.json', set
 # Application definition
 
 DJANGO_APPS = [
-    # 'suit',
+    'suit',
     'django.contrib.admin.apps.SimpleAdminConfig',  # disable auto-discovery
     'django.contrib.auth',
     'django.contrib.contenttypes',

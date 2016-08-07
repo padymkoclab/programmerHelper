@@ -5,10 +5,10 @@ from .models import UserLevel
 
 
 # Attributes for default superuser
-DEFAULT_SUPERUSER_DATA = dict(
-    email='setivolkylany@gmail.com',
-    username='setivolkylany',
-    password='PyJS210493',
+TEST_SUPERUSER_DATA = dict(
+    email='admin@admin.com',
+    username='admin',
+    password='admin',
     date_birthday='2000-12-12',
 )
 

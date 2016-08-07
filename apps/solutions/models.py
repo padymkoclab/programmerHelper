@@ -82,10 +82,10 @@ class Solution(TimeStampedModel):
     Model for solution.
     """
 
-    title = models.CharField(
+    problem = models.CharField(
         _('Title'), max_length=100, validators=[MinLengthValidator(settings.MIN_LENGTH_FOR_NAME_OR_TITLE_OBJECT)]
     )
-    slug = ConfiguredAutoSlugField(_('Slug'), populate_from='title', unique_with=['category'])
+    slug = ConfiguredAutoSlugField(_('Slug'), populate_from='problem', unique_with=['category'])
     body = models.TextField(_('Text solution'), validators=[MinLengthValidator(100)])
     category = models.ForeignKey(
         'SolutionCategory',
@@ -93,10 +93,10 @@ class Solution(TimeStampedModel):
         related_name='solutions',
         verbose_name=_('Category'),
     )
-    account = models.ForeignKey(
+    user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         related_name='solutions',
-        verbose_name=_('Author'),
+        verbose_name=_('User'),
         on_delete=models.CASCADE,
         limit_choices_to={'is_active': True}
     )
@@ -122,13 +122,13 @@ class Solution(TimeStampedModel):
         db_table = 'solutions'
         verbose_name = _("Solution")
         verbose_name_plural = _("Solutions")
-        ordering = ['category', 'title']
-        unique_together = ['title', 'category']
+        ordering = ['category', 'problem']
+        unique_together = ['problem', 'category']
         get_latest_by = 'date_modified'
         permissions = (("can_view_opinions_about_solutions", "Can view opinions about solutions"),)
 
     def __str__(self):
-        return '{0.title}'.format(self)
+        return '{0.problem}'.format(self)
 
     def get_absolute_url(self):
         return reverse('solutions:solution', kwargs={'pk': self.pk, 'slug': self.slug})
@@ -140,8 +140,8 @@ class Solution(TimeStampedModel):
         )
 
     def unique_error_message(self, model_class, unique_check):
-        if isinstance(self, model_class) and unique_check == ('title', 'category'):
-            return _('Solution with this title already exists in this category of solutions.')
+        if isinstance(self, model_class) and unique_check == ('problem', 'category'):
+            return _('Solution with this problem already exists in this category of solutions.')
         return super(Solution, self).unique_error_message(model_class, unique_check)
 
     def get_scope(self):
@@ -189,4 +189,4 @@ class Solution(TimeStampedModel):
 
         raise NotImplementedError
         # analysis tags
-        # analysis title
+        # analysis problem

@@ -2,7 +2,7 @@
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 
-from .models import Poll, Choice, Vote
+from .models import Poll, Choice
 
 
 class PollModelForm(forms.ModelForm):
@@ -17,6 +17,7 @@ class PollModelForm(forms.ModelForm):
         self.fields['title'].widget.attrs = {
             'placeholder': _('Enter a title of poll'),
             'autocomplete': 'off',
+
             # special css class for admin theme - django-suit
             # it allow made input on all width of container
             'class': 'span12',
@@ -40,17 +41,11 @@ class ChoiceModelForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(ChoiceModelForm, self).__init__(*args, **kwargs)
         self.fields['text_choice'].widget.attrs = {
-            'placeholder': _('Enter text of choice'),
+            'placeholder': _('Enter text of a choice'),
             'class': 'span11',
             'rows': 5,
         }
 
-        # It is not worked
-        # self.fields['poll'].widget.attrs['class'] = 'span12'
-        self.fields['poll'].widget.attrs = {
-            'class': 'span12',
-            'id': 'span11',
-            'name': 'span12',
-            'style': 'span12',
-            'multiple': 'multiple',
-        }
+        # for FK field in ModelForm django create sppecial RelatedFieldWidgetWrapper
+        # for it assignmention css class must next, but it is worked only in admin
+        self.fields['poll'].widget.widget.attrs['class'] = 'span11'
