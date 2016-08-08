@@ -3,6 +3,7 @@ from django.contrib.auth import get_user_model
 from django.core.urlresolvers import reverse
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 
+from pyvirtualdisplay import Display
 from selenium.webdriver import Chrome
 
 webdriver = Chrome
@@ -22,17 +23,24 @@ class StaticLiveAdminTest(StaticLiveServerTestCase):
 
     def setUp(self):
 
-        # create browser
-        self.browser = webdriver()
-        self.browser.implicitly_wait(10)
+        # create and start an invisible web-server
+        self.display = Display(visible=0, size=(800, 600))
+        self.display.start()
 
-        # made login in admin as superuser
+        # create a browser
+        self.browser = webdriver()
+        self.browser.implicitly_wait(5)
+
+        # made login in a admin as a superuser
         self.made_login_in_admin()
 
     def tearDown(self):
 
-        # close browser
+        # close the browser
         self.browser.quit()
+
+        # close the invisible web-server
+        self.display.stop()
 
     def made_login_in_admin(self):
 

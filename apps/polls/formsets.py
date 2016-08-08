@@ -5,6 +5,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.forms import BaseInlineFormSet
 
 from .models import Choice
+from .constants import MIN_COUNT_CHOICES_IN_POLL
 
 
 class ChoiceInlineFormSet(BaseInlineFormSet):
@@ -40,8 +41,14 @@ class ChoiceInlineFormSet(BaseInlineFormSet):
                 if form.cleaned_data.get('text_choice', None) in duplicated_text:
                     form.add_error('text_choice', Choice.UNIQUE_ERROR_MESSAGE_FOR_TEXT_CHOICE_AND_POLL)
 
+        # if is forms for delete
+        # deterninate count choices in poll, after delete any count choices
+        # if after deleting the choices this poll will be have a count choices less than min count choices in poll,
+        # than add error to all formset
         if self.deleted_forms:
-            # import ipdb; ipdb.set_trace()
-            for form in self.deleted_forms:
-                form.add_error('__all__', _('You don`t have delete choices when to try add new votes.'))
-            # self.can_delete = False
+            count_deleted_forms = len(self.deleted_forms)
+            count_total_forms = len(self.forms)
+            if count_total_forms - count_deleted_forms < MIN_COUNT_CHOICES_IN_POLL:
+                self._non_form_errors.append(
+                    _('You try delete choices more than must be minimal number of choices in an each poll.')
+                )

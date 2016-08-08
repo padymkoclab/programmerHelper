@@ -1,12 +1,17 @@
 
+from django.contrib.auth import get_user_model
 from django.utils.text import slugify
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 
 from apps.users.factories import UserFactory
-from apps.users.models import User
+from mylabour.datetime_utils import convert_date_to_django_date_format
+
 from apps.polls.models import Poll, Choice, Vote
 from apps.polls.factories import PollFactory, ChoiceFactory
+
+
+User = get_user_model()
 
 
 class PollTest(TestCase):
@@ -367,7 +372,10 @@ class PollTest(TestCase):
             Vote(poll=self.poll, choice=choice1, user=self.user2),
         ])
         vote3 = Vote.objects.create(poll=self.poll, choice=choice2, user=self.user3)
-        self.assertEqual(self.poll.get_date_lastest_voting(), vote3.date_voting)
+
+        date_voting = convert_date_to_django_date_format(vote3.date_voting)
+
+        self.assertEqual(self.poll.get_date_lastest_voting(), date_voting)
 
 
 class ChoiceTest(TestCase):
@@ -451,6 +459,27 @@ class ChoiceTest(TestCase):
         ])
         self.assertCountEqual(self.choice.get_voters(), [self.user1, self.user2, self.user3])
 
+    def test_get_truncated_text_choice_if_length_of_text_choice_is_more_90(self):
+        self.choice.text_choice = 'Since it may be happen.' * 8
+        self.choice.full_clean()
+        self.choice.save()
+        self.assertEqual(len(self.choice.text_choice), 184)
+
+        #
+        text_choice = ('Since it may be happen.' * 8)[:87] + '...'
+        self.assertEqual(self.choice.get_truncated_text_choice(), text_choice)
+
+    def test_get_truncated_text_choice_if_length_of_text_choice_is_equal_90(self):
+        self.choice.text_choice = 'Since it may be happen.' * 5
+        self.choice.text_choice = self.choice.text_choice[:90]
+        self.choice.full_clean()
+        self.choice.save()
+        self.assertEqual(len(self.choice.text_choice), 90)
+
+        #
+        text_choice = ('Since it may be happen.' * 5)[:90]
+        self.assertEqual(self.choice.get_truncated_text_choice(), text_choice)
+
 
 class VoteTest(TestCase):
     """
@@ -493,3 +522,24 @@ class VoteTest(TestCase):
     def test_unique_user_and_poll(self):
         self.vote = Vote(poll=self.poll, user=self.user2, choice=self.choice1)
         self.assertRaisesMessage(ValidationError, 'This user already participated in that poll.', self.vote.full_clean)
+
+    def test_get_truncated_text_choice_if_length_of_text_choice_is_more_90(self):
+        self.vote.choice.text_choice = 'Since it may be happen.' * 8
+        self.vote.choice.full_clean()
+        self.vote.choice.save()
+        self.assertEqual(len(self.vote.choice.text_choice), 184)
+
+        #
+        text_choice = ('Since it may be happen.' * 8)[:67] + '...'
+        self.assertEqual(self.vote.get_truncated_text_choice(), text_choice)
+
+    def test_get_truncated_text_choice_if_length_of_text_choice_is_equal_90(self):
+        self.vote.choice.text_choice = 'Since it may be happen.' * 5
+        self.vote.choice.text_choice = self.vote.choice.text_choice[:70]
+        self.vote.choice.full_clean()
+        self.vote.choice.save()
+        self.assertEqual(len(self.vote.choice.text_choice), 70)
+
+        #
+        text_choice = ('Since it may be happen.' * 5)[:70]
+        self.assertEqual(self.vote.get_truncated_text_choice(), text_choice)

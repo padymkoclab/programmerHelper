@@ -1,0 +1,31 @@
+
+{% extends "admin/change_form.html" %}
+
+{% load i18n admin_urls %}
+
+
+{% block breadcrumbs %}
+  <ul class="breadcrumb">
+    <li>
+      <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+      <span class="divider">&raquo;</span>
+    </li>
+    <li>
+      <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{% firstof opts.app_config.verbose_name app_label|capfirst|escape %}</a>
+      <span class="divider">&raquo;</span>
+    </li>
+    <li>
+      {% if has_change_permission %}
+        <a href="{% url opts|admin_urlname:'changelist' %}">
+          {{ opts.verbose_name_plural|capfirst }}</a>{% else %}
+        {{ opts.verbose_name_plural|capfirst }}{% endif %}
+      <span class="divider">&raquo;</span>
+    </li>
+    <li class="active">
+      {% comment %}
+        make truncatechars on header text
+      {% endcomment %}
+      {% if add %}{% trans 'Add' %} {{ opts.verbose_name }}{% else %}{{ original|truncatechars:"80" }}{% endif %}
+    </li>
+  </ul>
+{% endblock %}

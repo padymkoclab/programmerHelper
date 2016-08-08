@@ -24,3 +24,5 @@ traitlets==4.2.1
 pdfminer2==20151206
 coverage==4.2
 pytest-cov-2.3.0
+pyvirtualdisplay
+EasyProcess

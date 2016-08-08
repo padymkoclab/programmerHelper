@@ -391,7 +391,7 @@ class ExcelReport(object):
                 self.get_formats['table_cell_datetime']
             )
         else:
-            sheet.merge_range('A17:B20', _('Votes still do not have.'), self.get_formats['empty_row'])
+            sheet.merge_range('A17:B20', _('Votes are not exists yet.'), self.get_formats['empty_row'])
 
         sheet.set_column(0, 1, 20)
         sheet.set_row(4, 40)
@@ -412,7 +412,7 @@ class ExcelReport(object):
         title = _('All polls')
         sheet = self.workbook.get_worksheet_by_name('Polls')
         field_names = [
-            '№', _('Id (as UUID)'), _('Title'), _('Slug'),
+            '№', _('Id'), _('Title'), _('Slug'),
             _('Description'), _('Count\nvotes'), _('Count\nchoices'),
             _('Status'), _('Latest changed\nof status'), _('Date modified'), _('Date added')
         ]
@@ -423,7 +423,7 @@ class ExcelReport(object):
 
         self.write_title(title, sheet, count_fields)
         self.write_field_names(field_names, sheet)
-        self.write_objects(sheet, count_fields, 'Polls still do not have', qs, func)
+        self.write_objects(sheet, count_fields, 'Polls are not exists yet', qs, func)
 
         if self.count_polls > 1:
             self.add_formulas_to_polls()
@@ -442,7 +442,7 @@ class ExcelReport(object):
 
         title = _('All choices')
         sheet = self.workbook.get_worksheet_by_name('Choices')
-        field_names = ['№', _('Id (as UUID)'), _('Text of choice'), _('Poll'), _('Count\nvotes')]
+        field_names = ['№', _('Id'), _('Text of choice'), _('Poll'), _('Count\nvotes')]
 
         count_fields = len(field_names)
         qs = self.all_choices
@@ -450,7 +450,7 @@ class ExcelReport(object):
 
         self.write_title(title, sheet, count_fields)
         self.write_field_names(field_names, sheet)
-        self.write_objects(sheet, count_fields, 'Choices still do not have', qs, func)
+        self.write_objects(sheet, count_fields, 'Choices are not exists yet', qs, func)
 
         if self.count_choices > 1:
             self.add_formulas_to_choices()
@@ -466,7 +466,7 @@ class ExcelReport(object):
 
         title = _('All votes')
         sheet = self.workbook.get_worksheet_by_name('Votes')
-        field_names = ['№', _('Id (as UUID)'), _('Voter'), _('Poll'), _('Choice'), _('Date\nvoting')]
+        field_names = ['№', _('Id'), _('Voter'), _('Poll'), _('Choice'), _('Date\nvoting')]
 
         count_fields = len(field_names)
         qs = self.all_votes
@@ -474,7 +474,7 @@ class ExcelReport(object):
 
         self.write_title(title, sheet, count_fields)
         self.write_field_names(field_names, sheet)
-        self.write_objects(sheet, count_fields, 'Votes still do not have.', qs, func)
+        self.write_objects(sheet, count_fields, 'Votes are not exists yet.', qs, func)
 
         self.write_count_votes_by_months_for_past_year()
         chart = self.get_chart_votes_for_past_year()
@@ -496,10 +496,10 @@ class ExcelReport(object):
         count_fields = len(field_names)
         self.write_title(title, sheet, count_fields)
 
-        # if polls still do not have
+        # if polls are not exists yet
         if not self.count_polls:
             sheet.set_column('A:C', 15)
-            sheet.merge_range('A4:C6', _('Polls still do not have'), self.get_formats['empty_row'])
+            sheet.merge_range('A4:C6', _('Polls are not exists yet'), self.get_formats['empty_row'])
             return
 
         # if polls already created
@@ -576,7 +576,7 @@ class ExcelReport(object):
                     sheet.set_row(num_row, 40)
             else:
                 num_row += 1
-                sheet.merge_range(num_row, 0, num_row, 2, _('Choices still do not have'), self.get_formats['empty_row'])
+                sheet.merge_range(num_row, 0, num_row, 2, _('Choices are not exists yet'), self.get_formats['empty_row'])
                 sheet.set_row(num_row, 40)
 
             if poll.get_count_votes():
@@ -597,7 +597,7 @@ class ExcelReport(object):
         title = _('All voters')
         sheet = self.workbook.get_worksheet_by_name('Voters')
         field_names = [
-            '№', _('Id (as UUID)'), _('Full name'),
+            '№', _('Id'), _('Full name'),
             _('Count votes'), _('Latest vote'), _('Is active\nvoter?'),
             _('All votes')
         ]
@@ -608,7 +608,7 @@ class ExcelReport(object):
 
         self.write_title(title, sheet, count_fields)
         self.write_field_names(field_names, sheet)
-        self.write_objects(sheet, count_fields, 'Voters still do not have.', qs, func)
+        self.write_objects(sheet, count_fields, 'Voters are not exists yet.', qs, func)
         # if self.count_votes > 1:
         #     self.add_formulas_to_choices()
 
@@ -625,7 +625,7 @@ class ExcelReport(object):
         """Write values of fields of objects on passed sheet.
         At the same time set a height of rows, where is wrote an each object."""
 
-        # if polls still do not have, write message about that
+        # if polls are not exists yet, write message about that
         # othewise - write polls
 
         # write values of fields of poll, with adding, where it need, handy to display formats
@@ -1251,7 +1251,7 @@ class PollPDFReport(object):
         story.append(Paragraph(_('Statictics'), self.styles['TitlePage']))
         story.append(Spacer(self.doc_width, inch / 2))
 
-        # get a latest vote or none, if votes still do not have
+        # get a latest vote or none, if votes are not exists yet
         latest_vote = get_latest_or_none(Vote)
 
         if latest_vote is not None:
@@ -1327,7 +1327,7 @@ class PollPDFReport(object):
             story.append(tbl)
 
         else:
-            story.append(Paragraph(_('Polls still do not have'), self.styles['Warning']))
+            story.append(Paragraph(_('Polls are not exists yet'), self.styles['Warning']))
 
     def write_choices(self, story):
         """ """
@@ -1363,7 +1363,7 @@ class PollPDFReport(object):
             story.append(tbl)
 
         else:
-            story.append(Paragraph(_('Choices still do not have'), self.styles['Warning']))
+            story.append(Paragraph(_('Choices are not exists yet'), self.styles['Warning']))
 
     def write_votes(self, story):
         """ """
@@ -1407,7 +1407,7 @@ class PollPDFReport(object):
             story.append(tbl)
 
         else:
-            story.append(Paragraph(_('Votes still do not have'), self.styles['Warning']))
+            story.append(Paragraph(_('Votes are not exists yet'), self.styles['Warning']))
 
     def write_results(self, story):
         """ """
@@ -1434,7 +1434,7 @@ class PollPDFReport(object):
                     story.append(canvas_chart_result_poll)
                     story.append(PageBreak())
         else:
-            story.append(Paragraph(_('Polls still do not have'), self.styles['Warning']))
+            story.append(Paragraph(_('Polls are not exists yet'), self.styles['Warning']))
 
     def write_voters(self, story):
         """ """
@@ -1483,7 +1483,7 @@ class PollPDFReport(object):
                 story.append(PageBreak())
 
         else:
-            story.append(Paragraph(_('Votes still do not have'), self.styles['Warning']))
+            story.append(Paragraph(_('Votes are not exists yet'), self.styles['Warning']))
 
     def get_canvas_with_piechart_statistics_status_polls(self):
         """ """

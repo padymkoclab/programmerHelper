@@ -1,15 +1,13 @@
 
-import re
 import functools
 
+from django.shortcuts import get_object_or_404
+from django.conf.urls import url
 from django.contrib.auth import get_user_model
 from django.apps import apps
 from django.template.response import TemplateResponse
-from django.conf.urls import url
 from django.utils.safestring import mark_safe
-from django.template.defaultfilters import truncatechars
 from django.utils.html import format_html_join, format_html, conditional_escape
-from django.template.defaultfilters import truncatewords
 from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ungettext
 from django.contrib import admin
@@ -43,51 +41,43 @@ def add_current_app_to_request_in_admin_view(view):
     return wrapped_view
 
 
+def remove_url_from_admin_urls(urls, url_name):
+    for admin_url in urls:
+        if admin_url.name == url_name:
+            u = admin_url
+    urls.remove(u)
+
+
 class ChoiceInline(admin.StackedInline):
     '''
     Stacked Inline View for Choice
     '''
 
-    # templates
-    template = 'polls/admin/choice_stacked.html'
-
-    # object
     model = Choice
     form = ChoiceModelForm
     formset = ChoiceInlineFormSet
     min_num = MIN_COUNT_CHOICES_IN_POLL
     max_num = MAX_COUNT_CHOICES_IN_POLL
     extra = 0
+    can_delete = True
     list_select_related = ('poll',)
+    fields = ('text_choice', 'poll')
+    fk_name = 'poll'
 
 
 class VoteInline(admin.TabularInline):
     '''
-    Tabular Inline View for Vote
+    Stacked Inline View for Choice
     '''
 
-    list_select_related = ('poll', 'user', 'choice')
     model = Vote
     extra = 0
-    fields = ['choice', 'user']
-    # max_num = Account.objects,active_users()
-
-    def __init__(self, *args, **kwargs):
-        super(VoteInline, self).__init__(*args, **kwargs)
-
-    def get_queryset(self, request):
-        qs = super(VoteInline, self).get_queryset(request)
-        return qs.select_related('poll', 'user', 'choice')
-
-    def formfield_for_foreignkey(self, db_field, request, **kwargs):
-
-        # filter choices for only this poll
-        if db_field.name == 'choice':
-            args = request.resolver_match.args
-            if args:
-                pk = args[0]
-                kwargs['queryset'] = Choice.objects.filter(poll__pk=pk)
-        return super(VoteInline, self).formfield_for_foreignkey(db_field, request, **kwargs)
+    max_num = 0
+    can_delete = False
+    list_select_related = ('poll', 'choice', 'user')
+    fields = ('user', 'get_truncated_text_choice', 'date_voting')
+    fk_name = 'poll'
+    readonly_fields = ['get_truncated_text_choice', 'user', 'date_voting']
 
 
 class PollAdmin(admin.ModelAdmin):
@@ -95,10 +85,10 @@ class PollAdmin(admin.ModelAdmin):
     Admin View for Poll
     '''
 
-    # template
+    # templates
     change_form_template = 'polls/admin/poll_change_form.html'
 
-    # objects list
+    # changelist
     list_display = (
         'title',
         'get_count_votes',
@@ -116,7 +106,7 @@ class PollAdmin(admin.ModelAdmin):
     form = PollModelForm
     readonly_fields = (
         'status_changed',
-        'display_most_popular_choice_or_choices',
+        'get_most_popular_choice_or_choices_as_html',
         'get_date_lastest_voting',
         'get_count_votes',
         'get_count_choices'
@@ -132,39 +122,48 @@ class PollAdmin(admin.ModelAdmin):
         #   count votes
         #   date latest voting
         qs = qs.polls_with_count_choices_and_votes_and_date_lastest_voting()
-
         return qs
+
+    def get_inline_instances(self, request, obj=None):
+
+        inlines = [ChoiceInline]
+
+        if obj is not None:
+            if self.model.objects.get(pk=obj.pk).votes.count():
+                inlines.append(VoteInline)
+        return [inline(self.model, self.admin_site) for inline in inlines]
 
     def change_view(self, request, object_id, form_url='', extra_context=None):
 
         extra_context = extra_context or {}
 
-        # add addition context
-        extra_context['chart_poll_result'] = self._build_chart_poll_result(object_id)
+        # if poll has votes, add in context of view a chart of result of a poll
+        poll = get_object_or_404(Poll, pk=object_id)
+        if poll.votes.count() > 0:
+            extra_context['chart_poll_result'] = self._build_chart_poll_result(object_id)
 
         return super(PollAdmin, self).change_view(request, object_id, form_url, extra_context=extra_context)
 
-    def get_inline_instances(self, request, obj=None):
-
-        self.inlines = [ChoiceInline]
-
-        # add ability CRUD with votes if poll exists and yet not added early
-        if obj is not None:
-            self.inlines = [ChoiceInline, VoteInline]
-
-        return [inline(self.model, self.admin_site) for inline in self.inlines]
-
     def get_fieldsets(self, request, obj=None):
+
+        # fields for exists and non exists polls
         fields = ['title', 'slug', 'status']
 
-        # add additional fields if object already exists
+        # add fields if a poll already exists
         if obj is not None:
+
+            # fields needed for already exists poll
             additional_fields = [
                 'status_changed',
-                'display_most_popular_choice_or_choices',
                 'get_count_votes',
                 'get_count_choices',
             ]
+
+            # fields needed if poll has votes
+            if obj.votes.count():
+                additional_fields.append('get_date_lastest_voting')
+                additional_fields.append('get_most_popular_choice_or_choices_as_html')
+
             fields.extend(additional_fields)
         return [
             [
@@ -175,6 +174,8 @@ class PollAdmin(admin.ModelAdmin):
     def get_urls(self):
 
         urls = super(PollAdmin, self).get_urls()
+
+        # create additional urls as django admin`s standart
 
         # 'polls_poll_preview'
         preview = '{0}_{1}_{2}'.format(
@@ -194,6 +195,9 @@ class PollAdmin(admin.ModelAdmin):
             url(r'^preview/$', self.admin_site.admin_view(self.view_preview), {}, preview),
             url(r'^make_report/$', self.admin_site.admin_view(self.view_make_report), {}, make_report),
             url(r'^statistics/$', self.admin_site.admin_view(self.view_statistics), {}, statistics), ]
+
+        # additional urls must be placed early standartic urls,
+        # since the second will be capture more needed urls
         return additional_urls + urls
 
     @add_current_app_to_request_in_admin_view
@@ -215,7 +219,6 @@ class PollAdmin(admin.ModelAdmin):
             'count_choices': Choice.objects.count(),
             'count_votes': Vote.objects.count(),
             'count_voters': Vote.objects.get_count_voters(),
-            'latest_poll': get_latest_or_none(Poll),
             'all_voters': self.get_listing_voters_with_admin_url_and_count_votes(),
         }
 
@@ -288,23 +291,22 @@ class PollAdmin(admin.ModelAdmin):
     def _build_chart_poll_result(self, object_id):
         """Return chart as SVG , what reveal result a poll."""
 
-        # preliminary configuration for chart
+        # chart configuration
         config = pygal.Config()
         config.half_pie = True
         config.legend_at_bottom = True
         config.legend_at_bottom_columns = True
-        config.humen_readable = True
+        config.human_readable = True
         config.half_pie = True
-        config.truncate_legend = 65
-        config.height = 400
-        config.margin_right = 100
-        config.margin_left = 100
+        config.truncate_legend = 80
+        config.height = 500
+        config.margin_right = 50
+        config.margin_left = 50
         config.dynamic_print_values = True
-        config.no_data_text = _('Poll does not have votes at all.').format()
         config.style = pygal.style.DefaultStyle(
             value_font_family='googlefont:Raleway',
-            value_font_size=5,
-            value_label_font_size=5,
+            value_font_size=20,
+            value_label_font_size=10,
             value_colors=('white',),
             no_data_font_size=11,
         )
@@ -387,17 +389,19 @@ class PollAdmin(admin.ModelAdmin):
         html_listing_voters = mark_safe(conditional_escape(', ').join(html_voters))
         return html_listing_voters
 
-    def display_most_popular_choice_or_choices(self, obj):
+    def get_most_popular_choice_or_choices_as_html(self, obj):
         """Method-wrapper for method get_most_popular_choice_or_choices() of model Poll.
         Return result of the method get_most_popular_choice_or_choices() as humen-readable view HTML."""
 
         most_popular_choice_or_choices = obj.get_most_popular_choice_or_choices()
+
         if len(most_popular_choice_or_choices) > 1:
+            # text =
             return format_html_join(
                 '',
                 '<li style="list-style: none;">{0} ({1} votes)</li>',
                 (
-                    (truncatechars(choice.text_choice, 90), choice.count_votes)
+                    (choice.get_truncated_text_choice(), choice.count_votes)
                     for choice in most_popular_choice_or_choices
                 ),
             )
@@ -405,12 +409,12 @@ class PollAdmin(admin.ModelAdmin):
             popular_choice = most_popular_choice_or_choices[0]
             return format_html(
                 _('<p>{0} ({1} votes)</p>'),
-                truncatechars(popular_choice.text_choice, 90),
+                popular_choice.get_truncated_text_choice(),
                 popular_choice.count_votes,
             )
         else:
-            return mark_safe(_('<i>%s</i>' % _('Poll does not have a choices at all.')))
-    display_most_popular_choice_or_choices.short_description = _('Most popular choice/choices')
+            return mark_safe('<i>{0}</i>'.format(_('Poll does not have a choices at all.')))
+    get_most_popular_choice_or_choices_as_html.short_description = _('Most popular choice or choices')
 
     def colored_status_display(self, obj):
         """ """
@@ -436,7 +440,14 @@ class ChoiceAdmin(admin.ModelAdmin):
     Admin View for Choice
     '''
 
-    # objects list
+    # templates
+    #
+    # this template is using for preview a choice (all fields is readonly),
+    # but using view for change the choice
+    # it is easier than write custom view for preview
+    change_form_template = 'polls/admin/choice_preview_form.html'
+
+    # changelist
     list_display = ('__str__', 'poll', 'get_count_votes')
     list_filter = (
         ('poll', admin.RelatedOnlyFieldListFilter),
@@ -449,51 +460,53 @@ class ChoiceAdmin(admin.ModelAdmin):
     fieldsets = [
         [
             Choice._meta.verbose_name, {
-                'fields': ['poll', 'text_choice', 'get_count_votes', 'display_voters_with_get_admin_links']
-            }
+                'fields': [
+                    'poll',
+                    'text_choice',
+                    'get_count_votes',
+                    'get_voters_with_get_admin_links_as_html',
+                ]}
         ]
     ]
-    form = ChoiceModelForm
-    readonly_fields = ['get_count_votes', 'display_voters_with_get_admin_links']
+    readonly_fields = [
+        'poll',
+        'text_choice',
+        'get_count_votes',
+        'get_voters_with_get_admin_links_as_html',
+    ]
 
     def get_queryset(self, request):
         qs = super(ChoiceAdmin, self).get_queryset(request)
         qs = qs.choices_with_count_votes()
         return qs
 
-    def get_fieldsets(self, request, obj=None):
+    def get_urls(self):
+        urls = super(ChoiceAdmin, self).get_urls()
 
-        # basic fields
-        fields = ['poll', 'text_choice']
+        # replace a url`s regex from /change/ to /preview/
+        url_polls_choice_change = tuple(url for url in urls if url.name == 'polls_choice_change')[0]
+        index_url_polls_choice_change = urls.index(url_polls_choice_change)
+        url_polls_choice_view = url(r'^(.+)/preview/$', self.change_view, {}, 'polls_choice_change')
+        urls.remove(url_polls_choice_change)
+        urls.insert(index_url_polls_choice_change, url_polls_choice_view)
 
-        # if objects already exists, then add new fields
-        if obj is not None:
-            additional_fields = ['get_count_votes', 'display_voters_with_get_admin_links']
-            fields.extend(additional_fields)
+        remove_url_from_admin_urls(urls, 'polls_choice_add')
+        remove_url_from_admin_urls(urls, 'polls_choice_history')
 
-        return [
-            [
-                Choice._meta.verbose_name, {'fields': fields}
-            ]
-        ]
+        return urls
 
-    def shorted_text_choice(self, obj):
-        """Display long text choice as truncated."""
-
-        return truncatewords(obj, 5)
-
-    def display_voters_with_get_admin_links(self, obj):
+    def get_voters_with_get_admin_links_as_html(self, obj):
         """Display voters with link to admin url for each user."""
 
         voters = obj.get_voters()
         if not voters:
-            return mark_safe('<i>Nothing voted for this choice.</i>')
+            return mark_safe('<i>{0}</i>'.format(_('Nothing voted for this choice.')))
         return format_html_join(
             ', ',
             '<span><a href="{0}">{1}</a></span>',
             ((voter.get_admin_url(), voter.get_full_name()) for voter in voters)
         )
-    display_voters_with_get_admin_links.short_description = _('Voters')
+    get_voters_with_get_admin_links_as_html.short_description = _('Voters')
 
 
 class VoteAdmin(admin.ModelAdmin):
@@ -511,30 +524,12 @@ class VoteAdmin(admin.ModelAdmin):
         'date_voting',
     )
 
-    def get_fieldsets(self, request, obj=None):
-
-        fields = ['poll', 'user', 'choice', 'date_voting']
-
-        # if object does not exists then hide field 'date_voting'
-        if obj is None:
-            fields = ['poll', 'user', 'choice']
-
-        return [
-            [
-                Vote._meta.verbose_name, {'fields': fields}
-            ]
-        ]
-
     def get_urls(self):
 
         urls = super(VoteAdmin, self).get_urls()
 
         # remove urls for add and change vote
-        urls = filter(
-            lambda url:
-                not (url.name is None or re.match(r'\w*(_add|_change)$', url.name)),
-            urls
-        )
+        remove_url_from_admin_urls(urls, 'polls_vote_add')
+        remove_url_from_admin_urls(urls, 'polls_vote_change')
 
-        # return URLs as list
-        return list(urls)
+        return urls

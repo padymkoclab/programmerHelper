@@ -2,6 +2,7 @@
 import itertools
 import uuid
 
+from django.template.defaultfilters import truncatechars
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
@@ -13,6 +14,7 @@ from django.conf import settings
 from model_utils.fields import MonitorField, StatusField
 from model_utils import Choices
 
+from mylabour.datetime_utils import convert_date_to_django_date_format
 from mylabour.fields_db import ConfiguredAutoSlugField
 from mylabour.models import TimeStampedModel
 
@@ -130,10 +132,15 @@ class Poll(TimeStampedModel):
         return self.voters.all()
 
     def get_date_lastest_voting(self):
-        """Return a datetime latest voting in that poll or None."""
+        """Return a datetime latest voting, in the project datetime format, of the poll or none."""
 
         try:
-            return self.votes.latest().date_voting
+            # get date voting of a latest vote, if exists
+            date_voting = self.votes.latest().date_voting
+
+            # convert and to return the datetime object to the project datetime format
+            date_voting = convert_date_to_django_date_format(date_voting)
+            return date_voting
         except Vote.DoesNotExist:
             return
     get_date_lastest_voting.admin_order_field = 'date_latest_voting'
@@ -187,6 +194,9 @@ class Choice(models.Model):
 
         return get_user_model().objects.filter(pk__in=self.votes.values('user'))
 
+    def get_truncated_text_choice(self):
+        return truncatechars(self.text_choice, 90)
+
 
 class Vote(models.Model):
     """
@@ -222,7 +232,7 @@ class Vote(models.Model):
         db_table = 'votes'
         verbose_name = "Vote"
         verbose_name_plural = "Votes"
-        ordering = ['poll', 'date_voting']
+        ordering = ['poll', '-date_voting']
         get_latest_by = 'date_voting'
         unique_together = ('poll', 'user')
 
@@ -235,3 +245,9 @@ class Vote(models.Model):
         if model_class == type(self) and unique_check == ('poll', 'user'):
             return _('This user already participated in that poll.')
         return super(Vote, self).unique_error_message(model_class, unique_check)
+
+    def get_truncated_text_choice(self):
+        """Return a truncated text choice of a current choice. Using in admin."""
+
+        return truncatechars(self.choice.text_choice, 70)
+    get_truncated_text_choice.short_description = Choice._meta.verbose_name

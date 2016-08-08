@@ -1,4 +1,5 @@
 
+# from django.contrib.admin.widgets import RelatedFieldWidgetWrapper
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 
@@ -6,6 +7,7 @@ from .models import Poll, Choice
 
 
 class PollModelForm(forms.ModelForm):
+
     class Meta:
         model = Poll
         fields = ('title', 'slug', 'status')
@@ -48,4 +50,4 @@ class ChoiceModelForm(forms.ModelForm):
 
         # for FK field in ModelForm django create sppecial RelatedFieldWidgetWrapper
         # for it assignmention css class must next, but it is worked only in admin
-        self.fields['poll'].widget.widget.attrs['class'] = 'span11'
+        # self.fields['poll'].widget.widget.attrs['class'] = 'span11'

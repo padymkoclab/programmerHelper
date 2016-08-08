@@ -60,10 +60,6 @@
             <table class="table-overview applist table_statistics_latest_changes">
                 <caption>{% trans "Latest changes" %}</caption>
                 <tr>
-                    <td>{% trans "Latest added poll" %}</td>
-                    <td>{{ statistics.latest_poll|default_if_none:'' }}</td>
-                </tr>
-                <tr>
                     <td>{% trans "Latest vote" %}</td>
                     <td>{{ statistics.date_latest_vote|default_if_none:'' }}</td>
                 </tr>
