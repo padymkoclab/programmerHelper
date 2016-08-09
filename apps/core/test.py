@@ -1,4 +1,5 @@
 
+from django.test import TestCase
 from django.contrib.auth import get_user_model
 from django.core.urlresolvers import reverse
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
@@ -7,6 +8,23 @@ from pyvirtualdisplay import Display
 from selenium.webdriver import Chrome
 
 webdriver = Chrome
+
+
+class TestCase(TestCase):
+    """
+    Own TestCase with additional variables built-in in class.
+    """
+
+    user_model = get_user_model()
+
+
+class StaticLiveTest(StaticLiveServerTestCase):
+    """
+    Own StaticLiveServerTestCase with additional variables built-in in class.
+    """
+
+    reverse = reverse
+    user_model = get_user_model()
 
 
 class StaticLiveAdminTest(StaticLiveServerTestCase):

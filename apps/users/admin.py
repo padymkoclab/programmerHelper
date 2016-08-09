@@ -6,19 +6,17 @@ from django.contrib import admin
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
-from mylabour.admin_listfilters import ListFilterLastLogin
-from mylabour.admin_actions import (
+from apps.polls.listfilters import IsActiveVoterListFilter
+
+from .actions import (
     make_users_as_non_superuser,
     make_users_as_superuser,
     make_users_as_non_active,
     make_users_as_active,
 )
-
-from apps.polls.admin_listfilters import IsActiveVoterListFilter
-
 from .forms import UserChangeForm, UserCreationForm
 from .models import UserLevel
-from .admin_listfilters import UserLevelRelatedOnlyFieldListFilter
+from .listfilters import UserLevelRelatedOnlyFieldListFilter, ListFilterLastLogin
 
 
 class UserAdmin(BaseUserAdmin):

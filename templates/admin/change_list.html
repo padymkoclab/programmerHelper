@@ -2,6 +2,7 @@
 
 {% load i18n %}
 {% load myfilters %}
+{% load export_import_tags %}
 
 {% comment %}
 Load library of tags for filters of Django-Suit
@@ -10,14 +11,27 @@ Load library of tags for filters of Django-Suit
 
 {% block object-tools-items %}
     {% if has_add_permission %}
-        {% comment %}
-        Display button "Add object" if only that model admin class has url for add object.
-        {% endcomment %}
+
+    {% comment %}
+        For all registered models, added feature for export and import a data
+    {% endcomment %}
+
+    <a href="{% make_url_for_export_data_model %}" class="btn btn-danger">
+        <i class="icon-upload icon-white"></i>&nbsp;{% trans "Export" %}
+    </a>
+
+    <a href="{% make_url_for_export_data_model %}" class="btn btn-warning">
+        <i class="icon-download icon-white"></i>&nbsp;{% trans "Import" %}
+    </a>
+
+    {% comment %}
+    Display button "Add object" if only that model admin class has url for add object.
+    {% endcomment %}
     {% if cl.model_admin|has_admin_url:'add' %}
         <a href="{% url cl.opts|admin_urlname:'add' %}{% if is_popup %}?_popup=1{% endif %}" class="btn btn-success">
-        <i class="icon-plus-sign icon-white"></i>&nbsp;
-    {% blocktrans with cl.opts.verbose_name as name %}Add {{ name }}{% endblocktrans %}
-</a>
+            <i class="icon-plus-sign icon-white"></i>&nbsp;
+            {% blocktrans with cl.opts.verbose_name as name %}Add {{ name }}{% endblocktrans %}
+        </a>
 {% endif %}
 {% endif %}
 {% endblock object-tools-items %}

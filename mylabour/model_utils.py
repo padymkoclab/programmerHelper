@@ -1,4 +1,5 @@
 
+import itertools
 import random
 
 from django.db import models
@@ -12,7 +13,7 @@ logger = create_logger_by_filename(__name__)
 def get_random_objects(queryset, count, single_as_qs=False):
     """Return certain count random objects from queryset.
     If 'count' is great than queryset, then return all avaibled objects.
-    If queryset is empty - raise error."""
+    If queryset query_stringis empty - raise error."""
 
     #
     if count < 1:
@@ -102,3 +103,29 @@ def leave_only_predetermined_number_of_objects(model, count):
 
         # make filter the objects for removal and to remove it
         model.objects.filter(pk__in=pks_objects_for_removal).delete()
+
+
+def get_string_primary_keys_separated_commas(queryset):
+    """Return a string of primary keys of objects, passed in a queryset, separated commas."""
+
+    #
+    # if queryset created with .prefetch_related(),
+    # then it not working with values_list('[field_name]', flat=True), at least in Django 1.9
+    # ticket: https://code.djangoproject.com/ticket/26264
+    #
+    # for some reason does not working catch TypeError for this problem
+    #
+    # remains the last, make handle getting list of primary keys
+    #
+
+    # a two-nested list primary keys
+    list_pks = queryset.values_list('pk')
+
+    # a flatten the two-nested list primary keys
+    list_pks = itertools.chain.from_iterable(list_pks)
+
+    # convert the primary keys to string. Important for a UUID field.
+    list_pks = map(str, list_pks)
+
+    # return a string of the primary keys, separated commas
+    return ','.join(list_pks)

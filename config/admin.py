@@ -10,8 +10,6 @@ from apps.users.admin import UserAdmin, UserLevelAdmin
 from apps.users.models import User, UserLevel
 from django.contrib.auth.models import Group
 
-from mylabour.admin_actions import export_as_csv, export_as_json, export_as_xml, export_as_yaml, export_as_xlsx
-
 # apps
 from apps.activity.admin import ActivityAdmin
 from apps.activity.models import Activity
@@ -23,8 +21,12 @@ from apps.books.admin import BookAdmin, WritterAdmin
 from apps.books.models import Book, Writter
 from apps.comments.admin import CommentAdmin
 from apps.comments.models import Comment
+
+# Temprorary is disabled
+#
 # from apps.courses.admin import CourseAdmin, LessonAdmin, SublessonAdmin
 # from apps.courses.models import Course, Lesson, Sublesson
+#
 from apps.forum.admin import ForumSectionAdmin, ForumTopicAdmin, ForumPostAdmin
 from apps.forum.models import ForumSection, ForumTopic, ForumPost
 from apps.notifications.admin import NotificationAdmin
@@ -93,12 +95,10 @@ class ProgrammerHelperSite(admin.AdminSite):
 
 ProgrammerHelperAdminSite = ProgrammerHelperSite(name='admin')
 
-ProgrammerHelperAdminSite.add_action(export_as_csv)
-ProgrammerHelperAdminSite.add_action(export_as_json)
-ProgrammerHelperAdminSite.add_action(export_as_xml)
-ProgrammerHelperAdminSite.add_action(export_as_yaml)
-ProgrammerHelperAdminSite.add_action(export_as_xlsx)
 
+# Register models
+#
+# users
 ProgrammerHelperAdminSite.register(Group)
 
 # users

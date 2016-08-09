@@ -15,7 +15,6 @@ from django.contrib import admin
 import pygal
 
 from mylabour.utils import get_statistics_count_objects_by_year, get_latest_or_none
-from apps.export_import_models.actions import advanced_export, export_as_json
 
 from .models import Poll, Choice, Vote
 from .forms import PollModelForm, ChoiceModelForm
@@ -28,12 +27,12 @@ from .constants import MIN_COUNT_CHOICES_IN_POLL, MAX_COUNT_CHOICES_IN_POLL
 User = get_user_model()
 
 
+# only for admin theme Django-Suit
+# it is give feature display menu in left sidebar
 def add_current_app_to_request_in_admin_view(view):
     @functools.wraps(view)
     def wrapped_view(modelAdmin, request, **kwargs):
 
-        # only for admin theme Django-Suit
-        # it is give feature display menu in left sidebar
         request.current_app = 'admin'
 
         response = view(modelAdmin, request, **kwargs)
@@ -100,7 +99,7 @@ class PollAdmin(admin.ModelAdmin):
     )
     list_filter = ('status', 'date_modified', 'date_added')
     search_fields = ('title',)
-    actions = [make_closed, make_draft, make_opened, advanced_export, export_as_json]
+    actions = [make_closed, make_draft, make_opened]
 
     # object
     form = PollModelForm
@@ -116,7 +115,6 @@ class PollAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
 
         qs = super(PollAdmin, self).get_queryset(request)
-
         # for a ability sorting, add addition annotation for determination for each poll:
         #   count choice
         #   count votes
@@ -141,8 +139,6 @@ class PollAdmin(admin.ModelAdmin):
         poll = get_object_or_404(Poll, pk=object_id)
         if poll.votes.count() > 0:
             extra_context['chart_poll_result'] = self._build_chart_poll_result(object_id)
-
-        return super(PollAdmin, self).change_view(request, object_id, form_url, extra_context=extra_context)
 
     def get_fieldsets(self, request, obj=None):
 

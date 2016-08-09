@@ -13,18 +13,23 @@
     {{ block.super }}
     <div>
         <div>
-            <p>You tried export data`s {{ count_objects }} object/s to other formats. For it, please choice need fields.</p>
+            <h1>{% trans "Export data" %}</h1>
+            <p>
+                {% blocktrans %}
+                    You tried export data`s {{ count_objects }} object/s to other formats. For it, please choice need fields.
+                {% endblocktrans %}
+            </p>
         </div>
         <div>
-            <p>Choice fields:</p>
+            <h2>{% trans "Fields" %}</h2>
             <table class="table table-hover">
                 <thead>
                     <tr>
-                        <th><button id="btn_select_all_fields">Select all</button></th>
-                        <th>Name</th>
-                        <th>Human name</th>
-                        <th>Type</th>
-                        <th>Help text</th>
+                        <th><button id="btn_select_all_fields">{% trans "Select all" %}</button></th>
+                        <th>{% trans "Field" %}</th>
+                        <th>{% trans "Verbose name" %}</th>
+                        <th>{% trans "Type" %}</th>
+                        <th>{% trans "Help text" %}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -41,7 +46,7 @@
             </table>
         </div>
         <div>
-            <p>Choice format:</p>
+            <h2>{% trans "Format" %}</h2>
             <label for="format_exported_data_json">
                 <input type="radio" name="format_exported_data" value="json" checked="checked" id="format_exported_data_json">
                 JSON
@@ -54,15 +59,19 @@
                 <input type="radio" name="format_exported_data" value="xml" id="format_exported_data_xml">
                 XML
             </label>
-            <div>
-                <a href="#" target="_blank" id="link_admin_export_preview">{% trans "Preview output data" %}</a>
-                <a href="#" id="link_admin_export_download">{% trans "Download as file" %}</a>
-            </div>
+            <label for="format_exported_data_csv">
+                <input type="radio" name="format_exported_data" value="csv" id="format_exported_data_csv">
+                CSV
+            </label>
+            <label for="format_exported_data_xlsx">
+                <input type="radio" name="format_exported_data" value="xlsx" id="format_exported_data_xlsx">
+                XLSX
+            </label>
         </div>
         <div>
-            <a href="#" id="link_download_as_csv">{% trans "Download as CSV" %}</a>
-            <a href="#" id="link_download_as_excel">{% trans "Download as Excel" %}</a>
-            <a href="#" id="link_download_as_excel">{% trans "Download as PDF" %}</a>
+            <h4>{% trans "Action" %}</h4>
+            <a href="#" target="_blank" id="link_admin_export_preview" class="btn btn-info">{% trans "Preview output data" %}</a>
+            <a href="#" id="link_admin_export_download" class="btn btn-success">{% trans "Download as file" %}</a>
         </div>
     </div>
 {% endblock content %}
@@ -70,18 +79,5 @@
 
 {% block extrajs %}
     {{ block.super }}
-
-    <!-- Keep a JS variables by the DTL -->
-    <script>
-        var ct_model_pk = '{{ ct_model_pk }}'
-        var objects_pks = '{{ objects_pks }}'
-    </script>
-
-    <script src="{% static 'admin/js/vendor/jquery/jquery.min.js' %} " type="text/javascript" charset="utf-8"></script>
-    <script src="{% static 'admin/js/jquery.init.js' %} " type="text/javascript" charset="utf-8"></script>
-
-    <script src="{% url 'django_js_reverse' %}" type="text/javascript"></script>
-
     <script src="{% static 'export_import_models/js/export_import_models.js' %} " type="text/javascript" charset="utf-8"></script>
-
 {% endblock %}

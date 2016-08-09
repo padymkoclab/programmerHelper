@@ -9,17 +9,17 @@ import csv
 import collections
 import uuid
 
+from django.core.urlresolvers import reverse
 from django.template import Template, Context
 from django.core.exceptions import FieldDoesNotExist
 from django.utils.translation import ugettext_lazy as _
 from django.core.urlresolvers import resolve
-# from django.shortcuts import get_object_or_404, get_list_or_404
+from django.shortcuts import get_object_or_404, get_list_or_404
 from django.http import HttpResponse, HttpResponseBadRequest, StreamingHttpResponse
 from django.contrib.contenttypes.models import ContentType
-from django.views.generic import View, TemplateView
+from django.views.generic import View, TemplateView, RedirectView
 from django.core import serializers
 
-from reportlab.pdfgen import canvas
 import xlsxwriter
 
 from config.admin import ProgrammerHelperAdminSite
@@ -37,16 +37,16 @@ def made_validation(kwargs):
     model = ct_model.model_class()
 
     # get objects of model
-    objects_pks = kwargs['objects_pks']
-    list_objects_pks = objects_pks.split(',')
+    pks_separated_commas = kwargs['pks_separated_commas']
+    list_pks_separated_commas = pks_separated_commas.split(',')
     try:
-        qs = model.objects.filter(pk__in=list_objects_pks)
+        qs = model.objects.filter(pk__in=list_pks_separated_commas)
         qs.count()
     except:
         return HttpResponseBadRequest(_('Not prossible get a data from the database. Corrupted input the data.'))
 
     # compare count got and requested the objects
-    if len(list_objects_pks) != len(qs):
+    if len(list_pks_separated_commas) != len(qs):
         return HttpResponseBadRequest(_('A data were corrupted. Not all a primary key of the objects has in database.'))
 
     # get names of fields of model
@@ -62,6 +62,24 @@ def made_validation(kwargs):
     return model, qs, list_fields
 
 
+class ExportRedirectView(RedirectView):
+
+    def get_redirect_url(self, *args, **kwargs):
+
+        app_label = kwargs.get('app_label', None)
+        model_name = kwargs.get('model_name', None)
+        pks_separated_commas = kwargs.get('pks_separated_commas', None)
+
+        contenttype_model = get_object_or_404(ContentType, app_label=app_label, model=model_name)
+
+        url = reverse(
+            'export_import_models:export',
+            kwargs={'ct_model_pk': contenttype_model.pk, 'pks_separated_commas': pks_separated_commas}
+        )
+
+        return url
+
+
 class ExportTemplateView(TemplateView):
     """
     View fo export
@@ -72,26 +90,24 @@ class ExportTemplateView(TemplateView):
     def dispatch(self, request, *args, **kwargs):
 
         #
-        kwargs = self.request.resolver_match.kwargs
-
-        #
         ct_model_pk = kwargs['ct_model_pk']
         ct_model = ContentType.objects.get(pk=ct_model_pk)
         model = ct_model.model_class()
 
         #
-        objects_pks = kwargs['objects_pks']
-        list_objects_pks = objects_pks.split(',')
+        pks_separated_commas = kwargs['pks_separated_commas']
+        list_pks_separated_commas = pks_separated_commas.split(',')
 
         #
         try:
-            count_objects = model.objects.filter(pk__in=list_objects_pks).count()
+            count_objects = model.objects.filter(pk__in=list_pks_separated_commas).count()
         except ValueError:
             raise HttpResponseBadRequest(_('Not prossible get a data from the database. Corrupted input the data.'))
 
         #
-        if len(list_objects_pks) != count_objects:
-            raise HttpResponseBadRequest(_('A data were corrupted. Not all a primary key of the objects has in database.'))
+        if len(list_pks_separated_commas) != count_objects:
+            raise HttpResponseBadRequest(
+                _('A data were corrupted. Not all a primary key of the objects has in database.'))
 
         # For only admin theme Django-Suit
         # It need namespace for display menu in left sidebar
@@ -108,15 +124,15 @@ class ExportTemplateView(TemplateView):
         model = ct_model.model_class()
 
         #
-        objects_pks = kwargs['objects_pks']
-        # list_objects_pks = objects_pks.split(',')
-        # objects = model.objects.filter(pk__in=list_objects_pks)
+        pks_separated_commas = kwargs['pks_separated_commas']
+        # list_pks_separated_commas = pks_separated_commas.split(',')
+        # objects = model.objects.filter(pk__in=list_pks_separated_commas)
 
         #
         context['ct_model_pk'] = ct_model_pk
         context['fields'] = model._meta.fields
-        context['objects_pks'] = objects_pks
-        context['count_objects'] = len(objects_pks.split(','))
+        context['pks_separated_commas'] = pks_separated_commas
+        context['count_objects'] = len(pks_separated_commas.split(','))
 
         context.update(ProgrammerHelperAdminSite.each_context(self.request))
 
@@ -476,52 +492,3 @@ class ExportExcel(View):
             a = divmod(len_val, 8.43)
             width_column = math.floor(8.43 * a[0] + a[1])
         return width_column
-
-
-class ExportPDF(View):
-    """
-    View for export data of a models to PDF
-    """
-
-    def generate_pdf_simple(self, filename):
-        """ """
-
-        response = HttpResponse(content_type='application/pdf')
-        response['Content-Disposition'] = 'attachment; filename="%s"' % filename
-
-        p = canvas.Canvas(response)
-        p.drawString(400, 400, 'I am Python/JavaScript developer!')
-        p.showPage()
-        p.save()
-        return response
-
-    def generate_pdf_complex(self, filename):
-        response = HttpResponse(content_type='application/pdf')
-        response['Content-Disposition'] = 'attachment; filename="%s"' % filename
-
-        buffer_pdf = BytesIO()
-        p = canvas.Canvas(buffer_pdf)
-
-        p.drawString(100, 400, 'I am a programmer')
-        p.showPage()
-        p.save()
-
-        pdf = buffer_pdf.getvalue()
-        buffer_pdf.close()
-        response.write(pdf)
-        return response
-
-    def dispatch(self, request, *args, **kwargs):
-
-        #
-        # response = made_validation(kwargs)
-        # if isinstance(response, HttpResponseBadRequest):
-        #     return response
-        # model, qs, list_fields = response
-        from apps.polls.models import Poll
-        model = Poll
-        filename = get_filename_with_datetime(model._meta.verbose_name_plural, 'pdf')
-
-        # return self.generate_pdf_simple(model, qs, list_fields, filename=filename)
-        return self.generate_pdf_complex(filename=filename)
-        return self.generate_pdf_simple(filename=filename)

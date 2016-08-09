@@ -4,12 +4,152 @@
 		"selected_items":
 		[
 			[
-				"assertIs",
-				"assertIsNone	function"
+				"make",
+				"make_update_queryset	function"
+			],
+			[
+				"get",
+				"get_user_model	function"
+			],
+			[
+				"exc",
+				"exclude	param"
+			],
+			[
+				"choi",
+				"choice"
+			],
+			[
+				"ch",
+				"choices"
+			],
+			[
+				"fk",
+				"fk_name	param"
 			],
 			[
 				"Choi",
-				"ChoiceFactory	import"
+				"ChoiceInlineFormSet	import"
+			],
+			[
+				"for",
+				"formset	param"
+			],
+			[
+				"inli",
+				"inlineformset_factory	function"
+			],
+			[
+				"remo",
+				"remove_url_from_admin_urls	function"
+			],
+			[
+				"url",
+				"urls	statement"
+			],
+			[
+				"re",
+				"remove	function"
+			],
+			[
+				"extra",
+				"extra_context"
+			],
+			[
+				"change",
+				"change_view"
+			],
+			[
+				"nON",
+				"None	keyword"
+			],
+			[
+				"max_",
+				"max_num"
+			],
+			[
+				"tex",
+				"text_choice	statement"
+			],
+			[
+				"Sta",
+				"StackedInline	class"
+			],
+			[
+				"text",
+				"TextInput	class"
+			],
+			[
+				"wid",
+				"widgets	module"
+			],
+			[
+				"Vote",
+				"VoteModelForm	class"
+			],
+			[
+				"Model",
+				"ModelForm	ModelForm"
+			],
+			[
+				"NOe",
+				"None	keyword"
+			],
+			[
+				"all",
+				"all_texts	statement"
+			],
+			[
+				"im",
+				"implicitly_wait	function"
+			],
+			[
+				"live",
+				"live_server_url	function"
+			],
+			[
+				"setU",
+				"setUpClass	function"
+			],
+			[
+				"Poll",
+				"PollModelFormLiveTest	class"
+			],
+			[
+				"C",
+				"Chrome	class"
+			],
+			[
+				"Live",
+				"LiveServerTestCase	class"
+			],
+			[
+				"sele",
+				"selenium	module"
+			],
+			[
+				"fied",
+				"field_attrs"
+			],
+			[
+				"call",
+				"call_command	function"
+			],
+			[
+				"date",
+				"datetimes"
+			],
+			[
+				"Key",
+				"KeyError	class"
+			],
+			[
+				"min",
+				"minute	param"
+			],
+			[
+				"assertIs",
+				"assertIsNone	function"
 			],
 			[
 				"cal",
@@ -76,10 +216,6 @@
 				"classmethod	class"
 			],
 			[
-				"get",
-				"get_user_model	function"
-			],
-			[
 				"cont",
 				"contrib	module"
 			],
@@ -104,10 +240,6 @@
 				"ChoiceFactory	import"
 			],
 			[
-				"ch",
-				"choice"
-			],
-			[
 				"asser",
 				"assertEqual"
 			],
@@ -118,14 +250,6 @@
 			[
 				"list",
 				"list_display"
-			],
-			[
-				"url",
-				"urlresolvers	module"
-			],
-			[
-				"sele",
-				"selected	Attr"
 			],
 			[
 				"Not",
@@ -208,10 +332,6 @@
 				"template	module"
 			],
 			[
-				"Vote",
-				"VoteInPoll"
-			],
-			[
 				"is_a",
 				"is_active_voter"
 			],
@@ -276,20 +396,12 @@
 				"datetime_utils	module"
 			],
 			[
-				"im",
-				"import	keyword"
-			],
-			[
 				"doc",
 				"doc_width	statement"
 			],
 			[
 				"write_s",
 				"write_subject_header	function"
-			],
-			[
-				"text",
-				"textwrap	module"
 			],
 			[
 				"Definit",
@@ -322,10 +434,6 @@
 			[
 				"voters",
 				"voters_pages	function"
-			],
-			[
-				"choi",
-				"choices_pages"
 			],
 			[
 				"log",
@@ -406,114 +514,6 @@
 			[
 				"file",
 				"filename	param"
-			],
-			[
-				"lens",
-				"lines	statement"
-			],
-			[
-				"rea",
-				"readlines	function"
-			],
-			[
-				"QU",
-				"QUOTE_MINIMAL	instance"
-			],
-			[
-				"csv",
-				"csv_file	withstmt"
-			],
-			[
-				"sh",
-				"showPage"
-			],
-			[
-				"draw",
-				"drawString	function"
-			],
-			[
-				"buff",
-				"buffer_pdf	statement"
-			],
-			[
-				"fil",
-				"filename"
-			],
-			[
-				"show",
-				"showPage	function"
-			],
-			[
-				"pdf",
-				"pdfgen	module"
-			],
-			[
-				"gene",
-				"generate_pdf_simple	function"
-			],
-			[
-				"Exp",
-				"ExportPDF	class"
-			],
-			[
-				"Wa",
-				"Warning	class"
-			],
-			[
-				"value",
-				"values_list"
-			],
-			[
-				"genera",
-				"generate_csv_simple"
-			],
-			[
-				"fiel",
-				"field_name	forstmt"
-			],
-			[
-				"tem",
-				"temp"
-			],
-			[
-				"verb",
-				"verbose_name_plural"
-			],
-			[
-				"Http",
-				"HttpResponseBadRequest	import"
-			],
-			[
-				"ex",
-				"extension	param"
-			],
-			[
-				"NOt",
-				"NotImplementedError	class"
-			],
-			[
-				"Expo",
-				"ExportFile	class"
-			],
-			[
-				"fun",
-				"description-Function"
-			],
-			[
-				"functiot",
-				"description-Function.prototype.toString()"
-			],
-			[
-				"functio",
-				"description-Function.length"
-			],
-			[
-				"functi",
-				"description-Function"
-			],
-			[
-				"inde",
-				"indexOf(searchValue)	String"
 			]
 		]
 	},
@@ -523,31 +523,7 @@
 			"file": "/media/wlysenko/66ABF2AC3D03BAAA/Web/A",
 			"settings":
 			{
-				"buffer_size": 78643,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "apps/polls/admin.py",
-			"settings":
-			{
-				"buffer_size": 18682,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "apps/polls/reports.py",
-			"settings":
-			{
-				"buffer_size": 62920,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "apps/polls/managers.py",
-			"settings":
-			{
-				"buffer_size": 6777,
+				"buffer_size": 80794,
 				"line_ending": "Unix"
 			}
 		},
@@ -555,15 +531,55 @@
 			"file": "pytest.ini",
 			"settings":
 			{
-				"buffer_size": 81,
+				"buffer_size": 250,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "apps/polls/tests/test_managers.py",
+			"file": "apps/polls/admin.py",
 			"settings":
 			{
-				"buffer_size": 38674,
+				"buffer_size": 18670,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "templates/admin/change_list.html",
+			"settings":
+			{
+				"buffer_size": 2801,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/home/wlysenko/.virtualenvs/programmerHelper/lib/python3.4/site-packages/django/contrib/admin/options.py",
+			"settings":
+			{
+				"buffer_size": 81252,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "apps/export_import_models/urls.py",
+			"settings":
+			{
+				"buffer_size": 1839,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "apps/export_import_models/actions.py",
+			"settings":
+			{
+				"buffer_size": 3666,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "apps/export_import_models/views.py",
+			"settings":
+			{
+				"buffer_size": 16981,
 				"line_ending": "Unix"
 			}
 		}
@@ -644,9 +660,13 @@
 	"command_palette":
 	{
 		"height": 357.0,
-		"last_filter": "datet",
+		"last_filter": "beau",
 		"selected_items":
 		[
+			[
+				"beau",
+				"HTMLBeautify"
+			],
 			[
 				"datet",
 				"Snippet: input - datetime"
@@ -1154,10 +1174,6 @@
 			[
 				"input da",
 				"Snippet: input - datetime-local"
-			],
-			[
-				"dia",
-				"Package Control: Disable Package"
 			]
 		],
 		"width": 575.0
@@ -1183,17 +1199,14 @@
 	[
 		"/home/wlysenko/.virtualenvs/programmerHelper/project",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/core/locale",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/export_import_models",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/management",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/management/commands",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/templates",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/templates/polls",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/templates/polls/admin",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/tests",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/management",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/management/commands",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/templates",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/templates/admin",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/templates/admin/users",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/templates/users",
@@ -1201,69 +1214,98 @@
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/templates/users/userlevel",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/config",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/config/settings",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/mylabour/static",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/mylabour/static/mylabour",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/mylabour/static/mylabour/css",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/mylabour/templates",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/mylabour/templates/mylabour",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/mylabour/templatetags",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/static/project",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/static/project/css",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/static/project/css/admin",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/static/project/js",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/templates/admin"
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/templates",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/templates/admin",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/templates/admin/edit_inline"
 	],
 	"file_history":
 	[
+		"/home/wlysenko/.virtualenvs/programmerHelper/lib/python3.4/site-packages/suit/templates/admin/change_list_results.html",
+		"/home/wlysenko/.virtualenvs/programmerHelper/lib/python3.4/site-packages/suit/templates/admin/change_list.html",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/config/admin.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/actions.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/solutions/admin.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/admin.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/listfilters.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/mylabour/listfilters.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/mylabour/actions.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/mylabour/admin_methods.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/admin_actions.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/admin_listfilters.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/listfilters.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/mylabour/admin_actions.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/mylabour/admin_listfilters.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/export_import_models/actions.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/core/test.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/tests/test_formsets.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/formsets.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/lib/python3.4/site-packages/django/contrib/admin/options.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/tests/test_forms.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/models.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/tests/test_models.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/requirements/development.txt",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/htmlcov/index.html",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/admin.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/templates/admin/change_list.html",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/forms.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/reports.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/templates/admin/base.html",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/templates/polls/admin/statistics.html",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/templates/polls/admin/choice_preview_form.html",
+		"/home/wlysenko/.virtualenvs/programmerHelper/lib/python3.4/site-packages/suit/templates/admin/change_form.html",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/templates/polls/admin/poll_change_form.html",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/templates/admin/change_form.html",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/templates/polls/admin/_own_admin_breadcrumbs.html",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/templates/polls/admin/app_index.html",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/templates/polls/admin/report.html",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/pytest.ini",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/templates/admin/edit_inline/stacked.html",
+		"/home/wlysenko/.virtualenvs/programmerHelper/lib/python3.4/site-packages/suit/templates/admin/edit_inline/stacked.html",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/templates/polls/admin/choice_stacked.html",
+		"/home/wlysenko/.virtualenvs/programmerHelper/lib/python3.4/site-packages/django/forms/models.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/templates/polls/admin/preview.html",
+		"/home/wlysenko/.virtualenvs/programmerHelper/lib/python3.4/site-packages/django/forms/formsets.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/config/settings/thirdparty.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/solutions/models.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/signals.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/config/settings/development.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/constants.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/management/commands/create_test_superuser.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/config/settings/base.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/querysets.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/tests/test_querysets.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/managers.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/admin_listfilters.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/tests/test_managers.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/.coveragerc",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/mylabour/datetime_utils.py",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/models.py",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/config/settings/custom.py",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/exceptions.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/signals.py",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/activity/signals.py",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/management/commands/factory_test_polls.py",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/tests/test_commands.py",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/mylabour/model_utils.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/tests/test_models.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/pytest.ini",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/requirements/development.txt",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/mylabour/utils.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/tests/test_querysets.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/actions.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/formsets.py",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/urls.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/admin_listfilters.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/tests/test_forms.py",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/constants.py",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/factories.py",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/temp.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/config/settings/development.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/.coveragerc",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/tests/test_managers.py",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/cover/index.html",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/.coverage",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/models.py",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/.eslintrc.json",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/.bowerrc",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/factories.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/admin.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/templates/polls/admin/report.html",
 		"/home/wlysenko/.virtualenvs/programmerHelper/lib/python3.4/site-packages/django/db/models/signals.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/templates/polls/admin/app_index.html",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/templates/admin/app_index.html",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/templates/admin/users/change_list.html",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/mylabour/templates/mylabour/range_filter.html",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/mylabour/admin_listfilters.py",
 		"/home/wlysenko/.virtualenvs/programmerHelper/lib/python3.4/site-packages/suit/templates/admin/filter.html",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/config/settings/base.py",
 		"/home/wlysenko/.virtualenvs/programmerHelper/lib/python3.4/site-packages/django/contrib/admin/filters.py",
 		"/home/wlysenko/.virtualenvs/programmerHelper/lib/python3.4/site-packages/suit/templatetags/suit_list.py",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/mylabour/static/mylabour/bower_components/jquery/dist/jquery.min.js",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/mylabour/static/mylabour/bower_components/eonasdan-bootstrap-datetimepicker/Gruntfile.js",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/admin_listfilters.py",
 		"/home/wlysenko/.virtualenvs/programmerHelper/lib/python3.4/site-packages/django/contrib/admin/views/main.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/lib/python3.4/site-packages/django/contrib/admin/options.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/lib/python3.4/site-packages/suit/templates/admin/change_list.html",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/templates/admin/change_list.html",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/static/project/css/admin/app_index.css",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/mylabour/templatetags/myfilters.py",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/templates/users/userlevel/detail.html",
@@ -1271,11 +1313,6 @@
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/templates/users/user_form.html",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/templates/users/user_list.html",
 		"/home/wlysenko/.virtualenvs/programmerHelper/lib/python3.4/_collections_abc.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/querysets.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/templates/admin/base.html",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/managers.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/config/admin.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/forms.py",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/mylabour/templatetags/mytags.py",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/templatetags",
 		"/home/wlysenko/.virtualenvs/programmerHelper/lib/python3.4/site-packages/django/contrib/admin/sites.py",
@@ -1284,12 +1321,9 @@
 		"/home/wlysenko/.virtualenvs/programmerHelper/lib/python3.4/site-packages/suit/templates/admin/app_index.html",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/urls.py",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/querysets.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/reports.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/admin.py",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/tasks.py",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/tags/querysets.py",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/mylabour/models.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/mylabour/datetime_utils.py",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/mylabour/factories_utils.py",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/mylabour/text.py",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/mylabour/basecommands.py",
@@ -1305,7 +1339,6 @@
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/package.json",
 		"/home/wlysenko/.config/sublime-text-3/Packages/User/ESLint.sublime-settings",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/.eslintrc",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/templates/polls/admin/statistics.html",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/mylabour/context_processors.py",
 		"/home/wlysenko/.virtualenvs/virtual_programmerHelper/project_programmerHelper/apps/export_import_models/views.py",
 		"/home/wlysenko/.virtualenvs/virtual_programmerHelper/project_programmerHelper/excel.py",
@@ -1314,35 +1347,7 @@
 		"/home/wlysenko/.config/sublime-text-3/Packages/User/Anaconda.sublime-settings",
 		"/home/wlysenko/.config/sublime-text-3/Packages/User/JavaScript.sublime-build",
 		"/home/wlysenko/.config/sublime-text-3/Packages/User/untitled.sublime-build",
-		"/media/wlysenko/66ABF2AC3D03BAAA/Web/Programms/JS/CallbackFunction.js",
-		"/media/wlysenko/66ABF2AC3D03BAAA/Web/Programms/Web/Animation.html",
-		"/media/wlysenko/66ABF2AC3D03BAAA/Web/Programms/Web/NyLabour.js",
-		"/media/wlysenko/66ABF2AC3D03BAAA/Web/Programms/JS/Animation.js",
-		"/media/wlysenko/66ABF2AC3D03BAAA/Web/Programms/Web/Canvas.html",
-		"/home/wlysenko/.config/sublime-text-3/Packages/User/Preferences.sublime-settings",
-		"/media/wlysenko/66ABF2AC3D03BAAA/Web/Projects/python/wxPython/wxPython - second.py",
-		"/media/wlysenko/66ABF2AC3D03BAAA/Web/Projects/python/wxPython/wxPython -  first.py",
-		"/media/wlysenko/66ABF2AC3D03BAAA/Web/A2",
-		"/home/wlysenko/Documents/pass_commands_to_csv.py",
-		"/home/wlysenko/.virtualenvs/virtual_programmerHelper/project_programmerHelper/apps/polls/reports.py",
-		"/home/wlysenko/.virtualenvs/virtual_programmerHelper/project_programmerHelper/mylabour/templatetags/myfilters.py",
-		"/home/wlysenko/.virtualenvs/virtual_programmerHelper/project_programmerHelper/a.py",
-		"/home/wlysenko/.virtualenvs/virtual_programmerHelper/project_programmerHelper/Drawing_000000.png",
-		"/home/wlysenko/.virtualenvs/virtual_programmerHelper/project_programmerHelper/apps/export_import_models/utils.py",
-		"/home/wlysenko/.virtualenvs/virtual_programmerHelper/project_programmerHelper/apps/export_import_models/templates/export_import_models/admin/my_template_name.txt",
-		"/home/wlysenko/.virtualenvs/virtual_programmerHelper/project_programmerHelper/apps/export_import_models/templates/export_import_models/admin/template_for_csv.txt",
-		"/home/wlysenko/.virtualenvs/virtual_programmerHelper/project_programmerHelper/apps/export_import_models/templates/export_import_models/admin/export.html",
-		"/home/wlysenko/.virtualenvs/virtual_programmerHelper/project_programmerHelper/apps/polls/models.py",
-		"/home/wlysenko/.virtualenvs/virtual_programmerHelper/project_programmerHelper/apps/export_import_models/tests/test_utils.py",
-		"/home/wlysenko/.virtualenvs/virtual_programmerHelper/project_programmerHelper/config/settings/deployment.py",
-		"/home/wlysenko/.virtualenvs/virtual_programmerHelper/project_programmerHelper/config/settings/base.py",
-		"/home/wlysenko/.virtualenvs/virtual_programmerHelper/project_programmerHelper/config/urls.py",
-		"/home/wlysenko/.virtualenvs/virtual_programmerHelper/project_programmerHelper/apps/polls/templates/polls/admin/vote_in_poll_changelist.html",
-		"/home/wlysenko/.virtualenvs/virtual_programmerHelper/project_programmerHelper/assets/django_js_reverse/js/reverse.js",
-		"/home/wlysenko/.virtualenvs/virtual_programmerHelper/project_programmerHelper/apps/export_import_models/actions.py",
-		"/home/wlysenko/.virtualenvs/virtual_programmerHelper/project_programmerHelper/apps/polls/admin.py",
-		"/home/wlysenko/.virtualenvs/virtual_programmerHelper/project_programmerHelper/apps/export_import_models/models.py",
-		"/home/wlysenko/.virtualenvs/virtual_programmerHelper/lib/python3.4/site-packages/django/contrib/admin/options.py"
+		"/media/wlysenko/66ABF2AC3D03BAAA/Web/Programms/JS/CallbackFunction.js"
 	],
 	"find":
 	{
@@ -1360,134 +1365,134 @@
 		"case_sensitive": true,
 		"find_history":
 		[
-			"twenty",
-			"twelve",
-			"test_get_statistics_count_votes_by_months_for_past_year_if_votes_added__in_diffrent_time_for_past_year",
-			"0),",
-			"# month ago",
-			"timezone",
-			"last",
-			"first",
-			"voter2",
-			"voter1",
-			"voter",
-			"self",
-			"Choice",
-			"e_count_votes_i",
-			"count_votes_in",
-			"count_votes_",
-			"voter",
-			"GUI",
-			"last",
-			"first",
-			"last",
-			"choices",
-			"poll",
-			"closed",
-			"draft",
-			"closedopened",
+			"get_query_string",
+			"get_query",
+			"ModelAdmin",
+			"get_query_string",
+			"CLASS_NAME",
+			"ExportRedirectView",
+			"export",
+			"export_model",
+			"_('",
+			"ugettext_lazy",
+			"make_update_queryset",
+			"ungettext_lazy",
+			"count_updated_rows",
+			":\n",
+			"ungettext",
+			"Poll.objects.filter(pk=queryset",
 			"closed",
 			"draft",
 			"opened",
-			"closed",
-			"poll1",
-			"closed",
-			"draft",
-			"opened",
-			"draft",
-			"CHOICES_STATUS",
-			"closed",
-			"get_statistics_polls_by_status",
-			"def",
-			"xfa",
-			"ProtectDeleteAccount",
-			"ProtectDeleteUser",
-			"Acc",
-			"ele",
-			"elete",
-			"_and_users_have_votes",
-			"# create a poll with choices",
-			"cls",
-			"get_all_voters",
-			"count_polls",
-			"factory_test_polls",
-			"cls",
-			"_get_half_from_count_polls",
-			"TestCase(T",
-			"PollsManager",
-			"productivity",
-			"test_get_all_voters",
-			"cls",
-			"4 poll",
-			"3 poll",
-			"2 poll",
-			"@pytest.mark.xfail(run=False)",
-			"self",
-			"def",
-			"assert Poll.objects.count() == ",
-			"assert Poll.objects.count(), 0",
-			"all_voters",
-			"objects_for_removal",
-			"get_half_from_count_polls",
-			"count_p",
-			"_given_",
-			"cls",
-			"Parameter",
-			"Count",
-			"leave_only_predetermined_number_of_objects",
-			"deleting",
-			"objects_for_deleting",
-			"count_objects_for_deleting",
-			"amount",
-			"count_objects",
-			"than",
-			"plenty_vote",
-			"many",
-			"assertQuerysetEqual",
-			"self",
-			"record",
-			"report",
-			"Vote",
-			"call_command",
-			"tuple1",
-			"report",
-			"@unittest.skip('To late')",
-			"UserFactory",
-			"pytest",
-			"unittest",
-			"_generate_polls_choices_votes",
-			"assertGreatEqual",
-			"max_and_max_count_choices",
-			"max_count_choices",
-			"polls_with_count_choices",
-			"Choice.objects.count()",
-			"count_choices",
-			"an_each_poll",
-			"Choice.objects.count()",
-			"count_users",
-			"UserFactory",
-			"User",
-			"get_user_model",
-			"voteinpoll_set",
-			"factory_test_poll",
-			"account",
-			"Account",
-			"account",
-			"Account",
-			"levels_accounts_factory",
-			"VoteInPoll",
-			"run",
-			"call_command",
+			"make_opened",
+			"HttpResponse",
+			"advanced_export",
+			"actions",
+			"action",
+			"advanced_export",
+			"export_as_json",
+			"add_current_app_to_request_in_admin_view",
+			"OwnTestCase",
 			"TestCase",
-			"exist",
-			"vote3",
-			"get_voters",
+			"StaticLiveTest",
+			"add_current_app_to_request_in_admin_view",
+			"modelAdmin",
+			"pytest",
+			"ChoiceFactory",
+			"DELETE': True",
+			"deleted_forms",
+			"You try delete choices more than must be minimal number of choices in an each poll.",
+			"(self):",
+			"'@@@@@@@@@@@@@@@@@@@@@@@@@@@@@',",
+			"fff",
+			"choiceinlineformset",
+			"poll",
+			"PollFactory",
+			"inlineformset_factory",
+			"admin_site",
+			"inlines",
 			"self.choice",
-			"self",
-			"assertCountEqual",
-			"False",
-			"Poll.get_statuses_for_display",
-			"choices_statuses_for_display"
+			"text_choice",
+			"['Since, it may be happen.' * 5]",
+			"get_truncated_text_choice",
+			"Books",
+			"hidden",
+			"polls_choice_add",
+			"date_voting",
+			"        \n",
+			"still do not have",
+			"exis",
+			"(as UUID",
+			"UUID",
+			"admin_urls",
+			"admin_ac",
+			"block",
+			"admin_urlname:'add",
+			"poll",
+			"object_id",
+			"get_object_or_404",
+			"admin_url",
+			"url_name",
+			"admin_static",
+			"django_version",
+			"url_polls_choice_view",
+			"index_url_polls_choice_change",
+			"url_polls_choice_change",
+			"urls",
+			"list(",
+			"index_url_polls_choice_change",
+			"polls_choice_change",
+			"change_view",
+			"Books",
+			"masteringdjango",
+			"view",
+			"url_polls_choice_change",
+			"re_url",
+			"index_url_polls_choice_change",
+			"urls",
+			"url_polls_choice_change",
+			"change_view",
+			"chart",
+			"get_display_voters_with_get_admin_links",
+			"display_most_popular_choice_or_choices",
+			"display_voters_with_get_admin_links",
+			"_build_chart_poll_result",
+			"get_truncated_text_choice",
+			"truncatewords",
+			"truncatechars",
+			"display_most_popular_choice_or_choices",
+			"own",
+			"display_most_popular_choice_or_choices",
+			"ChoiceModelForm",
+			"get_date_lastest_voting",
+			"display_most_popular_choice_or_choices",
+			"get_date_lastest_voting",
+			"additional_fields",
+			"display_most_popular_choice_or_choices",
+			"block",
+			"VoteInline",
+			"get_inline_instances",
+			"choice__get_truncated_text_choice",
+			"date_voting",
+			"get_date_voting",
+			"StackedInline",
+			"VoteInline",
+			", ",
+			"text_choice",
+			"app",
+			"get_poll_name",
+			"truncatechars",
+			"User",
+			"Choice",
+			"<table",
+			"<option value=\"cd361a80-b135-4f28-9a23-be1bf1faacb1\">Ёнанй квюандо щуавятатэ опортэры эож мэль хэндрэрет. Хонэзтатёз незл ывыртятюр адипижкй. Зкрипторэм констятюам элыктрам ёнэрмйщ аккюжамюз. Лебыр аккузата квуёдам майыжтатйж июварыт квуй эзшэ.</option>\n<option value=\"70fb39d6-eac4-4a5f-a46a-ff47cea59d0c\">Видишчы факёльиси пауло вэртырэм квюо зймюл. Эож коммюны хонэзтатёз долорэм рыпрэхэндунт дытракжйт льаорыыт. Амэт латины дыфяниэбаж зюаз. Витюпырата ыам вэл вокынт выро чонэт дэлььынётё.</option>\n<option value=\"62480968-337f-46b3-ad00-9b02e3c927b8\">Ыам квюандо пхйложопхяа факёльиси долорэж шэа. Конжтетуто мыдиокрым толлйт мэль квюаэчтио зкрипторэм. Хонэзтатёз дытыррюизщэт зюаз опортэры доктюж адепйжкйнг вэртырэм льаорыыт.</option>\n<option value=\"f9445d0f-1216-4f5f-9ed2-6fb3c97e40cd\">Вэл дэлььынётё атоморюм пхйложопхяа ад вэрыар. Кончэтытюр вим выро щуавятатэ граэко зюаз факэр рыпрэхэндунт квюаэчтио.</option>\n<option value=\"0f21ea61-f893-4932-99e2-abc5558992d8\">Доктюж витюпырата пхйложопхяа лыгимуз омныз дольор атквюе. Элитр кибо ад зючкёпит аэквюы брутэ апэриам квюальизквюэ вэртырэм. Эффикеэнди ючю квюоджёныглэгэнтур дытракжйт дикунт бонорюм мютат квуй.</option>\n<option value=\"305f685e-053d-4f9f-a44c-c3d2bae0a570\">Тинкидюнт доктюж ут ведят дэлььякатезшимя. Хабымуч лаборамюз тамквюам дэлььякатезшимя дытыррюизщэт црял. Тинкидюнт тамквюам аккузата про тинкидюнт эрюдитя. Индоктум ан квуым алььтыра.</option>\n<option value=\"c777a226-4ef6-47e0-b294-9265e7f3bc84\">Вэл рэгяонэ чадипжкёнг витюпэраторебуз видишчы дэлььиката июварыт дэлььякатезшимя. Такематыш татион зыд хонэзтатёз агам ведят ты. Дэлььынётё чадипжкёнг эвэртё еюж ед витюпырата либриз.</option>\n<option value=\"b6013ba4-2536-4703-8343-d60d47ae1427\">Прё омнэжквюы щуавятатэ мыис эвэртё вяш йн чэнзэрет. Янтэрэсщэт ножтро альиквуандо эа эпикюре агам хэндрэрет. Номинатй ад апыирёан омнэжквюы мыа ат.</option>\n<option value=\"8765f417-be4b-4ca2-a068-ee8602bd345d\">Латины црял ад вёжи ыёюз. Чэнзэрет квюиж инимёкюж либриз. Вэртырэм молыжтйаы пошжим эю пхйложопхяа.</option>\n<option value=\"fb8a16ae-5abe-4526-8db8-f0756458683a\">Порро шапэрэт едквюэ дёзсэнтёаш апэриам зыд. Хабэо атоморюм элыктрам янтэрэсщэт мыа. Вёртюты квуым опортэры нихйл дектаж эррорибуз шэа.</option>\n<option value=\"343f9893-6064-405e-be66-8d6c29501eaa\">Порро лебыр ёнанй пырикульа мэльёуз. Дылыктуч ыам антеопам аккузата бонорюм квюандо игнота ведят эжт.</option>\n<option value=\"94f38d0d-8d53-4cd8-86d8-14ecc5729b4c\">Выро июварыт эжт конкыптам ты порро жкаывола жэмпэр. Лаборамюз вёжи квюандо адмодум квюаэчтио. Этёам тебиквюэ ипзум хабэо мэль.</option>\n<option value=\"94e523e5-b80f-4887-9a64-0cb390cc77d8\">Ут нэ вэрыар эюрйпйдяч дектаж чонэт дыфяниэбаж. Ючю ывыртятюр пырфэкто эпикюре хёз ведят модо мацим эюрйпйдяч. Льаорыыт адмодум квюоджёныглэгэнтур пэртинакёа дольор дюиж бонорюм зкрипторэм жкаывола.</option>\n<option value=\"8863fe28-8467-4773-8af7-60133830367e\">Адмодум адипижкй эи граэкйж ед. Чадипжкёнг квуй июварыт зючкёпит дектаж мэль вокынт квюандо. Шапэрэт адепйжкйнг вокынт еюж чадипжкёнг витюпырата ведят.</option>\n<option value=\"8e15167e-adc4-408c-a8c8-ef120203ecc4\">Ючю анкилльаы ажжынтиор ведят про вэрыар хаж жят. Дэлььиката глориатюр атоморюм квюо игнота долорэж. Нюлльам зюаз пхйложопхяа майыжтатйж вокынт вирйз тальэ ат црял.</option>\n<option value=\"a041e735-7bf2-4be0-890c-d66a0ed69cb4\">Рэктэквуэ омныз молыжтйаы фырре жкаывола мюндй витюпэраторебуз зймюл. Кевёбюж шынчебюз жят пырфэкто либриз магна мюндй хабымуч анкилльаы. Ты констятюам пырфэкто пырикульа ыльигэнди жят.</option>\n<option value=\"b78562df-4cad-4842-9eae-c91e20b8d757\">Вэл ты жят оффекйяж эффикеэнди бонорюм пырикульа. Инимёкюж констятюам кевёбюж опортэры ад аппарэат. Пэртинакёа хабымуч мацим адмодум рэгяонэ мёнём шэа. Вэрыар коммюны зыд мацим омнэжквюы ат.</option>\n<option value=\"3b577e9f-ae44-477d-a0d7-174747559f82\">Хабэо опортэры эпикюре дэлььякатезшимя тинкидюнт. Атквюе азжюывырит омныз квюоджё. Ут порро дюиж пхйложопхяа векж.</option>\n<option value=\"99f5a4ad-65a3-4d23-9211-748bc404d947\">Мацим ёнэрмйщ латины луптатум. Рэпудёандаэ нонумй граэкйж торквюатоз векж нам. Зючкёпит зэнтынтиаэ попюльо атквюе долорэж. Ылоквюэнтиам жэмпэр лебыр либриз дуо мёнём конжтетуто.</option>\n<option value=\"c19c2bba-39b1-4b14-8f09-bd646fa53921\">Модо тебиквюэ ножтро витюпэраторебуз аппэтырэ алььтыра коммюны. Элитр вяш ножтро алььтыра льаорыыт инимёкюж брутэ дектаж.</option>\n<option value=\"61a28d39-669f-4713-b23e-2f78f9178758\">Ут рыпрэхэндунт пхйложопхяа анкилльаы ыт. Торквюатоз кончэтытюр алььтыра апэриам. Дёзсэнтёаш квюот прима про.</option>\n<option value=\"c387b428-5977-47fa-8264-e769d9de44cc\">Мёнём юрбанйтаж конкыптам долорэм. Азжюывырит кевёбюж вокынт факилиз антеопам пырикульа. Пошжим толлйт эюрйпйдяч пэркйпет луптатум чонэт анкилльаы апэриам.</option>\n<option value=\"6d8b9fae-8664-4f32-852a-4c309e99996f\">Вокынт фалля ты коммюны чадипжкёнг. Тинкидюнт эа эррорибуз мацим одео. Омныз аугюэ анкилльаы форынчйбюж. Фырре ипзум дуо жят элитр квюальизквюэ аппэтырэ квюандо.</option>\n<option value=\"bd658bb3-7edb-4d0a-b4c8-845555d0e4f7\">Либриз вяш вёртюты квюандо эррорибуз долорэм татион эож эрюдитя. Мёнём тамквюам ведят зыд эффикеэнди вёртюты. Выро нам пырфэкто коммюны конжтетуто квюо дэлььынётё.</option>\n<option value=\"57b73ca3-c88d-45c4-a7e9-9a1ae090375f\">Ыт мэльёуз дэлььынётё нэ вэл апэриам. Нихйл аппарэат ыльигэнди ку вэрыар вяш. Эррорибуз эжт ыюм ипзум эжт эжт вёжи конгуы.</option>\n<option value=\"5dc3dbd8-3b08-41d6-9af3-59a9be09975f\">Ыпикурэи хабымуч пэртинакёа амэт торквюатоз. Дыфяниэбаж июварыт атоморюм порро аюдирэ кибо. Выро нык ножтро дычэрунт. Лебыр витюпырата ат дектаж эюрйпйдяч.</option>\n<option value=\"11ec7320-e637-4c10-acc7-69f737b0cad5\">Граэко эзшэ альиквуандо аппарэат тальэ. Дежпютатионй либриз прима кюм прима мютат. Лэгыры этёам шынчебюз витюпырата алььтыра зыд ан. Доктюж црял эпикюре вёртюты прё дытыррюизщэт кибо.</option>\n<option value=\"cdc5b6b3-f276-4e4c-a150-87e2fa2b4c27\">Ёнанй ывыртятюр нонумй квюальизквюэ дэлььынётё. Кибо ёнанй луптатум ат. Дектаж констятюам форынчйбюж едквюэ шынчебюз. Форынчйбюж декат квюандо еюж.</option>\n<option value=\"cfa560b6-fba6-45a6-b36d-3d4a0aac0ef6\">Ажжюм лыгимуз граэки пэркйпет. Пырикюлёз хёз тамквюам хэндрэрет ножтро зигнёфэрумквюы квюо юрбанйтаж.</option>\n<option value=\"02f18326-6181-4a27-b985-97059104458d\">Конжтетуто ылоквюэнтиам дэлььякатезшимя такематыш рэктэквуэ ёнэрмйщ коммюны ажжюм. Юрбанйтаж ыт квуй дыфяниэбаж. Эа квюиж ан брутэ дюиж шапэрэт. Витюпырата ёужто игнота дытракжйт амэт.</option>\n<option value=\"977d9a8f-4691-47fb-b75c-4199505a64a7\">Декат нык рэктэквуэ чадипжкёнг факилиз йн фюгит форынчйбюж. Прё ыёюз бонорюм зючкёпит анкилльаы фабулаз ножтро. Видишчы адипижкй эвэртё фюгит. Апыирёан ажжынтиор атквюе квюиж вяш ипзум вэл.</option>\n<option value=\"313e2173-70ca-4ec0-a659-73c31a71c14f\">Мэль квуым щуавятатэ порро адмодум зймюл ты аппарэат. Торквюатоз квуй жят апэриам йн порро витюпырата. Дэлььиката выро видишчы зючкёпит инимёкюж векж. Зючкёпит мацим модо атквюе адепйжкйнг бландит.</option>\n<option value=\"f2b83d9f-5c0d-4061-a8aa-234fe6168e9e\">Квюот анкилльаы квюот эррорибуз молыжтйаы ад. Ыт граэко граэки элыктрам атоморюм ед лэгыры конкыптам. Но альиквуандо дытыррюизщэт форынчйбюж.</option>\n<option value=\"74775840-2066-4318-850b-978d39f6f906\">Пауло магна граэкйж но ку. Индоктум ыам рэктэквуэ йн эрюдитя толлйт. Опортэры ёужто эффикеэнди алььтыра адипижкй дэльэнйт хабэо ючю.</option>\n<option value=\"b1088d7f-ffc6-4666-b086-13461bb3f29b\">sadsdsd</option>\n<option value=\"124f61a3-0775-47a1-b5fa-880b61423835\">dsdsdsd</option>\n<option value=\"1d6b0f35-14a0-49d3-864e-f435ea212268\">dsds</option>\n<option value=\"eaac458b-14c9-42a1-b53a-216ce13078eb\">Эю квуй альиквуандо фюгит нонумй дольор. Дэлььынётё дыфяниэбаж тальэ пауло нам. Про ажжюм брутэ вэрыар квюоджёныглэгэнтур майыжтатйж.</option>\n<option value=\"890af882-d208-4dda-9451-0fdec685d2be\">Дыфяниэбаж вэрыар вэрыар хаж граэкйж вяш льаборэж. Констятюам тота дычэрунт аппэтырэ шынчебюз пауло аппэтырэ попюльо. Одео тальэ агам кюм апэриам. Квуй ан дёзсэнтёаш дэлььынётё квюо.</option>\n<option value=\"0850c5b8-c488-4591-8684-5335c7c24797\">Тинкидюнт ан мёнём фюгит. Вэл лэгыры атквюе ты ведят льаборэж магна дэлььякатезшимя. Опортэры вирйз тота квюандо долорэм прё пэртинакёа эзшэ.</option>\n<option value=\"576fec2a-279b-473d-bf64-d3af326c9acc\">Мёнём дэлььиката юрбанйтаж но коммюны. Эюрйпйдяч нэ вяш эзшэ граэки. Апыирёан эа зэнтынтиаэ кюм бландит. Коммюны квюот ведят мютат пырикюлёз дытракжйт.</option>\n<option value=\"a77dd8f1-95a5-4afb-9ebc-bc9b05a2edb6\">Янтэрэсщэт ыпикурэи чадипжкёнг молыжтйаы хонэзтатёз еюж. Дуо ёнанй индоктум ыт пэркйпет нихйл шынчебюз мэльёуз. Ут торквюатоз эффикеэнди пэр. Чонэт мёнём вэрыар хэндрэрет молыжтйаы.</option>\n<option value=\"783e40bd-b160-4a5c-ba00-a4e33240cbf0\">Ты выро дэлььякатезшимя квюиж экз. Дэлььынётё зймюл квюо конжтетуто нэ мэя аккюжамюз вокынт. Мёнём чадипжкёнг доктюж оффекйяж эзшэ индоктум ывыртятюр альиквуандо.</option>\n<option value=\"e6b6b3b2-38ad-4871-b3c6-12f8ad11b87f\" selected=\"selected\">Квюо эзшэ юрбанйтаж пэртинакёа шэа аккузата пхйложопхяа аппарэат. Дежпютатионй хабымуч хёз эзшэ дэльэнйт. Модо пэр нык элыктрам кевёбюж.</option>\n<option value=\"de2c0c55-c0b7-4d0b-921f-bdb016002aae\">Мэя апыирёан атквюе жкаывола аугюэ мацим мэя. Фырре тинкидюнт зигнёфэрумквюы пырфэкто пырфэкто этёам. Нонумй аюдирэ одео ыт долорэм дикунт конгуы.</option>\n<option value=\"28e0710f-9886-4848-9b49-ca284851ee24\">Адмодум латины эа едквюэ эжт. Ыам аппарэат ед квюандо ку граэки вэртырэм но. Мыис пошжим кончэтытюр эрюдитя опортэры едквюэ хёз. Ывыртятюр чадипжкёнг вёжи ратионебюж.</option>\n<option value=\"1d07714d-9713-4e71-9f22-68fdc0695eeb\">Мэльёуз квюиж выро кибо жкаывола ывыртятюр этёам экз. Аккюжамюз хабымуч эррорибуз эа факэр эю экз прё. Хабымуч аэквюы тота вёжи видишчы векж.</option>\n<option value=\"9208e00f-2803-4d58-89fb-2e8810c7c255\">Фабулаз игнота дуо нык вирйз азжюывырит. Црял атоморюм конкыптам апэриам. Чонэт оффэндйт зэнтынтиаэ дектаж видишчы эи едквюэ лэгыры.</option>\n<option value=\"f776d31f-7a95-4385-ac4f-fa9c42adc929\">Льаборэж выро тамквюам мэль едквюэ пэркйпет. Пошжим нюлльам квюот вяш граэки дикунт. Ты вяш татион агам.\nГраэкйж едквюэ порро торквюатоз адмодум фабулаз. Лебыр глориатюр мёнём выро мэльёуз.</option>\n<option value=\"936f5db8-dae4-40a5-ac01-8e1504a7a2bc\">Констятюам модо ажжюм квюиж про ыёюз лэгыры щуавятатэ ан. Дюиж витюпырата инимёкюж еюж еюж. Бландит бонорюм вирйз инимёкюж мютат дикунт ыёюз. Эпикюре нык эа эффикеэнди дектаж.</option>\n<option value=\"1102bc6c-efba-405b-9a92-98cb75a12fe5\">Эррорибуз хабэо оффэндйт прима брутэ. Альиквуандо дылыктуч шынчебюз факилиз щуавятатэ ут. Пырфэкто мёнём нам пырикюлёз витюпырата.</option>\n<option value=\"0592797c-85b8-47f2-8828-272d3fc00ecc\">Лэгыры ыльигэнди дектаж эож дытракжйт хабымуч. Кибо конкыптам фалля аппэтырэ хэндрэрет. Эа дэлььякатезшимя эффикеэнди лыгимуз одео.</option>\n<option value=\"ef0cafa1-508e-401a-af01-019f6e288bb7\">Ыюм декат мацим ан этёам. Выро зкрипторэм ыпикурэи эжт жят игнота.\nПэртинакёа июварыт ажжюм конгуы дэльэнйт. Квюиж этёам аккюжамюз чадипжкёнг кончэтытюр. Кевёбюж квуй квюоджё эож тамквюам дикунт.</option>\n<option value=\"975c972e-bf19-428e-b794-673c4641a5a3\">Зючкёпит декат дэлььякатезшимя тамквюам эрюдитя опортэры факэр рыпрэхэндунт. Кибо интылльэгэбат пошжим луптатум дытракжйт игнота ут доктюж. Дуо эжт хаж хёз глориатюр.</option>\n<option value=\"c13c0986-92d5-4da4-b8ab-60a83801e353\">Ыльигэнди ты кевёбюж векж шапэрэт конжтетуто. Омныз прё витюпэраторебуз нюлльам едквюэ эож порро. Ывыртятюр но омнэжквюы юрбанйтаж хёз коммюны мютат. Татион ыт щуавятатэ вёжи эрюдитя пырфэкто.</option>",
+			"option",
+			"poll",
+			"choice",
+			"user",
+			"extra_context",
+			"ChoiceModelForm",
+			"80"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -1601,7 +1606,7 @@
 	"groups":
 	[
 		{
-			"selected": 0,
+			"selected": 4,
 			"sheets":
 			[
 				{
@@ -1610,15 +1615,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 78643,
+						"buffer_size": 80794,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								229,
-								229
+								237,
+								237
 							]
 						],
 						"settings":
@@ -1641,46 +1646,26 @@
 							},
 							"bracket_highlighter.regions":
 							[
-								"bh_tag",
-								"bh_tag_center",
-								"bh_tag_open",
-								"bh_tag_close",
-								"bh_tag_content",
-								"bh_default",
-								"bh_default_center",
-								"bh_default_open",
-								"bh_default_close",
-								"bh_default_content",
-								"bh_angle",
-								"bh_angle_center",
-								"bh_angle_open",
-								"bh_angle_close",
-								"bh_angle_content",
 								"bh_curly",
 								"bh_curly_center",
 								"bh_curly_open",
 								"bh_curly_close",
 								"bh_curly_content",
-								"bh_double_quote",
-								"bh_double_quote_center",
-								"bh_double_quote_open",
-								"bh_double_quote_close",
-								"bh_double_quote_content",
-								"bh_c_define",
-								"bh_c_define_center",
-								"bh_c_define_open",
-								"bh_c_define_close",
-								"bh_c_define_content",
-								"bh_regex",
-								"bh_regex_center",
-								"bh_regex_open",
-								"bh_regex_close",
-								"bh_regex_content",
-								"bh_square",
-								"bh_square_center",
-								"bh_square_open",
-								"bh_square_close",
-								"bh_square_content",
+								"bh_angle",
+								"bh_angle_center",
+								"bh_angle_open",
+								"bh_angle_close",
+								"bh_angle_content",
+								"bh_round",
+								"bh_round_center",
+								"bh_round_open",
+								"bh_round_close",
+								"bh_round_content",
+								"bh_default",
+								"bh_default_center",
+								"bh_default_open",
+								"bh_default_close",
+								"bh_default_content",
 								"bh_unmatched",
 								"bh_unmatched_center",
 								"bh_unmatched_open",
@@ -1691,11 +1676,31 @@
 								"bh_single_quote_open",
 								"bh_single_quote_close",
 								"bh_single_quote_content",
-								"bh_round",
-								"bh_round_center",
-								"bh_round_open",
-								"bh_round_close",
-								"bh_round_content"
+								"bh_square",
+								"bh_square_center",
+								"bh_square_open",
+								"bh_square_close",
+								"bh_square_content",
+								"bh_c_define",
+								"bh_c_define_center",
+								"bh_c_define_open",
+								"bh_c_define_close",
+								"bh_c_define_content",
+								"bh_tag",
+								"bh_tag_center",
+								"bh_tag_open",
+								"bh_tag_close",
+								"bh_tag_content",
+								"bh_double_quote",
+								"bh_double_quote_center",
+								"bh_double_quote_open",
+								"bh_double_quote_close",
+								"bh_double_quote_content",
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
+								"bh_regex_content"
 							],
 							"color_scheme": "Packages/User/Color Highlighter/themes/Monokai Extended Bright (SL).tmTheme",
 							"syntax": "Packages/Text/Plain text.tmLanguage",
@@ -1706,24 +1711,24 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 0,
+					"stack_index": 6,
 					"type": "text"
 				},
 				{
 					"buffer": 1,
-					"file": "apps/polls/admin.py",
+					"file": "pytest.ini",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 18682,
+						"buffer_size": 250,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								29,
-								29
+								36,
+								36
 							]
 						],
 						"settings":
@@ -1746,46 +1751,26 @@
 							},
 							"bracket_highlighter.regions":
 							[
-								"bh_tag",
-								"bh_tag_center",
-								"bh_tag_open",
-								"bh_tag_close",
-								"bh_tag_content",
-								"bh_default",
-								"bh_default_center",
-								"bh_default_open",
-								"bh_default_close",
-								"bh_default_content",
-								"bh_angle",
-								"bh_angle_center",
-								"bh_angle_open",
-								"bh_angle_close",
-								"bh_angle_content",
 								"bh_curly",
 								"bh_curly_center",
 								"bh_curly_open",
 								"bh_curly_close",
 								"bh_curly_content",
-								"bh_double_quote",
-								"bh_double_quote_center",
-								"bh_double_quote_open",
-								"bh_double_quote_close",
-								"bh_double_quote_content",
-								"bh_c_define",
-								"bh_c_define_center",
-								"bh_c_define_open",
-								"bh_c_define_close",
-								"bh_c_define_content",
-								"bh_regex",
-								"bh_regex_center",
-								"bh_regex_open",
-								"bh_regex_close",
-								"bh_regex_content",
-								"bh_square",
-								"bh_square_center",
-								"bh_square_open",
-								"bh_square_close",
-								"bh_square_content",
+								"bh_angle",
+								"bh_angle_center",
+								"bh_angle_open",
+								"bh_angle_close",
+								"bh_angle_content",
+								"bh_round",
+								"bh_round_center",
+								"bh_round_open",
+								"bh_round_close",
+								"bh_round_content",
+								"bh_default",
+								"bh_default_center",
+								"bh_default_open",
+								"bh_default_close",
+								"bh_default_content",
 								"bh_unmatched",
 								"bh_unmatched_center",
 								"bh_unmatched_open",
@@ -1796,14 +1781,273 @@
 								"bh_single_quote_open",
 								"bh_single_quote_close",
 								"bh_single_quote_content",
+								"bh_square",
+								"bh_square_center",
+								"bh_square_open",
+								"bh_square_close",
+								"bh_square_content",
+								"bh_c_define",
+								"bh_c_define_center",
+								"bh_c_define_open",
+								"bh_c_define_close",
+								"bh_c_define_content",
+								"bh_tag",
+								"bh_tag_center",
+								"bh_tag_open",
+								"bh_tag_close",
+								"bh_tag_content",
+								"bh_double_quote",
+								"bh_double_quote_center",
+								"bh_double_quote_open",
+								"bh_double_quote_close",
+								"bh_double_quote_content",
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
+								"bh_regex_content"
+							],
+							"color_scheme": "Packages/User/Color Highlighter/themes/Monokai Extended Bright (SL).tmTheme",
+							"syntax": "Packages/Text/Plain text.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 7,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "apps/polls/admin.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 18670,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								14888,
+								14888
+							]
+						],
+						"settings":
+						{
+							"bracket_highlighter.busy": false,
+							"bracket_highlighter.locations":
+							{
+								"close":
+								{
+									"1":
+									[
+										14898,
+										14899
+									]
+								},
+								"icon":
+								{
+									"1":
+									[
+										"Packages/BracketHighlighter/icons/round_bracket.png",
+										"brackethighlighter.default"
+									]
+								},
+								"open":
+								{
+									"1":
+									[
+										14888,
+										14889
+									]
+								},
+								"unmatched":
+								{
+								}
+							},
+							"bracket_highlighter.regions":
+							[
+								"bh_curly",
+								"bh_curly_center",
+								"bh_curly_open",
+								"bh_curly_close",
+								"bh_curly_content",
+								"bh_angle",
+								"bh_angle_center",
+								"bh_angle_open",
+								"bh_angle_close",
+								"bh_angle_content",
 								"bh_round",
 								"bh_round_center",
 								"bh_round_open",
 								"bh_round_close",
-								"bh_round_content"
+								"bh_round_content",
+								"bh_default",
+								"bh_default_center",
+								"bh_default_open",
+								"bh_default_close",
+								"bh_default_content",
+								"bh_unmatched",
+								"bh_unmatched_center",
+								"bh_unmatched_open",
+								"bh_unmatched_close",
+								"bh_unmatched_content",
+								"bh_single_quote",
+								"bh_single_quote_center",
+								"bh_single_quote_open",
+								"bh_single_quote_close",
+								"bh_single_quote_content",
+								"bh_square",
+								"bh_square_center",
+								"bh_square_open",
+								"bh_square_close",
+								"bh_square_content",
+								"bh_c_define",
+								"bh_c_define_center",
+								"bh_c_define_open",
+								"bh_c_define_close",
+								"bh_c_define_content",
+								"bh_tag",
+								"bh_tag_center",
+								"bh_tag_open",
+								"bh_tag_close",
+								"bh_tag_content",
+								"bh_double_quote",
+								"bh_double_quote_center",
+								"bh_double_quote_open",
+								"bh_double_quote_close",
+								"bh_double_quote_content",
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
+								"bh_regex_content"
 							],
 							"color_scheme": "Packages/User/Color Highlighter/themes/Monokai Extended Bright (SL).tmTheme",
 							"syntax": "Packages/Djaneiro/Syntaxes/Python Django.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 5721.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "templates/admin/change_list.html",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 2801,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								787,
+								787
+							]
+						],
+						"settings":
+						{
+							"bracket_highlighter.busy": false,
+							"bracket_highlighter.locations":
+							{
+								"close":
+								{
+									"1":
+									[
+										788,
+										789
+									]
+								},
+								"icon":
+								{
+									"1":
+									[
+										"Packages/BracketHighlighter/icons/curly_bracket.png",
+										"brackethighlighter.default"
+									]
+								},
+								"open":
+								{
+									"1":
+									[
+										783,
+										784
+									]
+								},
+								"unmatched":
+								{
+								}
+							},
+							"bracket_highlighter.regions":
+							[
+								"bh_curly",
+								"bh_curly_center",
+								"bh_curly_open",
+								"bh_curly_close",
+								"bh_curly_content",
+								"bh_angle",
+								"bh_angle_center",
+								"bh_angle_open",
+								"bh_angle_close",
+								"bh_angle_content",
+								"bh_round",
+								"bh_round_center",
+								"bh_round_open",
+								"bh_round_close",
+								"bh_round_content",
+								"bh_default",
+								"bh_default_center",
+								"bh_default_open",
+								"bh_default_close",
+								"bh_default_content",
+								"bh_unmatched",
+								"bh_unmatched_center",
+								"bh_unmatched_open",
+								"bh_unmatched_close",
+								"bh_unmatched_content",
+								"bh_single_quote",
+								"bh_single_quote_center",
+								"bh_single_quote_open",
+								"bh_single_quote_close",
+								"bh_single_quote_content",
+								"bh_square",
+								"bh_square_center",
+								"bh_square_open",
+								"bh_square_close",
+								"bh_square_content",
+								"bh_c_define",
+								"bh_c_define_center",
+								"bh_c_define_open",
+								"bh_c_define_close",
+								"bh_c_define_content",
+								"bh_tag",
+								"bh_tag_center",
+								"bh_tag_open",
+								"bh_tag_close",
+								"bh_tag_content",
+								"bh_double_quote",
+								"bh_double_quote_center",
+								"bh_double_quote_open",
+								"bh_double_quote_close",
+								"bh_double_quote_content",
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
+								"bh_regex_content"
+							],
+							"color_scheme": "Packages/User/Color Highlighter/themes/Monokai Extended Bright (SL).tmTheme",
+							"is_xml": false,
+							"syntax": "Packages/Djaneiro/Syntaxes/HTML (Django).tmLanguage",
 							"tab_size": 4,
 							"translate_tabs_to_spaces": true
 						},
@@ -1815,20 +2059,20 @@
 					"type": "text"
 				},
 				{
-					"buffer": 2,
-					"file": "apps/polls/reports.py",
+					"buffer": 4,
+					"file": "/home/wlysenko/.virtualenvs/programmerHelper/lib/python3.4/site-packages/django/contrib/admin/options.py",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 62920,
+						"buffer_size": 81252,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								54084,
-								54084
+								3763,
+								3763
 							]
 						],
 						"settings":
@@ -1851,46 +2095,26 @@
 							},
 							"bracket_highlighter.regions":
 							[
-								"bh_tag",
-								"bh_tag_center",
-								"bh_tag_open",
-								"bh_tag_close",
-								"bh_tag_content",
-								"bh_default",
-								"bh_default_center",
-								"bh_default_open",
-								"bh_default_close",
-								"bh_default_content",
-								"bh_angle",
-								"bh_angle_center",
-								"bh_angle_open",
-								"bh_angle_close",
-								"bh_angle_content",
 								"bh_curly",
 								"bh_curly_center",
 								"bh_curly_open",
 								"bh_curly_close",
 								"bh_curly_content",
-								"bh_double_quote",
-								"bh_double_quote_center",
-								"bh_double_quote_open",
-								"bh_double_quote_close",
-								"bh_double_quote_content",
-								"bh_c_define",
-								"bh_c_define_center",
-								"bh_c_define_open",
-								"bh_c_define_close",
-								"bh_c_define_content",
-								"bh_regex",
-								"bh_regex_center",
-								"bh_regex_open",
-								"bh_regex_close",
-								"bh_regex_content",
-								"bh_square",
-								"bh_square_center",
-								"bh_square_open",
-								"bh_square_close",
-								"bh_square_content",
+								"bh_angle",
+								"bh_angle_center",
+								"bh_angle_open",
+								"bh_angle_close",
+								"bh_angle_content",
+								"bh_round",
+								"bh_round_center",
+								"bh_round_open",
+								"bh_round_close",
+								"bh_round_content",
+								"bh_default",
+								"bh_default_center",
+								"bh_default_open",
+								"bh_default_close",
+								"bh_default_content",
 								"bh_unmatched",
 								"bh_unmatched_center",
 								"bh_unmatched_open",
@@ -1901,116 +2125,31 @@
 								"bh_single_quote_open",
 								"bh_single_quote_close",
 								"bh_single_quote_content",
-								"bh_round",
-								"bh_round_center",
-								"bh_round_open",
-								"bh_round_close",
-								"bh_round_content"
-							],
-							"color_scheme": "Packages/User/Color Highlighter/themes/Monokai Extended Bright (SL).tmTheme",
-							"syntax": "Packages/Djaneiro/Syntaxes/Python Django.tmLanguage",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 29.0,
-						"translation.y": 19441.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 2,
-					"type": "text"
-				},
-				{
-					"buffer": 3,
-					"file": "apps/polls/managers.py",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 6777,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								6616,
-								6616
-							]
-						],
-						"settings":
-						{
-							"bracket_highlighter.busy": false,
-							"bracket_highlighter.locations":
-							{
-								"close":
-								{
-								},
-								"icon":
-								{
-								},
-								"open":
-								{
-								},
-								"unmatched":
-								{
-								}
-							},
-							"bracket_highlighter.regions":
-							[
-								"bh_tag",
-								"bh_tag_center",
-								"bh_tag_open",
-								"bh_tag_close",
-								"bh_tag_content",
-								"bh_default",
-								"bh_default_center",
-								"bh_default_open",
-								"bh_default_close",
-								"bh_default_content",
-								"bh_angle",
-								"bh_angle_center",
-								"bh_angle_open",
-								"bh_angle_close",
-								"bh_angle_content",
-								"bh_curly",
-								"bh_curly_center",
-								"bh_curly_open",
-								"bh_curly_close",
-								"bh_curly_content",
-								"bh_double_quote",
-								"bh_double_quote_center",
-								"bh_double_quote_open",
-								"bh_double_quote_close",
-								"bh_double_quote_content",
-								"bh_c_define",
-								"bh_c_define_center",
-								"bh_c_define_open",
-								"bh_c_define_close",
-								"bh_c_define_content",
-								"bh_regex",
-								"bh_regex_center",
-								"bh_regex_open",
-								"bh_regex_close",
-								"bh_regex_content",
 								"bh_square",
 								"bh_square_center",
 								"bh_square_open",
 								"bh_square_close",
 								"bh_square_content",
-								"bh_unmatched",
-								"bh_unmatched_center",
-								"bh_unmatched_open",
-								"bh_unmatched_close",
-								"bh_unmatched_content",
-								"bh_single_quote",
-								"bh_single_quote_center",
-								"bh_single_quote_open",
-								"bh_single_quote_close",
-								"bh_single_quote_content",
-								"bh_round",
-								"bh_round_center",
-								"bh_round_open",
-								"bh_round_close",
-								"bh_round_content"
+								"bh_c_define",
+								"bh_c_define_center",
+								"bh_c_define_open",
+								"bh_c_define_close",
+								"bh_c_define_content",
+								"bh_tag",
+								"bh_tag_center",
+								"bh_tag_open",
+								"bh_tag_close",
+								"bh_tag_content",
+								"bh_double_quote",
+								"bh_double_quote_center",
+								"bh_double_quote_open",
+								"bh_double_quote_close",
+								"bh_double_quote_content",
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
+								"bh_regex_content"
 							],
 							"color_scheme": "Packages/User/Color Highlighter/themes/Monokai Extended Bright (SL).tmTheme",
 							"syntax": "Packages/Djaneiro/Syntaxes/Python Django.tmLanguage",
@@ -2018,27 +2157,27 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 2226.0,
+						"translation.y": 1050.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 5,
+					"stack_index": 0,
 					"type": "text"
 				},
 				{
-					"buffer": 4,
-					"file": "pytest.ini",
+					"buffer": 5,
+					"file": "apps/export_import_models/urls.py",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 81,
+						"buffer_size": 1839,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								29,
-								29
+								420,
+								420
 							]
 						],
 						"settings":
@@ -2048,12 +2187,27 @@
 							{
 								"close":
 								{
+									"1":
+									[
+										1741,
+										1742
+									]
 								},
 								"icon":
 								{
+									"1":
+									[
+										"Packages/BracketHighlighter/icons/round_bracket.png",
+										"brackethighlighter.default"
+									]
 								},
 								"open":
 								{
+									"1":
+									[
+										405,
+										406
+									]
 								},
 								"unmatched":
 								{
@@ -2061,46 +2215,26 @@
 							},
 							"bracket_highlighter.regions":
 							[
-								"bh_tag",
-								"bh_tag_center",
-								"bh_tag_open",
-								"bh_tag_close",
-								"bh_tag_content",
-								"bh_default",
-								"bh_default_center",
-								"bh_default_open",
-								"bh_default_close",
-								"bh_default_content",
-								"bh_angle",
-								"bh_angle_center",
-								"bh_angle_open",
-								"bh_angle_close",
-								"bh_angle_content",
 								"bh_curly",
 								"bh_curly_center",
 								"bh_curly_open",
 								"bh_curly_close",
 								"bh_curly_content",
-								"bh_double_quote",
-								"bh_double_quote_center",
-								"bh_double_quote_open",
-								"bh_double_quote_close",
-								"bh_double_quote_content",
-								"bh_c_define",
-								"bh_c_define_center",
-								"bh_c_define_open",
-								"bh_c_define_close",
-								"bh_c_define_content",
-								"bh_regex",
-								"bh_regex_center",
-								"bh_regex_open",
-								"bh_regex_close",
-								"bh_regex_content",
-								"bh_square",
-								"bh_square_center",
-								"bh_square_open",
-								"bh_square_close",
-								"bh_square_content",
+								"bh_angle",
+								"bh_angle_center",
+								"bh_angle_open",
+								"bh_angle_close",
+								"bh_angle_content",
+								"bh_round",
+								"bh_round_center",
+								"bh_round_open",
+								"bh_round_close",
+								"bh_round_content",
+								"bh_default",
+								"bh_default_center",
+								"bh_default_open",
+								"bh_default_close",
+								"bh_default_content",
 								"bh_unmatched",
 								"bh_unmatched_center",
 								"bh_unmatched_open",
@@ -2111,14 +2245,36 @@
 								"bh_single_quote_open",
 								"bh_single_quote_close",
 								"bh_single_quote_content",
-								"bh_round",
-								"bh_round_center",
-								"bh_round_open",
-								"bh_round_close",
-								"bh_round_content"
+								"bh_square",
+								"bh_square_center",
+								"bh_square_open",
+								"bh_square_close",
+								"bh_square_content",
+								"bh_c_define",
+								"bh_c_define_center",
+								"bh_c_define_open",
+								"bh_c_define_close",
+								"bh_c_define_content",
+								"bh_tag",
+								"bh_tag_center",
+								"bh_tag_open",
+								"bh_tag_close",
+								"bh_tag_content",
+								"bh_double_quote",
+								"bh_double_quote_center",
+								"bh_double_quote_open",
+								"bh_double_quote_close",
+								"bh_double_quote_content",
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
+								"bh_regex_content"
 							],
 							"color_scheme": "Packages/User/Color Highlighter/themes/Monokai Extended Bright (SL).tmTheme",
-							"syntax": "Packages/Text/Plain text.tmLanguage"
+							"syntax": "Packages/Djaneiro/Syntaxes/Python Django.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
@@ -2126,28 +2282,22 @@
 					},
 					"stack_index": 3,
 					"type": "text"
-				}
-			]
-		},
-		{
-			"selected": 0,
-			"sheets":
-			[
+				},
 				{
-					"buffer": 5,
-					"file": "apps/polls/tests/test_managers.py",
+					"buffer": 6,
+					"file": "apps/export_import_models/actions.py",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 38674,
+						"buffer_size": 3666,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								38674,
-								38674
+								3219,
+								3219
 							]
 						],
 						"settings":
@@ -2170,46 +2320,26 @@
 							},
 							"bracket_highlighter.regions":
 							[
-								"bh_tag",
-								"bh_tag_center",
-								"bh_tag_open",
-								"bh_tag_close",
-								"bh_tag_content",
-								"bh_default",
-								"bh_default_center",
-								"bh_default_open",
-								"bh_default_close",
-								"bh_default_content",
-								"bh_angle",
-								"bh_angle_center",
-								"bh_angle_open",
-								"bh_angle_close",
-								"bh_angle_content",
 								"bh_curly",
 								"bh_curly_center",
 								"bh_curly_open",
 								"bh_curly_close",
 								"bh_curly_content",
-								"bh_double_quote",
-								"bh_double_quote_center",
-								"bh_double_quote_open",
-								"bh_double_quote_close",
-								"bh_double_quote_content",
-								"bh_c_define",
-								"bh_c_define_center",
-								"bh_c_define_open",
-								"bh_c_define_close",
-								"bh_c_define_content",
-								"bh_regex",
-								"bh_regex_center",
-								"bh_regex_open",
-								"bh_regex_close",
-								"bh_regex_content",
-								"bh_square",
-								"bh_square_center",
-								"bh_square_open",
-								"bh_square_close",
-								"bh_square_content",
+								"bh_angle",
+								"bh_angle_center",
+								"bh_angle_open",
+								"bh_angle_close",
+								"bh_angle_content",
+								"bh_round",
+								"bh_round_center",
+								"bh_round_open",
+								"bh_round_close",
+								"bh_round_content",
+								"bh_default",
+								"bh_default_center",
+								"bh_default_open",
+								"bh_default_close",
+								"bh_default_content",
 								"bh_unmatched",
 								"bh_unmatched_center",
 								"bh_unmatched_open",
@@ -2220,11 +2350,31 @@
 								"bh_single_quote_open",
 								"bh_single_quote_close",
 								"bh_single_quote_content",
-								"bh_round",
-								"bh_round_center",
-								"bh_round_open",
-								"bh_round_close",
-								"bh_round_content"
+								"bh_square",
+								"bh_square_center",
+								"bh_square_open",
+								"bh_square_close",
+								"bh_square_content",
+								"bh_c_define",
+								"bh_c_define_center",
+								"bh_c_define_open",
+								"bh_c_define_close",
+								"bh_c_define_content",
+								"bh_tag",
+								"bh_tag_center",
+								"bh_tag_open",
+								"bh_tag_close",
+								"bh_tag_content",
+								"bh_double_quote",
+								"bh_double_quote_center",
+								"bh_double_quote_open",
+								"bh_double_quote_close",
+								"bh_double_quote_content",
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
+								"bh_regex_content"
 							],
 							"color_scheme": "Packages/User/Color Highlighter/themes/Monokai Extended Bright (SL).tmTheme",
 							"syntax": "Packages/Djaneiro/Syntaxes/Python Django.tmLanguage",
@@ -2232,10 +2382,130 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 3486.0,
+						"translation.y": 1134.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 4,
+					"type": "text"
+				},
+				{
+					"buffer": 7,
+					"file": "apps/export_import_models/views.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 16981,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								16849,
+								16849
+							]
+						],
+						"settings":
+						{
+							"bracket_highlighter.busy": false,
+							"bracket_highlighter.locations":
+							{
+								"close":
+								{
+									"1":
+									[
+										16858,
+										16859
+									]
+								},
+								"icon":
+								{
+									"1":
+									[
+										"Packages/BracketHighlighter/icons/round_bracket.png",
+										"brackethighlighter.default"
+									]
+								},
+								"open":
+								{
+									"1":
+									[
+										16827,
+										16828
+									]
+								},
+								"unmatched":
+								{
+								}
+							},
+							"bracket_highlighter.regions":
+							[
+								"bh_curly",
+								"bh_curly_center",
+								"bh_curly_open",
+								"bh_curly_close",
+								"bh_curly_content",
+								"bh_angle",
+								"bh_angle_center",
+								"bh_angle_open",
+								"bh_angle_close",
+								"bh_angle_content",
+								"bh_round",
+								"bh_round_center",
+								"bh_round_open",
+								"bh_round_close",
+								"bh_round_content",
+								"bh_default",
+								"bh_default_center",
+								"bh_default_open",
+								"bh_default_close",
+								"bh_default_content",
+								"bh_unmatched",
+								"bh_unmatched_center",
+								"bh_unmatched_open",
+								"bh_unmatched_close",
+								"bh_unmatched_content",
+								"bh_single_quote",
+								"bh_single_quote_center",
+								"bh_single_quote_open",
+								"bh_single_quote_close",
+								"bh_single_quote_content",
+								"bh_square",
+								"bh_square_center",
+								"bh_square_open",
+								"bh_square_close",
+								"bh_square_content",
+								"bh_c_define",
+								"bh_c_define_center",
+								"bh_c_define_open",
+								"bh_c_define_close",
+								"bh_c_define_content",
+								"bh_tag",
+								"bh_tag_center",
+								"bh_tag_open",
+								"bh_tag_close",
+								"bh_tag_content",
+								"bh_double_quote",
+								"bh_double_quote_center",
+								"bh_double_quote_open",
+								"bh_double_quote_close",
+								"bh_double_quote_content",
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
+								"bh_regex_content"
+							],
+							"color_scheme": "Packages/User/Color Highlighter/themes/Monokai Extended Bright (SL).tmTheme",
+							"syntax": "Packages/Djaneiro/Syntaxes/Python Django.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 378.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 5,
 					"type": "text"
 				}
 			]
@@ -2258,18 +2528,11 @@
 				0,
 				1,
 				1
-			],
-			[
-				1,
-				0,
-				2,
-				1
 			]
 		],
 		"cols":
 		[
 			0.0,
-			0.440935598644,
 			1.0
 		],
 		"rows":
@@ -2337,14 +2600,14 @@
 		],
 		"width": 0.0
 	},
-	"selected_group": 1,
+	"selected_group": 0,
 	"settings":
 	{
 	},
 	"show_minimap": true,
 	"show_open_files": true,
 	"show_tabs": true,
-	"side_bar_visible": false,
+	"side_bar_visible": true,
 	"side_bar_width": 263.0,
 	"status_bar_visible": true,
 	"template_settings":
