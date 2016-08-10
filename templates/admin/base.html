@@ -1,18 +1,15 @@
 
 {% extends "admin/base.html" %}
 
-{% load i18n %}
+{% block extrajs %}
 
-{% block footer_links %}
-    <a href="{% url 'index' %}">Index</a>
-    <a href="#">Sitemaps</a>
-    <a href="#">Privacy policy</a>
-{% endblock footer_links %}
+    {% comment %}
+        Variable for global admin access to build-in Djangp admin js-script,
+        including django.jQuery
 
-{% block copyright %}
-    Copyright <i>{{ sitename }}</i>
-{% endblock copyright %}
+        Must be filled in inherited templated: built and own
+    {% endcomment %}
 
-{% block footer_branding %}
-    {% trans "Website exists " %} {{ date_creating_website|timesince }}
-{% endblock footer_branding %}
+    {{ django_admin_media }}
+
+{% endblock %}

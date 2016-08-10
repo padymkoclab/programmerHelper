@@ -1,26 +1,11 @@
 $(function() {
 
-    // the variable ct_model_pk must be assigned in html file with using DTL
-    try {
-        ct_model_pk;
-        objects_pks;
-    } catch (e) {
-        // statements
-        console.error('Attention!!! Variable not assigned. ' + e);
-    }
-
     var $all_fields = django.jQuery("input[type='checkbox'][name^='model_field']");
-    var $formaters = django.jQuery('[name=format_exported_data]');
+    var $formaters = django.jQuery('[name=format_export_data]');
     var $btn_select_all_fields = django.jQuery('#btn_select_all_fields');
-    var $btn_preview = django.jQuery('#link_admin_export_preview');
-    var $btn_download = django.jQuery('#link_admin_export_download');
-    var $btn_download_as_csv = django.jQuery('#link_download_as_csv');
-    var $btn_download_as_excel = django.jQuery('#link_download_as_excel');
-
-    //
-    function get_format_output(format) {
-        return django.jQuery('[name=format_exported_data]:checked').val();
-    };
+    var $btn_submit_export_preview = django.jQuery('#btn_submit_export_preview');
+    var $radio_formats_exported_data = django.jQuery("input[type='radio'][name='format_export_data']");
+    var $labels_radio_formats_exported_data = $radio_formats_exported_data.parent();
 
     //
     function get_names_fields_model() {
@@ -41,48 +26,6 @@ $(function() {
         return names_choices_fields
     }
 
-    // Preview output data either in JSON or in YAML or XML
-    function_changing_href_on_based_choices_fields_and_format = function(event) {
-
-        // get format and fields
-        var format = get_format_output();
-        var names_choices_fields = get_names_fields_model();
-
-        // make a correct url as Django`s reverse
-        var href_for_preview = REVERSE['export_import_models:admin_export_preview'](
-            'preview',
-            format,
-            ct_model_pk,
-            names_choices_fields,
-            objects_pks
-        );
-        var href_for_download = REVERSE['export_import_models:admin_export_preview'](
-            'download',
-            format,
-            ct_model_pk,
-            names_choices_fields,
-            objects_pks
-        );
-        var href_for_download_as_csv = REVERSE['export_import_models:admin_export_csv'](
-            ct_model_pk,
-            names_choices_fields,
-            objects_pks
-        );
-        var href_for_download_as_excel = REVERSE['export_import_models:admin_export_excel'](
-            ct_model_pk,
-            names_choices_fields,
-            objects_pks
-        );
-
-        // replace a value of a attribute href on new value
-        $btn_preview.attr('href', href_for_preview);
-        $btn_download.attr('href', href_for_download);
-        $btn_download_as_csv.attr('href', href_for_download_as_csv);
-        $btn_download_as_excel.attr('href', href_for_download_as_excel);
-    }
-    // add listener of a event to elements
-    $formaters.click(function_changing_href_on_based_choices_fields_and_format);
-    $all_fields.click(function_changing_href_on_based_choices_fields_and_format);
 
     // Make all input for fields as checked
     $btn_select_all_fields.click(function(event) {
@@ -91,5 +34,58 @@ $(function() {
 
     // activate default fields and format output data
     $formaters.first().click()
+
+    /**
+     * [description]
+     * @param  {[type]} event) {                   if (django.jQuery(this).hasClass('disabled') [description]
+     * @return {[type]}        [description]
+     */
+   $btn_submit_export_preview.click(function(event) {
+        if (django.jQuery(this).hasClass('disabled') === true) {
+            event.preventDefault();
+            alert('You don`t have ability for preview XLSX or CSV.!');
+        } else {
+
+        };
+    });
+
+   /**
+    * [description]
+    * @param  {[type]} event) {                  alert('message')   } [description]
+    * @return {[type]}        [description]
+    */
+
+   var color_labels_radio_formats_exported_data = $labels_radio_formats_exported_data.css('color');
+   var background_color_labels_radio_formats_exported_data = $labels_radio_formats_exported_data.css('background-color');
+   $radio_formats_exported_data.click(function(event) {
+
+        var active_background_color = 'rgb(47, 150, 180)';
+        var active_text_color = 'rgb(256, 256, 256)';
+
+        // reset all background colors in labels of radio inputs
+        django.jQuery("input[type='radio'][name='format_export_data']").parent().css({
+            'background-color': background_color_labels_radio_formats_exported_data,
+            'color': color_labels_radio_formats_exported_data,
+        });
+
+        var $checked_radio_formats_exported_data = django.jQuery("input[type='radio'][name='format_export_data']:checked");
+        var $label_of_radio_input = $checked_radio_formats_exported_data.parent();
+        $label_of_radio_input.css('background-color', active_background_color);
+        $label_of_radio_input.css('color', active_text_color);
+
+        /*
+        Restiction for preview format output
+         */
+       var format_output = django.jQuery(this).val();
+       var re_exp = new RegExp('json|xml|yaml');
+       var is_format_with_preview = re_exp.test(format_output);
+       if (is_format_with_preview){
+            $btn_submit_export_preview.removeClass('disabled');
+       } else {
+            $btn_submit_export_preview.addClass('disabled');
+       };
+   });
+
+   django.jQuery('#format_export_data_json').click();
 
 });

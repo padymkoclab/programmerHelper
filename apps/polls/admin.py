@@ -234,7 +234,7 @@ class PollAdmin(admin.ModelAdmin):
             self.admin_site.each_context(request),
             title=_('Statistics'),
             statistics=statistics,
-            media=self.media,
+            django_admin_media=self.media,
             current_app=apps.get_app_config('polls'),
             chart_statistics_count_votes_by_year=chart_statistics_count_votes_by_year,
         )
@@ -253,7 +253,7 @@ class PollAdmin(admin.ModelAdmin):
                 self.admin_site.each_context(request),
                 title=_('Make a report about polls'),
                 current_app=apps.get_app_config('polls'),
-                media=self.media,
+                django_admin_media=self.media,
             )
             return TemplateResponse(request, "polls/admin/report.html", context)
 

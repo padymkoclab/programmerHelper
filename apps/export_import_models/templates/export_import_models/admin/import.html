@@ -1,0 +1,27 @@
+
+{% extends "admin/base.html" %}
+
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+    {{ block.super }}
+    <div>
+        <div>
+            <h2>{% trans "Import data" %}</h2>
+            <div class="alert alert-info">
+                <p>{% trans "Now you tring import data in project." %}</p>
+                <p>{% trans "First of all, select file with serialized data for this project in XML, JSON, YAML format." %}</p>
+            </div>
+        </div>
+        <div>
+            <form action="" enctype="multipart/form-data" method="POST">
+                {% csrf_token %}
+                <p>{{ form.file.errors }}</p>
+                <p>{{ form.file.label_tag }}{{ form.file }}</p>
+                <p>{{ form.file.help_text }}</p>
+                <input type="submit" value="check">
+            </form>
+        </div>
+    </div>
+{% endblock content %}

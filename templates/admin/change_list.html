@@ -20,7 +20,7 @@ Load library of tags for filters of Django-Suit
         <i class="icon-upload icon-white"></i>&nbsp;{% trans "Export" %}
     </a>
 
-    <a href="{% make_url_for_export_data_model %}" class="btn btn-warning">
+    <a href="{% url 'export_import_models:import_model' %}" class="btn btn-warning">
         <i class="icon-download icon-white"></i>&nbsp;{% trans "Import" %}
     </a>
 

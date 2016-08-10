@@ -9,12 +9,14 @@ import csv
 import collections
 import uuid
 
+from django.contrib import admin
+from django.contrib.auth import get_user_model
 from django.core.urlresolvers import reverse
 from django.template import Template, Context
 from django.core.exceptions import FieldDoesNotExist
 from django.utils.translation import ugettext_lazy as _
 from django.core.urlresolvers import resolve
-from django.shortcuts import get_object_or_404, get_list_or_404
+from django.shortcuts import get_object_or_404, get_list_or_404, render
 from django.http import HttpResponse, HttpResponseBadRequest, StreamingHttpResponse
 from django.contrib.contenttypes.models import ContentType
 from django.views.generic import View, TemplateView, RedirectView
@@ -25,13 +27,15 @@ import xlsxwriter
 from config.admin import ProgrammerHelperAdminSite
 from mylabour.utils import get_filename_with_datetime
 
+from .forms import UploadSerializedFileForm
+
 
 def made_validation(kwargs):
 
     # get model
-    ct_model_pk = int(kwargs['ct_model_pk'])
+    content_type_model_pk = int(kwargs['content_type_model_pk'])
     try:
-        ct_model = ContentType.objects.get(pk=ct_model_pk)
+        ct_model = ContentType.objects.get(pk=content_type_model_pk)
     except:
         return HttpResponseBadRequest(_('Not prossible get a data from the database. Corrupted input the data.'))
     model = ct_model.model_class()
@@ -74,7 +78,7 @@ class ExportRedirectView(RedirectView):
 
         url = reverse(
             'export_import_models:export',
-            kwargs={'ct_model_pk': contenttype_model.pk, 'pks_separated_commas': pks_separated_commas}
+            kwargs={'content_type_model_pk': contenttype_model.pk, 'pks_separated_commas': pks_separated_commas}
         )
 
         return url
@@ -87,11 +91,11 @@ class ExportTemplateView(TemplateView):
 
     template_name = "export_import_models/admin/export.html"
 
-    def dispatch(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs):
 
         #
-        ct_model_pk = kwargs['ct_model_pk']
-        ct_model = ContentType.objects.get(pk=ct_model_pk)
+        content_type_model_pk = kwargs['content_type_model_pk']
+        ct_model = ContentType.objects.get(pk=content_type_model_pk)
         model = ct_model.model_class()
 
         #
@@ -111,28 +115,34 @@ class ExportTemplateView(TemplateView):
 
         # For only admin theme Django-Suit
         # It need namespace for display menu in left sidebar
-        request.current_app = resolve('/admin/').namespace
+        request.current_app = ProgrammerHelperAdminSite.name
 
-        return super(ExportTemplateView, self).dispatch(request, *args, **kwargs)
+        return super(ExportTemplateView, self).get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super(ExportTemplateView, self).get_context_data(**kwargs)
 
         #
-        ct_model_pk = kwargs['ct_model_pk']
-        ct_model = ContentType.objects.get(pk=ct_model_pk)
+        content_type_model_pk = kwargs['content_type_model_pk']
+        ct_model = ContentType.objects.get(pk=content_type_model_pk)
         model = ct_model.model_class()
+        model_verbose_name = model._meta.verbose_name
+        app_verbose_name = model._meta.app_config.verbose_name
 
         #
         pks_separated_commas = kwargs['pks_separated_commas']
-        # list_pks_separated_commas = pks_separated_commas.split(',')
-        # objects = model.objects.filter(pk__in=list_pks_separated_commas)
+        list_pks_separated_commas = pks_separated_commas.split(',')
+        queryset = model.objects.filter(pk__in=list_pks_separated_commas)
 
         #
-        context['ct_model_pk'] = ct_model_pk
+        context['content_type_model_pk'] = content_type_model_pk
         context['fields'] = model._meta.fields
+        context['queryset'] = queryset
         context['pks_separated_commas'] = pks_separated_commas
-        context['count_objects'] = len(pks_separated_commas.split(','))
+        context['django_admin_media'] = admin.ModelAdmin(get_user_model(), ProgrammerHelperAdminSite).media
+
+        title = _('Export data from a model {0} (application {1})').format(model_verbose_name, app_verbose_name)
+        context['title'] = title
 
         context.update(ProgrammerHelperAdminSite.each_context(self.request))
 
@@ -144,39 +154,109 @@ class ExportPreviewDownloadView(View):
 
     """
 
+    def get(self, request, *args, **kwargs):
+
+        # data from hidden inputs
+        pks_separated_commas = request.GET.get('pks_separated_commas')
+        content_type_model_pk = request.GET.get('content_type_model_pk')
+
+        # data from user
+        format_export_data = request.GET.get('format_export_data')
+        fields = request.GET.getlist('fields')
+
+        allowed_formats_for_preview = ['json', 'yaml', 'xml']
+        allowed_formats = allowed_formats_for_preview + ['csv', 'xlxs']
+
+        if format_export_data not in allowed_formats:
+            return HttpResponseBadRequest('Passed not supported format for export')
+
+        if not (fields or format_export_data or pks_separated_commas or content_type_model_pk):
+            return HttpResponseBadRequest('Something wrong with input')
+
+        # get content_type_model by pk
+        content_type_model = ContentType.objects.get(pk=content_type_model_pk)
+
+        # get model of content_type_model
+        model = content_type_model.model_class()
+
+        # get list of primary keys of objects for export
+        list_pks_separated_commas = pks_separated_commas.split(',')
+
+        # get queryset of objects by their keys
+        queryset = model.objects.filter(pk__in=list_pks_separated_commas)
+
+        content_type = 'text/{0}'.format(format_export_data)
+        response = HttpResponse(content_type=content_type)
+        filename = 'filename.{0}'.format(format_export_data)
+
+        if 'download' in request.GET:
+            response['Content-Disposition'] = 'attachment; filename="{0}"'.format(filename)
+
+            if format_export_data in allowed_formats_for_preview:
+
+                # make serialization
+                serializer = serializers.get_serializer(format_export_data)
+                serializer = serializer()
+                serializer.serialize(queryset, stream=response)
+
+            else:
+                if format_export_data == 'csv':
+                    return HttpResponse('CSV')
+
+            return response
+        elif 'preview' in request.GET:
+            if format_export_data not in allowed_formats_for_preview:
+                return HttpResponseBadRequest('Preview accessibly only for JSON, XML, YAML.')
+
+            # make serialization
+            serializer = serializers.get_serializer(format_export_data)
+            serializer = serializer()
+            serializer.serialize(queryset, stream=response, fields=fields)
+
+            return response
+        return HttpResponseBadRequest('Not correct type of a request')
+
+    def return_preview(self):
+        pass
+
+
+class ImportTemplateView(TemplateView):
+
+    template_name = "export_import_models/admin/import.html"
+
     def dispatch(self, request, *args, **kwargs):
 
-        response = made_validation(kwargs)
-        if isinstance(response, HttpResponseBadRequest):
-            return response
-        model, qs, list_fields = response
+        # For only admin theme Django-Suit
+        # It need namespace for display menu in left sidebar
+        request.current_app = ProgrammerHelperAdminSite.name
 
-        # choice correct content_type for HttpResponse
-        format_output = kwargs['format']
-        if format_output == 'json':
-            content_type = 'text/json'
-            file_ext = 'json'
-        elif format_output == 'xml':
-            content_type = 'text/xml'
-            file_ext = 'xml'
-        else:
-            content_type = 'text/x-yaml'
-            file_ext = 'yaml'
-        response = HttpResponse(content_type=content_type)
+        return super(ImportTemplateView, self).dispatch(request, *args, **kwargs)
 
-        # make serializaion got the objects
-        serializers.serialize(format_output, qs, stream=response, fields=list_fields)
+    def get(self, request, *args, **kwargs):
 
-        # if need return file (download), not preview
-        mode = kwargs['mode']
-        if mode == 'download':
-            filename = get_filename_with_datetime(
-                name=model._meta.verbose_name_plural,
-                extension=file_ext,
-            )
-            response['Content-Disposition'] = 'attachment;filename="%s"' % filename
+        form = UploadSerializedFileForm()
 
-        return response
+        context = self.get_context_data()
+        context['form'] = form
+
+        return render(request, self.template_name, context)
+
+    def post(self, request, *args, **kwargs):
+
+        form = UploadSerializedFileForm(request.FILES)
+        if form.is_valid():
+            return HttpResponse('Hurrah!')
+
+        context = self.get_context_data()
+        context['form'] = form
+
+        return render(request, self.template_name, context)
+
+    def get_context_data(self, **kwargs):
+        context = super(ImportTemplateView, self).get_context_data(**kwargs)
+        context['title'] = _('Import data in a model')
+
+        return context
 
 
 class ExportCSV(View):

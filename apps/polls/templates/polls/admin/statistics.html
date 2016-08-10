@@ -9,11 +9,10 @@
     <link rel="stylesheet" href="{% static 'polls/css/admin.css' %}">
 {% endblock extrastyle %}
 
-{% block extrajs %}
+{% block extrahead %}
     {{ block.super }}
-    {{ media }}
     <script src="{% static 'project/js/pygal-tooltips.min.js' %}" type="text/javascript" charset="utf-8"></script>
-{% endblock extrajs %}
+{% endblock extrahead %}
 
 {% block breadcrumbs %}
     {% include "polls/admin/_own_admin_breadcrumbs.html" %}

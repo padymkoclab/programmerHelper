@@ -1,0 +1,17 @@
+{% extends "admin/index.html" %}
+
+{% load i18n %}
+
+{% block footer_links %}
+    <a href="{% url 'index' %}">Index</a>
+    <a href="#">Sitemaps</a>
+    <a href="#">Privacy policy</a>
+{% endblock footer_links %}
+
+{% block copyright %}
+    Copyright <i>{{ sitename }}</i>
+{% endblock copyright %}
+
+{% block footer_branding %}
+    {% trans "Website exists " %} {{ date_creating_website|timesince }}
+{% endblock footer_branding %}
