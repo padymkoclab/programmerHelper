@@ -140,6 +140,8 @@ class PollAdmin(admin.ModelAdmin):
         if poll.votes.count() > 0:
             extra_context['chart_poll_result'] = self._build_chart_poll_result(object_id)
 
+        return super(PollAdmin, self).change_view(request, object_id, form_url, extra_context)
+
     def get_fieldsets(self, request, obj=None):
 
         # fields for exists and non exists polls

@@ -90,3 +90,7 @@ def PhoneValidator(value):
 def OnlyLettersValidator(value):
     if not str(value).isalpha():
         raise ValidationError(_('Word may contains only letters.'))
+
+
+class FileValidator:
+    pass

@@ -1,6 +1,6 @@
 $(function() {
 
-    var $all_fields = django.jQuery("input[type='checkbox'][name^='model_field']");
+    var $all_fields = django.jQuery("#table_fields tbody input[type='checkbox']");
     var $formaters = django.jQuery('[name=format_export_data]');
     var $btn_select_all_fields = django.jQuery('#btn_select_all_fields');
     var $btn_submit_export_preview = django.jQuery('#btn_submit_export_preview');
@@ -29,6 +29,7 @@ $(function() {
 
     // Make all input for fields as checked
     $btn_select_all_fields.click(function(event) {
+        event.preventDefault();
         $all_fields.prop('checked', 'checked');
     });
 

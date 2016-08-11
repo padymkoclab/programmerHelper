@@ -4,7 +4,7 @@ from django.contrib.admin.views.decorators import staff_member_required
 
 from .views import (
     ExportTemplateView, ExportPreviewDownloadView, ExportRedirectView,
-    ImportTemplateView
+    ImportTemplateView, ImportResultTemplateView
 )
 
 
@@ -18,6 +18,7 @@ urlpatterns_for_export = [
         url(r'download_preview/', staff_member_required(ExportPreviewDownloadView.as_view()), {}, 'export_preview_download'),
     ])),
     url(r'import_model/', staff_member_required(ImportTemplateView.as_view()), {}, 'import_model'),
+    url(r'import_result/', staff_member_required(ImportResultTemplateView.as_view()), {}, 'import_result'),
 ]
 
 urlpatterns_for_import = [
