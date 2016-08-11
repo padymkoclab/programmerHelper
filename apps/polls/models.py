@@ -78,6 +78,10 @@ class Poll(TimeStampedModel):
             args=(self.pk, )
         )
 
+    def natural_key(self):
+        return self.title
+    natural_key.dependencies = ['apps.users.models.User']
+
     def get_most_popular_choice_or_choices(self):
         """Return a most popular choice/choices of that poll, as queryset."""
 
@@ -184,6 +188,10 @@ class Choice(models.Model):
             raise ValidationError(self.UNIQUE_ERROR_MESSAGE_FOR_TEXT_CHOICE_AND_POLL)
         return super(Choice, self).unique_error_message(model_class, unique_check)
 
+    def natural_key(self):
+        return (self.poll.natural_key(), self.text_choice)
+    natural_key.dependencies = ['apps.polls.models.Poll']
+
     def get_count_votes(self):
         return self.votes.count()
     get_count_votes.short_description = _('Count votes')
@@ -251,3 +259,11 @@ class Vote(models.Model):
 
         return truncatechars(self.choice.text_choice, 70)
     get_truncated_text_choice.short_description = Choice._meta.verbose_name
+
+    def natural_key(self):
+        return (self.poll.natural_key(), self.user.natural_key(), self.choice.natural_key())
+    natural_key.dependencies = [
+        'apps.users.models.User',
+        'apps.polls.models.Choice',
+        'apps.polls.models.Poll',
+    ]

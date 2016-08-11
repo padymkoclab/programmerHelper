@@ -93,6 +93,9 @@ class PollManager(models.Manager):
     Manager for polls
     """
 
+    def get_by_natural_key(self, title):
+        return self.get(title=title)
+
     def change_status_poll(self, poll, status_name):
         """Change status of poll in place."""
 
