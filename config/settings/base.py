@@ -275,3 +275,7 @@ DEFAULT_FROM_EMAIL = 'programmerHelper@gmail.com'
 # ----------------------------------------
 
 GEOIP_PATH = str(BASE_DIR.child('static', 'project', 'files'))
+
+# SERIALIZERS
+#
+SERIALIZATION_MODULES = {'csv': 'apps.export_import_models.serializers.csv'}

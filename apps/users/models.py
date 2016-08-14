@@ -111,7 +111,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         to_field='name',
         on_delete=models.PROTECT,
     )
-    signature = models.CharField(_('Signature'), max_length=50, default='', blank=True)
+    signature = models.CharField(_('Signature'), max_length=50, default='')
 
     # presents in web
     presents_on_gmail = models.URLField(_('Presents on google services'), default='')
