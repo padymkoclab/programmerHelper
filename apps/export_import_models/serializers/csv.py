@@ -2,6 +2,7 @@
 Serialize data to/from JSON
 """
 
+import itertools
 import json
 import datetime
 import decimal
@@ -11,8 +12,10 @@ import uuid
 
 from django.core.serializers.base import DeserializationError
 from django.core.serializers.python import (
-    Deserializer as PythonDeserializer, Serializer as PythonSerializer,
+    Deserializer as PythonDeserializer,
+    Serializer as PythonSerializer,
 )
+from django.db import DEFAULT_DB_ALIAS, models
 from django.utils import six
 from django.utils.timezone import is_aware
 from django.utils.encoding import is_protected_type
@@ -26,7 +29,7 @@ class Serializer(PythonSerializer):
     def serialize(self, queryset, **options):
 
         self.csv_kwargs = options.copy()
-        self.queryset = queryset
+        self.first_instance = queryset[0]
 
         self.set_obj_fields()
         self.set_all_fields()
@@ -48,14 +51,21 @@ class Serializer(PythonSerializer):
     def end_object(self, obj):
 
         # self._current has the field data
+
         self.writer.writerow(self._current)
         self._current = None
 
     def set_obj_fields(self):
-        model = self.queryset.model._meta.concrete_model
-        fields = model._meta.concrete_fields
-        list_fields = [field for field in fields]
-        self.obj_fields = [field.name for field in list_fields]
+
+        #
+        model = self.first_instance._meta.concrete_model
+
+        #
+        local_fields = model._meta.local_fields
+        many_to_many_fields = model._meta.many_to_many
+
+        #
+        self.obj_fields = [field.name for field in itertools.chain(local_fields, many_to_many_fields)]
 
     def set_all_fields(self):
         self.all_fields = ['model'] + self.obj_fields
@@ -73,14 +83,16 @@ class Serializer(PythonSerializer):
         return super(PythonSerializer, self).getvalue()
 
     def handle_field(self, obj, field):
+
         value = field.value_from_object(obj)
+
         # Protected types (i.e., primitives like None, numbers, dates,
         # and Decimals) are passed through as is. All other values are
         # converted to string first.
         if is_protected_type(value):
-            self._current[field.name] = '${0}$'.format(value)
+            self._current[field.name] = value
         else:
-            self._current[field.name] = '%{0}%'.format(field.value_to_string(obj))
+            self._current[field.name] = field.value_to_string(obj)
 
     # def handle_fk_field(self, obj, field):
     #     if self.use_natural_foreign_keys and hasattr(field.remote_field.model, 'natural_key'):
@@ -105,54 +117,13 @@ class Serializer(PythonSerializer):
     #                            for related in getattr(obj, field.name).iterator()]
 
 
-def Deserializer(stream_or_string, **options):
+def Deserializer(object_list, **options):
     """
-    Deserialize a stream or string of JSON data.
-    """
-    if not isinstance(stream_or_string, (bytes, six.string_types)):
-        stream_or_string = stream_or_string.read()
-    if isinstance(stream_or_string, bytes):
-        stream_or_string = stream_or_string.decode('utf-8')
-    try:
-        objects = json.loads(stream_or_string)
-        for obj in PythonDeserializer(objects, **options):
-            yield obj
-    except GeneratorExit:
-        raise
-    except Exception as e:
-        # Map to deserializer error
-        six.reraise(DeserializationError, DeserializationError(e), sys.exc_info()[2])
+    Deserialize simple Python objects back into Django ORM instances.
 
-
-class DjangoJSONEncoder(json.JSONEncoder):
-    """
-    JSONEncoder subclass that knows how to encode date/time, decimal types and UUIDs.
+    It's expected that you pass the Python objects themselves (instead of a
+    stream or a string) to the constructor
     """
 
-    def default(self, o):
-        # See "Date Time String Format" in the ECMA-262 specification.
-        if isinstance(o, datetime.datetime):
-            r = o.isoformat()
-            if o.microsecond:
-                r = r[:23] + r[26:]
-            if r.endswith('+00:00'):
-                r = r[:-6] + 'Z'
-            return r
-        elif isinstance(o, datetime.date):
-            return o.isoformat()
-        elif isinstance(o, datetime.time):
-            if is_aware(o):
-                raise ValueError("JSON can't represent timezone-aware times.")
-            r = o.isoformat()
-            if o.microsecond:
-                r = r[:12]
-            return r
-        elif isinstance(o, decimal.Decimal):
-            return str(o)
-        elif isinstance(o, uuid.UUID):
-            return str(o)
-        else:
-            return super(DjangoJSONEncoder, self).default(o)
-
-# Older, deprecated class name (for backwards compatibility purposes).
-DateTimeAwareJSONEncoder = DjangoJSONEncoder
+    db = options.pop('using', DEFAULT_DB_ALIAS)
+    ignore = options.pop('ignorenonexistent', False)

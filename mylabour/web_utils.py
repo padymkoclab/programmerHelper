@@ -1,18 +1,20 @@
 
-import urllib
-import unittest
 import subprocess
 import webbrowser
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
 
-class TemproraryHttpServer:
+PORT = 7000
+HOST = '127.0.0.1'
+SERVER_ADDRESS = '{host}:{port}'.format(host=HOST, port=PORT)
+FULL_SERVER_ADDRESS = 'http://' + SERVER_ADDRESS
+
+
+def TemproraryHttpServer(page_content_type, raw_data):
     """
     A simpe, temprorary http web server on the pure Python 3.
     It has features for processing pages with a XML or HTML content.
     """
-
-    PORT = 7000
 
     class HTTPServerRequestHandler(BaseHTTPRequestHandler):
         """
@@ -35,47 +37,43 @@ class TemproraryHttpServer:
 
             return
 
-    def __init__(self, page_content_type, *args, **kwargs):
+    if page_content_type not in ['html', 'xml']:
+        raise ValueError('This server can serve only HTML or XML pages.')
 
-        if page_content_type not in ['html', 'xml']:
-            raise ValueError('This server can serve only HTML or XML pages.')
+    page_content_type = page_content_type
 
-        self.page_content_type = page_content_type
+    # kill a process, hosted on a localhost:PORT
+    subprocess.call(['fuser', '-k', '{0}/tcp'.format(PORT)])
 
-    def __call__(self, raw_data):
+    # Started creating a temprorary http server.
+    httpd = HTTPServer((HOST, PORT), HTTPServerRequestHandler)
 
-        # keep passed data
-        self.raw_data = raw_data
+    # run a temprorary http server
+    httpd.serve_forever()
 
-        # kill a process, hosted on a localhost:PORT
-        self._kill_used_port()
 
-        # run a server
-        self.run_http_webserver()
+if __name__ == '__main__':
 
-    def run_http_webserver(self):
+    def run_xml_server():
 
-        # 'Started creating a temprorary http server.
-        server_address = ('127.0.0.1', self.PORT)
-
-        self.HTTPServerRequestHandler = self.HTTPServerRequestHandler
-        httpd = HTTPServer(server_address, self.HTTPServerRequestHandler)
-
-        # run a temprorary http server
-        httpd.serve_forever()
+        xml_data = """
+        <note>
+        <to>Tove</to>
+        <from>Jani</from>
+        <heading>Reminder</heading>
+        <body>Don't forget me this weekend!</body>
+        </note>
+        """
 
         # open in a browser URL and see a result
-        url = 'http://127.0.0.1:{0}'.format(self.PORT)
-        webbrowser.open(url)
+        webbrowser.open(FULL_SERVER_ADDRESS)
 
-    def _kill_used_port(self):
-        subprocess.call(['fuser', '-k', '{0}/tcp'.format(self.PORT)])
+        # run server
+        TemproraryHttpServer('xml', xml_data)
 
+    def run_html_server():
 
-class TemproraryHttpServerTest(unittest.TestCase):
-
-    def setUp(self):
-        self.html_raw_data = """
+        html_data = """
         <!DOCTYPE html>
         <html>
         <head>
@@ -88,20 +86,13 @@ class TemproraryHttpServerTest(unittest.TestCase):
         </html>
         """
 
-        self.xml_raw_data = """
-        <note>
-        <to>Tove</to>
-        <from>Jani</from>
-        <heading>Reminder</heading>
-        <body>Don't forget me this weekend!</body>
-        </note>
-        """
+        # open in a browser URL and see a result
+        webbrowser.open(FULL_SERVER_ADDRESS)
 
-    def test_succefull_request_to_xml_page(self):
-        page_content_type = 'xml'
-        TemproraryHttpServer(page_content_type)(self.xml_raw_data)
-        urllib.urlopen()
+        # run server
+        TemproraryHttpServer('html', html_data)
 
+    # choice needed server:
 
-if __name__ == '__main__':
-    unittest.main()
+    # run_xml_server()
+    # run_html_server()
