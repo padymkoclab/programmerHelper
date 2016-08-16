@@ -1,4 +1,5 @@
 
+from django.contrib.contenttypes.models import ContentType
 from django.core.urlresolvers import reverse
 from django import template
 
@@ -12,16 +13,22 @@ register = template.Library()
 def make_url_for_export_data_model(context):
 
     opts = context['opts']
-    app_label, model_name = opts.app_label, opts.model_name
+    contenttype_model = ContentType.objects.get_for_model(opts.model)
 
+    # get a ChangeList object
     cl = context['cl']
+
+    # get a current queryset in the ChangeList
     queryset = cl.queryset
+
+    if not queryset:
+        return '#'
+
     pks_separated_commas = get_string_primary_keys_separated_commas(queryset)
 
     return reverse(
-        'export_import_models:export_model',
+        'export_import_models:export',
         kwargs={
-            'app_label': app_label,
-            'model_name': model_name,
+            'contenttype_model_pk': contenttype_model.pk,
             'pks_separated_commas': pks_separated_commas,
         })

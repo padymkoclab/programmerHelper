@@ -459,7 +459,7 @@ class ChoiceAdmin(admin.ModelAdmin):
         [
             Choice._meta.verbose_name, {
                 'fields': [
-                    'poll',
+                    'get_poll_admin_link_as_html',
                     'text_choice',
                     'get_count_votes',
                     'get_voters_with_get_admin_links_as_html',
@@ -467,7 +467,7 @@ class ChoiceAdmin(admin.ModelAdmin):
         ]
     ]
     readonly_fields = [
-        'poll',
+        'get_poll_admin_link_as_html',
         'text_choice',
         'get_count_votes',
         'get_voters_with_get_admin_links_as_html',
@@ -505,6 +505,10 @@ class ChoiceAdmin(admin.ModelAdmin):
             ((voter.get_admin_url(), voter.get_full_name()) for voter in voters)
         )
     get_voters_with_get_admin_links_as_html.short_description = _('Voters')
+
+    def get_poll_admin_link_as_html(self, obj):
+        return format_html('<a href="{}">{}</a>', obj.poll.get_admin_url(), obj.poll)
+    get_poll_admin_link_as_html.short_description = _('Poll')
 
 
 class VoteAdmin(admin.ModelAdmin):

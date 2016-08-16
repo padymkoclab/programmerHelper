@@ -18,7 +18,7 @@
             Title and message for user
         {% endcomment %}
         <div>
-            <h1>{% trans "Export data" %}</h1>
+            <h1 class="lead">{% trans "Export data" %}</h1>
             <div class="alert alert-info">
                 {% blocktrans count count_objects=queryset.count %}
                     You trying made export <strong class="text-danger">{{ count_objects }}</strong> object to other formats.
@@ -31,7 +31,7 @@
         {% comment %}
             A table the selected objects for export
         {% endcomment %}
-        <button data-toggle="collapse" data-target="#div_table_objects" class="btn btn-default btn-xs pull-right">{% trans "Collapse/Show" %}</button>
+        <button data-toggle="collapse" data-target="#div_table_objects" class="btn btn-default btn-xs pull-right">{% trans "Collapse/show objects" %}</button>
         <div class="clearfix"></div>
         <div id="div_table_objects" class="collapse in">
             <table class="table table-hover" id="table_objects">
@@ -58,7 +58,7 @@
             {% comment %}
                 A hidden input with primary keys object for export, separated commas.
             {% endcomment %}
-            <input type="hidden" name="content_type_model_pk" value="{{ content_type_model_pk }}">
+            <input type="hidden" name="contenttype_model_pk" value="{{ contenttype_model_pk }}">
             <input type="hidden" name="pks_separated_commas" value="{{ pks_separated_commas }}">
 
             {% comment %}
@@ -122,18 +122,9 @@
                                     CSV
                                 </label>
                             </td>
-                            <td>
-                                <label for="format_export_data_xlsx">
-                                    <input type="radio" name="format_export_data" value="xlsx" id="format_export_data_xlsx">
-                                    XLSX
-                                </label>
-                            </td>
                         </tr>
                     </tbody>
                 </table>
-                <div class="alert alert-danger">
-                    {% trans "Export data in XLSX or CSV does not support preview" %}
-                </div>
             </div>
 
             {% comment %}
@@ -151,5 +142,5 @@
 
 {% block extrajs %}
     {{ block.super }}
-    <script src="{% static 'export_import_models/js/export_import_models.js' %} " type="text/javascript" charset="utf-8"></script>
+    <script src="{% static 'export_import_models/js/export.js' %} " type="text/javascript" charset="utf-8"></script>
 {% endblock %}
