@@ -55,7 +55,7 @@ from apps.utilities.admin import UtilityCategoryAdmin, UtilityAdmin
 from apps.utilities.models import UtilityCategory, Utility
 
 
-class ProgrammerHelperSite(admin.AdminSite):
+class AdminSite(admin.AdminSite):
     site_title = _('ProgrammerHelper administration')
     site_header = site_title
     index_title = _('AdminIndex')
@@ -93,82 +93,82 @@ class ProgrammerHelperSite(admin.AdminSite):
         return TemplateResponse(request, self.app_index_template or places_for_search, context)
 
 
-ProgrammerHelperAdminSite = ProgrammerHelperSite(name='admin')
+AdminSite = AdminSite(name='admin')
 
 
 # Register models
 #
 # users
-ProgrammerHelperAdminSite.register(Group)
+AdminSite.register(Group)
 
 # users
-ProgrammerHelperAdminSite.register(User, UserAdmin)
-ProgrammerHelperAdminSite.register(UserLevel, UserLevelAdmin)
+AdminSite.register(User, UserAdmin)
+AdminSite.register(UserLevel, UserLevelAdmin)
 
 # badges
-ProgrammerHelperAdminSite.register(Badge, BadgeAdmin)
-ProgrammerHelperAdminSite.register(GettingBadge, GettingBadgeAdmin)
+AdminSite.register(Badge, BadgeAdmin)
+AdminSite.register(GettingBadge, GettingBadgeAdmin)
 
 # utilities
-ProgrammerHelperAdminSite.register(UtilityCategory, UtilityCategoryAdmin)
-ProgrammerHelperAdminSite.register(Utility, UtilityAdmin)
+AdminSite.register(UtilityCategory, UtilityCategoryAdmin)
+AdminSite.register(Utility, UtilityAdmin)
 
 # tester
-ProgrammerHelperAdminSite.register(TestingSuit, TestingSuitAdmin)
-ProgrammerHelperAdminSite.register(TestingPassage, TestingPassageAdmin)
-ProgrammerHelperAdminSite.register(TestingQuestion, TestingQuestionAdmin)
-ProgrammerHelperAdminSite.register(TestingVariant, TestingVariantAdmin)
+AdminSite.register(TestingSuit, TestingSuitAdmin)
+AdminSite.register(TestingPassage, TestingPassageAdmin)
+AdminSite.register(TestingQuestion, TestingQuestionAdmin)
+AdminSite.register(TestingVariant, TestingVariantAdmin)
 
 # solution
-ProgrammerHelperAdminSite.register(SolutionCategory, SolutionCategoryAdmin)
-ProgrammerHelperAdminSite.register(Solution, SolutionAdmin)
+AdminSite.register(SolutionCategory, SolutionCategoryAdmin)
+AdminSite.register(Solution, SolutionAdmin)
 
 # question
-ProgrammerHelperAdminSite.register(Question, QuestionAdmin)
-ProgrammerHelperAdminSite.register(Answer, AnswerAdmin)
+AdminSite.register(Question, QuestionAdmin)
+AdminSite.register(Answer, AnswerAdmin)
 
 # articles
-ProgrammerHelperAdminSite.register(Article, ArticleAdmin)
-ProgrammerHelperAdminSite.register(ArticleSubsection, ArticleSubsectionAdmin)
+AdminSite.register(Article, ArticleAdmin)
+AdminSite.register(ArticleSubsection, ArticleSubsectionAdmin)
 
 # tags
-ProgrammerHelperAdminSite.register(Tag, TagAdmin)
+AdminSite.register(Tag, TagAdmin)
 
 # forum
-ProgrammerHelperAdminSite.register(ForumSection, ForumSectionAdmin)
-ProgrammerHelperAdminSite.register(ForumTopic, ForumTopicAdmin)
-ProgrammerHelperAdminSite.register(ForumPost, ForumPostAdmin)
+AdminSite.register(ForumSection, ForumSectionAdmin)
+AdminSite.register(ForumTopic, ForumTopicAdmin)
+AdminSite.register(ForumPost, ForumPostAdmin)
 
 # snippets
-ProgrammerHelperAdminSite.register(Snippet, SnippetAdmin)
+AdminSite.register(Snippet, SnippetAdmin)
 
 # newsletters
-ProgrammerHelperAdminSite.register(Newsletter, NewsletterAdmin)
+AdminSite.register(Newsletter, NewsletterAdmin)
 
 # books
-ProgrammerHelperAdminSite.register(Book, BookAdmin)
-ProgrammerHelperAdminSite.register(Writter, WritterAdmin)
+AdminSite.register(Book, BookAdmin)
+AdminSite.register(Writter, WritterAdmin)
 
 # cources
-# ProgrammerHelperAdminSite.register(Course, CourseAdmin)
-# ProgrammerHelperAdminSite.register(Lesson, LessonAdmin)
-# ProgrammerHelperAdminSite.register(Sublesson, SublessonAdmin)
+# AdminSite.register(Course, CourseAdmin)
+# AdminSite.register(Lesson, LessonAdmin)
+# AdminSite.register(Sublesson, SublessonAdmin)
 
 # polls
-ProgrammerHelperAdminSite.register(Poll, PollAdmin)
-ProgrammerHelperAdminSite.register(Choice, ChoiceAdmin)
-ProgrammerHelperAdminSite.register(Vote, VoteAdmin)
+AdminSite.register(Poll, PollAdmin)
+AdminSite.register(Choice, ChoiceAdmin)
+AdminSite.register(Vote, VoteAdmin)
 
 # Apps with generic models
-ProgrammerHelperAdminSite.register(Comment, CommentAdmin)
-ProgrammerHelperAdminSite.register(Opinion, OpinionAdmin)
-ProgrammerHelperAdminSite.register(Mark, MarkAdmin)
+AdminSite.register(Comment, CommentAdmin)
+AdminSite.register(Opinion, OpinionAdmin)
+AdminSite.register(Mark, MarkAdmin)
 
 # activity
-ProgrammerHelperAdminSite.register(Activity, ActivityAdmin)
+AdminSite.register(Activity, ActivityAdmin)
 
 # notifications
-ProgrammerHelperAdminSite.register(Notification, NotificationAdmin)
+AdminSite.register(Notification, NotificationAdmin)
 
 # sessions
-ProgrammerHelperAdminSite.register(ExpandedSession, ExpandedSessionAdmin)
+AdminSite.register(ExpandedSession, ExpandedSessionAdmin)

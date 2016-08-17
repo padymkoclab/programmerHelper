@@ -20,7 +20,7 @@ from django.core import serializers
 
 import magic
 
-from config.admin import ProgrammerHelperAdminSite
+from config.admin import AdminSite
 from mylabour.utils import get_filename_with_datetime, create_logger_by_filename
 
 from .forms import UploadSerializedFileForm
@@ -62,7 +62,7 @@ class ExportTemplateView(TemplateView):
 
         # For only admin theme Django-Suit
         # It need namespace for display menu in left sidebar
-        request.current_app = ProgrammerHelperAdminSite.name
+        request.current_app = AdminSite.name
 
         return super(ExportTemplateView, self).get(request, *args, **kwargs)
 
@@ -77,13 +77,13 @@ class ExportTemplateView(TemplateView):
         context['pks_separated_commas'] = self.pks_separated_commas
 
         # for access to the django.jQuery() on page
-        context['django_admin_media'] = admin.ModelAdmin(get_user_model(), ProgrammerHelperAdminSite).media
+        context['django_admin_media'] = admin.ModelAdmin(get_user_model(), AdminSite).media
 
         # pass a title of the page
         model_verbose_name = self.model._meta.verbose_name
         context['title'] = _('Export data from the model "{0}"').format(model_verbose_name)
 
-        context.update(ProgrammerHelperAdminSite.each_context(self.request))
+        context.update(AdminSite.each_context(self.request))
 
         return context
 
@@ -164,11 +164,13 @@ class ImportTemplateView(TemplateView):
 
     template_name = "export_import_models/admin/import.html"
 
+    valid_deserialized_objects = list()
+
     def dispatch(self, request, *args, **kwargs):
 
         # For only admin theme Django-Suit
         # It need namespace for display menu in left sidebar
-        request.current_app = ProgrammerHelperAdminSite.name
+        request.current_app = AdminSite.name
 
         return super(ImportTemplateView, self).dispatch(request, *args, **kwargs)
 
@@ -188,6 +190,8 @@ class ImportTemplateView(TemplateView):
             form = UploadSerializedFileForm(request.POST, request.FILES)
             context = self.get_context_data()
             context['form'] = form
+
+            self.valid_deserialized_objects = list()
 
             if form.is_valid():
                 file = request.FILES['file']
@@ -209,7 +213,6 @@ class ImportTemplateView(TemplateView):
 
                 lst = list()
 
-                lst_pks_valid_deserialized_objects = list()
                 for num_obj, deserialized_object in enumerate(deserialized_objects):
 
                     obj = deserialized_object.object
@@ -221,7 +224,7 @@ class ImportTemplateView(TemplateView):
                     )
                     try:
                         obj.full_clean()
-                        lst_pks_valid_deserialized_objects.append(obj.pk)
+                        self.valid_deserialized_objects.append(obj)
                     except ValidationError as errors:
                         obj_detail['is_valid'] = False
                         obj_detail['errors'] = errors
@@ -234,8 +237,7 @@ class ImportTemplateView(TemplateView):
                 format_file_for_import = file_extension.upper()
                 count_importing_objects = num_obj + 1
 
-                count_valid_objects = len(lst_pks_valid_deserialized_objects)
-                pks_valid_deserialized_objects = ','.join(map(str, lst_pks_valid_deserialized_objects))
+                count_valid_objects = len(self.valid_deserialized_objects)
 
                 context['details_import'] = dict(
                     verbose_application_name=verbose_application_name,
@@ -243,7 +245,6 @@ class ImportTemplateView(TemplateView):
                     format_file_for_import=format_file_for_import,
                     count_importing_objects=count_importing_objects,
                     count_valid_objects=count_valid_objects,
-                    pks_valid_deserialized_objects=pks_valid_deserialized_objects,
                 )
 
             logger.info('User made import data in model')
@@ -252,12 +253,7 @@ class ImportTemplateView(TemplateView):
 
         elif 'submit_apply_import' in request.POST:
 
-            pks_valid_deserialized_objects = request.POST.get('pks_valid_deserialized_objects')
-
-            lst_pks_valid_deserialized_objects = pks_valid_deserialized_objects.split(',')
-            import ipdb; ipdb.set_trace()
-
-            for valid_deserialized_object in valid_deserialized_objects:
+            for valid_deserialized_object in self.valid_deserialized_objects:
                 valid_deserialized_object.full_clean()
                 valid_deserialized_object.save()
 

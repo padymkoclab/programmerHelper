@@ -3,6 +3,7 @@ from io import BytesIO
 import random
 import textwrap
 
+from django.utils.text import force_text
 from django.utils.translation import ugettext as _
 from django.utils import timezone
 from django.http import HttpResponse
@@ -271,7 +272,7 @@ class ExcelReport(object):
     def write_title(self, title, sheet, count_fields):
         """Write title for passed sheet."""
 
-        title = str(title)
+        title = force_text(title)
 
         # since numeration in Excel begin from 0, then a title`s length must be decrement on 1
         title_length = count_fields - 1
@@ -332,7 +333,7 @@ class ExcelReport(object):
         max_count_rows = 0
         for field_name in all_field_names:
             val = getattr(obj, field_name, '')
-            val = str(val)
+            val = force_text(val)
             count_rows = len(textwrap.wrap(val, 30))
             if max_count_rows < count_rows:
                 max_count_rows = count_rows
@@ -381,9 +382,9 @@ class ExcelReport(object):
             sheet.write('A17', _('User'), self.get_formats['table_cell_header'])
             sheet.write('B17', latest_vote.user.get_full_name(), self.get_formats['table_cell_centered'])
             sheet.write('A18', _('Poll'), self.get_formats['table_cell_header'])
-            sheet.write('B18', str(latest_vote.poll), self.get_formats['table_cell_centered'])
+            sheet.write('B18', force_text(latest_vote.poll), self.get_formats['table_cell_centered'])
             sheet.write('A19', _('Choice'), self.get_formats['table_cell_header'])
-            sheet.write('B19', str(latest_vote.choice), self.get_formats['table_cell_justify_text'])
+            sheet.write('B19', force_text(latest_vote.choice), self.get_formats['table_cell_justify_text'])
             sheet.write('A20', _('Date voting'), self.get_formats['table_cell_header'])
             sheet.write(
                 'B20',
@@ -527,7 +528,7 @@ class ExcelReport(object):
                 _('Poll with id'),
                 self.get_formats['table_cell_bold']
             )
-            sheet.write(num_row, row_len, str(poll.pk), self.get_formats['table_cell_centered'])
+            sheet.write(num_row, row_len, force_text(poll.pk), self.get_formats['table_cell_centered'])
             sheet.set_row(num_row, 30)
 
             num_row += 1
@@ -572,7 +573,7 @@ class ExcelReport(object):
                     choice, count_votes = choice_and_count_votes
                     sheet.write(num_row, 0, i, self.get_formats['table_cell_centered'])
                     sheet.write(num_row, 1, count_votes, self.get_formats['table_cell_centered'])
-                    sheet.write(num_row, 2, str(choice), self.get_formats['table_cell_justify_text'])
+                    sheet.write(num_row, 2, force_text(choice), self.get_formats['table_cell_justify_text'])
                     sheet.set_row(num_row, 40)
             else:
                 num_row += 1
@@ -633,7 +634,7 @@ class ExcelReport(object):
 
         # convert UUID to str, because Excel doesn`t have support this type of data
         # and write id as str
-        sheet.write(num_row, 1, str(poll.pk), self.get_formats['table_cell_centered'])
+        sheet.write(num_row, 1, force_text(poll.pk), self.get_formats['table_cell_centered'])
 
         sheet.write(num_row, 2, poll.title, self.get_formats['table_cell_centered'])
         sheet.write(num_row, 3, poll.slug, self.get_formats['table_cell_justify_text'])
@@ -669,10 +670,10 @@ class ExcelReport(object):
 
         # convert UUID to str, because Excel doesn`t have support this type of data
         # and write id as str
-        sheet.write(num_row, 1, str(choice.pk), self.get_formats['table_cell_centered'])
+        sheet.write(num_row, 1, force_text(choice.pk), self.get_formats['table_cell_centered'])
 
         sheet.write(num_row, 2, choice.text_choice, self.get_formats['table_cell_justify_text'])
-        sheet.write(num_row, 3, str(choice.poll), self.get_formats['table_cell_justify_text'])
+        sheet.write(num_row, 3, force_text(choice.poll), self.get_formats['table_cell_justify_text'])
         sheet.write(num_row, 4, choice.get_count_votes(), self.get_formats['table_cell_centered'])
 
     def write_vote(self, sheet, num_row, num_obj, vote):
@@ -683,11 +684,11 @@ class ExcelReport(object):
 
         # convert UUID to str, because Excel doesn`t have support this type of data
         # and write id as str
-        sheet.write(num_row, 1, str(vote.pk), self.get_formats['table_cell_centered'])
+        sheet.write(num_row, 1, force_text(vote.pk), self.get_formats['table_cell_centered'])
 
         sheet.write(num_row, 2, vote.user.get_full_name(), self.get_formats['table_cell_justify_text'])
-        sheet.write(num_row, 3, str(vote.poll), self.get_formats['table_cell_justify_text'])
-        sheet.write(num_row, 4, str(vote.choice), self.get_formats['table_cell_justify_text'])
+        sheet.write(num_row, 3, force_text(vote.poll), self.get_formats['table_cell_justify_text'])
+        sheet.write(num_row, 4, force_text(vote.choice), self.get_formats['table_cell_justify_text'])
         sheet.write(
             num_row,
             5,
@@ -703,7 +704,7 @@ class ExcelReport(object):
 
         # convert UUID to str, because Excel doesn`t have support this type of data
         # and write id as str
-        sheet.write(num_row, 1, str(voter.pk), self.get_formats['table_cell_centered'])
+        sheet.write(num_row, 1, force_text(voter.pk), self.get_formats['table_cell_centered'])
 
         sheet.write(num_row, 2, voter.get_full_name(), self.get_formats['table_cell_centered'])
         sheet.write(num_row, 3, User.polls.get_count_votes_of_user(voter), self.get_formats['table_cell_centered'])
@@ -1257,8 +1258,8 @@ class PollPDFReport(object):
         if latest_vote is not None:
             latest_voter = textwrap.fill(latest_vote.user.get_full_name(), 50)
             latest_date_voting = convert_date_to_django_date_format(latest_vote.date_voting)
-            latest_poll = textwrap.fill(str(latest_vote.poll), 50)
-            latest_choice = textwrap.fill(str(latest_vote.choice), 50)
+            latest_poll = textwrap.fill(force_text(latest_vote.poll), 50)
+            latest_choice = textwrap.fill(force_text(latest_vote.choice), 50)
         else:
             latest_voter = ''
             latest_date_voting = ''
@@ -1309,7 +1310,7 @@ class PollPDFReport(object):
 
             for poll in self.all_polls:
                 row = [
-                    textwrap.fill(str(poll.pk), 10),
+                    textwrap.fill(force_text(poll.pk), 10),
                     textwrap.fill(poll.title, 20),
                     textwrap.fill(poll.description, 20),
                     poll.get_status_display(),
@@ -1348,9 +1349,9 @@ class PollPDFReport(object):
 
             for choice in self.all_choices:
                 row = [
-                    textwrap.fill(str(choice.pk), 10),
+                    textwrap.fill(force_text(choice.pk), 10),
                     textwrap.fill(choice.text_choice, 30),
-                    textwrap.fill(str(choice.poll), 30),
+                    textwrap.fill(force_text(choice.poll), 30),
                     choice.get_count_votes(),
                 ]
                 data.append(row)
@@ -1390,9 +1391,9 @@ class PollPDFReport(object):
 
             for vote in self.all_votes:
                 row = [
-                    textwrap.fill(str(vote.pk), 10),
-                    textwrap.fill(str(vote.poll), 20),
-                    textwrap.fill(str(vote.choice), 20),
+                    textwrap.fill(force_text(vote.pk), 10),
+                    textwrap.fill(force_text(vote.poll), 20),
+                    textwrap.fill(force_text(vote.choice), 20),
                     textwrap.fill(vote.user.get_full_name(), 20),
                     textwrap.fill(convert_date_to_django_date_format(vote.date_voting), 10),
                 ]
@@ -1524,9 +1525,9 @@ class PollPDFReport(object):
         # create legend
         legend = Legend()
         legend.colorNamePairs = [
-            (colors.red, str(Poll.CHOICES_STATUS._display_map['closed'])),
-            (colors.green, str(Poll.CHOICES_STATUS._display_map['opened'])),
-            (colors.blue, str(Poll.CHOICES_STATUS._display_map['draft'])),
+            (colors.red, force_text(Poll.CHOICES_STATUS._display_map['closed'])),
+            (colors.green, force_text(Poll.CHOICES_STATUS._display_map['opened'])),
+            (colors.blue, force_text(Poll.CHOICES_STATUS._display_map['draft'])),
         ]
         legend.x = canvas.width / 4
         legend.y = 0
@@ -1743,7 +1744,7 @@ class PollPDFReport(object):
         """ """
 
         for choice in choices:
-            choice = str(choice)
+            choice = force_text(choice)
             choice = textwrap.shorten(choice, 100)
             choice = textwrap.fill(choice, 55)
             yield choice

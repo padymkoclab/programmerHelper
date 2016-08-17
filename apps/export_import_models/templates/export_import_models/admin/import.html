@@ -105,7 +105,6 @@
                         </div>
                         <form action="" method="POST">
                             {% csrf_token %}
-                            <input type="hidden" name="pks_valid_deserialized_objects" value="{{ details_import.pks_valid_deserialized_objects }}">
                             <button class="btn btn-warning" type="submit" name="submit_apply_import">{% trans "Apply" %}</button>
                         </form>
                     {% endif %}
