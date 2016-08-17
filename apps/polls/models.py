@@ -204,6 +204,8 @@ class Choice(models.Model):
 
     def get_truncated_text_choice(self):
         return truncatechars(self.text_choice, 90)
+    get_truncated_text_choice.admin_order_field = 'text_choice'
+    get_truncated_text_choice.short_description = _('Text choice')
 
 
 class Vote(models.Model):

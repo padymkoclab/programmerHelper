@@ -29,7 +29,7 @@ User = get_user_model()
 
 # only for admin theme Django-Suit
 # it is give feature display menu in left sidebar
-def add_current_app_to_request_in_admin_view(view):
+def add_current_app_to_request_in_admin_view_for_django_suit(view):
     @functools.wraps(view)
     def wrapped_view(modelAdmin, request, **kwargs):
 
@@ -115,10 +115,7 @@ class PollAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
 
         qs = super(PollAdmin, self).get_queryset(request)
-        # for a ability sorting, add addition annotation for determination for each poll:
-        #   count choice
-        #   count votes
-        #   date latest voting
+        # own annotations
         qs = qs.polls_with_count_choices_and_votes_and_date_lastest_voting()
         return qs
 
@@ -137,7 +134,7 @@ class PollAdmin(admin.ModelAdmin):
 
         # if poll has votes, add in context of view a chart of result of a poll
         poll = get_object_or_404(Poll, pk=object_id)
-        if poll.votes.count() > 0:
+        if poll.votes.count():
             extra_context['chart_poll_result'] = self._build_chart_poll_result(object_id)
 
         return super(PollAdmin, self).change_view(request, object_id, form_url, extra_context)
@@ -176,17 +173,11 @@ class PollAdmin(admin.ModelAdmin):
         # create additional urls as django admin`s standart
 
         # 'polls_poll_preview'
-        preview = '{0}_{1}_{2}'.format(
-            self.model._meta.app_label, self.model._meta.model_name, 'preview'
-        )
-        # 'polls_poll_make_report'
-        make_report = '{0}_{1}_{2}'.format(
-            self.model._meta.app_label, self.model._meta.model_name, 'make_report'
-        )
-        # 'polls_poll_statistics'
-        statistics = '{0}_{1}_{2}'.format(
-            self.model._meta.app_label, self.model._meta.model_name, 'statistics'
-        )
+        preview = '{0}_{1}_{2}'.format(self.model._meta.app_label, self.model._meta.model_name, 'preview')
+        # 'polls_make_report'
+        make_report = '{0}_{1}'.format(self.model._meta.app_label, 'make_report')
+        # 'polls_statistics'
+        statistics = '{0}_{1}'.format(self.model._meta.app_label, 'statistics')
 
         # add urls
         additional_urls = [
@@ -198,13 +189,109 @@ class PollAdmin(admin.ModelAdmin):
         # since the second will be capture more needed urls
         return additional_urls + urls
 
-    @add_current_app_to_request_in_admin_view
+    def get_listing_voters_with_admin_url_and_count_votes(self):
+        """Return a listing of voters as links to their admin pages, full names and count votes.
+        Used in view statistics."""
+
+        # get all voters
+        all_voters = User.polls.get_all_voters()
+
+        # if no voters - return corresponding message
+        if not all_voters:
+            msg = _('No-one yet not participated in polls.')
+            return format_html('<i>{0}</i>', msg)
+
+        # else return a listing voters as a links with url to admin_url of a each voter,
+        # full name of voter and count votes its
+        html_voters = list()
+        for voter in all_voters:
+            admin_url = voter.get_admin_url()
+            voter_full_name = voter.get_full_name()
+            count_votes = User.polls.get_count_votes_of_user(voter)
+
+            # make a translatable text for a count votes
+            translated_part = ungettext(
+                '(%(count_votes)d vote)',
+                '(%(count_votes)d votes)',
+                count_votes,
+            ) % {
+                'count_votes': count_votes,
+            }
+
+            # pattern for link
+            pattern = '<a href="{0}">{1} {2}</a>'.format(admin_url, voter_full_name, translated_part)
+
+            # create html representation for voter and add it to the listing voters,
+            # prepared to dislay on page
+            html_voter = format_html(pattern, admin_url, voter_full_name, count_votes)
+            html_voters.append(html_voter)
+
+        # make join all voters in a safe html
+        html_listing_voters = mark_safe(conditional_escape(', ').join(html_voters))
+        return html_listing_voters
+
+    def get_most_popular_choice_or_choices_as_html(self, obj):
+        """Method-wrapper for method get_most_popular_choice_or_choices() of model Poll.
+        Return result of the method get_most_popular_choice_or_choices() as humen-readable view HTML."""
+
+        most_popular_choice_or_choices = obj.get_most_popular_choice_or_choices()
+
+        if len(most_popular_choice_or_choices) > 1:
+
+            lines = list()
+            for choice in most_popular_choice_or_choices:
+                format_string = ungettext(
+                    '%(truncated_text_choice)s (%(count_votes)d vote)',
+                    '%(truncated_text_choice)s (%(count_votes)d votes)',
+                    choice.count_votes,
+                ) % {
+                    'count_votes': choice.count_votes,
+                    'truncated_text_choice': choice.get_truncated_text_choice()
+                }
+
+                line = format_html('<li style="list-style: none;">{0}</li>', format_string)
+                lines.append(line)
+            return mark_safe(conditional_escape('').join(lines))
+        elif len(most_popular_choice_or_choices) == 1:
+
+            popular_choice = most_popular_choice_or_choices[0]
+
+            string = ungettext(
+                '%(truncated_text_choice)s (%(count_votes)d vote)',
+                '%(truncated_text_choice)s (%(count_votes)d votes)',
+                popular_choice.count_votes,
+            ) % {
+                'truncated_text_choice': popular_choice.get_truncated_text_choice(),
+                'count_votes': popular_choice.count_votes,
+            }
+
+            return format_html('<li style="list-style: none;">{0}</li>', string)
+        else:
+            return format_html('<i>{0}</i>', _('Poll does not have a choices at all.'))
+    get_most_popular_choice_or_choices_as_html.short_description = _('Most popular choice or choices')
+
+    def colored_status_display(self, obj):
+        """ """
+
+        # choice a color
+        if obj.status == 'draft':
+            color = 'rgb(0, 0, 255)'
+        elif obj.status == 'opened':
+            color = 'rgb(0, 255, 0)'
+        elif obj.status == 'closed':
+            color = 'rgb(255, 0, 0)'
+
+        return format_html('<span style="color: {0}">{1}</span>', color, obj.get_status_display())
+    colored_status_display.short_description = _('Status')
+    colored_status_display.admin_order_field = 'status'
+
+    @add_current_app_to_request_in_admin_view_for_django_suit
     def view_preview(self, request):
         """ """
 
         raise NotImplementedError
 
-    @add_current_app_to_request_in_admin_view
+    @add_current_app_to_request_in_admin_view_for_django_suit
     def view_statistics(self, request):
         """Admin view for display statistics about polls, choices, votes and a chart statistics count votes by year"""
 
@@ -234,17 +321,17 @@ class PollAdmin(admin.ModelAdmin):
         # and a context, needed for any admin view
         context = dict(
             self.admin_site.each_context(request),
-            title=_('Statistics'),
+            title=_('Statistics about polls'),
             statistics=statistics,
             django_admin_media=self.media,
-            current_app=apps.get_app_config('polls'),
+            current_app=apps.get_app_config(Poll._meta.app_label),
             chart_statistics_count_votes_by_year=chart_statistics_count_votes_by_year,
         )
 
         # return a response, on based a template and passed the context
         return TemplateResponse(request, "polls/admin/statistics.html", context)
 
-    @add_current_app_to_request_in_admin_view
+    @add_current_app_to_request_in_admin_view_for_django_suit
     def view_make_report(self, request):
         """View for ability of creating an Pdf reports in the admin."""
 
@@ -254,7 +341,7 @@ class PollAdmin(admin.ModelAdmin):
             context = dict(
                 self.admin_site.each_context(request),
                 title=_('Make a report about polls'),
-                current_app=apps.get_app_config('polls'),
+                current_app=apps.get_app_config(Poll._meta.app_label),
                 django_admin_media=self.media,
             )
             return TemplateResponse(request, "polls/admin/report.html", context)
@@ -287,7 +374,7 @@ class PollAdmin(admin.ModelAdmin):
             return response
 
     def _build_chart_poll_result(self, object_id):
-        """Return chart as SVG , what reveal result a poll."""
+        """Return chart as SVG, what reveal result a poll."""
 
         # chart configuration
         config = pygal.Config()
@@ -347,91 +434,6 @@ class PollAdmin(admin.ModelAdmin):
         # return chart in SVG format
         return chart_statistics_count_votes_by_year.render()
 
-    def get_listing_voters_with_admin_url_and_count_votes(self):
-        """ """
-
-        # get all voters
-        all_voters = User.polls.get_all_voters()
-
-        # if no voters - return corresponding message
-        if not all_voters:
-            msg = _('No-one yet not participated in polls.')
-            return format_html('<i>{0}</i>', msg)
-
-        # else return a listing voters as a links with url to admin_url of a each voter,
-        # full name of voter and count votes its
-        html_voters = list()
-        for voter in all_voters:
-            admin_url = voter.get_admin_url()
-            voter_full_name = voter.get_full_name()
-            count_votes = User.polls.get_count_votes_of_user(voter)
-
-            # make a translatable text for a count votes
-            translated_part = ungettext(
-                '(%(count_votes)d vote)',
-                '(%(count_votes)d votes)',
-                count_votes,
-            ) % {
-                'count_votes': count_votes,
-            }
-
-            # pattern for link
-            pattern = '<a href="{0}">{1} {2}</a>'.format(admin_url, voter_full_name, translated_part)
-
-            # create html representation for voter and add it to the listing voters,
-            # prepared to dislay on page
-            html_voter = format_html(pattern, admin_url, voter_full_name, count_votes)
-            html_voters.append(html_voter)
-
-        # make join all voters in a safe html
-        html_listing_voters = mark_safe(conditional_escape(', ').join(html_voters))
-        return html_listing_voters
-
-    def get_most_popular_choice_or_choices_as_html(self, obj):
-        """Method-wrapper for method get_most_popular_choice_or_choices() of model Poll.
-        Return result of the method get_most_popular_choice_or_choices() as humen-readable view HTML."""
-
-        most_popular_choice_or_choices = obj.get_most_popular_choice_or_choices()
-
-        if len(most_popular_choice_or_choices) > 1:
-            # text =
-            return format_html_join(
-                '',
-                '<li style="list-style: none;">{0} ({1} votes)</li>',
-                (
-                    (choice.get_truncated_text_choice(), choice.count_votes)
-                    for choice in most_popular_choice_or_choices
-                ),
-            )
-        elif len(most_popular_choice_or_choices) == 1:
-            popular_choice = most_popular_choice_or_choices[0]
-            return format_html(
-                _('<p>{0} ({1} votes)</p>'),
-                popular_choice.get_truncated_text_choice(),
-                popular_choice.count_votes,
-            )
-        else:
-            return mark_safe('<i>{0}</i>'.format(_('Poll does not have a choices at all.')))
-    get_most_popular_choice_or_choices_as_html.short_description = _('Most popular choice or choices')
-
-    def colored_status_display(self, obj):
-        """ """
-
-        #
-        if obj.status == Poll.CHOICES_STATUS.draft:
-            color = '#00f'
-        elif obj.status == Poll.CHOICES_STATUS.opened:
-            color = '#0f0'
-        elif obj.status == Poll.CHOICES_STATUS.closed:
-            color = '#f00'
-
-        #
-        displayed_status = obj.get_status_display()
-
-        return format_html('<span style="color: {0}">{1}</span>', color, displayed_status)
-    colored_status_display.short_description = _('Status')
-    colored_status_display.admin_order_field = 'status'
-
 
 class ChoiceAdmin(admin.ModelAdmin):
     '''
@@ -446,7 +448,7 @@ class ChoiceAdmin(admin.ModelAdmin):
     change_form_template = 'polls/admin/choice_preview_form.html'
 
     # changelist
-    list_display = ('__str__', 'poll', 'get_count_votes')
+    list_display = ('get_truncated_text_choice', 'poll', 'get_count_votes')
     list_filter = (
         ('poll', admin.RelatedOnlyFieldListFilter),
         # PositiveIntegerRangeListFilter,
@@ -507,7 +509,7 @@ class ChoiceAdmin(admin.ModelAdmin):
     get_voters_with_get_admin_links_as_html.short_description = _('Voters')
 
     def get_poll_admin_link_as_html(self, obj):
-        return format_html('<a href="{}">{}</a>', obj.poll.get_admin_url(), obj.poll)
+        return format_html('<a href="{0}">{1}</a>', obj.poll.get_admin_url(), obj.poll)
     get_poll_admin_link_as_html.short_description = _('Poll')
 
 

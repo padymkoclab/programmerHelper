@@ -27,7 +27,7 @@
 {% block content %}
     <div class="content-main">
         <div class="module">
-            <form action="{% url 'admin:polls_poll_make_report' %}" method="post" accept-charset="utf-8">
+            <form action="{% url 'admin:polls_make_report' %}" method="post" accept-charset="utf-8">
                 {% csrf_token %}
                 <table class="table-overview applist" id="table_radio_group_select_report">
                     <caption>{% trans "Select needed report" %}</caption>

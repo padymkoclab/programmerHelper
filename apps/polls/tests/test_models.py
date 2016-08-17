@@ -539,17 +539,12 @@ class VoteTest(TestCase):
 
     def test_natural_key(self):
 
-        title = 'Мою Родину топчеп враг, я такой же как и вы'
-        text_choice = 'но если кто то сможет прорваться то он сможет организовать прикрытие для наступления'
-        poll = PollFactory(title=title)
-        choice = ChoiceFactory(text_choice=text_choice)
+        poll = PollFactory()
+        choice = ChoiceFactory()
         user = UserFactory()
         vote = Vote.objects.create(user=user, poll=poll, choice=choice)
 
-        from IPython.core.debugger import Tracer
-        Tracer()()
-
-        self.assertTupleEqual(vote.natural_key(), (title, user.natural_key(), text_choice))
+        self.assertTupleEqual(vote.natural_key(), (poll.natural_key(), user.natural_key(), choice.natural_key()))
 
     def test_get_truncated_text_choice_if_length_of_text_choice_is_more_90(self):
         self.vote.choice.text_choice = 'Since it may be happen.' * 8
