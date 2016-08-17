@@ -135,6 +135,11 @@ class PollTest(TestCase):
         response = self.client.get(self.poll.get_admin_url())
         self.assertEqual(response.status_code, 200)
 
+    def test_natural_key(self):
+        title = 'Почему программист должен знать очень много?'
+        poll = PollFactory(title=title)
+        self.assertEqual(poll.natural_key(), title)
+
     def test_get_most_popular_choice_or_choices_if_does_not_have_choices(self):
         self.assertEqual(self.poll.choices.count(), 0)
         self.assertCountEqual(self.poll.get_most_popular_choice_or_choices(), ())
@@ -437,6 +442,13 @@ class ChoiceTest(TestCase):
             choice3.full_clean
         )
 
+    def test_natural_key(self):
+        title = 'Сколько боли может выдержать свободный человек?'
+        text_choice = 'Да на убой, на как баранов, но если кто-то сможет прорваться, то ...'
+        poll = PollFactory(title=title)
+        choice = ChoiceFactory(poll=poll, text_choice=text_choice)
+        self.assertTupleEqual(choice.natural_key(), (title, text_choice))
+
     def test_get_count_votes_if_non_votes(self):
         self.assertEqual(self.choice.get_count_votes(), 0)
 
@@ -521,7 +533,23 @@ class VoteTest(TestCase):
 
     def test_unique_user_and_poll(self):
         self.vote = Vote(poll=self.poll, user=self.user2, choice=self.choice1)
-        self.assertRaisesMessage(ValidationError, 'This user already participated in that poll.', self.vote.full_clean)
+        self.assertRaisesMessage(
+            ValidationError, 'This user already participated in that poll.', self.vote.full_clean
+        )
+
+    def test_natural_key(self):
+
+        title = 'Мою Родину топчеп враг, я такой же как и вы'
+        text_choice = 'но если кто то сможет прорваться то он сможет организовать прикрытие для наступления'
+        poll = PollFactory(title=title)
+        choice = ChoiceFactory(text_choice=text_choice)
+        user = UserFactory()
+        vote = Vote.objects.create(user=user, poll=poll, choice=choice)
+
+        from IPython.core.debugger import Tracer
+        Tracer()()
+
+        self.assertTupleEqual(vote.natural_key(), (title, user.natural_key(), text_choice))
 
     def test_get_truncated_text_choice_if_length_of_text_choice_is_more_90(self):
         self.vote.choice.text_choice = 'Since it may be happen.' * 8

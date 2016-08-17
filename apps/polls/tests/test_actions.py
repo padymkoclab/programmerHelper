@@ -22,13 +22,12 @@ class ActionsTests(TestCase):
     def setUpTestData(cls):
         call_command('factory_test_polls', '6')
 
+        # create polls
+        cls.poll1, cls.poll2, cls.poll3, cls.poll4, cls.poll5, cls.poll6 = Poll.objects.all()
+
     def setUp(self):
 
-        # test for 6 polls
-        self.assertEqual(Poll.objects.count(), 6)
-
-        # create polls
-        self.poll1, self.poll2, self.poll3, self.poll4, self.poll5, self.poll6 = Poll.objects.all()
+        # changes statuses of polls
 
         self.poll1.status = 'opened'
         self.poll1.full_clean()
