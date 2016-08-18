@@ -1,4 +1,7 @@
 
+import itertools
+
+from django.utils import timezone
 from django.forms import widgets
 from django.utils.text import force_text
 from django.apps import apps
@@ -376,18 +379,113 @@ class PollAdminTests(TestCase):
         self.assertEqual(response.context_data['current_app'], apps.get_app_config(Poll._meta.app_label))
         self.assertIsInstance(response.context_data['django_admin_media'], widgets.Media)
 
-    def test_view_make_report_throught_POST(self):
+    def test_view_make_report_throught_POST_without_specified_output_report(self):
 
-        pass
-        # request = self.factory.post(self.url_polls_make_report)
-        # request.user = self.active_superuser
-        # response = self.PollAdmin.view_make_report(request)
+        request = self.factory.post(self.url_polls_make_report, {})
+        request.user = self.active_superuser
+        response = self.PollAdmin.view_make_report(request)
 
-        # self.assertEqual(response.status_code, 200)
-        # self.assertEqual(response.template_name, 'polls/admin/report.html')
-        # self.assertEqual(force_text(response.context_data['title']), 'Make a report about polls')
-        # self.assertEqual(response.context_data['current_app'], apps.get_app_config(Poll._meta.app_label))
-        # self.assertIsInstance(response.context_data['django_admin_media'], widgets.Media)
+        self.assertContains(response, 'Not specified any theme for report.', status_code=400)
+
+    def test_view_make_report_throught_POST_without_specified_themes_of_excel_report(self):
+
+        request = self.factory.post(self.url_polls_make_report, {'output_report': 'report_excel'})
+        request.user = self.active_superuser
+        response = self.PollAdmin.view_make_report(request)
+
+        self.assertContains(response, 'Not specified any theme for report.', status_code=400)
+
+    def test_view_make_report_throught_POST_without_specified_themes_of_pdf_report(self):
+
+        request = self.factory.post(self.url_polls_make_report, {'output_report': 'report_pdf'})
+        request.user = self.active_superuser
+        response = self.PollAdmin.view_make_report(request)
+
+        self.assertContains(response, 'Not specified any theme for report.', status_code=400)
+
+    def test_view_make_report_throught_POST_without_specified_type_of_report_but_with_themes(self):
+
+        request = self.factory.post(self.url_polls_make_report, {'votes': 'votes'})
+        request.user = self.active_superuser
+        response = self.PollAdmin.view_make_report(request)
+
+        self.assertContains(response, 'Type of report is not supplied.', status_code=400)
+
+    def test_view_make_report_throught_POST_for_excel_report_on_different_themes(self):
+
+        themes_for_report = {
+            'polls': 'polls',
+            'choices': 'choices',
+            'votes': 'votes',
+            'results': 'results',
+            'voters': 'voters',
+        }
+
+        # make all possible combinations demand the report`s themes
+        combinations = list()
+        for i in range(1, len(themes_for_report) + 1):
+            combinations += map(dict, itertools.combinations(themes_for_report.items(), i))
+
+        # must be 31 requests
+        for themes_for_report in combinations:
+            themes_for_report['output_report'] = 'report_excel'
+
+            request = self.factory.post(self.url_polls_make_report, themes_for_report)
+            request.user = self.active_superuser
+
+            # keep time on start request
+            now = timezone.now().strftime('%Y-%m-%d %H:%M:%S')
+
+            response = self.PollAdmin.view_make_report(request)
+
+            self.assertEqual(magic.from_buffer(response.getvalue(), mime=True), 'application/zip')
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(
+                response.get('Content-Type'),
+                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            )
+
+            self.assertEqual(
+                response.get('Content-Disposition'),
+                'attachment; filename=Report about polls {0}.xlsx'.format(now)
+            )
+
+    def test_view_make_report_throught_POST_for_pdf_report_on_different_themes(self):
+
+        themes_for_report = {
+            'polls': 'polls',
+            'choices': 'choices',
+            'votes': 'votes',
+            'results': 'results',
+            'voters': 'voters',
+        }
+
+        # make all possible combinations demand the report`s themes
+        combinations = list()
+
+        for i in range(1, len(themes_for_report) + 1):
+            combinations += map(dict, itertools.combinations(themes_for_report.items(), i))
+
+        # must be 31 requests
+        for themes_for_report in combinations:
+            themes_for_report['output_report'] = 'report_pdf'
+
+            request = self.factory.post(self.url_polls_make_report, themes_for_report)
+            request.user = self.active_superuser
+
+            # keep time on start request
+            now = timezone.now().strftime('%Y-%m-%d %H:%M:%S')
+
+            response = self.PollAdmin.view_make_report(request)
+
+            self.assertEqual(magic.from_buffer(response.getvalue(), mime=True), 'application/pdf')
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.get('Content-Type'), 'application/pdf')
+
+            self.assertEqual(
+                response.get('Content-Disposition'),
+                'attachment; filename=Report about polls {0}.pdf'.format(now)
+            )
 
 
 class ChoiceAdminTests(TestCase):

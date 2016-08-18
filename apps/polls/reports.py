@@ -150,10 +150,10 @@ class ExcelReport(object):
         """Create a response with attached a Excel file """
 
         # create response for Excel
-        response = HttpResponse(content_type='application/application/vnd.ms-excel')
+        response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
 
         # get filename and attach it to the response
-        filename = get_filename_with_datetime(_('Polls'), 'xlsx')
+        filename = get_filename_with_datetime(_('Report about polls'), 'xlsx')
         response['Content-Disposition'] = 'attachment; filename=%s' % filename
         logger.debug('Created response for Excel report')
         return response
@@ -168,23 +168,23 @@ class ExcelReport(object):
         self.fillup_sheet_statistics()
 
         # adding needed worksheets and to fill up it
-        if 'polls' in self.subjects:
-            self.workbook.add_worksheet(_('Polls'))
-            self.fillup_sheet_polls()
-        if 'choices' in self.subjects:
-            self.workbook.add_worksheet(_('Choices'))
-            self.fillup_sheet_choices()
-        if 'votes' in self.subjects:
-            self.workbook.add_worksheet(_('Votes'))
-            self.fillup_sheet_votes()
-        if 'results' in self.subjects:
-            self.workbook.add_worksheet(_('Results'))
-            self.fillup_sheet_results()
-        if 'voters' in self.subjects:
-            self.workbook.add_worksheet(_('Voters'))
-            self.fillup_sheet_voters()
+        # if 'polls' in self.subjects:
+        #     self.workbook.add_worksheet(_('Polls'))
+        #     self.fillup_sheet_polls()
+        # if 'choices' in self.subjects:
+        #     self.workbook.add_worksheet(_('Choices'))
+        #     self.fillup_sheet_choices()
+        # if 'votes' in self.subjects:
+        #     self.workbook.add_worksheet(_('Votes'))
+        #     self.fillup_sheet_votes()
+        # if 'results' in self.subjects:
+        #     self.workbook.add_worksheet(_('Results'))
+        #     self.fillup_sheet_results()
+        # if 'voters' in self.subjects:
+        #     self.workbook.add_worksheet(_('Voters'))
+        #     self.fillup_sheet_voters()
 
-        # logger.debug('Added worksheets to the workbook')
+        logger.debug('Added worksheets to the workbook')
 
         # close the workbook, as well as to write the Excel document in the response and to return it
         self.workbook.close()
@@ -1078,7 +1078,7 @@ class PollPDFReport(object):
         filename = get_filename_with_datetime(self.report_name, 'pdf')
 
         # attach a file to the response and return it
-        response['Content-Disposition'] = 'atachment; filename={0}'.format(filename)
+        response['Content-Disposition'] = 'attachment; filename={0}'.format(filename)
         return response
 
     def write_pdf_in_response(self):

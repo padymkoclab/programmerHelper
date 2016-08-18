@@ -6,6 +6,7 @@ from django.conf.urls import url
 from django.contrib.auth import get_user_model
 from django.apps import apps
 from django.template.response import TemplateResponse
+from django.http import HttpResponseBadRequest
 from django.utils.safestring import mark_safe
 from django.utils.html import format_html_join, format_html, conditional_escape
 from django.utils.translation import ugettext_lazy as _
@@ -351,7 +352,7 @@ class PollAdmin(admin.ModelAdmin):
         elif request.method == 'POST':
 
             # get type output of report: pdf or excel
-            output_report = request.POST['output_report']
+            output_report = request.POST.get('output_report', None)
 
             # get subjects of report
             subjects = [
@@ -362,6 +363,10 @@ class PollAdmin(admin.ModelAdmin):
                 request.POST.get('voters', None),
             ]
 
+            subjects = [subject for subject in subjects if subject]
+            if not subjects:
+                return HttpResponseBadRequest('Not specified any theme for report.')
+
             # generate pdf-report by subject
             if output_report == 'report_pdf':
                 report = PollPDFReport(request, subjects)
@@ -369,6 +374,9 @@ class PollAdmin(admin.ModelAdmin):
             # generate excel-report
             elif output_report == 'report_excel':
                 report = ExcelReport(request, subjects)
+
+            else:
+                return HttpResponseBadRequest(_('Type of report is not supplied.'))
 
             response = report.make_report()
             return response

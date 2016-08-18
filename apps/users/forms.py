@@ -3,9 +3,9 @@ from django.utils.translation import ugettext_lazy as _
 from django import forms
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
 
-from passwords.fields import PasswordField
-from passwords.validators import (
-    DictionaryValidator, LengthValidator, ComplexityValidator)
+# from passwords.fields import PasswordField
+# from passwords.validators import (
+#     DictionaryValidator, LengthValidator, ComplexityValidator)
 
 from .models import User
 
@@ -15,16 +15,18 @@ class Createuserform(forms.ModelForm):
     Form for creating user
     """
 
-    password = PasswordField(label=_('Passowrd'))
-    field = forms.CharField(validators=[
-        DictionaryValidator(words=['banned_word'], threshold=0.9),
-        LengthValidator(min_length=8),
-        ComplexityValidator(complexities=dict(
-            UPPER=1,
-            LOWER=1,
-            DIGITS=1
-        ),
-        )])
+    # password = PasswordField(label=_('Passowrd'))
+    field = forms.CharField(
+        # validators=[
+        # DictionaryValidator(words=['banned_word'], threshold=0.9),
+        # LengthValidator(min_length=8),
+        # ComplexityValidator(complexities=dict(
+        #     UPPER=1,
+        #     LOWER=1,
+        #     DIGITS=1
+        # ),
+        # )])
+    )
 
     class Meta:
         model = User
