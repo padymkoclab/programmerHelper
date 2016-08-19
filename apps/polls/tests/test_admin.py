@@ -1,5 +1,5 @@
 
-import itertools
+from unittest import mock
 
 from django.utils import timezone
 from django.forms import widgets
@@ -147,6 +147,7 @@ class PollAdminTests(TestCase):
         self.assertIn('polls_make_report', urls_names)
         self.assertIn('polls_statistics', urls_names)
 
+    @pytest.mark.xfail(reason='Not implemented Preview for poll in Admin')
     def test_accessibility_urls(self):
 
         urls = self.PollAdmin.get_urls()
@@ -168,8 +169,8 @@ class PollAdminTests(TestCase):
                 urlpath = reverse('admin:polls_poll_delete', args=[self.poll1.pk])
                 response = self.client.get(urlpath)
                 self.assertEqual(response.status_code, 200)
-            # elif url.name == 'polls_poll_preview':
-            #     urlpath = reverse('admin:polls_poll_preview', args=[self.poll1.pk])
+            elif url.name == 'polls_poll_preview':
+                urlpath = reverse('admin:polls_poll_preview', args=[self.poll1.pk])
             elif url.name == 'polls_make_report':
                 urlpath = reverse('admin:polls_make_report')
                 response = self.client.get(urlpath)
@@ -299,7 +300,7 @@ class PollAdminTests(TestCase):
         chart_polls_statistics = self.PollAdmin._build_chart_polls_statistics()
         self.assertEqual(magic.from_buffer(chart_polls_statistics, mime=True), 'application/xml')
 
-    @pytest.mark.xfail
+    @pytest.mark.xfail(reason='Not implemented Preview for poll in Admin')
     def test_view_preview(self):
         raise NotImplementedError
 
@@ -447,87 +448,65 @@ class PollAdminTests(TestCase):
 
         self.assertContains(response, 'Type of report is not supplied.', status_code=400)
 
-    def test_view_make_report_throught_POST_for_excel_report_on_different_themes(self):
+    @mock.patch('django.utils.timezone.now')
+    def test_view_make_report_throught_POST_for_excel_report_on_different_themes(self, mock_now):
 
-        themes_for_report = {
+        mock_now.return_value = timezone.datetime(2018, 4, 1, 11, 18, tzinfo=timezone.utc)
+
+        data = {
             'polls': 'polls',
             'choices': 'choices',
             'votes': 'votes',
             'results': 'results',
             'voters': 'voters',
+            'output_report': 'report_excel',
         }
 
-        # make all possible combinations demand the report`s themes
-        combinations = list()
-        for i in range(1, len(themes_for_report) + 1):
-            combinations += map(dict, itertools.combinations(themes_for_report.items(), i))
+        request = self.factory.post(self.url_polls_make_report, data)
+        request.user = self.active_superuser
 
-        # must be 31 requests
-        for themes_for_report in combinations:
-            themes_for_report['output_report'] = 'report_excel'
+        # keep time on start request
+        # now = timezone.now()
 
-            request = self.factory.post(self.url_polls_make_report, themes_for_report)
-            request.user = self.active_superuser
+        response = self.PollAdmin.view_make_report(request)
 
-            # keep time on start request
-            now = timezone.now()
+        self.assertEqual(magic.from_buffer(response.getvalue(), mime=True), 'application/zip')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.get('Content-Type'),
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
+        self.assertIn(
+            response.get('Content-Disposition'),
+            'attachment; filename=Report about polls 2018-04-01 11:18:00.xlsx'
+        )
 
-            response = self.PollAdmin.view_make_report(request)
+    @mock.patch('django.utils.timezone.now')
+    def test_view_make_report_throught_POST_for_pdf_report_on_different_themes(self, mock_now):
 
-            self.assertEqual(magic.from_buffer(response.getvalue(), mime=True), 'application/zip')
-            self.assertEqual(response.status_code, 200)
-            self.assertEqual(
-                response.get('Content-Type'),
-                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-            )
+        mock_now.return_value = timezone.datetime(2016, 11, 11, 1, 8, 7, tzinfo=timezone.utc)
 
-            # generate possible filename for past 5 seconds ago
-            times_for_5_seconds = list()
-            for i in range(5):
-                str_datetime = (now - timezone.timedelta(seconds=i)).strftime('%Y-%m-%d %H:%M:%S')
-                content_disposition = 'attachment; filename=Report about polls {0}.xlsx'.format(str_datetime)
-                times_for_5_seconds.append(content_disposition)
-            self.assertIn(response.get('Content-Disposition'), times_for_5_seconds)
-
-    def test_view_make_report_throught_POST_for_pdf_report_on_different_themes(self):
-
-        themes_for_report = {
+        data = {
             'polls': 'polls',
             'choices': 'choices',
             'votes': 'votes',
             'results': 'results',
             'voters': 'voters',
+            'output_report': 'report_pdf',
         }
 
-        # make all possible combinations demand the report`s themes
-        combinations = list()
+        request = self.factory.post(self.url_polls_make_report, data)
+        request.user = self.active_superuser
 
-        for i in range(1, len(themes_for_report) + 1):
-            combinations += map(dict, itertools.combinations(themes_for_report.items(), i))
+        response = self.PollAdmin.view_make_report(request)
 
-        # must be 31 requests
-        for themes_for_report in combinations:
-            themes_for_report['output_report'] = 'report_pdf'
-
-            request = self.factory.post(self.url_polls_make_report, themes_for_report)
-            request.user = self.active_superuser
-
-            # keep time on start request
-            now = timezone.now()
-
-            response = self.PollAdmin.view_make_report(request)
-
-            self.assertEqual(magic.from_buffer(response.getvalue(), mime=True), 'application/pdf')
-            self.assertEqual(response.status_code, 200)
-            self.assertEqual(response.get('Content-Type'), 'application/pdf')
-
-            # generate possible filename for past 5 seconds ago
-            times_for_5_seconds = list()
-            for i in range(5):
-                str_datetime = (now - timezone.timedelta(seconds=i)).strftime('%Y-%m-%d %H:%M:%S')
-                content_disposition = 'attachment; filename=Report about polls {0}.pdf'.format(str_datetime)
-                times_for_5_seconds.append(content_disposition)
-            self.assertIn(response.get('Content-Disposition'), times_for_5_seconds)
+        self.assertEqual(magic.from_buffer(response.getvalue(), mime=True), 'application/pdf')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.get('Content-Type'), 'application/pdf')
+        self.assertIn(
+            response.get('Content-Disposition'),
+            'attachment; filename=Report about polls 2016-11-11 01:08:07.pdf'
+        )
 
 
 class ChoiceAdminTests(TestCase):

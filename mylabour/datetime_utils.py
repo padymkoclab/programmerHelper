@@ -39,7 +39,7 @@ def get_current_timezone_offset():
     return '{0} {1}'.format(time_offset, tz_name)
 
 
-def get_year_by_slavic_aryan_calendar(self):
+def get_year_by_slavic_aryan_calendar(now):
     """Get year by Slavic-Aryan calendar on today.
 
     New year (Новолетие) by Slavic-Aryan Clandar starting in the day autum equinox.
@@ -50,8 +50,6 @@ def get_year_by_slavic_aryan_calendar(self):
     Returns:
         [type] -- [description]
     """
-
-    now = timezone.now()
 
     format_datetime = '%Y/%m/%d %H:%M:%S'
     str_datetime_next_autumn_equinox = str(ephem.next_autumn_equinox(now))

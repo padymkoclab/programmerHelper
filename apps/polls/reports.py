@@ -61,7 +61,7 @@ logger = create_logger_by_filename(__name__)
 
 SUBJECTS_HUMAN_NAMES = {
     'polls': _('Polls'),
-    'choices': _('Choises'),
+    'choices': _('Choices'),
     'votes': _('Votes'),
     'voters': _('Voters'),
     'results': _('Results of polls'),
@@ -168,21 +168,21 @@ class ExcelReport(object):
         self.fillup_sheet_statistics()
 
         # adding needed worksheets and to fill up it
-        # if 'polls' in self.subjects:
-        #     self.workbook.add_worksheet(_('Polls'))
-        #     self.fillup_sheet_polls()
-        # if 'choices' in self.subjects:
-        #     self.workbook.add_worksheet(_('Choices'))
-        #     self.fillup_sheet_choices()
-        # if 'votes' in self.subjects:
-        #     self.workbook.add_worksheet(_('Votes'))
-        #     self.fillup_sheet_votes()
-        # if 'results' in self.subjects:
-        #     self.workbook.add_worksheet(_('Results'))
-        #     self.fillup_sheet_results()
-        # if 'voters' in self.subjects:
-        #     self.workbook.add_worksheet(_('Voters'))
-        #     self.fillup_sheet_voters()
+        if 'polls' in self.subjects:
+            self.workbook.add_worksheet(_('Polls'))
+            self.fillup_sheet_polls()
+        if 'choices' in self.subjects:
+            self.workbook.add_worksheet(_('Choices'))
+            self.fillup_sheet_choices()
+        if 'votes' in self.subjects:
+            self.workbook.add_worksheet(_('Votes'))
+            self.fillup_sheet_votes()
+        if 'results' in self.subjects:
+            self.workbook.add_worksheet(_('Results'))
+            self.fillup_sheet_results()
+        if 'voters' in self.subjects:
+            self.workbook.add_worksheet(_('Voters'))
+            self.fillup_sheet_voters()
 
         logger.debug('Added worksheets to the workbook')
 
@@ -577,7 +577,10 @@ class ExcelReport(object):
                     sheet.set_row(num_row, 40)
             else:
                 num_row += 1
-                sheet.merge_range(num_row, 0, num_row, 2, _('Choices are not exists yet'), self.get_formats['empty_row'])
+                sheet.merge_range(
+                    num_row, 0, num_row, 2,
+                    _('Choices are not exists yet'), self.get_formats['empty_row']
+                )
                 sheet.set_row(num_row, 40)
 
             if poll.get_count_votes():
@@ -870,7 +873,7 @@ class ExcelReport(object):
             'name': _('Count votes'),
             'name_font': {
                 'size': 14,
-                'rotation': -89,
+                'rotation': 90,
             },
             'name_layout': {
                 'x': 0.02,
@@ -964,9 +967,9 @@ class PollPDFReport(object):
             PageTemplate('Statistics', frames=[frame], onPage=self.statisctics_page),
             PageTemplate('Polls', frames=[frame], onPage=self.polls_pages),
             PageTemplate('Choices', frames=[frame], onPage=self.choices_pages),
-            PageTemplate('Votes', frames=[frame], onPage=self.voters_pages),
+            PageTemplate('Votes', frames=[frame], onPage=self.votes_pages),
             PageTemplate('Results', frames=[frame], onPage=self.results_pages),
-            PageTemplate('Voters', frames=[frame], onPage=self.votes_pages),
+            PageTemplate('Voters', frames=[frame], onPage=self.voters_pages),
         ])
 
     def add_styles(self):
@@ -1008,6 +1011,13 @@ class PollPDFReport(object):
             alignment=TA_CENTER,
             fontSize=15,
             fontName='FreeSansBold',
+        ))
+        self.styles.add(ParagraphStyle(
+            'TableCaption',
+            alignment=TA_CENTER,
+            fontSize=15,
+            fontName='FreeSansBold',
+            leading=inch / 2,
         ))
         self.styles.add(ParagraphStyle(
             'SubjectHeader',
@@ -1117,10 +1127,10 @@ class PollPDFReport(object):
             self.write_choices(story)
         if 'votes' in self.subjects:
             self.write_votes(story)
-        if 'results' in self.subjects:
-            self.write_results(story)
         if 'voters' in self.subjects:
             self.write_voters(story)
+        if 'results' in self.subjects:
+            self.write_results(story)
 
         # build document
         self.doc.build(story)
@@ -1375,8 +1385,6 @@ class PollPDFReport(object):
         self._write_subject_header(story, SUBJECTS_HUMAN_NAMES['votes'])
 
         canvas_with_linechart_count_votes_for_past_year = self.get_canvas_with_linechart_count_votes_for_past_year()
-        story.append(canvas_with_linechart_count_votes_for_past_year)
-        story.append(PageBreak())
 
         # Draw table of the all choices
 
@@ -1386,6 +1394,9 @@ class PollPDFReport(object):
         # as well as select corresponding style for table
 
         if self.count_votes:
+
+            story.append(canvas_with_linechart_count_votes_for_past_year)
+            story.append(PageBreak())
 
             data = [[_('Primary\nkey'), _('Poll'), _('Choice'), _('User'), _('Date\nvoting')]]
 
@@ -1409,6 +1420,7 @@ class PollPDFReport(object):
 
         else:
             story.append(Paragraph(_('Votes are not exists yet'), self.styles['Warning']))
+            story.append(canvas_with_linechart_count_votes_for_past_year)
 
     def write_results(self, story):
         """ """
@@ -1425,6 +1437,7 @@ class PollPDFReport(object):
             for poll in self.all_polls:
 
                 # add detail about poll
+                story.append(Paragraph('Poll', self.styles['TableCaption']))
                 tbl = self.get_table_poll_details(poll)
                 story.append(tbl)
                 story.append(PageBreak())

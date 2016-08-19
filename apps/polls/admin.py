@@ -359,8 +359,8 @@ class PollAdmin(admin.ModelAdmin):
                 request.POST.get('polls', None),
                 request.POST.get('choices', None),
                 request.POST.get('votes', None),
-                request.POST.get('results', None),
                 request.POST.get('voters', None),
+                request.POST.get('results', None),
             ]
 
             subjects = [subject for subject in subjects if subject]
