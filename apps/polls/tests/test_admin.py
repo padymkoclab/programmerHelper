@@ -59,6 +59,8 @@ class PollAdminTests(TestCase):
         cls.PollAdmin = PollAdmin(Poll, AdminSite)
 
     def setUp(self):
+        self.client.force_login(self.active_superuser)
+
         self.choice11 = ChoiceFactory(poll=self.poll1)
         self.choice21 = ChoiceFactory(poll=self.poll2)
         self.choice31 = ChoiceFactory(poll=self.poll3)
@@ -93,19 +95,21 @@ class PollAdminTests(TestCase):
         self.assertIsInstance(inlines[0], ChoiceInline)
         self.assertIsInstance(inlines[1], VoteInline)
 
-    def test_change_view_if_poll_has_no_votes(self):
+    def test_change_view_if_poll_has_no_votes_and_test_used_template(self):
 
-        self.client.force_login(self.active_superuser)
         response = self.client.get(self.poll1.get_admin_url())
+
+        self.assertTemplateUsed(response, 'polls/admin/poll_change_form.html')
 
         self.assertNotIn('chart_poll_result', response.context_data.keys())
 
-    def test_change_view_if_poll_has_1_vote(self):
+    def test_change_view_if_poll_has_votes_and_test_used_template(self):
 
         Vote.objects.create(user=self.active_superuser, poll=self.poll1, choice=self.choice11)
 
-        self.client.force_login(self.active_superuser)
         response = self.client.get(self.poll1.get_admin_url())
+
+        self.assertTemplateUsed(response, 'polls/admin/poll_change_form.html')
 
         self.assertIn('chart_poll_result', response.context_data.keys())
         svg_chart = response.context_data['chart_poll_result']
@@ -142,6 +146,38 @@ class PollAdminTests(TestCase):
         self.assertIn('polls_poll_preview', urls_names)
         self.assertIn('polls_make_report', urls_names)
         self.assertIn('polls_statistics', urls_names)
+
+    def test_accessibility_urls(self):
+
+        urls = self.PollAdmin.get_urls()
+
+        for url in urls:
+            if url.name == 'polls_poll_changelist':
+                urlpath = reverse('admin:polls_poll_changelist')
+                response = self.client.get(urlpath)
+                self.assertEqual(response.status_code, 200)
+            elif url.name == 'polls_poll_change':
+                urlpath = reverse('admin:polls_poll_change', args=[self.poll1.pk])
+                response = self.client.get(urlpath)
+                self.assertEqual(response.status_code, 200)
+            elif url.name == 'polls_poll_history':
+                urlpath = reverse('admin:polls_poll_history', args=[self.poll1.pk])
+                response = self.client.get(urlpath)
+                self.assertEqual(response.status_code, 200)
+            elif url.name == 'polls_poll_delete':
+                urlpath = reverse('admin:polls_poll_delete', args=[self.poll1.pk])
+                response = self.client.get(urlpath)
+                self.assertEqual(response.status_code, 200)
+            # elif url.name == 'polls_poll_preview':
+            #     urlpath = reverse('admin:polls_poll_preview', args=[self.poll1.pk])
+            elif url.name == 'polls_make_report':
+                urlpath = reverse('admin:polls_make_report')
+                response = self.client.get(urlpath)
+                self.assertEqual(response.status_code, 200)
+            elif url.name == 'polls_statistics':
+                urlpath = reverse('admin:polls_statistics')
+                response = self.client.get(urlpath)
+                self.assertEqual(response.status_code, 200)
 
     def test_get_listing_voters_with_admin_url_and_count_votes_if_does_not_votes(self):
 
@@ -434,7 +470,7 @@ class PollAdminTests(TestCase):
             request.user = self.active_superuser
 
             # keep time on start request
-            now = timezone.now().strftime('%Y-%m-%d %H:%M:%S')
+            now = timezone.now()
 
             response = self.PollAdmin.view_make_report(request)
 
@@ -445,10 +481,13 @@ class PollAdminTests(TestCase):
                 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
             )
 
-            self.assertEqual(
-                response.get('Content-Disposition'),
-                'attachment; filename=Report about polls {0}.xlsx'.format(now)
-            )
+            # generate possible filename for past 5 seconds ago
+            times_for_5_seconds = list()
+            for i in range(5):
+                str_datetime = (now - timezone.timedelta(seconds=i)).strftime('%Y-%m-%d %H:%M:%S')
+                content_disposition = 'attachment; filename=Report about polls {0}.xlsx'.format(str_datetime)
+                times_for_5_seconds.append(content_disposition)
+            self.assertIn(response.get('Content-Disposition'), times_for_5_seconds)
 
     def test_view_make_report_throught_POST_for_pdf_report_on_different_themes(self):
 
@@ -474,7 +513,7 @@ class PollAdminTests(TestCase):
             request.user = self.active_superuser
 
             # keep time on start request
-            now = timezone.now().strftime('%Y-%m-%d %H:%M:%S')
+            now = timezone.now()
 
             response = self.PollAdmin.view_make_report(request)
 
@@ -482,10 +521,13 @@ class PollAdminTests(TestCase):
             self.assertEqual(response.status_code, 200)
             self.assertEqual(response.get('Content-Type'), 'application/pdf')
 
-            self.assertEqual(
-                response.get('Content-Disposition'),
-                'attachment; filename=Report about polls {0}.pdf'.format(now)
-            )
+            # generate possible filename for past 5 seconds ago
+            times_for_5_seconds = list()
+            for i in range(5):
+                str_datetime = (now - timezone.timedelta(seconds=i)).strftime('%Y-%m-%d %H:%M:%S')
+                content_disposition = 'attachment; filename=Report about polls {0}.pdf'.format(str_datetime)
+                times_for_5_seconds.append(content_disposition)
+            self.assertIn(response.get('Content-Disposition'), times_for_5_seconds)
 
 
 class ChoiceAdminTests(TestCase):
@@ -506,6 +548,9 @@ class ChoiceAdminTests(TestCase):
         cls.choice2 = ChoiceFactory(poll=cls.poll)
         cls.choice3 = ChoiceFactory(poll=cls.poll)
 
+    def setUp(self):
+        self.client.force_login(self.active_superuser)
+
     def test_get_queryset(self):
         qs = self.ChoiceAdmin.get_queryset(mockrequest)
         self.assertIn('count_votes', qs.values()[0])
@@ -521,7 +566,27 @@ class ChoiceAdminTests(TestCase):
 
         self.assertNotIn('polls_choice_add', urls_names)
         self.assertNotIn('polls_choice_history', urls_names)
+        self.assertNotIn('polls_choice_delete', urls_names)
         self.assertEqual(url_polls_choice_change.regex.pattern, '^(.+)/preview/$')
+
+    def test_template_used_in_change_view(self):
+
+        url = reverse('admin:polls_choice_change', args=[self.choice1.pk])
+        response = self.client.get(url)
+        self.assertTemplateUsed(response, 'polls/admin/choice_preview_form.html')
+
+    def test_accessibility_urls(self):
+
+        urls = self.ChoiceAdmin.get_urls()
+
+        for url in urls:
+            if url.name == 'polls_choice_changelist':
+                urlpath = reverse('admin:polls_choice_changelist')
+            elif url.name == 'polls_choice_change':
+                urlpath = reverse('admin:polls_choice_change', args=[self.choice1.pk])
+
+            response = self.client.get(urlpath)
+            self.assertEqual(response.status_code, 200)
 
     def test_get_voters_with_get_admin_links_as_html_if_no_voters(self):
 
@@ -580,7 +645,22 @@ class VoteAdminTests(TestCase):
 
     @classmethod
     def setUpTestData(cls):
+
+        call_command('factory_test_users', '1')
+
+        cls.active_superuser = User.objects.get()
+        cls.active_superuser.is_active = True
+        cls.active_superuser.is_superuser = True
+        cls.active_superuser.save()
+
+        poll = PollFactory()
+        choice = ChoiceFactory(poll=poll)
+        cls.vote = Vote.objects.create(poll=poll, choice=choice, user=cls.active_superuser)
+
         cls.VoteAdmin = VoteAdmin(Vote, AdminSite)
+
+    def setUp(self):
+        self.client.force_login(self.active_superuser)
 
     def test_get_urls(self):
         urls = self.VoteAdmin.get_urls()
@@ -588,3 +668,15 @@ class VoteAdminTests(TestCase):
 
         self.assertNotIn('polls_vote_add', urls_names)
         self.assertNotIn('polls_vote_change', urls_names)
+        self.assertNotIn('polls_vote_history', urls_names)
+        self.assertNotIn('polls_vote_delete', urls_names)
+
+    def test_accessibility_urls(self):
+
+        urls = self.VoteAdmin.get_urls()
+
+        for url in urls:
+            if url.name == 'polls_vote_changelist':
+                urlpath = reverse('admin:polls_vote_changelist')
+                response = self.client.get(urlpath)
+                self.assertEqual(response.status_code, 200)

@@ -500,6 +500,7 @@ class ChoiceAdmin(admin.ModelAdmin):
 
         remove_url_from_admin_urls(urls, 'polls_choice_add')
         remove_url_from_admin_urls(urls, 'polls_choice_history')
+        remove_url_from_admin_urls(urls, 'polls_choice_delete')
 
         return urls
 
@@ -543,5 +544,7 @@ class VoteAdmin(admin.ModelAdmin):
         # remove urls for add and change vote
         remove_url_from_admin_urls(urls, 'polls_vote_add')
         remove_url_from_admin_urls(urls, 'polls_vote_change')
+        remove_url_from_admin_urls(urls, 'polls_vote_history')
+        remove_url_from_admin_urls(urls, 'polls_vote_delete')
 
         return urls
