@@ -119,7 +119,7 @@ class ExcelReport(object):
         logger.critical('A subject of the workbook is not correct')
 
         workbook.set_properties({
-            'title': _('A report about polls'),
+            'title': _('Report about polls'),
             'subject': self.get_subjects(),
             'keywords': _('Polls, votes, voters'),
             'comments': _('Report created with help library XlsxWriter 0.8.7.'),
@@ -177,12 +177,12 @@ class ExcelReport(object):
         if 'votes' in self.subjects:
             self.workbook.add_worksheet(_('Votes'))
             self.fillup_sheet_votes()
-        if 'results' in self.subjects:
-            self.workbook.add_worksheet(_('Results'))
-            self.fillup_sheet_results()
         if 'voters' in self.subjects:
             self.workbook.add_worksheet(_('Voters'))
             self.fillup_sheet_voters()
+        if 'results' in self.subjects:
+            self.workbook.add_worksheet(_('Results'))
+            self.fillup_sheet_results()
 
         logger.debug('Added worksheets to the workbook')
 
@@ -250,7 +250,7 @@ class ExcelReport(object):
                 'valign': 'vcenter',
                 'align': 'center',
                 'border': 2,
-                'border_color': '##C4E9ED',
+                'border_color': '#C4E9ED',
                 'text_wrap': True,
                 'font_size': 11,
                 'bold': True,
@@ -356,7 +356,7 @@ class ExcelReport(object):
 
         self.write_title(title, sheet, count_fields)
 
-        sheet.merge_range('A5:B5', _('Common statistics '), self.get_formats['table_cell_title'])
+        sheet.merge_range('A5:B5', _('Common statistics'), self.get_formats['table_cell_title'])
         sheet.write('A6', _('Count polls'), self.get_formats['table_cell_header'])
         sheet.write('B6', self.count_polls, self.get_formats['table_cell_centered'])
         sheet.write('A7', _('Count choices'), self.get_formats['table_cell_header'])
@@ -369,7 +369,7 @@ class ExcelReport(object):
         sheet.write('B10', Poll.objects.opened_polls().count(), self.get_formats['table_cell_centered'])
         sheet.write('A11', _('Count closed\npolls'), self.get_formats['table_cell_header'])
         sheet.write('B11', Poll.objects.closed_polls().count(), self.get_formats['table_cell_centered'])
-        sheet.write('A12', _('Count draft polls'), self.get_formats['table_cell_header'])
+        sheet.write('A12', _('Count draft\npolls'), self.get_formats['table_cell_header'])
         sheet.write('B12', Poll.objects.draft_polls().count(), self.get_formats['table_cell_centered'])
         sheet.write('A13', _('Average count\nchoices in polls'), self.get_formats['table_cell_header'])
         sheet.write('B13', Poll.objects.get_average_count_choices_in_polls(), self.get_formats['table_cell_centered'])
@@ -392,7 +392,7 @@ class ExcelReport(object):
                 self.get_formats['table_cell_datetime']
             )
         else:
-            sheet.merge_range('A17:B20', _('Votes are not exists yet.'), self.get_formats['empty_row'])
+            sheet.merge_range('A17:B20', _('Votes are not exists yet'), self.get_formats['empty_row'])
 
         sheet.set_column(0, 1, 20)
         sheet.set_row(4, 40)
@@ -410,7 +410,7 @@ class ExcelReport(object):
     def fillup_sheet_polls(self):
         """ """
 
-        title = _('All polls')
+        title = _('Polls')
         sheet = self.workbook.get_worksheet_by_name('Polls')
         field_names = [
             '№', _('Id'), _('Title'), _('Slug'),
@@ -441,7 +441,7 @@ class ExcelReport(object):
     def fillup_sheet_choices(self):
         """ """
 
-        title = _('All choices')
+        title = _('Choices')
         sheet = self.workbook.get_worksheet_by_name('Choices')
         field_names = ['№', _('Id'), _('Text of choice'), _('Poll'), _('Count\nvotes')]
 
@@ -465,7 +465,7 @@ class ExcelReport(object):
     def fillup_sheet_votes(self):
         """ """
 
-        title = _('All votes')
+        title = _('Votes')
         sheet = self.workbook.get_worksheet_by_name('Votes')
         field_names = ['№', _('Id'), _('Voter'), _('Poll'), _('Choice'), _('Date\nvoting')]
 
@@ -475,7 +475,7 @@ class ExcelReport(object):
 
         self.write_title(title, sheet, count_fields)
         self.write_field_names(field_names, sheet)
-        self.write_objects(sheet, count_fields, 'Votes are not exists yet.', qs, func)
+        self.write_objects(sheet, count_fields, 'Votes are not exists yet', qs, func)
 
         self.write_count_votes_by_months_for_past_year()
         chart = self.get_chart_votes_for_past_year()
@@ -598,7 +598,7 @@ class ExcelReport(object):
     def fillup_sheet_voters(self):
         """ """
 
-        title = _('All voters')
+        title = _('Voters')
         sheet = self.workbook.get_worksheet_by_name('Voters')
         field_names = [
             '№', _('Id'), _('Full name'),
@@ -612,7 +612,7 @@ class ExcelReport(object):
 
         self.write_title(title, sheet, count_fields)
         self.write_field_names(field_names, sheet)
-        self.write_objects(sheet, count_fields, 'Voters are not exists yet.', qs, func)
+        self.write_objects(sheet, count_fields, 'Votes are not exists yet', qs, func)
         # if self.count_votes > 1:
         #     self.add_formulas_to_choices()
 

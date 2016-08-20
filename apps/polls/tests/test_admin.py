@@ -1,19 +1,15 @@
 
 from unittest import mock
 
-from django.utils import timezone
 from django.forms import widgets
 from django.utils.text import force_text
 from django.apps import apps
-from django.core.urlresolvers import reverse
-from django.contrib.auth import get_user_model
 from django.core.management import call_command
-from django.test import TestCase
-from django.test.client import RequestFactory
 
 import magic
 import pytest
 
+from mylabour.test_utils import EnhancedTestCase
 from config.admin import AdminSite
 
 from apps.polls.admin import PollAdmin, ChoiceAdmin, VoteAdmin, ChoiceInline, VoteInline
@@ -21,15 +17,7 @@ from apps.polls.models import Poll, Choice, Vote
 from apps.polls.factories import PollFactory, ChoiceFactory
 
 
-class MockRequest:
-    pass
-
-
-mockrequest = MockRequest()
-User = get_user_model()
-
-
-class PollAdminTests(TestCase):
+class PollAdminTests(EnhancedTestCase):
     """
     Tests for admin view of polls
     """
@@ -43,18 +31,14 @@ class PollAdminTests(TestCase):
         cls.poll2 = PollFactory(status='draft')
         cls.poll3 = PollFactory(status='closed')
 
-        cls.active_superuser, cls.user2, cls.user3 = User.objects.all()
-        cls.active_superuser.is_superuser = True
-        cls.active_superuser.is_active = True
-        cls.active_superuser.save()
+        cls.active_superuser, cls.user2, cls.user3 = cls.django_user_model.objects.all()
+        cls._make_user_as_active_superuser(cls.active_superuser)
 
-        cls.factory = RequestFactory()
-
-        url = reverse('admin:polls_statistics')
+        url = cls.reverse('admin:polls_statistics')
         cls.request_for_view_statistics = cls.factory.get(url)
         cls.request_for_view_statistics.user = cls.active_superuser
 
-        cls.url_polls_make_report = reverse('admin:polls_make_report')
+        cls.url_polls_make_report = cls.reverse('admin:polls_make_report')
 
         cls.PollAdmin = PollAdmin(Poll, AdminSite)
 
@@ -67,7 +51,7 @@ class PollAdminTests(TestCase):
 
     def test_get_queryset_must_return_objects_with_annotated_fields(self):
 
-        qs = self.PollAdmin.get_queryset(mockrequest)
+        qs = self.PollAdmin.get_queryset(self.mockrequest)
 
         values_poll = qs.values()[0]
         self.assertIn('count_votes', values_poll)
@@ -76,13 +60,13 @@ class PollAdminTests(TestCase):
 
     def test_get_inline_instances_if_poll_does_not_exists(self):
 
-        inlines = self.PollAdmin.get_inline_instances(mockrequest)
+        inlines = self.PollAdmin.get_inline_instances(self.mockrequest)
         self.assertEqual(len(inlines), 1)
         self.assertIsInstance(inlines[0], ChoiceInline)
 
     def test_get_inline_instances_if_poll_has_no_votes(self):
 
-        inlines = self.PollAdmin.get_inline_instances(mockrequest, self.poll1)
+        inlines = self.PollAdmin.get_inline_instances(self.mockrequest, self.poll1)
         self.assertEqual(len(inlines), 1)
         self.assertIsInstance(inlines[0], ChoiceInline)
 
@@ -90,7 +74,7 @@ class PollAdminTests(TestCase):
 
         Vote.objects.create(user=self.active_superuser, poll=self.poll1, choice=self.choice11)
 
-        inlines = self.PollAdmin.get_inline_instances(mockrequest, self.poll1)
+        inlines = self.PollAdmin.get_inline_instances(self.mockrequest, self.poll1)
         self.assertEqual(len(inlines), 2)
         self.assertIsInstance(inlines[0], ChoiceInline)
         self.assertIsInstance(inlines[1], VoteInline)
@@ -117,13 +101,13 @@ class PollAdminTests(TestCase):
 
     def test_get_fieldsets_if_poll_does_not_exists(self):
 
-        fieldsets = self.PollAdmin.get_fieldsets(mockrequest)
+        fieldsets = self.PollAdmin.get_fieldsets(self.mockrequest)
         fields = ['title', 'slug', 'status']
         self.assertListEqual(fieldsets, [[Poll._meta.verbose_name, {'fields': fields}]])
 
     def test_get_fieldsets_if_poll_has_not_votes(self):
 
-        fieldsets = self.PollAdmin.get_fieldsets(mockrequest, self.poll1)
+        fieldsets = self.PollAdmin.get_fieldsets(self.mockrequest, self.poll1)
         fields = ['title', 'slug', 'status', 'status_changed', 'get_count_votes', 'get_count_choices']
         self.assertListEqual(fieldsets, [[Poll._meta.verbose_name, {'fields': fields}]])
 
@@ -131,7 +115,7 @@ class PollAdminTests(TestCase):
 
         Vote.objects.create(user=self.active_superuser, poll=self.poll1, choice=self.choice11)
 
-        fieldsets = self.PollAdmin.get_fieldsets(mockrequest, self.poll1)
+        fieldsets = self.PollAdmin.get_fieldsets(self.mockrequest, self.poll1)
         fields = [
             'title', 'slug', 'status', 'status_changed', 'get_count_votes', 'get_count_choices',
             'get_date_lastest_voting', 'get_most_popular_choice_or_choices_as_html'
@@ -154,29 +138,29 @@ class PollAdminTests(TestCase):
 
         for url in urls:
             if url.name == 'polls_poll_changelist':
-                urlpath = reverse('admin:polls_poll_changelist')
+                urlpath = self.reverse('admin:polls_poll_changelist')
                 response = self.client.get(urlpath)
                 self.assertEqual(response.status_code, 200)
             elif url.name == 'polls_poll_change':
-                urlpath = reverse('admin:polls_poll_change', args=[self.poll1.pk])
+                urlpath = self.reverse('admin:polls_poll_change', args=[self.poll1.pk])
                 response = self.client.get(urlpath)
                 self.assertEqual(response.status_code, 200)
             elif url.name == 'polls_poll_history':
-                urlpath = reverse('admin:polls_poll_history', args=[self.poll1.pk])
+                urlpath = self.reverse('admin:polls_poll_history', args=[self.poll1.pk])
                 response = self.client.get(urlpath)
                 self.assertEqual(response.status_code, 200)
             elif url.name == 'polls_poll_delete':
-                urlpath = reverse('admin:polls_poll_delete', args=[self.poll1.pk])
+                urlpath = self.reverse('admin:polls_poll_delete', args=[self.poll1.pk])
                 response = self.client.get(urlpath)
                 self.assertEqual(response.status_code, 200)
             elif url.name == 'polls_poll_preview':
-                urlpath = reverse('admin:polls_poll_preview', args=[self.poll1.pk])
+                urlpath = self.reverse('admin:polls_poll_preview', args=[self.poll1.pk])
             elif url.name == 'polls_make_report':
-                urlpath = reverse('admin:polls_make_report')
+                urlpath = self.reverse('admin:polls_make_report')
                 response = self.client.get(urlpath)
                 self.assertEqual(response.status_code, 200)
             elif url.name == 'polls_statistics':
-                urlpath = reverse('admin:polls_statistics')
+                urlpath = self.reverse('admin:polls_statistics')
                 response = self.client.get(urlpath)
                 self.assertEqual(response.status_code, 200)
 
@@ -306,7 +290,7 @@ class PollAdminTests(TestCase):
 
     def test_basic_view_statistics(self):
 
-        url = reverse('admin:polls_statistics')
+        url = self.reverse('admin:polls_statistics')
 
         request = self.factory.get(url)
         request.user = self.active_superuser
@@ -451,7 +435,7 @@ class PollAdminTests(TestCase):
     @mock.patch('django.utils.timezone.now')
     def test_view_make_report_throught_POST_for_excel_report_on_different_themes(self, mock_now):
 
-        mock_now.return_value = timezone.datetime(2018, 4, 1, 11, 18, tzinfo=timezone.utc)
+        mock_now.return_value = self.timezone.datetime(2018, 4, 1, 11, 18, tzinfo=self.timezone.utc)
 
         data = {
             'polls': 'polls',
@@ -484,7 +468,7 @@ class PollAdminTests(TestCase):
     @mock.patch('django.utils.timezone.now')
     def test_view_make_report_throught_POST_for_pdf_report_on_different_themes(self, mock_now):
 
-        mock_now.return_value = timezone.datetime(2016, 11, 11, 1, 8, 7, tzinfo=timezone.utc)
+        mock_now.return_value = self.timezone.datetime(2016, 11, 11, 1, 8, 7, tzinfo=self.timezone.utc)
 
         data = {
             'polls': 'polls',
@@ -509,16 +493,14 @@ class PollAdminTests(TestCase):
         )
 
 
-class ChoiceAdminTests(TestCase):
+class ChoiceAdminTests(EnhancedTestCase):
 
     @classmethod
     def setUpTestData(cls):
 
         call_command('factory_test_users', '3')
-        cls.active_superuser, cls.user2, cls.user3 = User.objects.all()
-        cls.active_superuser.is_superuser = True
-        cls.active_superuser.is_active = True
-        cls.active_superuser.save()
+        cls.active_superuser, cls.user2, cls.user3 = cls.django_user_model.objects.all()
+        cls._make_user_as_active_superuser(cls.active_superuser)
 
         cls.ChoiceAdmin = ChoiceAdmin(Choice, AdminSite)
 
@@ -531,7 +513,7 @@ class ChoiceAdminTests(TestCase):
         self.client.force_login(self.active_superuser)
 
     def test_get_queryset(self):
-        qs = self.ChoiceAdmin.get_queryset(mockrequest)
+        qs = self.ChoiceAdmin.get_queryset(self.mockrequest)
         self.assertIn('count_votes', qs.values()[0])
 
     def test_get_urls(self):
@@ -550,7 +532,7 @@ class ChoiceAdminTests(TestCase):
 
     def test_template_used_in_change_view(self):
 
-        url = reverse('admin:polls_choice_change', args=[self.choice1.pk])
+        url = self.reverse('admin:polls_choice_change', args=[self.choice1.pk])
         response = self.client.get(url)
         self.assertTemplateUsed(response, 'polls/admin/choice_preview_form.html')
 
@@ -560,9 +542,9 @@ class ChoiceAdminTests(TestCase):
 
         for url in urls:
             if url.name == 'polls_choice_changelist':
-                urlpath = reverse('admin:polls_choice_changelist')
+                urlpath = self.reverse('admin:polls_choice_changelist')
             elif url.name == 'polls_choice_change':
-                urlpath = reverse('admin:polls_choice_change', args=[self.choice1.pk])
+                urlpath = self.reverse('admin:polls_choice_change', args=[self.choice1.pk])
 
             response = self.client.get(urlpath)
             self.assertEqual(response.status_code, 200)
@@ -620,17 +602,15 @@ class ChoiceAdminTests(TestCase):
         )
 
 
-class VoteAdminTests(TestCase):
+class VoteAdminTests(EnhancedTestCase):
 
     @classmethod
     def setUpTestData(cls):
 
         call_command('factory_test_users', '1')
 
-        cls.active_superuser = User.objects.get()
-        cls.active_superuser.is_active = True
-        cls.active_superuser.is_superuser = True
-        cls.active_superuser.save()
+        cls.active_superuser = cls.django_user_model.objects.get()
+        cls._make_user_as_active_superuser(cls.active_superuser)
 
         poll = PollFactory()
         choice = ChoiceFactory(poll=poll)
@@ -656,6 +636,6 @@ class VoteAdminTests(TestCase):
 
         for url in urls:
             if url.name == 'polls_vote_changelist':
-                urlpath = reverse('admin:polls_vote_changelist')
+                urlpath = self.reverse('admin:polls_vote_changelist')
                 response = self.client.get(urlpath)
                 self.assertEqual(response.status_code, 200)
