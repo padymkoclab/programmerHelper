@@ -1,7 +1,9 @@
 
+import collections
 import itertools
 import io
 from unittest import mock
+from unittest import skip
 
 from django.core.management import call_command
 
@@ -97,21 +99,25 @@ class PollPDFReportWithoutObjectsTests(EnhancedTestCase):
         text = 'Report about polls\nResults of polls\nPage {0}\nSubject: Results of polls\nPolls are not exists yet\n'
         return text.format(number_page_in_doc)
 
-    def _test_doc_info(self, doc, subject, count_pages):
+    def _test_doc_info(self, combination):
         """Tests for an each generated report-document."""
 
-        doc_info = doc.getDocumentInfo()
-        self.assertEqual(doc.getNumPages(), count_pages)
+        # count pages must be +2, because always presents is page Title, Content, Statistics
+        # and in self.data is type output as PDF
+        count_pages = len(combination) + 3
+
+        doc_info = self.doc.getDocumentInfo()
+        self.assertEqual(self.doc.getNumPages(), count_pages)
         self.assertEqual(doc_info['/Creator'], self.settings.SITE_NAME)
         self.assertEqual(doc_info['/Keywords'], 'Polls, votes, voters')
-        self.assertEqual(doc_info['/Subject'], subject)
+        self.assertEqual(doc_info['/Subject'], self.subject)
         self.assertEqual(doc_info['/Title'], 'Report about polls')
         self.assertEqual(doc_info['/Author'], self.superuser_full_name)
 
-    def _tests_title_page(self, doc, now, request):
+    def _tests_title_page(self, now, request):
         """Tests for a first (title) page of an each generated report."""
 
-        page0Text = doc.getPage(0).extractText()
+        page0Text = self.doc.getPage(0).extractText()
 
         self.assertIn(self.settings.SITE_NAME, page0Text)
         self.assertIn(
@@ -141,23 +147,22 @@ class PollPDFReportWithoutObjectsTests(EnhancedTestCase):
             page0Text
         )
 
-    def _tests_content_page(self, doc, themes):
+    def _tests_content_page(self):
         """Tests for a second page in an each generated report."""
 
-        page1Text = doc.getPage(1).extractText()
-        listing_themes = '\n'.join(themes)
+        page1Text = self.doc.getPage(1).extractText()
         self.assertEqual(
             ''.join([
                 'Report about polls\nContent\nPage 2\nContent of report\n',
-                'This report contains a next subject:\n{0}\n'.format(listing_themes),
+                'This report contains a next subject:\n{0}\n'.format(self.lst_themes),
             ]),
             page1Text
         )
 
-    def _test_statistics_page(self, doc):
+    def _test_statistics_page(self):
         """Tests for a third page - statistics of an each generated report."""
 
-        page2Text = doc.getPage(2).extractText()
+        page2Text = self.doc.getPage(2).extractText()
         self.assertEqual(
             ''.join([
                 'Report about polls\nStatistics\nPage 3\nStatictics\nCount polls\n0\nCount opened polls\n0\n',
@@ -182,36 +187,109 @@ class PollPDFReportWithoutObjectsTests(EnhancedTestCase):
 
         response = self.PollAdmin.view_make_report(request)
 
-        self.buffer.write(response.getvalue())
-
-        doc = PdfFileReader(self.buffer)
+        # in-memory file for PDF response
+        doc = PdfFileReader(io.BytesIO((response.getvalue())))
 
         return doc, now, request
 
-    def test_without_objects_on_theme_polls(self):
+    def test_generated_reports_on_different_themes_if_no_polls_and_choices_and_votes_at_all(self):
 
-        # needed data of a POST request for generate PDF report
-        self.data = {'output_report': 'report_pdf'}
+        # all possible themes
+        themes = {
+            'polls': 'polls',
+            'choices': 'choices',
+            'votes': 'votes',
+            'voters': 'voters',
+            'results': 'results',
+        }
 
-        # in-memory file for PDF response
-        self.buffer = io.BytesIO()
+        # create all possible combinations from the themes
+        combinations = list()
+        for i in range(1, len(themes) + 1):
+            combinations.extend(map(dict, itertools.combinations(themes.items(), i)))
 
-        self.data['polls'] = 'polls'
+        # names of the themes and their functions for empty text on their pages
+        themes_and_functions = {
+            'polls': self._get_text_for_empty_page_polls,
+            'choices': self._get_text_for_empty_page_choices,
+            'votes': self._get_text_for_empty_page_votes,
+            'voters': self._get_text_for_empty_page_voters,
+            'results': self._get_text_for_empty_page_results,
+        }
 
-        doc, now, request = self._get_doc_from_request_and_now_and_request()
+        # themes and their priorities in the report
+        themes_and_priorities = collections.OrderedDict([
+            ('polls', 1),
+            ('choices', 2),
+            ('votes', 3),
+            ('voters', 4),
+            ('results', 5),
+        ])
 
-        self._test_doc_info(doc, 'Polls', 4)
-        self._tests_title_page(doc, now, request)
-        self._tests_content_page(doc, ['Polls'])
-        self._test_statistics_page(doc)
+        for combination in combinations:
 
-        self.assertEqual(
-            self._get_text_for_empty_page_polls(number_page_in_doc=4),
-            doc.getPage(3).extractText()
-        )
+            ordered_themes_and_function = collections.OrderedDict(
+                (k, themes_and_functions[k]) for k, v in themes_and_priorities.items()
+                if k in combination
+            )
+
+            # needed data of a POST request for generate PDF report
+            self.data = {'output_report': 'report_pdf'}
+
+            # add combination of themes for POST data
+            self.data.update(combination)
+
+            # determinated a subject of the report and it`s themes
+            subject = list()
+            lst_themes = list()
+            if 'polls' in self.data:
+                subject.append('Polls')
+                lst_themes.append('Polls')
+            if 'choices' in self.data:
+                subject.append('Choices')
+                lst_themes.append('Choices')
+            if 'votes' in self.data:
+                subject.append('Votes')
+                lst_themes.append('Votes')
+            if 'voters' in self.data:
+                subject.append('Voters')
+                lst_themes.append('Voters')
+            if 'results' in self.data:
+                subject.append('Results of polls')
+                lst_themes.append('Results of polls')
+            self.subject = ', '.join(subject).capitalize()
+            self.lst_themes = '\n'.join(lst_themes)
+
+            # get output of PDF report, now and request
+            self.doc, now, request = self._get_doc_from_request_and_now_and_request()
+
+            # tests basic of the report
+            self._test_doc_info(combination)
+
+            # tests for a title page on based the now datetime and the request
+            self._tests_title_page(now, request)
+
+            # tests for a page with content of the report
+            self._tests_content_page()
+
+            # tests for a page with statistics of the report
+            self._test_statistics_page()
+
+            # a number of page started from 2
+            i = 2
+            for func in ordered_themes_and_function.values():
+
+                # number page in PDF document, numeration from 0
+                page = i + 1
+
+                # number page in report, numeration from 1
+                number_page_in_doc = page + 1
+
+                self.assertEqual(func(number_page_in_doc=number_page_in_doc), self.doc.getPage(page).extractText())
+                i += 1
 
 
-@pytest.mark.xfail('PyPDF does not support for unicode')
+@skip('PyPDF does not support for unicode')
 class PollPDFReportWithObjectsTests(EnhancedTestCase):
     """
     Test for the PollPDFReport considering that polls, choices and votes
@@ -429,7 +507,6 @@ class PollPDFReportWithObjectsTests(EnhancedTestCase):
             doc.getPage(3).extractText()
         )
 
-    @pytest.mark.xfail(run=False)
     def test_without_objects_on_theme_choices(self):
 
         self.data['choices'] = 'choices'
@@ -447,7 +524,6 @@ class PollPDFReportWithObjectsTests(EnhancedTestCase):
             doc.getPage(3).extractText()
         )
 
-    @pytest.mark.xfail(run=False)
     def test_without_objects_on_theme_votes(self):
 
         self.data['votes'] = 'votes'
@@ -465,7 +541,6 @@ class PollPDFReportWithObjectsTests(EnhancedTestCase):
             doc.getPage(3).extractText()
         )
 
-    @pytest.mark.xfail(run=False)
     def test_without_objects_on_theme_voters(self):
 
         self.data['voters'] = 'voters'
@@ -483,7 +558,6 @@ class PollPDFReportWithObjectsTests(EnhancedTestCase):
             doc.getPage(3).extractText()
         )
 
-    @pytest.mark.xfail(run=False)
     def test_without_objects_on_theme_results(self):
 
         self.data['results'] = 'results'
@@ -501,7 +575,6 @@ class PollPDFReportWithObjectsTests(EnhancedTestCase):
             doc.getPage(3).extractText()
         )
 
-    @pytest.mark.xfail(run=False)
     def test_without_objects_on_theme_polls_and_choices(self):
 
         self.data['polls'] = 'polls'
@@ -525,7 +598,6 @@ class PollPDFReportWithObjectsTests(EnhancedTestCase):
             doc.getPage(4).extractText()
         )
 
-    @pytest.mark.xfail(run=False)
     def test_without_objects_on_theme_polls_and_votes(self):
 
         self.data['polls'] = 'polls'
@@ -549,7 +621,6 @@ class PollPDFReportWithObjectsTests(EnhancedTestCase):
             doc.getPage(4).extractText()
         )
 
-    @pytest.mark.xfail(run=False)
     def test_without_objects_on_theme_polls_and_voters(self):
 
         self.data['polls'] = 'polls'
@@ -573,7 +644,6 @@ class PollPDFReportWithObjectsTests(EnhancedTestCase):
             doc.getPage(4).extractText()
         )
 
-    @pytest.mark.xfail(run=False)
     def test_without_objects_on_theme_polls_and_results(self):
 
         self.data['polls'] = 'polls'
@@ -597,7 +667,6 @@ class PollPDFReportWithObjectsTests(EnhancedTestCase):
             doc.getPage(4).extractText()
         )
 
-    @pytest.mark.xfail(run=False)
     def test_without_objects_on_theme_choices_and_votes(self):
 
         self.data['choices'] = 'choices'
@@ -621,7 +690,6 @@ class PollPDFReportWithObjectsTests(EnhancedTestCase):
             doc.getPage(4).extractText()
         )
 
-    @pytest.mark.xfail(run=False)
     def test_without_objects_on_theme_choices_and_voters(self):
 
         self.data['choices'] = 'choices'
@@ -645,7 +713,6 @@ class PollPDFReportWithObjectsTests(EnhancedTestCase):
             doc.getPage(4).extractText()
         )
 
-    @pytest.mark.xfail(run=False)
     def test_without_objects_on_theme_choices_and_results(self):
 
         self.data['choices'] = 'choices'
@@ -669,7 +736,6 @@ class PollPDFReportWithObjectsTests(EnhancedTestCase):
             doc.getPage(4).extractText()
         )
 
-    @pytest.mark.xfail(run=False)
     def test_without_objects_on_theme_votes_and_voters(self):
 
         self.data['votes'] = 'votes'
@@ -693,7 +759,6 @@ class PollPDFReportWithObjectsTests(EnhancedTestCase):
             doc.getPage(4).extractText()
         )
 
-    @pytest.mark.xfail(run=False)
     def test_without_objects_on_theme_votes_and_results(self):
 
         self.data['votes'] = 'votes'
@@ -717,7 +782,6 @@ class PollPDFReportWithObjectsTests(EnhancedTestCase):
             doc.getPage(4).extractText()
         )
 
-    @pytest.mark.xfail(run=False)
     def test_without_objects_on_theme_voters_and_results(self):
 
         self.data['voters'] = 'voters'
@@ -741,7 +805,6 @@ class PollPDFReportWithObjectsTests(EnhancedTestCase):
             doc.getPage(4).extractText()
         )
 
-    @pytest.mark.xfail(run=False)
     def test_without_objects_on_theme_polls_and_choices_and_results(self):
 
         self.data['polls'] = 'polls'
@@ -772,7 +835,6 @@ class PollPDFReportWithObjectsTests(EnhancedTestCase):
             doc.getPage(5).extractText()
         )
 
-    @pytest.mark.xfail(run=False)
     def test_without_objects_on_theme_polls_and_choices_and_votes(self):
 
         self.data['polls'] = 'polls'
@@ -803,7 +865,6 @@ class PollPDFReportWithObjectsTests(EnhancedTestCase):
             doc.getPage(5).extractText()
         )
 
-    @pytest.mark.xfail(run=False)
     def test_without_objects_on_theme_polls_and_choices_and_voters(self):
 
         self.data['polls'] = 'polls'
@@ -834,7 +895,6 @@ class PollPDFReportWithObjectsTests(EnhancedTestCase):
             doc.getPage(5).extractText()
         )
 
-    @pytest.mark.xfail(run=False)
     def test_without_objects_on_theme_polls_and_votes_and_voters(self):
 
         self.data['polls'] = 'polls'
@@ -865,7 +925,6 @@ class PollPDFReportWithObjectsTests(EnhancedTestCase):
             doc.getPage(5).extractText()
         )
 
-    @pytest.mark.xfail(run=False)
     def test_without_objects_on_theme_polls_and_votes_results(self):
 
         self.data['polls'] = 'polls'
@@ -896,7 +955,6 @@ class PollPDFReportWithObjectsTests(EnhancedTestCase):
             doc.getPage(5).extractText()
         )
 
-    @pytest.mark.xfail(run=False)
     def test_without_objects_on_theme_polls_and_voters_results(self):
 
         self.data['polls'] = 'polls'
@@ -927,7 +985,6 @@ class PollPDFReportWithObjectsTests(EnhancedTestCase):
             doc.getPage(5).extractText()
         )
 
-    @pytest.mark.xfail(run=False)
     def test_without_objects_on_theme_choices_and_votes_and_voters(self):
 
         self.data['choices'] = 'choices'
@@ -958,7 +1015,6 @@ class PollPDFReportWithObjectsTests(EnhancedTestCase):
             doc.getPage(5).extractText()
         )
 
-    @pytest.mark.xfail(run=False)
     def test_without_objects_on_theme_choices_and_votes_and_results(self):
 
         self.data['choices'] = 'choices'
@@ -989,7 +1045,6 @@ class PollPDFReportWithObjectsTests(EnhancedTestCase):
             doc.getPage(5).extractText()
         )
 
-    @pytest.mark.xfail(run=False)
     def test_without_objects_on_theme_choices_and_voters_and_results(self):
 
         self.data['choices'] = 'choices'
@@ -1020,7 +1075,6 @@ class PollPDFReportWithObjectsTests(EnhancedTestCase):
             doc.getPage(5).extractText()
         )
 
-    @pytest.mark.xfail(run=False)
     def test_without_objects_on_theme_votes_and_voters_and_results(self):
 
         self.data['results'] = 'results'
@@ -1051,7 +1105,6 @@ class PollPDFReportWithObjectsTests(EnhancedTestCase):
             doc.getPage(5).extractText()
         )
 
-    @pytest.mark.xfail(run=False)
     def test_without_objects_on_theme_polls_and_choices_and_votes_and_voters(self):
 
         self.data['polls'] = 'polls'
@@ -1083,7 +1136,6 @@ class PollPDFReportWithObjectsTests(EnhancedTestCase):
             doc.getPage(6).extractText()
         )
 
-    @pytest.mark.xfail(run=False)
     def test_without_objects_on_theme_polls_and_choices_and_votes_and_results(self):
 
         self.data['polls'] = 'polls'
@@ -1115,7 +1167,6 @@ class PollPDFReportWithObjectsTests(EnhancedTestCase):
             doc.getPage(6).extractText()
         )
 
-    @pytest.mark.xfail(run=False)
     def test_without_objects_on_theme_polls_and_choices_votes_and_voters(self):
 
         self.data['polls'] = 'polls'
@@ -1147,7 +1198,6 @@ class PollPDFReportWithObjectsTests(EnhancedTestCase):
             doc.getPage(6).extractText()
         )
 
-    @pytest.mark.xfail(run=False)
     def test_without_objects_on_theme_polls_and_choices_and_voters_and_results(self):
 
         self.data['polls'] = 'polls'
@@ -1179,7 +1229,6 @@ class PollPDFReportWithObjectsTests(EnhancedTestCase):
             doc.getPage(6).extractText()
         )
 
-    @pytest.mark.xfail(run=False)
     def test_without_objects_on_theme_choices_and_votes_voters_and_results(self):
 
         self.data['votes'] = 'votes'
@@ -1211,7 +1260,6 @@ class PollPDFReportWithObjectsTests(EnhancedTestCase):
             doc.getPage(6).extractText()
         )
 
-    @pytest.mark.xfail(run=False)
     def test_without_objects_on_theme_polls_and_choices_and_votes_and_voters_and_results(self):
 
         self.data['polls'] = 'polls'
