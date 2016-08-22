@@ -17,6 +17,24 @@ from apps.polls.models import Poll, Choice, Vote
 from apps.polls.factories import PollFactory, ChoiceFactory
 
 
+class PollsAdminTests(EnhancedTestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+
+        call_command('factory_test_users', '1')
+
+        cls.active_superuser = cls.django_user_model.objects.get()
+        cls._make_user_as_active_superuser(cls.active_superuser)
+
+    def test_app_index_page(self):
+        url = self.reverse('admin:app_list', kwargs={'app_label': 'polls'})
+        self.client.force_login(self.active_superuser)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed('polls/admin/app_index.html')
+
+
 class PollAdminTests(EnhancedTestCase):
     """
     Tests for admin view of polls
@@ -153,8 +171,8 @@ class PollAdminTests(EnhancedTestCase):
                 urlpath = self.reverse('admin:polls_poll_delete', args=[self.poll1.pk])
                 response = self.client.get(urlpath)
                 self.assertEqual(response.status_code, 200)
-            elif url.name == 'polls_poll_preview':
-                urlpath = self.reverse('admin:polls_poll_preview', args=[self.poll1.pk])
+            # elif url.name == 'polls_poll_preview':
+            #     urlpath = self.reverse('admin:polls_poll_preview', args=[self.poll1.pk])
             elif url.name == 'polls_make_report':
                 urlpath = self.reverse('admin:polls_make_report')
                 response = self.client.get(urlpath)

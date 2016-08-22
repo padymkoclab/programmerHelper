@@ -1,45 +1,68 @@
 
-# import io
+from mylabour.test_utils import StaticLiveAdminTest
 
-# import openpyxl
+from config.admin import AdminSite
 
-# from mylabour.test_utils import EnhancedTestCase
+from apps.polls.models import Poll
+from apps.polls.admin import PollAdmin
 
-# from config.admin import AdminSite
-
-# from apps.polls.models import Poll
-# from apps.polls.admin import PollAdmin
+# invoke git_push "Started writing live tests for the app 'polls'."
 
 
-# class Tests(EnhancedTestCase):
+class PollAdminLiveTests(StaticLiveAdminTest):
 
-#     @classmethod
-#     def setUpTestData(cls):
-#         cls.call_command('factory_test_users', '1')
-#         cls.active_superuser = cls.django_user_model.objects.first()
-#         cls._make_user_as_active_superuser(cls.active_superuser)
+    def test_page_app_index_polls(self):
 
-#         cls.PollAdmin = PollAdmin(Poll, AdminSite)
+        url = self.reverse('admin:app_list', kwargs={'app_label': 'polls'})
+        self.open_page(url)
 
-#     def setUp(self):
-#         self.buffer = io.BytesIO()
+        self.browser.find_element_by_xpath('//*[@id="content-main"]/div/table/tbody/tr[1]/td[1]/a').click()
+        self.assertIn(self.reverse('admin:polls_choice_changelist'), self.browser.current_url)
 
-#     def _make_request_and_return_excelfile(self, data):
-#         request = self.factory.post('admin:polls_make_report', data)
-#         request.user = self.active_superuser
-#         response = self.PollAdmin.view_make_report(request)
-#         return openpyxl.load_workbook(io.BytesIO(response))
+        self.open_page(url)
+        self.browser.find_element_by_xpath('//*[@id="content-main"]/div/table/tbody/tr[2]/td[1]/a').click()
+        self.assertIn(self.reverse('admin:polls_poll_changelist'), self.browser.current_url)
 
-#     def test_(self):
+        self.open_page(url)
+        self.browser.find_element_by_xpath('//*[@id="content-main"]/div/table/tbody/tr[2]/td[2]/a').click()
+        self.assertIn(self.reverse('admin:polls_poll_add'), self.browser.current_url)
 
-#         data = {
-#             'output_report': 'report_excel',
-#             'polls': 'polls',
-#             'choices': 'choices',
-#             'votes': 'votes',
-#             'voters': 'voters',
-#             'results': 'results',
-#         }
+        self.open_page(url)
+        self.browser.find_element_by_xpath('//*[@id="content-main"]/div/table/tbody/tr[3]/td[1]/a').click()
+        self.assertIn(self.reverse('admin:polls_vote_changelist'), self.browser.current_url)
 
-#         excelfile = self._make_request_and_return_excelfile(data)
-#         import ipdb; ipdb.set_trace()
+        self.open_page(url)
+        self.browser.find_element_by_xpath('//*[@id="content-main"]/div/table/tbody/tr[4]/td[1]/a').click()
+        self.assertIn(self.reverse('admin:users_user_changelist'), self.browser.current_url)
+
+        self.open_page(url)
+        self.browser.find_element_by_xpath('//*[@id="content-summary"]/table/tbody/tr[1]/td[1]/a').click()
+        self.assertIn(self.reverse('admin:polls_make_report'), self.browser.current_url)
+
+        self.open_page(url)
+        self.browser.find_element_by_xpath('//*[@id="content-summary"]/table/tbody/tr[2]/td[1]/a').click()
+        self.assertIn(self.reverse('admin:polls_statistics'), self.browser.current_url)
+
+    def test_page_polls_make_report(self):
+
+        url = self.reverse('admin:polls_make_report')
+        self.open_page(url)
+
+        self.assertFalse(self.browser.find_element_by_name('polls').is_selected())
+        self.assertFalse(self.browser.find_element_by_name('choices').is_selected())
+        self.assertFalse(self.browser.find_element_by_name('votes').is_selected())
+        self.assertTrue(self.browser.find_element_by_name('results').is_selected())
+        self.assertFalse(self.browser.find_element_by_name('voters').is_selected())
+
+    def test_page_polls_statistics(self):
+
+        url = self.reverse('admin:polls_statistics')
+        self.open_page(url)
+
+        admin_breadcrumb_ul = self.browser.find_element_by_xpath('//*[@id="suit-center"]/ul')
+        lis = admin_breadcrumb_ul.find_elements_by_tag_name('li')
+
+        self.assertEqual(lis[0].find_element_by_tag_name('a').text, 'Home')
+        self.assertEqual(lis[1].find_element_by_tag_name('a').text, 'Polls')
+        self.assertEqual(lis[2].find_element_by_tag_name('a').text, 'Make a report about polls')
+        self.assertEqual(lis[2].find_element_by_tag_name('a').get_attribute('class'), 'activate')
