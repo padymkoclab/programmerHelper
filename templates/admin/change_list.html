@@ -20,7 +20,7 @@ Load library of tags for filters of Django-Suit
         <i class="icon-upload icon-white"></i>&nbsp;{% trans "Export" %}
     </a>
 
-    <a href="{% url 'export_import_models:import_model' %}" class="btn btn-warning">
+    <a href="{% url 'export_import_models:import' %}" class="btn btn-warning">
         <i class="icon-download icon-white"></i>&nbsp;{% trans "Import" %}
     </a>
 
@@ -53,7 +53,9 @@ Load library of tags for filters of Django-Suit
                 Display button "Add object" if only that model admin class has url for add object.
                 And replace text in blocktrans
                 {% endcomment %}
-                {% blocktrans with cl.opts.verbose_name_plural|capfirst as name_plural %}{{ name_plural }} are not exists yet{% endblocktrans %}.
+                {% blocktrans with cl.opts.verbose_name_plural|capfirst as name_plural  trimmed %}
+                  {{ name_plural }} are not exists yet
+                {% endblocktrans %}.
                 {% if cl.model_admin|has_admin_url:'add' %}
                     {% if has_add_permission %}<a href="{% url cl.opts|admin_urlname:'add' %}{% if is_popup %}?{{ POPUP_VAR }}=1{% endif %}">
                     {% blocktrans with cl.opts.verbose_name as name %}Add {{ name }}{% endblocktrans %}</a>{% endif %}

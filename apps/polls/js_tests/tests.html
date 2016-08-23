@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Javascript tests for polls</title>
+        <link rel="stylesheet" href="qunit.css">
+    </head>
+    <body>
+        <div id="qunit"></div>
+        <div id="qunit-fixture">
+            <button id="tita">Tita</button>
+            <table class="table-overview applist" id="table_radio_group_select_report">
+                <caption>{% trans "Select needed report" %}</caption>
+                <tbody>
+                    <tr>
+                        <td class="section">
+                            <select name="output_report" id="select_output_report">
+                                <option value="report_pdf" selected>{% trans "Report PDF" %}</option>
+                                <option value="report_excel">{% trans "Report Excel" %}</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="section">
+                            <label for="subject_polls">
+                                <input type="checkbox" name="polls" value="polls" id="subject_polls">
+                                <span>{% trans "Polls" %}</span>
+                            </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="section">
+                            <label for="subject_choices">
+                                <input type="checkbox" name="choices" value="choices" id="subject_choices">
+                                <span>{% trans "Choices" %}</span>
+                            </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="section">
+                            <label for="subject_votes">
+                                <input type="checkbox" name="votes" value="votes" id="subject_votes">
+                                <span>{% trans "Votes" %}</span>
+                            </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="section">
+                            <label for="subject_results">
+                                <input type="checkbox" name="results" value="results" id="subject_results" checked="checked">
+                                <span>{% trans "Result of polls" %}</span>
+                            </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="section">
+                            <label for="subject_voters">
+                                <input type="checkbox" name="voters" value="voters" id="subject_voters">
+                                <span>{% trans "Voters" %}</span>
+                            </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="section">
+                            <input type="submit" name="submit" value="Make report" id="btn_submit_make_report_polls">
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <script src="qunit.js"></script>
+
+        <script src='../../../../lib/python3.4/site-packages/django/contrib/admin/static/admin/js/vendor/jquery/jquery.min.js'></script>
+        <script src='../../../../lib/python3.4/site-packages/django/contrib/admin/static/admin/js/jquery.init.js'></script>
+
+        <script src='../../../static/project/js/blanket.min.js'></script>
+
+        <script src='../static/polls/js/admin/admin.js' data-cover></script>
+        <script src='../static/polls/js/admin/admin.test.js' data-cover></script>
+
+    </body>
+</html>

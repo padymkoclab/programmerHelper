@@ -1,0 +1,21 @@
+{% extends "admin/change_form.html" %}
+
+{% load static %}
+
+
+{% block content %}
+    <div id="content-main" class="inner-two-columns">
+        <form class="form-horizontal">
+            <div class="inner-right-column"></div>
+            <div class="inner-center-column">
+                <div class="tab-content tab-content-main">
+                    {% block field_sets %}
+                        {% for fieldset in adminform %}
+                            {% include "admin/includes/fieldset.html" %}
+                        {% endfor %}
+                    {% endblock %}
+                </div>
+            </div>
+        </form>
+    </div>
+{% endblock %}

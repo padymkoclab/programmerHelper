@@ -65,8 +65,8 @@ class StaticLiveAdminTest(StaticLiveServerTestCase):
     def setUpClass(cls):
         super(StaticLiveAdminTest, cls).setUpClass()
 
-        User = get_user_model()
-        cls.superuser = User.objects.latest()
+        cls.call_command('factory_test_superusers', '1')
+        cls.active_superuser = cls.django_user_model.objects.get()
 
     def setUp(self):
 
@@ -96,7 +96,7 @@ class StaticLiveAdminTest(StaticLiveServerTestCase):
 
         # simulation login superuser for get needed cookies
         client = self.client_class()
-        client.force_login(self.superuser)
+        client.force_login(self.active_superuser)
         cookie = client.cookies['sessionid']
 
         # open the admin`s login page and add the needed cookies, and then the refresh page

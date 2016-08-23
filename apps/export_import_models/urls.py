@@ -21,7 +21,7 @@ urlpatterns = [
             staff_member_required(ExportPreviewDownloadView.as_view()), {}, 'export_preview_download'),
     ])),
     url(r'import/', include([
-        url(r'^$', staff_member_required(ImportTemplateView.as_view()), {}, 'import_model'),
+        url(r'^$', staff_member_required(ImportTemplateView.as_view()), {}, 'import'),
         url(r'result/$', staff_member_required(ImportResultTemplateView.as_view()), {}, 'import_result'),
     ]))
 ]

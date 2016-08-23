@@ -876,7 +876,7 @@ class ExcelReport(object):
                 'rotation': 90,
             },
             'name_layout': {
-                'x': 0.02,
+                'x': 0.05,
                 'y': 0.3,
             },
             'label_position': 'low',
