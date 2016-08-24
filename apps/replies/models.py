@@ -21,7 +21,7 @@ class Reply(BaseGenericModel):
     MAX_SCOPE = 5
     MIN_SCOPE = 1
 
-    account = models.ForeignKey(
+    user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name='replies',
@@ -88,11 +88,11 @@ class Reply(BaseGenericModel):
         verbose_name_plural = _('Replies')
         get_latest_by = 'date_added'
         ordering = ['date_added']
-        unique_together = ['account', 'object_id']
+        unique_together = ['user', 'object_id']
 
     def __str__(self):
         type_instance = self.content_object._meta.verbose_name.lower()
-        return _('Reply on {0} "{1.content_object}" from {1.account}').format(type_instance, self)
+        return _('Reply on {0} "{1.content_object}" from {1.user}').format(type_instance, self)
 
     def save(self, *args, **kwargs):
         # each word must saved as capitalize

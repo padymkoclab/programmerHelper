@@ -6,8 +6,8 @@ from django.contrib import admin
 
 from apps.replies.admin import ReplyInline
 
-from .models import Book, Writter
-from .forms import BookForm, WritterForm
+from .models import Book, Writer
+from .forms import BookForm, WriterForm
 
 
 class BookAdmin(admin.ModelAdmin):
@@ -18,7 +18,7 @@ class BookAdmin(admin.ModelAdmin):
     form = BookForm
     list_display = (
         'name',
-        'show_writters',
+        'show_writers',
         'pages',
         'publishers',
         'language',
@@ -59,7 +59,7 @@ class BookAdmin(admin.ModelAdmin):
 
     def get_queryset(self, request):
         qs = super(BookAdmin, self).get_queryset(request)
-        qs = qs.books_with_count_tags_links_replies_and_rating()
+        qs = qs.books_with_count_tags_replies_and_rating()
         return qs
 
     def get_count_tags(self, obj):
@@ -72,33 +72,33 @@ class BookAdmin(admin.ModelAdmin):
     get_count_replies.admin_order_field = 'count_replies'
     get_count_replies.short_description = _('Count replies')
 
-    def show_writters(self, obj):
-        """Listing writters separated throgh commas"""
+    def show_writers(self, obj):
+        """Listing writers separated throgh commas"""
 
-        return format_html_join(', ', '{0}', ((writter, ) for writter in obj.accounts.all()))
-    show_writters.short_description = _('Writters')
+        return format_html_join(', ', '{0}', ((writer, ) for writer in obj.accounts.all()))
+    show_writers.short_description = _('Writers')
 
     def color_styled_rating(self, obj):
         raise NotImplementedError
 
 
-class WritterAdmin(admin.ModelAdmin):
+class WriterAdmin(admin.ModelAdmin):
     '''
-    Admin View for Writter
+    Admin View for Writer
     '''
 
-    form = WritterForm
+    form = WriterForm
     list_display = (
         'name',
         'show_years_life',
         'show_books',
         'get_count_books',
-        'short_about_writter',
+        'short_about_writer',
     )
     search_fields = ['name', 'about']
     fieldsets = [
         [
-            Writter._meta.verbose_name, {
+            Writer._meta.verbose_name, {
                 'fields': [
                     'name',
                     'about',
@@ -109,8 +109,8 @@ class WritterAdmin(admin.ModelAdmin):
     ]
 
     def get_queryset(self, request):
-        qs = super(WritterAdmin, self).get_queryset(request)
-        qs = qs.writters_with_count_books()
+        qs = super(WriterAdmin, self).get_queryset(request)
+        qs = qs.writers_with_count_books()
         return qs
 
     def get_count_books(self, obj):
@@ -123,6 +123,6 @@ class WritterAdmin(admin.ModelAdmin):
     show_books.admin_order_field = 'count_books'
     show_books.short_description = _('Books')
 
-    def short_about_writter(self, obj):
+    def short_about_writer(self, obj):
         return truncatewords(obj.about, 10)
-    short_about_writter.short_description = _('Short about writter')
+    short_about_writer.short_description = _('Short about writer')

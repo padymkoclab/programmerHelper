@@ -4,14 +4,15 @@ import random
 
 from django.conf import settings
 
-from psycopg2.extras import NumericRange
 import factory
 from factory import fuzzy
 
-from apps.replies.factories import ReplyFactory
-from mylabour.utils import generate_text_by_min_length
+from mylabour.factories_utils import generate_text_by_min_length
 
-from .models import *
+from apps.tags.models import Tag
+from apps.replies.factories import ReplyFactory
+
+from .models import Book, Writer, NOW_YEAR
 
 
 class BookFactory(factory.django.DjangoModelFactory):
@@ -57,61 +58,39 @@ class BookFactory(factory.django.DjangoModelFactory):
     @factory.post_generation
     def tags(self, created, extracted, **kwargs):
         count_tags = random.randrange(settings.MIN_COUNT_TAGS_ON_OBJECT, settings.MAX_COUNT_TAGS_ON_OBJECT)
-        tags = random.sample(tuple(Tag.objects.all()), count_tags)
+        tags = Tag.objects.random_tags(count_tags, single_as_qs=True)
         self.tags.set(tags)
 
     @factory.post_generation
-    def accounts(self, created, extracted, **kwargs):
+    def authorship(self, created, extracted, **kwargs):
         count_authors = random.randint(1, 4)
-        authors = random.sample(tuple(Writter.objects.all()), count_authors)
-        self.accounts.set(authors)
+        authors = random.sample(tuple(Writer.objects.all()), count_authors)
+        self.authorship.set(authors)
 
 
-class WritterFactory(factory.django.DjangoModelFactory):
+class WriterFactory(factory.django.DjangoModelFactory):
 
     class Meta:
-        model = Writter
+        model = Writer
 
     name = factory.Faker('name', locale='ru')
 
     @factory.lazy_attribute
     def about(self):
-        return generate_text_by_min_length(150, as_p=True)
+        return generate_text_by_min_length(100, as_p=True)
 
     @factory.lazy_attribute
     def years_life(self):
-        now_year = datetime.datetime.now().year
-        # year_birth
-        if random.random() > .5:
-            year_birth = None
+
+        year = datetime.datetime.now().year
+
+        min_year_birth = year - 16
+
+        year_birth = random.choice((random.randint(1900, min_year_birth), '?'))
+
+        if year_birth == '?':
+            year_death = random.choice((random.randint(1900, year), '?', ''))
         else:
-            year_birth = fuzzy.FuzzyInteger(1000, now_year - 20).fuzz()
-        # year_death
-        if year_birth is None:
-            if random.random() > .5:
-                year_death = fuzzy.FuzzyInteger(1000, now_year).fuzz()
-            else:
-                year_death = None
-        else:
-            if now_year - year_birth < 100:
-                if random.random() > .5:
-                    year_death = fuzzy.FuzzyInteger(year_birth + 20, now_year).fuzz()
-                else:
-                    year_death = None
-            else:
-                year_death = fuzzy.FuzzyInteger(year_birth + 20, year_birth + 100).fuzz()
-        return NumericRange(year_birth, year_death)
+            year_death = random.choice((random.randint(year_birth + 16, year), '?', ''))
 
-
-def writters_factory(count):
-    Writter.objects.filter().delete()
-    for i in range(count):
-        WritterFactory()
-
-
-def books_factory(count):
-    Book.objects.filter().delete()
-    if not Writter.objects.count():
-        writters_factory(20)
-    for i in range(count):
-        BookFactory()
+        return '{} - {}'.format(year_birth, year_death)

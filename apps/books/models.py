@@ -4,8 +4,6 @@ import itertools
 import collections
 import uuid
 
-from psycopg2.extras import NumericRange
-from django.contrib.postgres.fields import IntegerRangeField
 from django.core.exceptions import ValidationError
 from django.contrib.contenttypes.fields import GenericRelation
 from django.core.validators import MinLengthValidator, RegexValidator, MinValueValidator, MaxValueValidator
@@ -19,11 +17,11 @@ from mylabour.fields_db import ConfiguredAutoSlugField
 from apps.replies.models import Reply
 from apps.tags.models import Tag
 
-from .managers import BookManager, WritterManager
-from .querysets import BookQuerySet, WritterQuerySet
+from .managers import BookManager, WriterManager
+from .querysets import BookQuerySet, WriterQuerySet
 
 
-NOW_YEAR = timezone.datetime.now().year
+NOW_YEAR = timezone.now().year
 
 # announs book, soon
 #
@@ -59,7 +57,7 @@ class Book(models.Model):
     language = models.CharField(_('Language'), max_length=25, choices=LANGUAGES)
     pages = models.PositiveSmallIntegerField(_('Count pages'), validators=[MinValueValidator(1)])
     authorship = models.ManyToManyField(
-        'Writter',
+        'Writer',
         verbose_name=_('Authorship'),
         related_name='books',
     )
@@ -68,7 +66,12 @@ class Book(models.Model):
         _('ISBN'),
         max_length=30,
         help_text=_('ISBN code of book'),
-        validators=[RegexValidator(regex='\d+-\d+-\d+-\d+-\d+')],
+        validators=[
+            RegexValidator(
+                regex='\d+-\d+-\d+-\d+-\d+',
+                message=_('Impact'),
+            )
+        ],
         blank=True,
         default='',
     )
@@ -104,7 +107,7 @@ class Book(models.Model):
     def get_absolute_url(self):
         return reverse('books:book', kwargs={'slug': self.slug})
 
-    def get_admin_page_url(self):
+    def get_admin_url(self):
         return reverse(
             'admin:{0}_{1}_change'.format(self._meta.app_label, self._meta.model_name),
             args=(self.pk,)
@@ -155,9 +158,9 @@ class Book(models.Model):
         return counter_words.most_common(10)
 
 
-class Writter(models.Model):
+class Writer(models.Model):
     """
-    Model for writters of books
+    Model for writers of books
     """
 
     id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
@@ -166,84 +169,64 @@ class Writter(models.Model):
         max_length=200,
         validators=[MinLengthValidator(settings.MIN_LENGTH_FOR_NAME_OR_TITLE_OBJECT)],
         unique=True,
-        error_messages={'unique': _('Writter with this name already exists.')}
+        error_messages={'unique': _('Writer with this name already exists.')}
     )
     slug = ConfiguredAutoSlugField(_('Slug'), populate_from='name', unique=True)
     #
     # basic trends of books
     #
     about = models.TextField(
-        _('About writter'),
+        _('About writer'),
         validators=[MinLengthValidator(100)],
-        help_text=_('Give a brief character of the writter and his books.')
+        help_text=_('Give a brief character of the writer and his books.')
     )
-    years_life = IntegerRangeField(
+
+    years_life = models.CharField(
         _('years life'),
-        null=True,
-        blank=True,
-        help_text='Enter year birth and year death, if aware.'
+        default='? - ?',
+        help_text='Enter year birth and year death, if aware, otherwise use signs ? or if writer is living, empty space.',
+        max_length=15,
+        validators=[
+            # year birth may be in range 1900 - 2000
+            # year birth may be in range 1915 - 2029
+            # or ? - ?
+            # or ? -
+            # or ? - 2000
+            # or 1900 -
+            # or 1900 - ?
+            RegexValidator(
+                r'^((19[0-9][0-9])|2000|\?) - ((20[0-2][0-9])|(19(1[5-9])|([2-9][0-9]))||\?)$',
+                _('Invalid years life of a writer.')
+            )
+        ]
     )
 
     class Meta:
-        db_table = 'writters'
-        verbose_name = _('Writter')
-        verbose_name_plural = _('Writters')
+        db_table = 'writers'
+        verbose_name = _('Writer')
+        verbose_name_plural = _('Writers')
         ordering = ['name']
 
     objects = models.Manager()
-    objects = WritterManager.from_queryset(WritterQuerySet)()
+    objects = WriterManager.from_queryset(WriterQuerySet)()
 
     def __str__(self):
         return '{0.name}'.format(self)
 
     def get_absolute_url(self):
-        return reverse('books:writter', kwargs={'slug': self.slug})
+        return reverse('books:writer', kwargs={'slug': self.slug})
 
     def clean(self):
-        if self.years_life is not None:
-            if not isinstance(self.years_life, NumericRange):
-                raise ValidationError(
-                    {'years_life': _('Years life of writter must be passed as not empty sequence with two values.')}
-                )
 
-            # accept only None or integer
-            year_birth = self.years_life.lower
-            year_death = self.years_life.upper
-            if not (type(year_birth) == int or year_birth is None) or \
-                    not (type(year_death) == int or year_death is None):
-                raise ValidationError(
-                    {'years_life': _('Year birth and death must be integer or skiped.')}
-                )
+        year_birth, year_death = self.years_life.split('_')
 
-            #
-            if year_birth is not None:
-                if not 1000 <= year_birth <= NOW_YEAR - 20:
-                    raise ValidationError(
-                        {'years_life': _('Writter may can bithed only from 1000 A. D. to {0} year.').format(NOW_YEAR - 20)}
-                    )
-            if year_death is not None:
-                if not 1000 <= year_death <= NOW_YEAR:
-                    raise ValidationError(
-                        {'years_life': _('Writter may can dead only from 1000 A. D. to now year.')}
-                    )
-            if year_death is not None and year_birth is not None:
-                if year_birth >= year_death:
-                    raise ValidationError({
-                        'years_life': [_('Year of birth can not more or equal year of dearth.')]
-                    })
-                elif self.get_age() < 20:
-                    raise ValidationError({
-                        'years_life': [_('Very small range between year of birth and year of death.')]
-                    })
-                elif self.get_age() > 100:
-                    raise ValidationError({
-                        'years_life': [
-                            _('Very big range between year of birth and year of death ({0} years).').format(self.get_age())
-                        ]
-                    })
+        if year_death not in ['', '?']:
+            year_death = int(year_death)
+            if year_death > NOW_YEAR:
+                raise ValidationError('message')
 
     def get_age(self):
-        """Getting age writter if it is possible."""
+        """Getting age writer if it is possible."""
 
         try:
             age = self.years_life.upper - self.years_life.lower
@@ -253,7 +236,7 @@ class Writter(models.Model):
             return None
 
     def show_years_life(self):
-        """Show age`s writter in human view."""
+        """Show age`s writer in human view."""
 
         birth_year = self.years_life.lower
         death_year = self.years_life.upper
@@ -268,7 +251,7 @@ class Writter(models.Model):
     show_years_life.short_description = _('Year life')
 
     def get_avg_scope_for_books(self):
-        """Getting avarage scope for books`s writter, on based average rating it books."""
+        """Getting avarage scope for books`s writer, on based average rating it books."""
 
         all_scopes_books = tuple((book.get_rating() for book in self.books.iterator()))
         if all_scopes_books:

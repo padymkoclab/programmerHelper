@@ -17,16 +17,16 @@ class BookManager(models.Manager):
         self.update(language='en')
 
 
-class WritterManager(models.Manager):
+class WriterManager(models.Manager):
     """
-    Custom manager of model Writter.
+    Custom manager of model Writer.
     """
 
-    def mark_writter_dead_in_this_year(self, writter):
-        """Mark writter as dead in this year if he don`t deed early."""
+    def mark_writer_dead_in_this_year(self, writer):
+        """Mark writer as dead in this year if he don`t deed early."""
 
-        if writter.years_life.upper is not None:
-            raise ValidationError(_('This writter already dead.'))
-        writter.years_life = (writter.years_life.lower, datetime.datetime.now().year)
-        writter.full_clean()
-        writter.save()
+        if writer.years_life.upper is not None:
+            raise ValidationError(_('This writer already dead.'))
+        writer.years_life = (writer.years_life.lower, datetime.datetime.now().year)
+        writer.full_clean()
+        writer.save()

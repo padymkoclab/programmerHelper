@@ -20,11 +20,6 @@ class BookQuerySet(models.QuerySet):
 
         return self.annotate(count_tags=models.Count('tags', distinct=True))
 
-    def books_with_count_links(self):
-        """Queryset with count links where are ability downloads of each with the book."""
-
-        return self.annotate(count_links=models.Count('links', distinct=True))
-
     def books_with_count_replies(self):
         """Queryset with count replies of each the book."""
 
@@ -33,17 +28,15 @@ class BookQuerySet(models.QuerySet):
     def books_with_rating(self):
         """Queryset with rating of each the book."""
 
-        raise NotImplementedError
-
         self = self.annotate(rating=models.Avg('replies__scope_for_content'))
         self = self.annotate(rating=models.functions.Coalesce('rating', .0))
         self = self.annotate(rating=Round('rating'))
         return self
 
-    def books_with_count_tags_links_replies_and_rating(self):
-        """Complex queryset with count tags, links, replies and rating of each the book."""
+    def books_with_count_tags_replies_and_rating(self):
+        """Complex queryset with count tags, replies and rating of each the book."""
 
-        return self.books_with_count_tags().books_with_count_links().books_with_count_replies().books_with_rating()
+        return self.books_with_count_tags().books_with_count_replies().books_with_rating()
 
     def new_books(self):
         """Books published no later in this and past year."""
@@ -102,21 +95,21 @@ class BookQuerySet(models.QuerySet):
         return self.exclude(language__iexact='en')
 
 
-class WritterQuerySet(models.QuerySet):
+class WriterQuerySet(models.QuerySet):
     """
-    Queryset for writters
+    Queryset for writers
     """
 
-    def writters_with_count_books(self):
-        """Determinating count books on each writter."""
+    def writers_with_count_books(self):
+        """Determinating count books on each writer."""
 
         return self.annotate(count_books=models.Count('books', distinct=True))
 
-    def writters_last_century(self):
-        """Writters livig in the last century.
-        If writter born early than 110 year ago, he must be have without fail year of death."""
+    def writers_last_century(self):
+        """Writers livig in the last century.
+        If writer born early than 110 year ago, he must be have without fail year of death."""
 
-        # find writter without year of death and
+        # find writer without year of death and
         # either without year of birth or if year of birth is early than 100 year ago.
         pks = list()
         for i in self.iterator():
@@ -124,19 +117,19 @@ class WritterQuerySet(models.QuerySet):
                 if i.years_life.lower is None or i.years_life.lower < NOW_YEAR - 100:
                     pks.append(i.pk)
 
-        # exclude unsatisfied writters
+        # exclude unsatisfied writers
         self = self.exclude(pk__in=pks)
 
-        # filter only writters with living from 100 years ago to now
+        # filter only writers with living from 100 years ago to now
         self = self.filter(years_life__overlap=NumericRange(NOW_YEAR - 101, NOW_YEAR))
         return self
 
-    def writters_with_avg_scope_by_rating_of_books(self):
+    def writers_with_avg_scope_by_rating_of_books(self):
         """ """
 
         raise NotImplementedError
 
-    def writters_with_count_books_and_avg_scope_by_rating_of_books(self):
+    def writers_with_count_books_and_avg_scope_by_rating_of_books(self):
         """ """
 
         raise NotImplementedError

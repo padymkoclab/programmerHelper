@@ -5,7 +5,7 @@ from django.conf import settings
 
 from apps.tags.forms import clean_tags
 
-from .models import Book, Writter
+from .models import Book, Writer
 
 
 class BookForm(forms.ModelForm):
@@ -19,10 +19,10 @@ class BookForm(forms.ModelForm):
         return cleaned_tags
 
 
-class WritterForm(forms.ModelForm):
+class WriterForm(forms.ModelForm):
     class Meta:
-        model = Writter
+        model = Writer
         fields = ('name',)
 
     def clean(self):
-        super(WritterForm, self).clean()
+        super(WriterForm, self).clean()

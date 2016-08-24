@@ -13,8 +13,8 @@ from apps.tags.factories import tags_factory
 from apps.badges.factories import badges_factory
 from apps.web_links.factories import web_links_factory
 
-from apps.books.models import Book, Writter
-from apps.books.factories import books_factory, WritterFactory
+from apps.books.models import Book, Writer
+from apps.books.factories import books_factory, WriterFactory
 
 
 class BookManagerTest(TestCase):
@@ -44,20 +44,20 @@ class BookManagerTest(TestCase):
         self.assertCountEqual(Book.objects.books_wrote_english(), Book.objects.all())
 
 
-class WritterManagerTest(TestCase):
+class WriterManagerTest(TestCase):
     """
-    Tests for custom manager of model Writter.
+    Tests for custom manager of model Writer.
     """
 
-    def test_mark_writter_dead_in_this_year(self):
-        writter = WritterFactory(years_life=NumericRange(1990, None))
-        self.assertIsNone(writter.years_life.upper)
-        Writter.objects.mark_writter_dead_in_this_year(writter)
-        self.assertEqual(writter.years_life.upper, datetime.datetime.now().year)
+    def test_mark_writer_dead_in_this_year(self):
+        writer = WriterFactory(years_life=NumericRange(1990, None))
+        self.assertIsNone(writer.years_life.upper)
+        Writer.objects.mark_writer_dead_in_this_year(writer)
+        self.assertEqual(writer.years_life.upper, datetime.datetime.now().year)
 
-    def test_attempt_mark_writter_dead_in_this_year_if_he_dead_early(self):
-        writter = WritterFactory(years_life=NumericRange(1930, datetime.datetime.now().year))
-        self.assertIsNotNone(writter.years_life.upper)
+    def test_attempt_mark_writer_dead_in_this_year_if_he_dead_early(self):
+        writer = WriterFactory(years_life=NumericRange(1930, datetime.datetime.now().year))
+        self.assertIsNotNone(writer.years_life.upper)
         self.assertRaisesMessage(
-            ValidationError, 'This writter already dead.', Writter.objects.mark_writter_dead_in_this_year, writter
+            ValidationError, 'This writer already dead.', Writer.objects.mark_writer_dead_in_this_year, writer
         )

@@ -9,10 +9,10 @@ class TagQuerySet(models.QuerySet):
 
     """
 
-    def random_tags(self, count=1):
+    def random_tags(self, count=1, single_as_qs=False):
         """ """
 
-        return get_random_objects(self, count)
+        return get_random_objects(self, count, single_as_qs)
 
     def tags_with_count_solutions(self):
         """ """

@@ -1,7 +1,7 @@
 
 from django.views.generic import DetailView
 
-from .models import Book, Writter
+from .models import Book, Writer
 
 
 class BookDetailView(DetailView):
@@ -9,6 +9,6 @@ class BookDetailView(DetailView):
     template_name = "books/book_detail.html"
 
 
-class WritterDetailView(DetailView):
-    model = Writter
-    template_name = "books/writter_detail.html"
+class WriterDetailView(DetailView):
+    model = Writer
+    template_name = "books/writer_detail.html"
