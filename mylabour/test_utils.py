@@ -25,7 +25,6 @@ class EnhancedTestCase(TestCase):
     reverse = reverse
     timezone = timezone
     settings = settings
-    liveserver = 1
     mockrequest = MockRequest()
     call_command = call_command
 
@@ -54,19 +53,19 @@ class StaticLiveAdminTest(StaticLiveServerTestCase):
     reverse = reverse
     timezone = timezone
     settings = settings
-    mockrequest = MockRequest()
     call_command = call_command
 
     def __init__(self, *args, **kwargs):
         super(StaticLiveAdminTest, self).__init__(*args, **kwargs)
         self.reverse = reverse
+        self.call_command = call_command
 
     @classmethod
     def setUpClass(cls):
         super(StaticLiveAdminTest, cls).setUpClass()
 
-        cls.call_command('factory_test_superusers', '1')
-        cls.active_superuser = cls.django_user_model.objects.get()
+        # cls.call_command('factory_test_superusers', '1')
+        # cls.active_superuser = cls.django_user_model.objects.get()
 
     def setUp(self):
 
@@ -96,6 +95,10 @@ class StaticLiveAdminTest(StaticLiveServerTestCase):
 
         # simulation login superuser for get needed cookies
         client = self.client_class()
+
+        self.call_command('factory_test_superusers', '1')
+        self.active_superuser = self.django_user_model.objects.get()
+
         client.force_login(self.active_superuser)
         cookie = client.cookies['sessionid']
 

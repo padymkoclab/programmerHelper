@@ -7,7 +7,7 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django_js_reverse.views import urls_js
 
 from .admin import AdminSite
-from .views import IndexView
+from .views import IndexView, PlaceholderView
 
 js_info_dict = {
     'packages': ('your.app.package',),
@@ -23,6 +23,7 @@ urlpatterns = [
 
     # project
     url(r'^$', IndexView.as_view(), {}, 'index'),
+    url(r'^image/(?P<height>\d+)x(?P<width>\d+)/$', PlaceholderView.as_view(), {}, 'placeholder'),
     url(r'^django_js_reverse/$', cache_page(3600)(urls_js), name='django_js_reverse'),
 
     # apps

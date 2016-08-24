@@ -166,7 +166,7 @@ class Writter(models.Model):
         max_length=200,
         validators=[MinLengthValidator(settings.MIN_LENGTH_FOR_NAME_OR_TITLE_OBJECT)],
         unique=True,
-        error_messages={'unique': _('The such writter already is here.')}
+        error_messages={'unique': _('Writter with this name already exists.')}
     )
     slug = ConfiguredAutoSlugField(_('Slug'), populate_from='name', unique=True)
     #
@@ -175,7 +175,7 @@ class Writter(models.Model):
     about = models.TextField(
         _('About writter'),
         validators=[MinLengthValidator(100)],
-        help_text=_('Give brief character of the writter and his books.')
+        help_text=_('Give a brief character of the writter and his books.')
     )
     years_life = IntegerRangeField(
         _('years life'),

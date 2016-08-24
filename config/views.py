@@ -1,9 +1,11 @@
 
 from django.contrib.auth import login, authenticate, logout
 from django.http import HttpResponse
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, View
 
 from PIL import Image, ImageDraw
+
+from .forms import PlaceholderForm
 
 
 class IndexView(TemplateView):
@@ -61,3 +63,14 @@ class IndexView(TemplateView):
 
 
 # Today newly objects
+
+
+class PlaceholderView(View):
+
+    def get(self, request, *args, **kwargs):
+
+        form = PlaceholderForm(kwargs)
+        if form.is_valid():
+            image = form.generate()
+            return HttpResponse(image, content_type='image/png')
+        return HttpResponse('Not OK')

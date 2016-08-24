@@ -5,8 +5,7 @@
   // a handler on change value all checkboxes for selecting subjects of the report
 
   django.jQuery('#table_radio_group_select_report input:checkbox').change(function() {
-    console.log(1);
-    alert();
+
     // check up count selected subjects
     var count_checked_subjects = $('#table_radio_group_select_report input:checkbox:checked').length;
 
