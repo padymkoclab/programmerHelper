@@ -10,27 +10,14 @@ import pytest
 from apps.replies.factories import ReplyFactory
 from apps.tags.models import Tag
 
-from mylabour.test_utils import EnhancedTestCase
+from mylabour.test_utils import EnhancedTestCase, override_media_root_for_testing
 from mylabour.factories_utils import generate_text_by_min_length
 
 from apps.books.factories import BookFactory, WriterFactory
 from apps.books.models import Book, Writer
 
 
-class T(EnhancedTestCase):
-
-    def setUp(self):
-
-        self.call_command('factory_test_users', '8')
-        self.call_command('factory_test_writers', '4')
-
-        super().setUp()
-        self.book = BookFactory(name='Made boring stuff with Python')
-
-    def test_(self):
-        print('Run main test')
-
-
+@override_media_root_for_testing()
 class BookTests(EnhancedTestCase):
     """
     Test for model Book
@@ -243,6 +230,7 @@ class BookTests(EnhancedTestCase):
         self.assertEqual(most_common_words_from_replies[0], ('Strange', 5))
 
 
+@override_media_root_for_testing()
 class WriterTests(EnhancedTestCase):
     """
     Test for model Writer

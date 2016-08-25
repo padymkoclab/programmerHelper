@@ -1,7 +1,9 @@
 
+import functools
 import tempfile
 import shutil
 
+from django.test.utils import override_settings
 from django.contrib.auth import get_user_model
 from django.core.urlresolvers import reverse
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
@@ -27,34 +29,12 @@ class EnhancedTestCase(TestCase):
     django_user_model = get_user_model()
     reverse = reverse
     timezone = timezone
-    settings = settings
     mockrequest = MockRequest()
     call_command = call_command
 
     def __init__(self, *args, **kwargs):
         super(EnhancedTestCase, self).__init__(*args, **kwargs)
         self.reverse = reverse
-        self.call_command = call_command
-
-    def setUp(self):
-
-        self._original_MEDIA_ROOT = self.settings.MEDIA_ROOT
-        self._original_DEFAULT_FILE_STORAGE = self.settings.DEFAULT_FILE_STORAGE
-
-        self._testing_tempdir = tempfile.mkdtemp()
-        self.settings.MEDIA_ROOT = self._testing_tempdir
-        self.settings.DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
-
-    def tearDown(self):
-
-        shutil.rmtree(self._testing_tempdir, ignore_errors=True)
-
-        self.settings.MEDIA_ROOT = self._original_MEDIA_ROOT
-        self.settings.DEFAULT_FILE_STORAGE = self._original_DEFAULT_FILE_STORAGE
-
-        del self._testing_tempdir
-        del self._original_MEDIA_ROOT
-        del self._original_DEFAULT_FILE_STORAGE
 
     @classmethod
     def _make_user_as_active_superuser(cls, user):
@@ -136,3 +116,28 @@ class StaticLiveAdminTest(StaticLiveServerTestCase):
         """Add host to a passed url and to open it in a browser."""
 
         self.browser.get(self.live_server_url + url)
+
+
+class override_media_root_for_testing(override_settings):
+    """Override setting MEDIA_ROOT and """
+
+    def __init__(self):
+        self.testing_tempdir = tempfile.mkdtemp()
+
+        self.options = {
+            'MEDIA_ROOT': self.testing_tempdir,
+            'DEFAULT_FILE_STORAGE': 'django.core.files.storage.FileSystemStorage',
+        }
+
+    def __call__(self, test_func):
+        from django.test import SimpleTestCase
+        if isinstance(test_func, type):
+            if not issubclass(test_func, SimpleTestCase):
+                raise Exception(
+                    "Only subclasses of Django SimpleTestCase can be decorated "
+                    "with override_settings")
+            self.save_options(test_func)
+            sclass = test_func
+            shutil.rmtree(self.testing_tempdir, ignore_errors=True)
+            # import pdb; pdb.set_trace()
+            return sclass

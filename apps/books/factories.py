@@ -27,15 +27,27 @@ class BookFactory(factory.django.DjangoModelFactory):
 
     @factory.lazy_attribute
     def picture(self):
-        print(settings.MEDIA_ROOT)
+
+        color = random.choice([
+            'rgb(255, 0, 0)',
+            'rgb(255, 255, 0)',
+            'rgb(255, 0, 255)',
+            'rgb(255, 255, 255)',
+            'rgb(0, 255, 255)',
+            'rgb(0, 255, 0)',
+            'rgb(0, 0, 255)',
+        ])
+
         filename = 'factory_book.jpeg'
         imagefield = factory.django.ImageField()
         content = imagefield._make_data(dict(
-            filename=filename, width=100, height=100, format='JPEG', color='green'
+            filename=filename,
+            width=100,
+            height=100,
+            format='JPEG',
+            color=color
         ))
         image = ContentFile(content, filename)
-        print(settings.MEDIA_ROOT)
-        # import pdb; pdb.set_trace()
         return image
 
     @factory.lazy_attribute
