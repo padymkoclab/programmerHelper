@@ -2,6 +2,7 @@
 import datetime
 import random
 
+from django.core.files.base import ContentFile
 from django.conf import settings
 
 import factory
@@ -25,15 +26,22 @@ class BookFactory(factory.django.DjangoModelFactory):
     year_published = fuzzy.FuzzyInteger(1950, NOW_YEAR)
 
     @factory.lazy_attribute
-    def name(self):
-        length_book_name = random.randint(10, 200)
-        return factory.Faker('text', locale='ru').generate([])[:length_book_name]
+    def picture(self):
+        print(settings.MEDIA_ROOT)
+        filename = 'factory_book.jpeg'
+        imagefield = factory.django.ImageField()
+        content = imagefield._make_data(dict(
+            filename=filename, width=100, height=100, format='JPEG', color='green'
+        ))
+        image = ContentFile(content, filename)
+        print(settings.MEDIA_ROOT)
+        # import pdb; pdb.set_trace()
+        return image
 
     @factory.lazy_attribute
-    def picture(self):
-        site_name = factory.Faker('url', locale='ru').generate([])
-        picture_name = factory.Faker('slug', locale='ru').generate([])
-        return site_name + picture_name + 'jpeg'
+    def name(self):
+        length_book_name = random.randint(10, 100)
+        return factory.Faker('text', locale='ru').generate([])[:length_book_name]
 
     @factory.lazy_attribute
     def publishers(self):
@@ -64,6 +72,10 @@ class BookFactory(factory.django.DjangoModelFactory):
     @factory.post_generation
     def authorship(self, created, extracted, **kwargs):
         count_authors = random.randint(1, 4)
+
+        if Writer.objects.count() < 4:
+            raise ValueError('Writers is less than 4.')
+
         authors = random.sample(tuple(Writer.objects.all()), count_authors)
         self.authorship.set(authors)
 
@@ -89,7 +101,7 @@ class WriterFactory(factory.django.DjangoModelFactory):
         year_birth = random.choice((random.randint(1900, min_year_birth), '?'))
 
         if year_birth == '?':
-            year_death = random.choice((random.randint(1900, year), '?', ''))
+            year_death = random.choice((random.randint(1915, year), '?', ''))
         else:
             year_death = random.choice((random.randint(year_birth + 16, year), '?', ''))
 

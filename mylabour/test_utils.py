@@ -1,4 +1,7 @@
 
+import tempfile
+import shutil
+
 from django.contrib.auth import get_user_model
 from django.core.urlresolvers import reverse
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
@@ -31,6 +34,27 @@ class EnhancedTestCase(TestCase):
     def __init__(self, *args, **kwargs):
         super(EnhancedTestCase, self).__init__(*args, **kwargs)
         self.reverse = reverse
+        self.call_command = call_command
+
+    def setUp(self):
+
+        self._original_MEDIA_ROOT = self.settings.MEDIA_ROOT
+        self._original_DEFAULT_FILE_STORAGE = self.settings.DEFAULT_FILE_STORAGE
+
+        self._testing_tempdir = tempfile.mkdtemp()
+        self.settings.MEDIA_ROOT = self._testing_tempdir
+        self.settings.DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+
+    def tearDown(self):
+
+        shutil.rmtree(self._testing_tempdir, ignore_errors=True)
+
+        self.settings.MEDIA_ROOT = self._original_MEDIA_ROOT
+        self.settings.DEFAULT_FILE_STORAGE = self._original_DEFAULT_FILE_STORAGE
+
+        del self._testing_tempdir
+        del self._original_MEDIA_ROOT
+        del self._original_DEFAULT_FILE_STORAGE
 
     @classmethod
     def _make_user_as_active_superuser(cls, user):

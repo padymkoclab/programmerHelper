@@ -2,8 +2,8 @@
 from mylabour.basecommands import ExtendedBaseCommand
 from mylabour.utils import create_logger_by_filename
 
-from apps.books.factories import WriterFactory
-from apps.books.models import Writer
+from apps.books.factories import BookFactory
+from apps.books.models import Book, Writer
 
 logger = create_logger_by_filename(__name__)
 
@@ -18,9 +18,12 @@ class Command(ExtendedBaseCommand):
     def handle(self, *args, **kwargs):
         count = kwargs.get('count')[0]
 
-        Writer.objects.filter().delete()
+        Book.objects.filter().delete()
+
+        if Writer.objects.count() < 4:
+            self.call_command('factory_test_writers', '4')
 
         for i in range(count):
-            WriterFactory()
+            BookFactory()
 
-        logger.debug('Factoried books in count: {0}'.format(count))
+        logger.debug('Factoried writers in count: {0}'.format(count))

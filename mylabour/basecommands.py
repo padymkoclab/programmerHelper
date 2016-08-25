@@ -1,11 +1,16 @@
 
 import argparse
 
+from django.core.management import call_command
 from django.core.management.base import BaseCommand
 
 
 class ExtendedBaseCommand(BaseCommand):
     """Subclass from BaseCommand with extended functionality. Additional checker input and ..."""
+
+    def __init__(self, *args, **kwargs):
+        super(ExtendedBaseCommand, self).__init__(*args, **kwargs)
+        self.call_command = call_command
 
     def _positive_integer_from_1_to_999(self, value):
         """Check up argument."""

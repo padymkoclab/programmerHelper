@@ -90,7 +90,7 @@ class WriterAdmin(admin.ModelAdmin):
     form = WriterForm
     list_display = (
         'name',
-        'show_years_life',
+        'years_life',
         'show_books',
         'get_count_books',
         'short_about_writer',

@@ -4,6 +4,8 @@ import itertools
 import collections
 import uuid
 
+from django.db.models.functions import Coalesce, Value
+from mylabour.functions_db import Round
 from django.core.exceptions import ValidationError
 from django.contrib.contenttypes.fields import GenericRelation
 from django.core.validators import MinLengthValidator, RegexValidator, MinValueValidator, MaxValueValidator
@@ -14,6 +16,8 @@ from django.db import models
 from django.conf import settings
 
 from mylabour.fields_db import ConfiguredAutoSlugField
+from mylabour.utils import create_logger_by_filename
+
 from apps.replies.models import Reply
 from apps.tags.models import Tag
 
@@ -28,6 +32,9 @@ NOW_YEAR = timezone.now().year
 # read with Scrapy data from Amazon.com
 
 
+logger = create_logger_by_filename(__name__)
+
+
 class Book(models.Model):
     """
     Model for books
@@ -37,13 +44,13 @@ class Book(models.Model):
 
     # display language name on Site Language for user
 
-    def upload_media(instance, filename):
+    def upload_book_picture(instance, filename):
         return 'books/{slug}/{filename}'.format(slug=instance.slug, filename=filename)
 
     id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
     name = models.CharField(
         _('Name'),
-        max_length=200,
+        max_length=100,
         validators=[MinLengthValidator(settings.MIN_LENGTH_FOR_NAME_OR_TITLE_OBJECT)],
         unique=True,
     )
@@ -53,7 +60,7 @@ class Book(models.Model):
         validators=[MinLengthValidator(100)],
         help_text=_('Minimal length 100 characters.'),
     )
-    picture = models.ImageField(_('Picture'), upload_to=upload_media, max_length=1000)
+    picture = models.ImageField(_('Picture'), upload_to=upload_book_picture, max_length=1000)
     language = models.CharField(_('Language'), max_length=25, choices=LANGUAGES)
     pages = models.PositiveSmallIntegerField(_('Count pages'), validators=[MinValueValidator(1)])
     authorship = models.ManyToManyField(
@@ -69,7 +76,7 @@ class Book(models.Model):
         validators=[
             RegexValidator(
                 regex='\d+-\d+-\d+-\d+-\d+',
-                message=_('Impact'),
+                message=_('Not correct ISBN for a book'),
             )
         ],
         blank=True,
@@ -184,7 +191,7 @@ class Writer(models.Model):
     years_life = models.CharField(
         _('years life'),
         default='? - ?',
-        help_text='Enter year birth and year death, if aware, otherwise use signs ? or if writer is living, empty space.',
+        # help_text='Enter year birth and year death, if aware, otherwise use signs ? or if writer is living, empty space. Birth year may be in range from 1900 to 2000.',
         max_length=15,
         validators=[
             # year birth may be in range 1900 - 2000
@@ -195,7 +202,7 @@ class Writer(models.Model):
             # or 1900 -
             # or 1900 - ?
             RegexValidator(
-                r'^((19[0-9][0-9])|2000|\?) - ((20[0-2][0-9])|(19(1[5-9])|([2-9][0-9]))||\?)$',
+                r'^((19[0-9][0-9])|2000|\?) - ((20[0-2][0-9])|(19((1[5-9])|([2-9][0-9])))||\?)$',
                 _('Invalid years life of a writer.')
             )
         ]
@@ -216,44 +223,58 @@ class Writer(models.Model):
     def get_absolute_url(self):
         return reverse('books:writer', kwargs={'slug': self.slug})
 
+    def get_admin_url(self):
+        return reverse('admin:books_writer_change', args=(self.pk, ))
+
     def clean(self):
 
-        year_birth, year_death = self.years_life.split('_')
+        year_birth, year_death = self.years_life.split(' - ')
 
         if year_death not in ['', '?']:
             year_death = int(year_death)
             if year_death > NOW_YEAR:
-                raise ValidationError('message')
+                raise ValidationError({
+                    'years_life': _('Year death of a writer not possible in future.')
+                })
+
+        if year_birth != '?' and year_death not in ['', '?']:
+            year_birth = int(year_birth)
+            year_death = int(year_death)
+
+            if year_birth >= year_death:
+                raise ValidationError({
+                    'years_life': _('Year of birth can not more or equal year of death.')
+                })
+
+            if year_death - year_birth < 15:
+                raise ValidationError({
+                    'years_life': _('Very small range years between year of birth and year of death of a writer.')
+                })
 
     def get_age(self):
         """Getting age writer if it is possible."""
 
-        try:
-            age = self.years_life.upper - self.years_life.lower
-            assert age > 0
-            return age
-        except:
-            return None
+        year_birth, year_death = self.years_life.split(' - ')
 
-    def show_years_life(self):
-        """Show age`s writer in human view."""
+        if year_birth != '?' and year_death not in ['?']:
+            year_birth = int(year_birth)
 
-        birth_year = self.years_life.lower
-        death_year = self.years_life.upper
+            if year_death == '':
+                return NOW_YEAR - year_birth
 
-        # chage value None on ????
-        if birth_year is None:
-            birth_year = '????'
-        if death_year is None:
-            death_year = '????'
-
-        return '{0} - {1}'.format(birth_year, death_year)
-    show_years_life.short_description = _('Year life')
+            year_death = int(year_death)
+            return year_death - year_birth
+        return
 
     def get_avg_scope_for_books(self):
         """Getting avarage scope for books`s writer, on based average rating it books."""
 
-        all_scopes_books = tuple((book.get_rating() for book in self.books.iterator()))
-        if all_scopes_books:
-            return round(statistics.mean(all_scopes_books), 4)
+        logger.debug('Rewrite SQL for books_with_rating()')
+        # books = self.books.books_with_rating()
+        # return books.aggregate(rating_avg=Coalesce(Round(models.Avg('rating')), Value(0.0)))['rating_avg']
+
+        if self.books.count():
+            avg_scope_for_books = statistics.mean(book.get_rating() for book in self.books.iterator())
+            avg_scope_for_books = round(avg_scope_for_books, 3)
+            return avg_scope_for_books
         return 0.0

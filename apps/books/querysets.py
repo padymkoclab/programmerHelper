@@ -5,8 +5,10 @@ from django.db import models
 from psycopg2.extras import NumericRange
 
 from mylabour.functions_db import Round
+from mylabour.utils import create_logger_by_filename
 
 
+logger = create_logger_by_filename(__name__)
 NOW_YEAR = timezone.datetime.now().year
 
 
@@ -28,9 +30,23 @@ class BookQuerySet(models.QuerySet):
     def books_with_rating(self):
         """Queryset with rating of each the book."""
 
-        self = self.annotate(rating=models.Avg('replies__scope_for_content'))
-        self = self.annotate(rating=models.functions.Coalesce('rating', .0))
-        self = self.annotate(rating=Round('rating'))
+        logger.debug('Is is working is not properly')
+
+        # getting replies total sum all of the scopes
+        self = self.values('replies').annotate(
+            sum_scope=models.F('replies__scope_for_content') +
+            models.F('replies__scope_for_style') +
+            models.F('replies__scope_for_language')
+        )
+
+        # determining avg scope
+        self = self.annotate(total_scope=models.ExpressionWrapper(
+            models.F('sum_scope') / models.Value(3.0), output_field=models.FloatField()
+        ))
+
+        # make round for avg scope
+        self = self.annotate(rating=Round('total_scope'))
+
         return self
 
     def books_with_count_tags_replies_and_rating(self):
