@@ -3,13 +3,15 @@ import functools
 import tempfile
 import shutil
 
+from django.apps import apps
 from django.test.utils import override_settings
 from django.contrib.auth import get_user_model
 from django.core.urlresolvers import reverse
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.core.management import call_command
 from django.utils import timezone
-from django.conf import settings
+from django.conf import settings, UserSettingsHolder
+from django.test.signals import setting_changed
 from django.test import TestCase, RequestFactory
 
 from pyvirtualdisplay import Display
@@ -35,6 +37,37 @@ class EnhancedTestCase(TestCase):
     def __init__(self, *args, **kwargs):
         super(EnhancedTestCase, self).__init__(*args, **kwargs)
         self.reverse = reverse
+
+    @classmethod
+    def setup_class(cls):
+        """Override MEDIA_ROOT adn create tempdir for media while testing."""
+
+        cls.testing_tempdir = tempfile.mkdtemp()
+
+        cls.options = {
+            'MEDIA_ROOT': cls.testing_tempdir,
+            'DEFAULT_FILE_STORAGE': 'django.core.files.storage.FileSystemStorage',
+        }
+
+        override = UserSettingsHolder(settings._wrapped)
+        for key, new_value in cls.options.items():
+            setattr(override, key, new_value)
+        cls.wrapped = settings._wrapped
+        settings._wrapped = override
+        for key, new_value in cls.options.items():
+            setting_changed.send(sender=settings._wrapped.__class__, setting=key, value=new_value, enter=True)
+
+    @classmethod
+    def teardown_class(cls):
+        """Restore original MEDIA_ROOT adn remove tempdir for media while testing."""
+
+        settings._wrapped = cls.wrapped
+        del cls.wrapped
+        for key in cls.options:
+            new_value = getattr(settings, key, None)
+            setting_changed.send(sender=settings._wrapped.__class__, setting=key, value=new_value, enter=False)
+
+        shutil.rmtree(cls.testing_tempdir, ignore_errors=True)
 
     @classmethod
     def _make_user_as_active_superuser(cls, user):
@@ -116,28 +149,3 @@ class StaticLiveAdminTest(StaticLiveServerTestCase):
         """Add host to a passed url and to open it in a browser."""
 
         self.browser.get(self.live_server_url + url)
-
-
-class override_media_root_for_testing(override_settings):
-    """Override setting MEDIA_ROOT and """
-
-    def __init__(self):
-        self.testing_tempdir = tempfile.mkdtemp()
-
-        self.options = {
-            'MEDIA_ROOT': self.testing_tempdir,
-            'DEFAULT_FILE_STORAGE': 'django.core.files.storage.FileSystemStorage',
-        }
-
-    def __call__(self, test_func):
-        from django.test import SimpleTestCase
-        if isinstance(test_func, type):
-            if not issubclass(test_func, SimpleTestCase):
-                raise Exception(
-                    "Only subclasses of Django SimpleTestCase can be decorated "
-                    "with override_settings")
-            self.save_options(test_func)
-            sclass = test_func
-            shutil.rmtree(self.testing_tempdir, ignore_errors=True)
-            # import pdb; pdb.set_trace()
-            return sclass

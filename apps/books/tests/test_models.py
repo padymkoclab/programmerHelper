@@ -4,20 +4,20 @@ from unittest import mock
 
 from django.utils.text import slugify
 from django.core.exceptions import ValidationError
+from django.conf import settings
 
 import pytest
 
 from apps.replies.factories import ReplyFactory
 from apps.tags.models import Tag
 
-from mylabour.test_utils import EnhancedTestCase, override_media_root_for_testing
+from mylabour.test_utils import EnhancedTestCase
 from mylabour.factories_utils import generate_text_by_min_length
 
 from apps.books.factories import BookFactory, WriterFactory
 from apps.books.models import Book, Writer
 
 
-@override_media_root_for_testing()
 class BookTests(EnhancedTestCase):
     """
     Test for model Book
@@ -230,7 +230,6 @@ class BookTests(EnhancedTestCase):
         self.assertEqual(most_common_words_from_replies[0], ('Strange', 5))
 
 
-@override_media_root_for_testing()
 class WriterTests(EnhancedTestCase):
     """
     Test for model Writer
