@@ -1,7 +1,7 @@
 
 from django.core.management import call_command
 
-from mylabour.utils import create_logger_by_filename
+from mylabour.logging_utils import create_logger_by_filename
 
 
 logger = create_logger_by_filename(__name__)

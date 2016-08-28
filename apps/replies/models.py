@@ -18,8 +18,8 @@ class Reply(BaseGenericModel):
     Model for reply about other objects.
     """
 
-    MAX_SCOPE = 5
-    MIN_SCOPE = 1
+    MAX_MARK = 5
+    MIN_MARK = 1
 
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -58,23 +58,23 @@ class Reply(BaseGenericModel):
         validators=[MinCountWordsValidator(10), MaxCountWordsValidator(100)],
         help_text=_('From 10 to 100 words.'),
     )
-    scope_for_content = models.PositiveSmallIntegerField(
-        _('scope for content'),
-        default=MIN_SCOPE,
+    mark_for_content = models.PositiveSmallIntegerField(
+        _('mark for content'),
+        default=MIN_MARK,
         validators=[
-            MaxValueValidator(MAX_SCOPE, _('The scope for content must be from 1 to %d' % MAX_SCOPE))
+            MaxValueValidator(MAX_MARK, _('The mark for content must be from 1 to %d' % MAX_MARK))
         ])
-    scope_for_style = models.PositiveSmallIntegerField(
-        _('scope for style'),
-        default=MIN_SCOPE,
+    mark_for_style = models.PositiveSmallIntegerField(
+        _('mark for style'),
+        default=MIN_MARK,
         validators=[
-            MaxValueValidator(MAX_SCOPE, _('The scope for style must be from 1 to %d' % MAX_SCOPE))
+            MaxValueValidator(MAX_MARK, _('The mark for style must be from 1 to %d' % MAX_MARK))
         ])
-    scope_for_language = models.PositiveSmallIntegerField(
-        _('scope for language'),
-        default=MIN_SCOPE,
+    mark_for_language = models.PositiveSmallIntegerField(
+        _('mark for language'),
+        default=MIN_MARK,
         validators=[
-            MaxValueValidator(MAX_SCOPE, _('The scope for language must be from 1 to %d' % MAX_SCOPE))
+            MaxValueValidator(MAX_MARK, _('The mark for language must be from 1 to %d' % MAX_MARK))
         ])
     date_added = models.DateTimeField(_('Date aded'), auto_now_add=True)
 
@@ -107,7 +107,7 @@ class Reply(BaseGenericModel):
     is_new.short_description = _('Is new?')
     is_new.boolean = True
 
-    def get_total_scope(self):
-        return self.__class__.objects.replies_with_total_scope().get(pk=self.pk).total_scope
-    get_total_scope.admin_order_field = 'total_scope'
-    get_total_scope.short_description = _('Total scope')
+    def get_total_mark(self):
+        return self.__class__.objects.replies_with_total_mark().get(pk=self.pk).total_mark
+    get_total_mark.admin_order_field = 'total_mark'
+    get_total_mark.short_description = _('Total mark')

@@ -2,7 +2,7 @@
 from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
 
-from mylabour.utils import create_logger_by_filename
+from mylabour.logging_utils import create_logger_by_filename
 
 from apps.users.constants import TEST_SUPERUSER_DATA
 

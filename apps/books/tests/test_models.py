@@ -1,21 +1,23 @@
 
-import random
 from unittest import mock
 
+from django.db.models.fields.files import ImageFieldFile
 from django.utils.text import slugify
 from django.core.exceptions import ValidationError
-from django.conf import settings
 
 import pytest
 
 from apps.replies.factories import ReplyFactory
 from apps.tags.models import Tag
 
+from mylabour.logging_utils import create_logger_by_filename
 from mylabour.test_utils import EnhancedTestCase
 from mylabour.factories_utils import generate_text_by_min_length
 
 from apps.books.factories import BookFactory, WriterFactory
 from apps.books.models import Book, Writer
+
+logger = create_logger_by_filename(__name__)
 
 
 class BookTests(EnhancedTestCase):
@@ -25,6 +27,7 @@ class BookTests(EnhancedTestCase):
 
     @classmethod
     def setUpTestData(cls):
+
         cls.call_command('factory_test_users', '8')
         cls.call_command('factory_test_writers', '4')
 
@@ -33,15 +36,19 @@ class BookTests(EnhancedTestCase):
 
         cls.now_year = cls.timezone.now().year
 
+        cls.book = BookFactory(name='Made boring stuff with Python', pages=49)
+        cls.book.replies.clear()
+
     def setUp(self):
-        super().setUp()
-        self.book = BookFactory(name='Made boring stuff with Python')
+
+        self.book.refresh_from_db()
 
     def test_create_book(self):
+
         data = dict(
             name='Книжка о программировании на Python 3',
             description=generate_text_by_min_length(100, as_p=True),
-            picture='1',
+            picture=self._generate_image(),
             language='ru',
             pages=140,
             publishers='O`Reilly',
@@ -63,7 +70,7 @@ class BookTests(EnhancedTestCase):
         self.assertEqual(book.name, data['name'])
         self.assertEqual(book.slug, slugify(data['name'], allow_unicode=True))
         self.assertEqual(book.description, data['description'])
-        self.assertEqual(book.picture, data['picture'])
+        self.assertIsInstance(book.picture, ImageFieldFile)
         self.assertEqual(book.language, data['language'])
         self.assertEqual(book.pages, data['pages'])
         self.assertEqual(book.publishers, data['publishers'])
@@ -74,15 +81,12 @@ class BookTests(EnhancedTestCase):
         self.assertEqual(book.authorship.count(), 3)
 
     def test_update_book(self):
-        # choice random language
-        languages_without_already_used = filter(lambda couple: couple[0] != self.book.language, Book.LANGUAGES)
-        another_language = random.choice(tuple(languages_without_already_used))[0]
-        #
+
         data = dict(
             name='Книга рецептов JS с подробными объяснениями и красивым постраничными оформлением.',
             description=generate_text_by_min_length(100, as_p=True),
-            picture='http://using.com/anaconda.png',
-            language=another_language,
+            picture=self._generate_image(),
+            language='ru',
             pages=440,
             publishers='Express',
             isbn='785121-4512-7515-4215-784',
@@ -102,7 +106,7 @@ class BookTests(EnhancedTestCase):
         self.assertEqual(book.name, data['name'])
         self.assertEqual(book.slug, slugify(data['name'], allow_unicode=True))
         self.assertEqual(book.description, data['description'])
-        self.assertEqual(book.picture, data['picture'])
+        self.assertIsInstance(book.picture, ImageFieldFile)
         self.assertEqual(book.language, data['language'])
         self.assertEqual(book.pages, data['pages'])
         self.assertEqual(book.publishers, data['publishers'])
@@ -110,12 +114,16 @@ class BookTests(EnhancedTestCase):
         self.assertEqual(book.year_published, data['year_published'])
 
     def test_delete_book(self):
-        self.book.delete()
+
+        book = BookFactory()
+        book.delete()
 
     def test_str(self):
+
         self.assertEqual(str(self.book), 'Made boring stuff with Python')
 
     def test_unique_slug(self):
+
         same_name = 'Справочник смелого человека решившегося пойти против течения и найти себя в жизни таким как есть.'
         same_name_as_lower = same_name.lower()
         same_name_as_upper = same_name.upper()
@@ -134,62 +142,101 @@ class BookTests(EnhancedTestCase):
         self.assertEqual(book3.slug, slug_same_name + '-3')
 
     def test_get_absolute_url(self):
+
         response = self.client.get(self.book.get_absolute_url())
         self.assertEqual(response.status_code, 200)
 
-    @pytest.mark.skip('For some reason it is not working')
     def test_get_admin_url(self):
+
+        book = BookFactory()
+        book.replies.clear()
+
+        logger.warning('Book worked only with single ReplyFactory(). Problem in replies.factories.fuzzuinteger')
+
+        ReplyFactory(content_object=book)
+
         self.client.force_login(self.active_superuser)
-        response = self.client.get(self.book.get_admin_url())
+        response = self.client.get(book.get_admin_url())
         self.assertEqual(response.status_code, 200)
 
     def test_upload_book_picture(self):
+
         path = Book(slug='cassandra-and-apache-on-aws').upload_book_picture('bucket_big_code.png')
         self.assertEqual(path, 'books/cassandra-and-apache-on-aws/bucket_big_code.png')
 
-    def test_get_rating(self):
-        self.book.replies.clear()
+    def test_get_rating_if_book_has_not_replies(self):
+
         self.assertEqual(self.book.get_rating(), 0)
-        ReplyFactory(content_object=self.book, scope_for_content=3, scope_for_style=1, scope_for_language=2)  # 2
+
+    def test_get_rating_if_book_has_replies(self):
+
+        ReplyFactory(content_object=self.book, mark_for_content=3, mark_for_style=1, mark_for_language=2)  # 2
         self.assertEqual(self.book.get_rating(), 2.0)
-        ReplyFactory(content_object=self.book, scope_for_content=4, scope_for_style=5, scope_for_language=1)  # 3.3333
-        ReplyFactory(content_object=self.book, scope_for_content=5, scope_for_style=4, scope_for_language=5)  # 4.6667
-        ReplyFactory(content_object=self.book, scope_for_content=2, scope_for_style=5, scope_for_language=4)  # 3.6667
+        ReplyFactory(content_object=self.book, mark_for_content=4, mark_for_style=5, mark_for_language=1)  # 3.3333
+        ReplyFactory(content_object=self.book, mark_for_content=5, mark_for_style=4, mark_for_language=5)  # 4.6667
+        ReplyFactory(content_object=self.book, mark_for_content=2, mark_for_style=5, mark_for_language=4)  # 3.6667
         self.assertEqual(self.book.get_rating(), 3.4167)
 
-    def test_is_new(self):
-        #
+    def test_is_new_if_published_in_this_year(self):
+
         self.book.year_published = self.now_year
         self.book.full_clean()
         self.book.save()
-        #
-        new_book1 = BookFactory()
-        new_book2 = BookFactory()
-        new_book3 = BookFactory()
-        new_book1.year_published = self.now_year - 1
-        new_book2.year_published = self.now_year - 2
-        new_book3.year_published = self.now_year - 3
-        new_book1.full_clean()
-        new_book2.full_clean()
-        new_book3.full_clean()
-        new_book1.save()
-        new_book2.save()
-        new_book3.save()
-        #
         self.assertTrue(self.book.is_new())
-        self.assertTrue(new_book1.is_new())
-        self.assertFalse(new_book2.is_new())
-        self.assertFalse(new_book3.is_new())
 
-    def test_get_size(self):
-        self.book.pages = 40
+    def test_is_new_if_published_one_year_ago(self):
+
+        self.book.year_published = self.now_year - 1
         self.book.full_clean()
         self.book.save()
-        self.assertEqual(self.book.get_size(), 'Tiny book')
+        self.assertTrue(self.book.is_new())
 
-    def test_most_common_words_from_replies(self):
-        self.book.replies.clear()
+    def test_is_new_if_published_two_years_ago(self):
+
+        self.book.year_published = self.now_year - 2
+        self.book.full_clean()
+        self.book.save()
+        self.assertFalse(self.book.is_new())
+
+    def test_is_new_if_published_three_years_ago(self):
+
+        self.book.year_published = self.now_year - 3
+        self.book.full_clean()
+        self.book.save()
+        self.assertFalse(self.book.is_new())
+
+    def test_get_size_book_with_diffrent_count_pages(self):
+
+        for count_pages, book_size_name in (
+            (1, 'Tiny book'),
+            (10, 'Tiny book'),
+            (49, 'Tiny book'),
+            (50, 'Middle book'),
+            (100, 'Middle book'),
+            (200, 'Middle book'),
+            (299, 'Middle book'),
+            (300, 'Big book'),
+            (400, 'Big book'),
+            (500, 'Big book'),
+            (599, 'Big book'),
+            (600, 'Big book'),
+            (700, 'Big book'),
+            (800, 'Big book'),
+            (900, 'Big book'),
+            (999, 'Big book'),
+            (1000, 'Great book'),
+            (2000, 'Great book'),
+        ):
+            self.book.pages = count_pages
+            self.book.full_clean()
+            self.book.save()
+            self.assertEqual(self.book.get_size(), book_size_name)
+
+    def test_most_common_words_from_replies_if_book_has_not_replies(self):
+
         self.assertEqual(self.book.most_common_words_from_replies(), [])
+
+    def test_most_common_words_from_replies_if_book_has_replies(self):
         ReplyFactory(
             content_object=self.book,
             advantages=['Perfect', 'Good', 'Nice', 'Interesting', 'Amazing', 'Fantastic', 'Alluring'],
@@ -232,11 +279,12 @@ class BookTests(EnhancedTestCase):
 
 class WriterTests(EnhancedTestCase):
     """
-    Test for model Writer
+    Tests for the model Writer
     """
 
     @classmethod
     def setUpTestData(cls):
+
         cls.call_command('factory_test_users', '8')
         cls.call_command('factory_test_writers', '4')
 
@@ -249,12 +297,14 @@ class WriterTests(EnhancedTestCase):
             mock_now.return_value = cls.timezone.datetime(2016, 11, 11)
             cls.now_year = cls.timezone.now().year
 
-    def setUp(self):
-        super().setUp()
+        cls.writer = WriterFactory()
 
-        self.writer = WriterFactory()
+    def setUp(self):
+
+        self.writer.refresh_from_db()
 
     def test_create_writer(self):
+
         data = dict(
             name='Nanvel Olexander',
             about=generate_text_by_min_length(100, as_p=True),
@@ -269,6 +319,7 @@ class WriterTests(EnhancedTestCase):
         self.assertEqual(writer.years_life, data['years_life'])
 
     def test_update_writer(self):
+
         data = dict(
             name='Daniel Roseman',
             about=generate_text_by_min_length(100, as_p=True),
@@ -285,9 +336,12 @@ class WriterTests(EnhancedTestCase):
         self.assertEqual(self.writer.years_life, data['years_life'])
 
     def test_delete_writer(self):
-        self.writer.delete()
+
+        writer = WriterFactory()
+        writer.delete()
 
     def test_unique_slug(self):
+
         same_name = 'русский Омар Хайам ибн Рахман Дулиб али Алькуманди Парандреус Кавказинидзе Агипян Младший'
         same_name_as_lower = same_name.lower()
         same_name_as_upper = same_name.upper()
@@ -420,36 +474,37 @@ class WriterTests(EnhancedTestCase):
         self.writer.save()
         self.assertEqual(self.writer.get_age(), 63)
 
-    def test_get_avg_scope_for_books(self):
-        # without books
-        self.writer.books.clear()
-        self.assertEqual(self.writer.get_avg_scope_for_books(), 0.0)
+    def test_get_avg_mark_for_books_if_writer_has_no_books(self):
 
-        # books
+        self.writer.books.clear()
+        self.assertEqual(self.writer.get_avg_mark_for_books(), 0.0)
+
+    def test_get_avg_mark_for_books_if_writer_has_books(self):
+
         # rating first book 4.0
         book1 = BookFactory()
         book1.authorship.set([self.writer])
         book1.replies.clear()
-        ReplyFactory(content_object=book1, scope_for_content=3, scope_for_style=5, scope_for_language=4)  # 4
-        self.assertEqual(self.writer.get_avg_scope_for_books(), 4.0)
+        ReplyFactory(content_object=book1, mark_for_content=3, mark_for_style=5, mark_for_language=4)  # 4
+        self.assertEqual(self.writer.get_avg_mark_for_books(), 4.0)
 
         # rating second book 3
         book2 = BookFactory()
         book2.authorship.set([self.writer])
         book2.replies.clear()
-        ReplyFactory(content_object=book2, scope_for_content=3, scope_for_style=1, scope_for_language=5)  # 3
-        ReplyFactory(content_object=book2, scope_for_content=1, scope_for_style=1, scope_for_language=1)  # 1
-        ReplyFactory(content_object=book2, scope_for_content=5, scope_for_style=5, scope_for_language=5)  # 5
+        ReplyFactory(content_object=book2, mark_for_content=3, mark_for_style=1, mark_for_language=5)  # 3
+        ReplyFactory(content_object=book2, mark_for_content=1, mark_for_style=1, mark_for_language=1)  # 1
+        ReplyFactory(content_object=book2, mark_for_content=5, mark_for_style=5, mark_for_language=5)  # 5
 
         # rating first book 4.0, second - 3.0 = (4 + 3) / 2
-        self.assertEqual(self.writer.get_avg_scope_for_books(), 3.5)
+        self.assertEqual(self.writer.get_avg_mark_for_books(), 3.5)
 
         # rating third book 3.6667
         book3 = BookFactory()
         book3.authorship.set([self.writer])
         book3.replies.clear()
-        ReplyFactory(content_object=book3, scope_for_content=4, scope_for_style=5, scope_for_language=5)  # 4.6667
-        ReplyFactory(content_object=book3, scope_for_content=1, scope_for_style=5, scope_for_language=2)  # 2.6667
+        ReplyFactory(content_object=book3, mark_for_content=4, mark_for_style=5, mark_for_language=5)  # 4.6667
+        ReplyFactory(content_object=book3, mark_for_content=1, mark_for_style=5, mark_for_language=2)  # 2.6667
 
         # rating first book 4.0, second - 3.0, third - 3.6667 = (4 + 3+ 3.6667) / 3
-        self.assertEqual(self.writer.get_avg_scope_for_books(), 3.556)
+        self.assertEqual(self.writer.get_avg_mark_for_books(), 3.556)

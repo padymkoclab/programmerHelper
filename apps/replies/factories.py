@@ -1,7 +1,6 @@
 
 import random
 
-from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth import get_user_model
 
 import factory
@@ -18,15 +17,14 @@ class ReplyFactory(factory.DjangoModelFactory):
         model = Reply
 
     text_reply = factory.Faker('text', locale='ru')
-    scope_for_content = fuzzy.FuzzyInteger(5)
-    scope_for_style = fuzzy.FuzzyInteger(5)
-    scope_for_language = fuzzy.FuzzyInteger(5)
+    mark_for_language = fuzzy.FuzzyInteger(1, 5)
+    mark_for_content = fuzzy.FuzzyInteger(1, 5)
+    mark_for_style = fuzzy.FuzzyInteger(1, 5)
 
     @factory.lazy_attribute
     def user(self):
         users_given_their_replies = self.content_object.replies.values('user')
         users_given_not_their_replies = get_user_model().objects.exclude(pk__in=users_given_their_replies)
-        assert users_given_not_their_replies.count() > 0
         return users_given_not_their_replies.random_users(1)
 
     @factory.lazy_attribute

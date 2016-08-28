@@ -4,7 +4,7 @@ import random
 
 from django.db import models
 
-from .utils import create_logger_by_filename
+from .logging_utils import create_logger_by_filename
 
 
 logger = create_logger_by_filename(__name__)
@@ -26,9 +26,10 @@ def get_random_objects(queryset, count, single_as_qs=False):
     #
     if queryset.count() == 1:
         logger.warn('In queryset only 1 object, thus returned it.')
+        obj = queryset.first()
         if single_as_qs:
-            return queryset.filter()
-        return queryset.first()
+            return queryset.filter(pk=obj.pk)
+        return obj
 
     #
     all_primary_keys = list(queryset.values_list('pk', flat=True))
@@ -42,9 +43,10 @@ def get_random_objects(queryset, count, single_as_qs=False):
 
     #
     if count == 1:
+        obj = random_objects.first()
         if single_as_qs:
-            return queryset.filter()
-        return random_objects.first()
+            return queryset.filter(pk=obj.pk)
+        return obj
 
     # prevent dublicates through SQL
     random_objects = random_objects.distinct()

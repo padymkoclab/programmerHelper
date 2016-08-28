@@ -2,18 +2,21 @@
 import datetime
 import random
 
-from django.core.files.base import ContentFile
+from django.utils import timezone
 from django.conf import settings
 
 import factory
 from factory import fuzzy
 
-from mylabour.factories_utils import generate_text_by_min_length
+from mylabour.factories_utils import generate_text_by_min_length, generate_image, generate_words
 
 from apps.tags.models import Tag
 from apps.replies.factories import ReplyFactory
 
-from .models import Book, Writer, NOW_YEAR
+from .models import Book, Writer
+
+
+NOW_YEAR = datetime.datetime.now().year
 
 
 class BookFactory(factory.django.DjangoModelFactory):
@@ -22,33 +25,12 @@ class BookFactory(factory.django.DjangoModelFactory):
         model = Book
 
     language = fuzzy.FuzzyChoice(tuple(code for code, name in Book.LANGUAGES))
-    pages = fuzzy.FuzzyInteger(1, 1000)
+    count_pages = fuzzy.FuzzyInteger(1, 1000)
     year_published = fuzzy.FuzzyInteger(1950, NOW_YEAR)
 
     @factory.lazy_attribute
     def picture(self):
-
-        color = random.choice([
-            'rgb(255, 0, 0)',
-            'rgb(255, 255, 0)',
-            'rgb(255, 0, 255)',
-            'rgb(255, 255, 255)',
-            'rgb(0, 255, 255)',
-            'rgb(0, 255, 0)',
-            'rgb(0, 0, 255)',
-        ])
-
-        filename = 'factory_book.jpeg'
-        imagefield = factory.django.ImageField()
-        content = imagefield._make_data(dict(
-            filename=filename,
-            width=100,
-            height=100,
-            format='JPEG',
-            color=color
-        ))
-        image = ContentFile(content, filename)
-        return image
+        return generate_image(filename='factory_book.jpeg')
 
     @factory.lazy_attribute
     def name(self):
@@ -91,6 +73,11 @@ class BookFactory(factory.django.DjangoModelFactory):
         authors = random.sample(tuple(Writer.objects.all()), count_authors)
         self.authorship.set(authors)
 
+    @factory.post_generation
+    def date_added(self, created, extracted, **kwargs):
+        self.date_added = fuzzy.FuzzyDateTime(timezone.now() - timezone.timedelta(days=400)).fuzz()
+        self.save()
+
 
 class WriterFactory(factory.django.DjangoModelFactory):
 
@@ -101,20 +88,17 @@ class WriterFactory(factory.django.DjangoModelFactory):
 
     @factory.lazy_attribute
     def about(self):
-        return generate_text_by_min_length(100, as_p=True)
+        return generate_text_by_min_length(100)
 
     @factory.lazy_attribute
-    def years_life(self):
+    def birth_year(self):
+        max_birth_year = NOW_YEAR - 16
+        return random.randint(1900, max_birth_year)
 
-        year = datetime.datetime.now().year
+    @factory.lazy_attribute
+    def death_year(self):
+        return random.choice((random.randint(self.birth_year + 16, NOW_YEAR), None))
 
-        min_year_birth = year - 16
-
-        year_birth = random.choice((random.randint(1900, min_year_birth), '?'))
-
-        if year_birth == '?':
-            year_death = random.choice((random.randint(1915, year), '?', ''))
-        else:
-            year_death = random.choice((random.randint(year_birth + 16, year), '?', ''))
-
-        return '{} - {}'.format(year_birth, year_death)
+    @factory.lazy_attribute
+    def trends(self):
+        return generate_words(1, random.randint(1, 10))

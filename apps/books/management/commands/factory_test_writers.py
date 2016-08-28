@@ -1,6 +1,6 @@
 
 from mylabour.basecommands import ExtendedBaseCommand
-from mylabour.utils import create_logger_by_filename
+from mylabour.logging_utils import create_logger_by_filename
 
 from apps.books.factories import WriterFactory
 from apps.books.models import Writer
@@ -23,4 +23,4 @@ class Command(ExtendedBaseCommand):
         for i in range(count):
             WriterFactory()
 
-        logger.debug('Factoried books in count: {0}'.format(count))
+        logger.debug('Factoried writers in count: {0}'.format(count))

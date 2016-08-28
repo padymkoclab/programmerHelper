@@ -1,18 +1,14 @@
 
 import socket
-import logging
-import warnings
 import urllib
 import pprint
 import pip
 import pathlib
 import time
-import random
 import json
 
 from django.shortcuts import _get_queryset
 from django.utils import timezone
-from django.db import models
 from django.core.exceptions import ImproperlyConfigured
 
 from dateutil.relativedelta import relativedelta
@@ -176,31 +172,6 @@ def has_connect_to_internet():
         return True
 
 
-def create_logger_by_filename(name):
-    """Return a logger for with passed name."""
-
-    # create log
-    logger = logging.getLogger(name)
-    logger.setLevel(logging.DEBUG)
-
-    # create handler for terminal
-    terminalHandler = logging.StreamHandler()
-
-    # set level messages for handler
-    terminalHandler.setLevel(logging.DEBUG)
-
-    # create formatter for handler
-    fmt = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-
-    # add formatter for handler
-    terminalHandler.setFormatter(fmt)
-
-    # add handler to logger
-    logger.addHandler(terminalHandler)
-
-    return logger
-
-
 def get_filename_with_datetime(name, extension):
     """Return filename with determined name, current datetime in internation format and extension."""
 
@@ -283,8 +254,8 @@ def hex_to_rgb(value):
         v = int(value, 16) * 17
         return v, v, v
     if lv == 3:
-        return tuple(int(value[i:i+1], 16)*17 for i in range(0, 3))
-    return tuple(int(value[i:i+lv/3], 16) for i in range(0, lv, lv/3))
+        return tuple(int(value[i:i + 1], 16) * 17 for i in range(0, 3))
+    return tuple(int(value[i:i + lv / 3], 16) for i in range(0, lv, lv / 3))
 
 
 if __name__ == "__main__":

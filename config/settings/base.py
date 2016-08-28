@@ -33,30 +33,30 @@ DJANGO_APPS = [
 MY_APPS = [
     'mylabour',
     'apps.core.apps.CoreConfig',
-    'apps.users.apps.UsersConfig',
     'apps.activity.apps.ActivityConfig',
     'apps.articles.apps.ArticlesConfig',
     'apps.badges.apps.BadgesConfig',
     'apps.books.apps.BooksConfig',
     'apps.comments.apps.CommentsConfig',
     # 'apps.courses.apps.CoursesConfig',  # temporary is disabled
+    'apps.export_import_models.apps.ExportImportModelsConfig',
     'apps.favours.apps.FavoursConfig',
     'apps.forum.apps.ForumConfig',
+    'apps.marks.apps.MarksConfig',
     'apps.newsletters.apps.NewslettersConfig',
     'apps.notifications.apps.NotificationsConfig',
     'apps.opinions.apps.OpinionsConfig',
     'apps.polls.apps.PollsConfig',
     'apps.questions.apps.QuestionsConfig',
     'apps.replies.apps.RepliesConfig',
-    'apps.marks.apps.MarksConfig',
     'apps.sessions.apps.SessionsConfig',
     'apps.snippets.apps.SnippetsConfig',
     'apps.solutions.apps.SolutionsConfig',
     'apps.tags.apps.TagsConfig',
     'apps.testing.apps.TestingConfig',
+    'apps.users.apps.UsersConfig',
     'apps.utilities.apps.UtilitiesConfig',
     'apps.visits.apps.VisitsConfig',
-    'apps.export_import_models.apps.ExportImportModelsConfig',
 ]
 
 THIRD_PARTY_APPS = [

@@ -21,7 +21,8 @@ from django.core import serializers
 import magic
 
 from config.admin import AdminSite
-from mylabour.utils import get_filename_with_datetime, create_logger_by_filename
+from mylabour.utils import get_filename_with_datetime
+from mylabour.logging_utils import create_logger_by_filename
 
 from .forms import UploadSerializedFileForm
 

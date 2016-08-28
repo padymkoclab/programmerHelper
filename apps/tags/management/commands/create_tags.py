@@ -5,7 +5,7 @@ from apps.tags.constants import TAGS_NAMES
 from apps.tags.factories import TagFactory
 from apps.tags.models import Tag
 
-from mylabour.utils import create_logger_by_filename
+from mylabour.logging_utils import create_logger_by_filename
 
 
 logger = create_logger_by_filename(__name__)

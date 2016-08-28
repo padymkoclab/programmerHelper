@@ -16,20 +16,15 @@ class PollModelForm(forms.ModelForm):
         super(PollModelForm, self).__init__(*args, **kwargs)
 
         # add css class
-        self.fields['title'].widget.attrs = {
-            'placeholder': _('Enter a title of poll'),
-            'autocomplete': 'off',
+        # special css class for admin theme - django-suit
+        # it allow made input on all width of container
 
-            # special css class for admin theme - django-suit
-            # it allow made input on all width of container
-            'class': 'span12',
-        }
-        self.fields['slug'].widget.attrs = {
-            'class': 'span12',
-        }
-        self.fields['status'].widget.attrs = {
-            'class': 'span12',
-        }
+        self.fields['title'].widget.attrs['placeholder'] = _('Enter a title of poll')
+        self.fields['title'].widget.attrs['autocomplete'] = 'off'
+        self.fields['title'].widget.attrs['class'] = 'span12'
+
+        self.fields['slug'].widget.attrs['class'] = 'span12'
+        self.fields['status'].widget.attrs['class'] = 'span12'
 
         # make field slug as disabled
         self.fields['slug'].disabled = True

@@ -3,7 +3,7 @@ from django.core.management import call_command
 from django.dispatch import receiver
 from django.contrib.auth.signals import user_logged_in, user_logged_out, user_login_failed
 
-from mylabour.utils import create_logger_by_filename
+from mylabour.logging_utils import create_logger_by_filename
 
 
 logger = create_logger_by_filename(__name__)

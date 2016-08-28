@@ -80,7 +80,7 @@ class Poll(TimeStampedModel):
 
     def natural_key(self):
         return self.title
-    natural_key.dependencies = ['apps.users.models.User']
+    natural_key.dependencies = ['users.User']
 
     def get_most_popular_choice_or_choices(self):
         """Return a most popular choice/choices of that poll, as queryset."""
@@ -190,7 +190,7 @@ class Choice(models.Model):
 
     def natural_key(self):
         return (self.poll.natural_key(), self.text_choice)
-    natural_key.dependencies = ['apps.polls.models.Poll']
+    natural_key.dependencies = ['polls.Poll']
 
     def get_count_votes(self):
         return self.votes.count()
@@ -265,7 +265,7 @@ class Vote(models.Model):
     def natural_key(self):
         return (self.poll.natural_key(), self.user.natural_key(), self.choice.natural_key())
     natural_key.dependencies = [
-        'apps.users.models.User',
-        'apps.polls.models.Choice',
-        'apps.polls.models.Poll',
+        'users.User',
+        'polls.Choice',
+        'polls.Poll',
     ]

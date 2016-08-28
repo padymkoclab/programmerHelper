@@ -9,7 +9,7 @@ from django.conf import settings
 
 from invoke import task
 
-from mylabour.utils import create_logger_by_filename
+from mylabour.logging_utils import create_logger_by_filename
 
 
 logger = create_logger_by_filename(__name__)

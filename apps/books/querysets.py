@@ -1,15 +1,14 @@
 
+import re
+
 from django.utils import timezone
 from django.db import models
 
-from psycopg2.extras import NumericRange
-
 from mylabour.functions_db import Round
-from mylabour.utils import create_logger_by_filename
+from mylabour.logging_utils import create_logger_by_filename
 
 
 logger = create_logger_by_filename(__name__)
-NOW_YEAR = timezone.datetime.now().year
 
 
 class BookQuerySet(models.QuerySet):
@@ -30,90 +29,87 @@ class BookQuerySet(models.QuerySet):
     def books_with_rating(self):
         """Queryset with rating of each the book."""
 
-        logger.debug('Is is working is not properly')
+        self = self.annotate(total_mark_reply=(
+            models.F('replies__mark_for_content') +
+            models.F('replies__mark_for_language') +
+            models.F('replies__mark_for_style')
+        ) / models.Value(3))
 
-        # getting replies total sum all of the scopes
-        self = self.values('replies').annotate(
-            sum_scope=models.F('replies__scope_for_content') +
-            models.F('replies__scope_for_style') +
-            models.F('replies__scope_for_language')
-        )
+        self = self.annotate(rating=models.functions.Coalesce(models.F('total_mark_reply'), 0.0))
+        self = self.annotate(rating=Round('rating'))
+        self = self.annotate(rating=models.Avg('rating'))
+        self = self.annotate(rating=Round('rating'))
 
-        # determining avg scope
-        self = self.annotate(total_scope=models.ExpressionWrapper(
-            models.F('sum_scope') / models.Value(3.0), output_field=models.FloatField()
-        ))
-
-        # make round for avg scope
-        self = self.annotate(rating=Round('total_scope'))
+        logger.error('It is worked not properly yet')
 
         return self
 
     def books_with_count_tags_replies_and_rating(self):
         """Complex queryset with count tags, replies and rating of each the book."""
 
+        logger.error('It is worked not properly yet')
+
         return self.books_with_count_tags().books_with_count_replies().books_with_rating()
 
     def new_books(self):
-        """Books published no later in this and past year."""
+        """Books published in this or past year."""
 
-        return self.filter(year_published__gte=NOW_YEAR - 1).filter(year_published__lte=NOW_YEAR)
+        now_year = timezone.now().year
+        return self.filter(year_published__gte=now_year - 1).filter(year_published__lte=now_year)
 
-    def giant_books(self):
-        """Books with pages 500 and more."""
+    def great_books(self):
+        """Books with count pages 500 and more."""
 
-        return self.filter(pages__gte=500)
+        return self.filter(count_pages__gte=1000)
 
     def big_books(self):
-        """Books with pages from 200 to 500."""
+        """Books with count pages from 200 to 500."""
 
-        return self.filter(pages__range=[200, 499])
+        return self.filter(count_pages__range=[300, 999])
 
     def middle_books(self):
-        """Books with pages from 50 to 200."""
+        """Books with count pages from 50 to 200."""
 
-        return self.filter(pages__range=[50, 199])
+        return self.filter(count_pages__range=[50, 299])
 
     def tiny_books(self):
-        """Books with pages until 50."""
+        """Books with count pages until 50."""
 
-        return self.filter(pages__lt=50)
+        return self.filter(count_pages__lt=50)
 
     def books_with_sizes(self):
         """Queryset where each the book have determined values it size."""
 
         return self.annotate(size=models.Case(
-            models.When(pk__in=self.giant_books(), then=models.Value('Giant book')),
-            models.When(pk__in=self.big_books(), then=models.Value('Big book')),
-            models.When(pk__in=self.middle_books(), then=models.Value('Middle book')),
-            models.When(pk__in=self.tiny_books(), then=models.Value('Tiny book')),
+            models.When(pk__in=self.great_books(), then=models.Value('great')),
+            models.When(pk__in=self.big_books(), then=models.Value('big')),
+            models.When(pk__in=self.middle_books(), then=models.Value('middle')),
+            models.When(pk__in=self.tiny_books(), then=models.Value('tiny')),
             output_field=models.CharField(),
         ))
 
     def popular_books(self):
         """Books with rating 5 and more."""
 
-        #
-        # Rating and count views page
-        #
+        logger.info('Add evaluation replated with Count Views of Book page')
 
         self = self.books_with_rating()
         return self.filter(rating__range=[4, 5])
 
-    def books_wrote_english(self):
+    def books_wrote_on_english(self):
         """Book wrote on english."""
 
-        return self.filter(language__iexact='en')
+        return self.filter(language__exact='en')
 
-    def books_wrote_non_english(self):
-        """Book wrote non english."""
+    def books_wrote_on_russian(self):
+        """Book wrote on russian."""
 
-        return self.exclude(language__iexact='en')
+        return self.filter(language__exact='ru')
 
 
 class WriterQuerySet(models.QuerySet):
     """
-    Queryset for writers
+    A queryset for the model Writer
     """
 
     def writers_with_count_books(self):
@@ -121,31 +117,37 @@ class WriterQuerySet(models.QuerySet):
 
         return self.annotate(count_books=models.Count('books', distinct=True))
 
-    def writers_last_century(self):
-        """Writers livig in the last century.
-        If writer born early than 110 year ago, he must be have without fail year of death."""
+    def writers_with_age(self):
+        """Annotate writers and deternimate age of each writer if it is possible."""
 
-        # find writer without year of death and
-        # either without year of birth or if year of birth is early than 100 year ago.
-        pks = list()
-        for i in self.iterator():
-            if i.years_life.upper is None:
-                if i.years_life.lower is None or i.years_life.lower < NOW_YEAR - 100:
-                    pks.append(i.pk)
+        return self.annotate(age=models.Case(
+            models.When(death_year=None, then=models.Value(2016) - models.F('birth_year')),
+            default=models.F('death_year') - models.F('birth_year'),
+            output_field=models.IntegerField()
+        ))
 
-        # exclude unsatisfied writers
-        self = self.exclude(pk__in=pks)
+    def writers_with_status_life(self):
+        """Annotate writers and deternimate age of each writer if it is possible."""
 
-        # filter only writers with living from 100 years ago to now
-        self = self.filter(years_life__overlap=NumericRange(NOW_YEAR - 101, NOW_YEAR))
+        return self.annotate(is_alive=models.Case(
+            models.When(death_year=None, then=True),
+            default=False,
+            output_field=models.IntegerField()
+        ))
+
+    def writers_with_avg_mark_by_rating_of_books(self):
+        """ """
+
+        logger.error('NotImplementedError yet')
         return self
 
-    def writers_with_avg_scope_by_rating_of_books(self):
+    def writers_with_count_books_and_avg_mark_by_rating_of_books(self):
         """ """
 
-        raise NotImplementedError
+        logger.error('NotImplementedError yet')
 
-    def writers_with_count_books_and_avg_scope_by_rating_of_books(self):
-        """ """
-
-        raise NotImplementedError
+        self = self.writers_with_count_books()
+        self = self.writers_with_age()
+        self = self.writers_with_status_life()
+        self = self.writers_with_avg_mark_by_rating_of_books()
+        return self

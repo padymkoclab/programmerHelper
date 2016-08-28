@@ -43,10 +43,10 @@ import xlsxwriter
 from mylabour.utils import (
     get_filename_with_datetime,
     get_latest_or_none,
-    create_logger_by_filename,
     get_location,
     join_enumarate,
 )
+from mylabour.logging_utils import create_logger_by_filename
 from mylabour.datetime_utils import (
     convert_date_to_django_date_format,
     get_year_by_slavic_aryan_calendar,

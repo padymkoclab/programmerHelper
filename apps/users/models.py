@@ -12,7 +12,6 @@ from django.db import models
 from django.conf import settings
 
 from model_utils import Choices
-from model_utils.managers import QueryManager
 
 from apps.polls.managers import PollsManager
 from apps.polls.querysets import UserPollQuerySet
@@ -139,15 +138,11 @@ class User(AbstractBaseUser, PermissionsMixin):
     polls = PollsManager.from_queryset(UserPollQuerySet)()
     badges = BadgeManager()
 
-    # simple managers
-    actives = QueryManager(is_active=True)
-    superusers = QueryManager(is_superuser=True)
-
     class Meta:
         db_table = 'user'
         verbose_name = _("User")
         verbose_name_plural = _("Users")
-        ordering = ['-last_login']  # not worked
+        ordering = ['-date_joined']
         get_latest_by = 'date_joined'
 
     def __str__(self):

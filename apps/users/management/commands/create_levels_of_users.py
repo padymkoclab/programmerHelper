@@ -1,7 +1,7 @@
 
 from django.core.management.base import BaseCommand
 
-from mylabour.utils import create_logger_by_filename
+from mylabour.logging_utils import create_logger_by_filename
 
 from apps.users.factories import UserLevelFactory
 from apps.users.models import UserLevel

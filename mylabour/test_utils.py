@@ -17,6 +17,8 @@ from django.test import TestCase, RequestFactory
 from pyvirtualdisplay import Display
 from selenium.webdriver import Chrome
 
+from mylabour.factories_utils import generate_image
+
 
 webdriver = Chrome
 
@@ -78,6 +80,9 @@ class EnhancedTestCase(TestCase):
 
     def _logger_as_admin(self, user):
         raise NotImplementedError
+
+    def _generate_image(self):
+        return generate_image(filename='testing_image.png')
 
 
 class StaticLiveAdminTest(StaticLiveServerTestCase):

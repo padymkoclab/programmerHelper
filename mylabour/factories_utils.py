@@ -1,6 +1,11 @@
 
 import string
 import random
+import io
+
+from django.core.files.base import ContentFile
+
+from PIL import ImageColor, ImageDraw, Image
 
 from django.template import Template, Context
 import factory
@@ -12,6 +17,44 @@ from .text_utils import findall_words
 
 [description]
 """
+
+
+def generate_image(width=100, height=100, filename='setivolkylany.com', imageformat='JPEG', show=False):
+    """Generate image by help Pillow on based width, height and image`s format."""
+
+    # generate supported the PIL`s colors in RGB
+    colors = [ImageColor.getrgb(colorname) for colorname in ImageColor.colormap.keys()]
+
+    # choice a random color
+    color = random.choice(colors)
+
+    # create a buffer for an image
+    buffer_file = io.BytesIO()
+
+    # create an image
+    image = Image.new('RGB', (width, height), color)
+
+    # draw a text by center on the image if it possible contains it
+    draw = ImageDraw.Draw(image)
+    text = '{0} X {1}'.format(width, height)
+    textwidth, textheight = draw.textsize(text)
+    if textwidth < width and textheight < height:
+        left = (width - textwidth) // 2
+        top = (height - textheight) // 2
+        draw.text((left, top), text, fill=(0, 0, 0))
+
+    # write the image in buffer
+    image.save(buffer_file, imageformat)
+
+    # show the image if needed
+    if show:
+        image.show()
+
+    # write the generated image in supported the Django`s type and return it
+    buffer_file.seek(0)
+    imagecontent = buffer_file.getvalue()
+    image = ContentFile(imagecontent, filename)
+    return image
 
 
 def generate_text_by_min_length(min_length, as_p=False):

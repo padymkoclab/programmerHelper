@@ -1,474 +1,730 @@
 
-import unittest
+from unittest import mock
 
-from django.test import TestCase
+import pytest
 
-from apps.accounts.factories import accounts_factory
+from mylabour.test_utils import EnhancedTestCase
+
 from apps.replies.factories import ReplyFactory
-from apps.tags.factories import tags_factory
 from apps.tags.models import Tag
-from apps.web_links.models import WebLink
-from apps.badges.factories import badges_factory
-from apps.web_links.factories import web_links_factory
 
-from apps.books.factories import BookFactory, WritterFactory, books_factory
-from apps.books.models import Book, Writter, NOW_YEAR
+from apps.books.models import Book, Writer
 
 
-class BookQuerySetTest(TestCase):
+class BookQuerySetTests(EnhancedTestCase):
     """
-    Tests for queryset of model Book.
+    Tests for queryset of the model Book.
     """
 
     @classmethod
     def setUpTestData(cls):
-        tags_factory(15)
-        web_links_factory(15)
-        badges_factory()
-        accounts_factory(15)
-        books_factory(4)
+        cls.call_command('factory_test_users', '8')
+        cls.call_command('factory_test_writers', '4')
+        cls.call_command('factory_test_books', '7')
+
+        cls.book1, cls.book2, cls.book3, cls.book4, cls.book5, cls.book6, cls.book7 = Book.objects.all()
+
+        for book in Book.objects.iterator():
+            book.replies.clear()
+            book.tags.clear()
+
+        cls.book1.language = 'ru'
+        cls.book1.year_published = 2003
+        cls.book1.full_clean()
+        cls.book1.save()
+
+        cls.book2.language = 'en'
+        cls.book2.year_published = 2002
+        cls.book2.full_clean()
+        cls.book2.save()
+
+        cls.book3.language = 'ru'
+        cls.book3.year_published = 2004
+        cls.book3.full_clean()
+        cls.book3.save()
+
+        cls.book4.language = 'en'
+        cls.book4.year_published = 2001
+        cls.book4.full_clean()
+        cls.book4.save()
+
+        cls.book5.language = 'en'
+        cls.book5.year_published = 2006
+        cls.book5.full_clean()
+        cls.book5.save()
+
+        cls.book6.language = 'ru'
+        cls.book6.year_published = 2000
+        cls.book6.full_clean()
+        cls.book6.save()
+
+        cls.book7.language = 'en'
+        cls.book7.year_published = 2005
+        cls.book7.full_clean()
+        cls.book7.save()
 
     def setUp(self):
-        books = Book.objects.all()
-        self.book1 = books[0]
-        self.book2 = books[1]
-        self.book3 = books[2]
-        self.book4 = books[3]
+        for book in Book.objects.iterator():
+            book.refresh_from_db()
 
-    def test_books_with_count_tags(self):
-        #
+    def test_books_with_count_tags_if_books_have_not_tags(self):
+
+        books_with_count_tags = Book.objects.books_with_count_tags()
+        for book in Book.objects.iterator():
+            self.assertEqual(books_with_count_tags.get(pk=book.pk).count_tags, 0)
+
+    def test_books_with_count_tags_if_books_have_tags(self):
+
         self.book1.tags.set(Tag.objects.random_tags(5))
         self.book2.tags.set(Tag.objects.random_tags(2))
-        self.book3.tags.set([Tag.objects.random_tags(1)])
-        self.book4.tags.clear()
-        #
+        self.book3.tags.set(Tag.objects.random_tags(1, single_as_qs=True))
+        self.book4.tags.set(Tag.objects.random_tags(4))
+        self.book6.tags.set(Tag.objects.random_tags(3))
+        self.book7.tags.set(Tag.objects.random_tags(6))
+
         books_with_count_tags = Book.objects.books_with_count_tags()
-        #
         self.assertEqual(books_with_count_tags.get(pk=self.book1.pk).count_tags, 5)
         self.assertEqual(books_with_count_tags.get(pk=self.book2.pk).count_tags, 2)
         self.assertEqual(books_with_count_tags.get(pk=self.book3.pk).count_tags, 1)
-        self.assertEqual(books_with_count_tags.get(pk=self.book4.pk).count_tags, 0)
+        self.assertEqual(books_with_count_tags.get(pk=self.book4.pk).count_tags, 4)
+        self.assertEqual(books_with_count_tags.get(pk=self.book5.pk).count_tags, 0)
+        self.assertEqual(books_with_count_tags.get(pk=self.book6.pk).count_tags, 3)
+        self.assertEqual(books_with_count_tags.get(pk=self.book7.pk).count_tags, 6)
 
-    def test_books_with_count_links(self):
-        #
-        self.book1.links.set(WebLink.objects.random_weblinks(5))
-        self.book2.links.set(WebLink.objects.random_weblinks(2))
-        self.book3.links.set([WebLink.objects.random_weblinks(1)])
-        self.book4.links.clear()
-        #
-        books_with_count_links = Book.objects.books_with_count_links()
-        #
-        self.assertEqual(books_with_count_links.get(pk=self.book1.pk).count_links, 5)
-        self.assertEqual(books_with_count_links.get(pk=self.book2.pk).count_links, 2)
-        self.assertEqual(books_with_count_links.get(pk=self.book3.pk).count_links, 1)
-        self.assertEqual(books_with_count_links.get(pk=self.book4.pk).count_links, 0)
+    def test_books_with_count_replies_if_books_have_not_replies(self):
 
-    def test_books_with_count_replies(self):
-        #
-        self.book1.replies.clear()
-        self.book2.replies.clear()
-        self.book3.replies.clear()
-        self.book4.replies.clear()
-        #
-        ReplyFactory(content_object=self.book1)
-        ReplyFactory(content_object=self.book1)
-        ReplyFactory(content_object=self.book1)
-        #
-        ReplyFactory(content_object=self.book2)
-        ReplyFactory(content_object=self.book2)
-        ReplyFactory(content_object=self.book2)
-        ReplyFactory(content_object=self.book2)
-        ReplyFactory(content_object=self.book2)
-        ReplyFactory(content_object=self.book2)
-        ReplyFactory(content_object=self.book2)
-        #
-        ReplyFactory(content_object=self.book3)
-        ReplyFactory(content_object=self.book3)
-        #
+        books_with_count_replies = Book.objects.books_with_count_replies()
+        for book in Book.objects.iterator():
+            self.assertEqual(books_with_count_replies.get(pk=book.pk).count_replies, 0)
+
+    def test_books_with_count_replies_if_books_have_replies(self):
+
+        for book, count_replies in (
+            (self.book1, 3),
+            (self.book2, 6),
+            (self.book3, 2),
+            (self.book4, 1),
+            (self.book5, 0),
+            (self.book6, 4),
+            (self.book7, 6),
+        ):
+            for i in range(count_replies):
+                ReplyFactory(content_object=book)
+
         books_with_count_replies = Book.objects.books_with_count_replies()
         self.assertEqual(books_with_count_replies.get(pk=self.book1.pk).count_replies, 3)
-        self.assertEqual(books_with_count_replies.get(pk=self.book2.pk).count_replies, 7)
+        self.assertEqual(books_with_count_replies.get(pk=self.book2.pk).count_replies, 6)
         self.assertEqual(books_with_count_replies.get(pk=self.book3.pk).count_replies, 2)
-        self.assertEqual(books_with_count_replies.get(pk=self.book4.pk).count_replies, 0)
+        self.assertEqual(books_with_count_replies.get(pk=self.book4.pk).count_replies, 1)
+        self.assertEqual(books_with_count_replies.get(pk=self.book5.pk).count_replies, 0)
+        self.assertEqual(books_with_count_replies.get(pk=self.book6.pk).count_replies, 4)
+        self.assertEqual(books_with_count_replies.get(pk=self.book7.pk).count_replies, 6)
 
-    @unittest.skip('Not implemented')
-    def test_books_with_rating(self):
-        #
-        self.book1.replies.clear()
-        self.book2.replies.clear()
-        self.book3.replies.clear()
-        self.book4.replies.clear()
-        #
-        ReplyFactory(content_object=self.book1, scope_for_content=3, scope_for_style=2, scope_for_language=1)  # 2
-        ReplyFactory(content_object=self.book1, scope_for_content=5, scope_for_style=2, scope_for_language=2)  # 3
-        ReplyFactory(content_object=self.book1, scope_for_content=1, scope_for_style=1, scope_for_language=1)  # 1
-        #
-        ReplyFactory(content_object=self.book2, scope_for_content=3, scope_for_style=2, scope_for_language=1)  # 2
-        ReplyFactory(content_object=self.book2, scope_for_content=5, scope_for_style=1, scope_for_language=4)  # 10 / 3
-        ReplyFactory(content_object=self.book2, scope_for_content=2, scope_for_style=3, scope_for_language=2)  # 7 / 3
-        ReplyFactory(content_object=self.book2, scope_for_content=5, scope_for_style=1, scope_for_language=1)  # 7 / 3
-        ReplyFactory(content_object=self.book2, scope_for_content=5, scope_for_style=5, scope_for_language=5)  # 5
-        #
-        ReplyFactory(content_object=self.book3, scope_for_content=1, scope_for_style=5, scope_for_language=2)  # 8 / 3
-        #
+    def test_books_with_rating_if_books_have_no_replies(self):
+
+        books_with_rating = Book.objects.books_with_rating()
+        for book in Book.objects.iterator():
+            self.assertEqual(books_with_rating.get(pk=book.pk).rating, .0)
+
+    def test_books_with_rating_if_books_have_replies(self):
+
+        # total mark 3.0
+        ReplyFactory(content_object=self.book1, mark_for_content=3, mark_for_style=2, mark_for_language=1)  # 2
+        ReplyFactory(content_object=self.book1, mark_for_content=5, mark_for_style=2, mark_for_language=2)  # 3
+        ReplyFactory(content_object=self.book1, mark_for_content=1, mark_for_style=1, mark_for_language=1)  # 1
+
+        # total mark 3.733
+        ReplyFactory(content_object=self.book2, mark_for_content=5, mark_for_style=1, mark_for_language=4)  # 10 / 3
+        ReplyFactory(content_object=self.book2, mark_for_content=2, mark_for_style=4, mark_for_language=2)  # 8 / 3
+        ReplyFactory(content_object=self.book2, mark_for_content=5, mark_for_style=5, mark_for_language=1)  # 11 / 3
+        ReplyFactory(content_object=self.book2, mark_for_content=5, mark_for_style=3, mark_for_language=5)  # 13 / 3
+        ReplyFactory(content_object=self.book2, mark_for_content=5, mark_for_style=5, mark_for_language=4)  # 14 / 3
+
+        # total mark 0.0
+        ReplyFactory(content_object=self.book3, mark_for_content=0, mark_for_style=0, mark_for_language=0)  # 0
+
+        # total mark 2.833
+        ReplyFactory(content_object=self.book4, mark_for_content=2, mark_for_style=5, mark_for_language=1)  # 2.667
+        ReplyFactory(content_object=self.book4, mark_for_content=5, mark_for_style=3, mark_for_language=2)  # 3
+
+        # total mark 2.667
+        ReplyFactory(content_object=self.book5, mark_for_content=5, mark_for_style=5, mark_for_language=2)  # 2.667
+
+        # total mark 4.5
+        ReplyFactory(content_object=self.book6, mark_for_content=5, mark_for_style=5, mark_for_language=4)  # 14 / 3
+        ReplyFactory(content_object=self.book6, mark_for_content=5, mark_for_style=3, mark_for_language=5)  # 13 / 3
+
         books_with_rating = Book.objects.books_with_rating()
         self.assertEqual(books_with_rating.get(pk=self.book1.pk).rating, 3.0)
-        self.assertEqual(books_with_rating.get(pk=self.book2.pk).rating, 14.9999)
-        self.assertEqual(books_with_rating.get(pk=self.book3.pk).rating, 2.6667)
-        self.assertEqual(books_with_rating.get(pk=self.book4.pk).rating, 0)
+        self.assertEqual(books_with_rating.get(pk=self.book2.pk).rating, 3.733)
+        self.assertEqual(books_with_rating.get(pk=self.book3.pk).rating, 0.0)
+        self.assertEqual(books_with_rating.get(pk=self.book4.pk).rating, 2.833)
+        self.assertEqual(books_with_rating.get(pk=self.book5.pk).rating, 2.667)
+        self.assertEqual(books_with_rating.get(pk=self.book6.pk).rating, 4.5)
+        self.assertEqual(books_with_rating.get(pk=self.book7.pk).rating, 0.0)
 
-    @unittest.skip('Very complex test')
-    def test_books_with_count_tags_links_replies_and_rating(self):
-        self.book1.tags.set(Tag.objects.random_tags(5))
-        self.book2.tags.set(Tag.objects.random_tags(2))
-        self.book3.tags.set([Tag.objects.random_tags(1)])
-        self.book4.tags.clear()
-        #
-        books_with_count_tags = Book.objects.books_with_count_tags()
-        #
-        self.assertEqual(books_with_count_tags.get(pk=self.book1.pk).count_tags, 5)
-        self.assertEqual(books_with_count_tags.get(pk=self.book2.pk).count_tags, 2)
-        self.assertEqual(books_with_count_tags.get(pk=self.book3.pk).count_tags, 1)
-        self.assertEqual(books_with_count_tags.get(pk=self.book4.pk).count_tags, 0)
-        #
-        self.book1.links.set(WebLink.objects.random_weblinks(5))
-        self.book2.links.set(WebLink.objects.random_weblinks(2))
-        self.book3.links.set([WebLink.objects.random_weblinks(1)])
-        self.book4.links.clear()
-        #
-        books_with_count_links = Book.objects.books_with_count_links()
-        #
-        self.assertEqual(books_with_count_links.get(pk=self.book1.pk).count_links, 5)
-        self.assertEqual(books_with_count_links.get(pk=self.book2.pk).count_links, 2)
-        self.assertEqual(books_with_count_links.get(pk=self.book3.pk).count_links, 1)
-        self.assertEqual(books_with_count_links.get(pk=self.book4.pk).count_links, 0)
-        #
-        self.book1.replies.clear()
-        self.book2.replies.clear()
-        self.book3.replies.clear()
-        self.book4.replies.clear()
-        #
-        ReplyFactory(content_object=self.book1)
-        ReplyFactory(content_object=self.book1)
-        ReplyFactory(content_object=self.book1)
-        #
-        ReplyFactory(content_object=self.book2)
-        ReplyFactory(content_object=self.book2)
-        ReplyFactory(content_object=self.book2)
-        ReplyFactory(content_object=self.book2)
-        ReplyFactory(content_object=self.book2)
-        ReplyFactory(content_object=self.book2)
-        ReplyFactory(content_object=self.book2)
-        #
-        ReplyFactory(content_object=self.book3)
-        ReplyFactory(content_object=self.book3)
-        #
-        books_with_count_replies = Book.objects.books_with_count_replies()
-        self.assertEqual(books_with_count_replies.get(pk=self.book1.pk).count_links, 3)
-        self.assertEqual(books_with_count_replies.get(pk=self.book2.pk).count_links, 7)
-        self.assertEqual(books_with_count_replies.get(pk=self.book3.pk).count_links, 2)
-        self.assertEqual(books_with_count_replies.get(pk=self.book4.pk).count_links, 0)
-        #
-        self.book1.replies.clear()
-        self.book2.replies.clear()
-        self.book3.replies.clear()
-        self.book4.replies.clear()
-        #
-        ReplyFactory(content_object=self.book1, scope_for_content=3, scope_for_style=2, scope_for_language=1)  # 2
-        ReplyFactory(content_object=self.book1, scope_for_content=5, scope_for_style=2, scope_for_language=2)  # 3
-        ReplyFactory(content_object=self.book1, scope_for_content=1, scope_for_style=1, scope_for_language=2)  # 1
-        #
-        ReplyFactory(content_object=self.book2, scope_for_content=3, scope_for_style=2, scope_for_language=1)  # 2
-        ReplyFactory(content_object=self.book2, scope_for_content=5, scope_for_style=1, scope_for_language=4)  # 10 / 3
-        ReplyFactory(content_object=self.book2, scope_for_content=2, scope_for_style=3, scope_for_language=2)  # 7 / 3
-        ReplyFactory(content_object=self.book2, scope_for_content=5, scope_for_style=1, scope_for_language=1)  # 7 / 3
-        ReplyFactory(content_object=self.book2, scope_for_content=5, scope_for_style=5, scope_for_language=5)  # 5
-        #
-        ReplyFactory(content_object=self.book3, scope_for_content=1, scope_for_style=5, scope_for_language=2)  # 8 / 3
-        #
-        books_with_rating = Book.objects.books_with_rating()
-        self.assertEqual(books_with_rating.get(pk=self.book1.pk).rating, 3.0)
-        self.assertEqual(books_with_rating.get(pk=self.book2.pk).rating, 14.9999)
-        self.assertEqual(books_with_rating.get(pk=self.book3.pk).rating, 2.6667)
-        self.assertEqual(books_with_rating.get(pk=self.book4.pk).rating, 0)
+    def test_books_with_count_tags_replies_and_rating_if_books_have_not_tags_and_replies(self):
 
-    def test_new_books(self):
-        # no new books
-        Book.objects.update(year_published=NOW_YEAR - 2)
-        self.assertFalse(Book.objects.new_books())
-        # all books is new (odd books published year ago, even books published in this year)
-        for i, book in enumerate(Book.objects.iterator()):
-            if i % 2 == 0:
-                year_published = NOW_YEAR
-            else:
-                year_published = NOW_YEAR - 1
-            book.year_published = year_published
-            book.full_clean()
-            book.save()
-        self.assertCountEqual(Book.objects.new_books(), Book.objects.all())
-        # reset
-        Book.objects.update(year_published=NOW_YEAR - 10)
-        self.assertFalse(Book.objects.new_books())
-        # some books is new
-        all_books = Book.objects.all()
-        #
-        first_book = all_books.first()
-        second_book = all_books[1]
-        penultimate_book = all_books[::-1][1]
-        last_book = all_books[::-1][0]
-        #
-        first_book.year_published = NOW_YEAR - 1
-        second_book.year_published = NOW_YEAR
-        penultimate_book.year_published = NOW_YEAR - 1
-        last_book.year_published = NOW_YEAR
-        #
-        first_book.full_clean()
-        second_book.full_clean()
-        penultimate_book.full_clean()
-        last_book.full_clean()
-        #
-        first_book.save()
-        second_book.save()
-        penultimate_book.save()
-        last_book.save()
-        #
-        self.assertCountEqual(Book.objects.new_books(), [first_book, second_book, penultimate_book, last_book])
+        books_with_count_tags_replies_and_rating = Book.objects.books_with_count_tags_replies_and_rating()
+        for book in Book.objects.iterator():
+            book = books_with_count_tags_replies_and_rating.get(pk=book.pk)
+            self.assertEqual(book.rating, .0)
+            self.assertEqual(book.count_tags, 0)
+            self.assertEqual(book.count_replies, 0)
 
-    def test_giant_book(self):
-        giant_books = Book.objects.giant_books()
-        self.assertTrue(all(book in giant_books for book in Book.objects.iterator() if book.pages >= 500))
+    def test_books_with_count_tags_replies_and_rating_if_books_have_tags_and_replies(self):
 
-    def test_big_book(self):
-        big_books = Book.objects.big_books()
-        self.assertTrue(all(book in big_books for book in Book.objects.iterator() if 200 <= book.pages < 500))
+        # Add tags
+        #
+        self.book1.tags.set(Tag.objects.random_tags(6))
+        self.book2.tags.set(Tag.objects.random_tags(5))
+        self.book3.tags.set(Tag.objects.random_tags(4))
+        self.book4.tags.set(Tag.objects.random_tags(3))
+        self.book5.tags.set(Tag.objects.random_tags(2))
+        self.book6.tags.set(Tag.objects.random_tags(1, single_as_qs=True))
 
-    def test_middle_book(self):
-        middle_books = Book.objects.middle_books()
-        self.assertTrue(all(book in middle_books for book in Book.objects.iterator() if 50 <= book.pages < 200))
+        # Add replies with marks
+        #
+        # total mark 4.667
+        ReplyFactory(content_object=self.book1, mark_for_content=3, mark_for_style=3, mark_for_language=3)  # 3
+        ReplyFactory(content_object=self.book1, mark_for_content=5, mark_for_style=2, mark_for_language=2)  # 3
+        ReplyFactory(content_object=self.book1, mark_for_content=1, mark_for_style=5, mark_for_language=2)  # 8
+
+        # total mark 3.0
+        ReplyFactory(content_object=self.book2, mark_for_content=3, mark_for_style=2, mark_for_language=1)  # 2
+        ReplyFactory(content_object=self.book2, mark_for_content=5, mark_for_style=1, mark_for_language=4)  # 10 / 3
+        ReplyFactory(content_object=self.book2, mark_for_content=2, mark_for_style=3, mark_for_language=2)  # 7 / 3
+        ReplyFactory(content_object=self.book2, mark_for_content=5, mark_for_style=1, mark_for_language=1)  # 7 / 3
+        ReplyFactory(content_object=self.book2, mark_for_content=5, mark_for_style=5, mark_for_language=5)  # 5
+
+        # total mark 3.333
+        ReplyFactory(content_object=self.book3, mark_for_content=3, mark_for_style=5, mark_for_language=2)  # 10 / 3
+
+        # total mark 3.5
+        ReplyFactory(content_object=self.book4, mark_for_content=1, mark_for_style=3, mark_for_language=5)  # 3
+        ReplyFactory(content_object=self.book4, mark_for_content=4, mark_for_style=4, mark_for_language=4)  # 4
+
+        # total mark 3.167
+        ReplyFactory(content_object=self.book5, mark_for_content=1, mark_for_style=5, mark_for_language=2)  # 8 / 3
+        ReplyFactory(content_object=self.book5, mark_for_content=2, mark_for_style=2, mark_for_language=5)  # 3
+        ReplyFactory(content_object=self.book5, mark_for_content=1, mark_for_style=5, mark_for_language=1)  # 7 / 3
+        ReplyFactory(content_object=self.book5, mark_for_content=5, mark_for_style=4, mark_for_language=5)  # 14 / 3
+
+        # total mark 2.833
+        ReplyFactory(content_object=self.book6, mark_for_content=1, mark_for_style=5, mark_for_language=3)  # 8 / 3
+        ReplyFactory(content_object=self.book6, mark_for_content=1, mark_for_style=3, mark_for_language=2)  # 2
+        ReplyFactory(content_object=self.book6, mark_for_content=2, mark_for_style=1, mark_for_language=1)  # 4 / 3
+        ReplyFactory(content_object=self.book6, mark_for_content=1, mark_for_style=5, mark_for_language=5)  # 11 / 3
+        ReplyFactory(content_object=self.book6, mark_for_content=4, mark_for_style=4, mark_for_language=5)  # 14 / 3
+        ReplyFactory(content_object=self.book6, mark_for_content=1, mark_for_style=5, mark_for_language=2)  # 8 / 3
+
+        # Tests
+        books_with_count_tags_replies_and_rating = Book.objects.books_with_count_tags_replies_and_rating()
+        result_book1 = books_with_count_tags_replies_and_rating.get(pk=self.book1.pk)
+        result_book2 = books_with_count_tags_replies_and_rating.get(pk=self.book2.pk)
+        result_book3 = books_with_count_tags_replies_and_rating.get(pk=self.book3.pk)
+        result_book4 = books_with_count_tags_replies_and_rating.get(pk=self.book4.pk)
+        result_book5 = books_with_count_tags_replies_and_rating.get(pk=self.book5.pk)
+        result_book6 = books_with_count_tags_replies_and_rating.get(pk=self.book6.pk)
+        result_book7 = books_with_count_tags_replies_and_rating.get(pk=self.book7.pk)
+
+        self.assertEqual(result_book1.rating, 4.667)
+        self.assertEqual(result_book2.rating, 3.0)
+        self.assertEqual(result_book3.rating, 3.333)
+        self.assertEqual(result_book4.rating, 3.5)
+        self.assertEqual(result_book5.rating, 3.167)
+        self.assertEqual(result_book6.rating, 2.833)
+        self.assertEqual(result_book7.rating, 0.0)
+
+        self.assertEqual(result_book1.count_tags, 6)
+        self.assertEqual(result_book2.count_tags, 5)
+        self.assertEqual(result_book3.count_tags, 4)
+        self.assertEqual(result_book4.count_tags, 3)
+        self.assertEqual(result_book5.count_tags, 2)
+        self.assertEqual(result_book6.count_tags, 1)
+        self.assertEqual(result_book7.count_tags, 0)
+
+        self.assertEqual(result_book1.count_replies, 3)
+        self.assertEqual(result_book2.count_replies, 5)
+        self.assertEqual(result_book3.count_replies, 1)
+        self.assertEqual(result_book4.count_replies, 2)
+        self.assertEqual(result_book5.count_replies, 4)
+        self.assertEqual(result_book6.count_replies, 6)
+        self.assertEqual(result_book7.count_replies, 0)
+
+    @mock.patch('django.utils.timezone.now')
+    def test_new_books(self, mock_now):
+
+        mock_now.return_value = self.timezone.datetime(2006, 1, 1)
+        new_books = Book.objects.new_books()
+        self.assertCountEqual(new_books, [self.book5, self.book7])
 
     def test_tiny_book(self):
-        tiny_books = Book.objects.tiny_books()
-        self.assertTrue(all(book in tiny_books for book in Book.objects.iterator() if book.pages < 50))
+
+        self.book1.pages = 1
+        self.book1.full_clean()
+        self.book1.save()
+
+        self.book2.pages = 100
+        self.book2.full_clean()
+        self.book2.save()
+
+        self.book3.pages = 70
+        self.book3.full_clean()
+        self.book3.save()
+
+        self.book4.pages = 49
+        self.book4.full_clean()
+        self.book4.save()
+
+        self.book5.pages = 50
+        self.book5.full_clean()
+        self.book5.save()
+
+        self.book6.pages = 10
+        self.book6.full_clean()
+        self.book6.save()
+
+        self.book7.pages = 200
+        self.book7.full_clean()
+        self.book7.save()
+
+        self.assertCountEqual(Book.objects.tiny_books(), [self.book1, self.book4, self.book6])
+
+    def test_middle_book(self):
+
+        self.book1.pages = 200
+        self.book1.full_clean()
+        self.book1.save()
+
+        self.book2.pages = 100
+        self.book2.full_clean()
+        self.book2.save()
+
+        self.book3.pages = 300
+        self.book3.full_clean()
+        self.book3.save()
+
+        self.book4.pages = 400
+        self.book4.full_clean()
+        self.book4.save()
+
+        self.book5.pages = 49
+        self.book5.full_clean()
+        self.book5.save()
+
+        self.book6.pages = 299
+        self.book6.full_clean()
+        self.book6.save()
+
+        self.book7.pages = 50
+        self.book7.full_clean()
+        self.book7.save()
+
+        self.assertCountEqual(Book.objects.middle_books(), [self.book1, self.book2, self.book6, self.book7])
+
+    def test_big_book(self):
+
+        self.book1.pages = 200
+        self.book1.full_clean()
+        self.book1.save()
+
+        self.book2.pages = 900
+        self.book2.full_clean()
+        self.book2.save()
+
+        self.book3.pages = 300
+        self.book3.full_clean()
+        self.book3.save()
+
+        self.book4.pages = 1100
+        self.book4.full_clean()
+        self.book4.save()
+
+        self.book5.pages = 1000
+        self.book5.full_clean()
+        self.book5.save()
+
+        self.book6.pages = 299
+        self.book6.full_clean()
+        self.book6.save()
+
+        self.book7.pages = 600
+        self.book7.full_clean()
+        self.book7.save()
+
+        self.assertCountEqual(Book.objects.big_books(), [self.book2, self.book3, self.book7])
+
+    def test_great_book(self):
+
+        self.book1.pages = 200
+        self.book1.full_clean()
+        self.book1.save()
+
+        self.book2.pages = 1100
+        self.book2.full_clean()
+        self.book2.save()
+
+        self.book3.pages = 300
+        self.book3.full_clean()
+        self.book3.save()
+
+        self.book4.pages = 1000
+        self.book4.full_clean()
+        self.book4.save()
+
+        self.book5.pages = 999
+        self.book5.full_clean()
+        self.book5.save()
+
+        self.book6.pages = 299
+        self.book6.full_clean()
+        self.book6.save()
+
+        self.book7.pages = 600
+        self.book7.full_clean()
+        self.book7.save()
+
+        self.assertCountEqual(Book.objects.great_books(), [self.book2, self.book4])
 
     def test_books_with_sizes(self):
+
+        self.book1.pages = 49
+        self.book1.full_clean()
+        self.book1.save()
+
+        self.book2.pages = 50
+        self.book2.full_clean()
+        self.book2.save()
+
+        self.book3.pages = 299
+        self.book3.full_clean()
+        self.book3.save()
+
+        self.book4.pages = 599
+        self.book4.full_clean()
+        self.book4.save()
+
+        self.book5.pages = 1000
+        self.book5.full_clean()
+        self.book5.save()
+
+        self.book6.pages = 999
+        self.book6.full_clean()
+        self.book6.save()
+
+        self.book7.pages = 300
+        self.book7.full_clean()
+        self.book7.save()
+
         books_with_sizes = Book.objects.books_with_sizes()
-        for book in books_with_sizes:
-            if book.pages < 50:
-                self.assertEqual(book.size, 'Tiny book')
-            elif 50 <= book.pages < 200:
-                self.assertEqual(book.size, 'Middle book')
-            elif 200 <= book.pages < 500:
-                self.assertEqual(book.size, 'Big book')
-            else:
-                self.assertEqual(book.size, 'Giant book')
+        self.assertEqual(books_with_sizes.get(pk=self.book1.pk).size, 'Tiny book')
+        self.assertEqual(books_with_sizes.get(pk=self.book2.pk).size, 'Middle book')
+        self.assertEqual(books_with_sizes.get(pk=self.book3.pk).size, 'Middle book')
+        self.assertEqual(books_with_sizes.get(pk=self.book4.pk).size, 'Big book')
+        self.assertEqual(books_with_sizes.get(pk=self.book5.pk).size, 'Great book')
+        self.assertEqual(books_with_sizes.get(pk=self.book6.pk).size, 'Big book')
+        self.assertEqual(books_with_sizes.get(pk=self.book7.pk).size, 'Big book')
 
-    @unittest.skip('NotImplemented books_with_rating')
-    def test_popular_books(self):
-        #
-        self.book1.replies.clear()
-        self.book2.replies.clear()
-        self.book3.replies.clear()
-        self.book4.replies.clear()
-        # 4.5
-        ReplyFactory(content_object=self.book1, scope_for_content=5, scope_for_style=2, scope_for_language=5)  # 4
-        ReplyFactory(content_object=self.book1, scope_for_content=5, scope_for_style=5, scope_for_language=4)  # 4.6667
-        ReplyFactory(content_object=self.book1, scope_for_content=5, scope_for_style=4, scope_for_language=4)  # 4.3333
-        ReplyFactory(content_object=self.book1, scope_for_content=5, scope_for_style=5, scope_for_language=5)  # 5
-        # 3.9999
-        ReplyFactory(content_object=self.book2, scope_for_content=5, scope_for_style=3, scope_for_language=5)  # 4.3333
-        ReplyFactory(content_object=self.book2, scope_for_content=5, scope_for_style=2, scope_for_language=4)  # 3.6667
-        # 5
-        ReplyFactory(content_object=self.book3, scope_for_content=5, scope_for_style=2, scope_for_language=5)  # 4
-        ReplyFactory(content_object=self.book3, scope_for_content=5, scope_for_style=5, scope_for_language=5)  # 5
-        # 4
-        ReplyFactory(content_object=self.book4, scope_for_content=5, scope_for_style=2, scope_for_language=5)  # 4
-        #
-        self.assertCountEqual(Book.objects.popular_books(), [self.book1, self.book3, self.book4])
+    def test_popular_books_if_books_have_not_replies(self):
 
-    def test_books_wrote_english(self):
-        #
-        Book.objects.update(language='en')
-        self.assertCountEqual(Book.objects.books_wrote_english(), Book.objects.all())
-        #
-        Book.objects.update(language='ru')
-        self.assertEqual(Book.objects.books_wrote_english().count(), 0)
-        #
-        first_book = Book.objects.first()
-        first_book.language = 'en'
-        first_book.full_clean()
-        first_book.save()
-        last_book = Book.objects.last()
-        last_book.language = 'en'
-        last_book.full_clean()
-        last_book.save()
-        self.assertCountEqual(Book.objects.books_wrote_english(), [first_book, last_book])
+        self.assertQuerysetEqual(Book.objects.popular_books(), Book.objects.none())
 
-    def test_books_wrote_non_english(self):
-        #
-        Book.objects.update(language='ru')
-        self.assertCountEqual(Book.objects.books_wrote_non_english(), Book.objects.all())
-        #
-        Book.objects.update(language='en')
-        self.assertEqual(Book.objects.books_wrote_non_english().count(), 0)
-        #
-        first_book = Book.objects.first()
-        first_book.language = 'uk'
-        first_book.full_clean()
-        first_book.save()
-        last_book = Book.objects.last()
-        last_book.language = 'ru'
-        last_book.full_clean()
-        last_book.save()
-        self.assertCountEqual(Book.objects.books_wrote_non_english(), [first_book, last_book])
+    def test_popular_books_if_books_have_replies(self):
+
+        # total mark is 4.5
+        ReplyFactory(content_object=self.book1, mark_for_content=5, mark_for_style=5, mark_for_language=4)  # 4
+        ReplyFactory(content_object=self.book1, mark_for_content=5, mark_for_style=5, mark_for_language=5)  # 5
+
+        # total mark is 3.917
+        ReplyFactory(content_object=self.book2, mark_for_content=4, mark_for_style=4, mark_for_language=4)  # 4
+        ReplyFactory(content_object=self.book2, mark_for_content=5, mark_for_style=4, mark_for_language=5)  # 14 / 3
+        ReplyFactory(content_object=self.book2, mark_for_content=4, mark_for_style=4, mark_for_language=4)  # 4
+        ReplyFactory(content_object=self.book2, mark_for_content=3, mark_for_style=3, mark_for_language=3)  # 3
+
+        # total mark is 5
+        ReplyFactory(content_object=self.book3, mark_for_content=5, mark_for_style=5, mark_for_language=5)  # 5
+
+        # total mark is 4
+        ReplyFactory(content_object=self.book4, mark_for_content=5, mark_for_style=3, mark_for_language=4)  # 4
+
+        # total mark is 3.5
+        ReplyFactory(content_object=self.book5, mark_for_content=1, mark_for_style=1, mark_for_language=1)  # 3
+        ReplyFactory(content_object=self.book5, mark_for_content=1, mark_for_style=2, mark_for_language=1)  # 4
+
+        # total mark is 4.944
+        ReplyFactory(content_object=self.book6, mark_for_content=5, mark_for_style=4, mark_for_language=5)  # 14 / 3
+        ReplyFactory(content_object=self.book6, mark_for_content=5, mark_for_style=5, mark_for_language=5)  # 5
+        ReplyFactory(content_object=self.book6, mark_for_content=5, mark_for_style=5, mark_for_language=5)  # 5
+        ReplyFactory(content_object=self.book6, mark_for_content=5, mark_for_style=5, mark_for_language=5)  # 5
+        ReplyFactory(content_object=self.book6, mark_for_content=5, mark_for_style=5, mark_for_language=5)  # 5
+        ReplyFactory(content_object=self.book6, mark_for_content=5, mark_for_style=5, mark_for_language=5)  # 5
+
+        self.assertCountEqual(
+            Book.objects.popular_books(),
+            [self.book1, self.book3, self.book4, self.book6]
+        )
+
+    def test_books_wrote_on_english(self):
+
+        books_wrote_on_english = Book.objects.books_wrote_on_english()
+        self.assertCountEqual(books_wrote_on_english, (self.book2, self.book4, self.book5, self.book7))
+
+    def test_books_wrote_on_russian(self):
+
+        books_wrote_on_russian = Book.objects.books_wrote_on_russian()
+        self.assertCountEqual(books_wrote_on_russian, (self.book1, self.book3, self.book6))
 
 
-class WritterQuerySetTest(TestCase):
+class WriterQuerySetTests(EnhancedTestCase):
     """
-    Tests for queryset of model Writter.
+    Tests for queryset of the model Writer.
     """
 
     @classmethod
     def setUpTestData(cls):
-        tags_factory(15)
-        web_links_factory(15)
-        badges_factory()
-        accounts_factory(15)
+        cls.call_command('factory_test_users', '8')
+        cls.call_command('factory_test_writers', '9')
+        cls.call_command('factory_test_books', '8')
+
+        cls.writer1, cls.writer2, cls.writer3, cls.writer4,\
+            cls.writer5, cls.writer6, cls.writer7, cls.writer8, cls.writer9 = Writer.objects.all()
+
+        cls.book1, cls.book2, cls.book3, cls.book4,\
+            cls.book5, cls.book6, cls.book7, cls.book8 = Book.objects.all()
+
+        for book in Book.objects.iterator():
+            book.replies.clear()
+
+        cls.writer1.years_life = '1900 - 2000'
+        cls.writer1.books.set([cls.book1, cls.book2, cls.book3, cls.book4])
+        cls.writer1.full_clean()
+        cls.writer1.save()
+
+        cls.writer2.years_life = '1999 - 2016'
+        cls.writer2.books.set([cls.book1])
+        cls.writer2.full_clean()
+        cls.writer2.save()
+
+        cls.writer3.years_life = '1900 - 1999'
+        cls.writer3.books.set([cls.book1, cls.book2, cls.book3, cls.book4, cls.book5, cls.book6])
+        cls.writer3.full_clean()
+        cls.writer3.save()
+
+        cls.writer4.years_life = '? - 1999'
+        cls.writer4.books.set([cls.book5, cls.book6])
+        cls.writer4.full_clean()
+        cls.writer4.save()
+
+        cls.writer5.years_life = '2000 - '
+        cls.writer5.books.set([cls.book5, cls.book6, cls.book7])
+        cls.writer5.full_clean()
+        cls.writer5.save()
+
+        cls.writer6.years_life = '1999 - ?'
+        cls.writer6.books.clear()
+        cls.writer6.full_clean()
+        cls.writer6.save()
+
+        cls.writer7.years_life = '1999 - '
+        cls.writer7.books.set([cls.book4, cls.book5, cls.book6, cls.book7, cls.book8])
+        cls.writer7.full_clean()
+        cls.writer7.save()
+
+        cls.writer8.years_life = '2000 - 2016'
+        cls.writer8.books.set([cls.book1, cls.book2, cls.book3, cls.book4, cls.book5, cls.book6, cls.book7, cls.book8])
+        cls.writer8.full_clean()
+        cls.writer8.save()
+
+        cls.writer9.years_life = '? - ?'
+        cls.writer9.books.set([cls.book2, cls.book3, cls.book4, cls.book5, cls.book6, cls.book7, cls.book8])
+        cls.writer9.full_clean()
+        cls.writer9.save()
 
     def setUp(self):
-        self.writter1 = WritterFactory(years_life=(1958, 2000))
-        self.writter2 = WritterFactory(years_life=(1941, 2015))
-        self.writter3 = WritterFactory(years_life=(1937, 1987))
-        self.writter4 = WritterFactory(years_life=(None, 1947))
-        self.writter5 = WritterFactory(years_life=(1880, 1937))
-        self.writter6 = WritterFactory(years_life=(1977, None))
-        self.writter7 = WritterFactory(years_life=(1950, None))
-        self.writter8 = WritterFactory(years_life=(1911, 1990))
-        self.writter9 = WritterFactory(years_life=(None, 1899))
-        #
-        books_factory(15)
 
-    def test_writters_with_count_books(self):
-        #
-        self.writter1.books.set(Book.objects.filter()[:4])
-        self.writter2.books.set(Book.objects.filter()[:1])
-        self.writter3.books.clear()
-        self.writter4.books.set(Book.objects.filter()[:10])
-        #
-        writters_with_count_books = Writter.objects.writters_with_count_books()
-        self.assertEqual(writters_with_count_books.get(pk=self.writter1.pk).count_books, 4)
-        self.assertEqual(writters_with_count_books.get(pk=self.writter2.pk).count_books, 1)
-        self.assertEqual(writters_with_count_books.get(pk=self.writter3.pk).count_books, 0)
-        self.assertEqual(writters_with_count_books.get(pk=self.writter4.pk).count_books, 10)
+        for book in Book.objects.iterator():
+            book.refresh_from_db()
+        for writer in Writer.objects.iterator():
+            writer.refresh_from_db()
 
-    def test_writters_last_century(self):
-        # change years life of writter
-        self.writter1.years_life = (NOW_YEAR - 150, NOW_YEAR - 100)
-        self.writter1.full_clean()
-        self.writter1.save()
-        self.writter2.years_life = (NOW_YEAR - 150, NOW_YEAR - 101)
-        self.writter2.full_clean()
-        self.writter2.save()
-        self.writter3.years_life = (NOW_YEAR - 100, None)
-        self.writter3.full_clean()
-        self.writter3.save()
-        self.writter4.years_life = (NOW_YEAR - 101, None)
-        self.writter4.full_clean()
-        self.writter4.save()
-        self.writter5.years_life = (None, NOW_YEAR - 100)
-        self.writter5.full_clean()
-        self.writter5.save()
-        self.writter6.years_life = (None, NOW_YEAR - 101)
-        self.writter6.full_clean()
-        self.writter6.save()
-        self.writter7.years_life = (None, NOW_YEAR)
-        self.writter7.full_clean()
-        self.writter7.save()
-        self.writter8.years_life = (NOW_YEAR - 100, NOW_YEAR)
-        self.writter8.full_clean()
-        self.writter8.save()
-        self.writter9.years_life = (None, None)
-        self.writter9.full_clean()
-        self.writter9.save()
-        #
-        writters_last_century = Writter.objects.writters_last_century()
+    def test_writers_with_count_books_if_writers_have_no_books(self):
+
+        Book.objects.filter().delete()
+
+        writers_with_count_books = Writer.objects.writers_with_count_books()
+        self.assertEqual(writers_with_count_books.get(pk=self.writer1.pk).count_books, 0)
+        self.assertEqual(writers_with_count_books.get(pk=self.writer2.pk).count_books, 0)
+        self.assertEqual(writers_with_count_books.get(pk=self.writer3.pk).count_books, 0)
+        self.assertEqual(writers_with_count_books.get(pk=self.writer4.pk).count_books, 0)
+        self.assertEqual(writers_with_count_books.get(pk=self.writer5.pk).count_books, 0)
+        self.assertEqual(writers_with_count_books.get(pk=self.writer6.pk).count_books, 0)
+        self.assertEqual(writers_with_count_books.get(pk=self.writer7.pk).count_books, 0)
+        self.assertEqual(writers_with_count_books.get(pk=self.writer8.pk).count_books, 0)
+        self.assertEqual(writers_with_count_books.get(pk=self.writer9.pk).count_books, 0)
+
+    def test_writers_with_count_books_if_writers_have_books(self):
+
+        writers_with_count_books = Writer.objects.writers_with_count_books()
+        self.assertEqual(writers_with_count_books.get(pk=self.writer1.pk).count_books, 4)
+        self.assertEqual(writers_with_count_books.get(pk=self.writer2.pk).count_books, 1)
+        self.assertEqual(writers_with_count_books.get(pk=self.writer3.pk).count_books, 6)
+        self.assertEqual(writers_with_count_books.get(pk=self.writer4.pk).count_books, 2)
+        self.assertEqual(writers_with_count_books.get(pk=self.writer5.pk).count_books, 3)
+        self.assertEqual(writers_with_count_books.get(pk=self.writer6.pk).count_books, 0)
+        self.assertEqual(writers_with_count_books.get(pk=self.writer7.pk).count_books, 5)
+        self.assertEqual(writers_with_count_books.get(pk=self.writer8.pk).count_books, 8)
+        self.assertEqual(writers_with_count_books.get(pk=self.writer9.pk).count_books, 7)
+
+    def test_writers_20th_century(self):
+
         self.assertCountEqual(
-            [self.writter1, self.writter3, self.writter5, self.writter7, self.writter8],
-            writters_last_century
+            Writer.objects.writers_20th_century(),
+            [self.writer1, self.writer2, self.writer3, self.writer4, self.writer6, self.writer7]
         )
 
-    @unittest.skip('How made annotation on related field and using foward?')
-    def test_writters_lived_in_range_years(self):
+    def test_writers_21st_century(self):
+
         self.assertCountEqual(
-            [self.writter1, self.writter2, self.writter3, self.writter6, self.writter7, self.writter8],
-            Writter.objects.writters_lived_in_range_years(1957, 2011))
-        self.assertCountEqual(
-            [self.writter2, self.writter3, self.writter5, self.writter7, self.writter8],
-            Writter.objects.writters_lived_in_range_years(1930, 1950)
-        )
-        self.assertCountEqual(
-            [self.writter1, self.writter2, self.writter6, self.writter7],
-            Writter.objects.writters_lived_in_range_years(2000),
-        )
-        self.assertCountEqual(
-            [self.writter1, self.writter2, self.writter6, self.writter7, self.writter8],
-            Writter.objects.writters_lived_in_range_years(1990, 2000),
-        )
-        self.assertCountEqual(
-            [self.writter5, self.writter9],
-            Writter.objects.writters_lived_in_range_years(1800, 1900),
+            Writer.objects.writers_21st_century(),
+            [self.writer1, self.writer2, self.writer5, self.writer7, self.writer8]
         )
 
-    @unittest.skip('How made annotation on related field and using foward?')
-    def test_writters_with_avg_scope_by_rating_of_books(self):
-        # books of self.writter1
-        self.writter1.books.clear()
-        book11 = BookFactory(account=self.writter1)
-        book12 = BookFactory(account=self.writter1)
-        book13 = BookFactory(account=self.writter1)
-        # scope for books of self.writter1
-        # 3.8334
-        ReplyFactory(content_object=book11, scope_for_content=5, scope_for_style=5, scope_for_language=5)  # 5
-        ReplyFactory(content_object=book11, scope_for_content=3, scope_for_style=2, scope_for_language=3)  # 2.6667
-        # 2.1666
-        ReplyFactory(content_object=book12, scope_for_content=1, scope_for_style=1, scope_for_language=1)  # 3
-        ReplyFactory(content_object=book12, scope_for_content=1, scope_for_style=2, scope_for_language=1)  # 1.3333
-        # 2.6667
-        ReplyFactory(content_object=book13, scope_for_content=3, scope_for_style=1, scope_for_language=1)  # 5
-        ReplyFactory(content_object=book13, scope_for_content=1, scope_for_style=1, scope_for_language=1)  # 3
-        # books of self.writter2
-        self.writter2.books.clear()
-        book21 = BookFactory(account=self.writter2)
-        book22 = BookFactory(account=self.writter2)
-        # scope for books of self.writter2
-        # 5.6667
-        ReplyFactory(content_object=book21, scope_for_content=4, scope_for_style=2, scope_for_language=2)  # 2.6667
-        ReplyFactory(content_object=book21, scope_for_content=1, scope_for_style=3, scope_for_language=2)  # 3
-        # 6.9999
-        ReplyFactory(content_object=book22, scope_for_content=5, scope_for_style=3, scope_for_language=5)  # 4.3333
-        ReplyFactory(content_object=book22, scope_for_content=1, scope_for_style=2, scope_for_language=4)  # 2.6666
-        # books of self.writter3
-        self.writter3.books.clear()
-        book31 = BookFactory(account=self.writter3)
-        # scope for books of self.writter3
-        # 6.3333
-        ReplyFactory(content_object=book31, scope_for_content=4, scope_for_style=1, scope_for_language=5)  # 3.3333
-        ReplyFactory(content_object=book31, scope_for_content=1, scope_for_style=4, scope_for_language=4)  # 3
-        #
-        self.writter4.books.clear()
-        book31 = BookFactory(account=self.writter3)
-        #
-        ReplyFactory(content_object=book31, scope_for_content=4, scope_for_style=3, scope_for_language=5)  # 4
-        #
-        self.writter5.books.clear()
-        #
-        writters_with_avg_scope_by_rating_of_books = Writter.objects.writters_with_avg_scope_by_rating_of_books()
-        #
-        self.assertEqual(writters_with_avg_scope_by_rating_of_books.get(pk=self.writter1.pk).avg_scope, 2.8889)
-        self.assertEqual(writters_with_avg_scope_by_rating_of_books.get(pk=self.writter2.pk).avg_scope, 6.3332)
-        self.assertEqual(writters_with_avg_scope_by_rating_of_books.get(pk=self.writter3.pk).avg_scope, 6.3333)
-        self.assertEqual(writters_with_avg_scope_by_rating_of_books.get(pk=self.writter4.pk).avg_scope, 4)
-        self.assertEqual(writters_with_avg_scope_by_rating_of_books.get(pk=self.writter5.pk).avg_scope, 0)
+    def tests_writers_with_avg_mark_by_rating_of_books_if_books_have_not_replies(self):
 
-    @unittest.skip('How made annotation on related field and using foward?')
-    def test_writters_with_count_books_and_avg_scope_by_rating_of_books(self):
-        pass
+        writers_with_avg_mark_by_rating_of_books = Writer.objects.writers_with_avg_mark_by_rating_of_books()
+        self.assertEqual(writers_with_avg_mark_by_rating_of_books.get(pk=self.writer1.pk).rating_books, .0)
+        self.assertEqual(writers_with_avg_mark_by_rating_of_books.get(pk=self.writer2.pk).rating_books, .0)
+        self.assertEqual(writers_with_avg_mark_by_rating_of_books.get(pk=self.writer3.pk).rating_books, .0)
+        self.assertEqual(writers_with_avg_mark_by_rating_of_books.get(pk=self.writer4.pk).rating_books, .0)
+        self.assertEqual(writers_with_avg_mark_by_rating_of_books.get(pk=self.writer5.pk).rating_books, .0)
+        self.assertEqual(writers_with_avg_mark_by_rating_of_books.get(pk=self.writer6.pk).rating_books, .0)
+        self.assertEqual(writers_with_avg_mark_by_rating_of_books.get(pk=self.writer7.pk).rating_books, .0)
+        self.assertEqual(writers_with_avg_mark_by_rating_of_books.get(pk=self.writer8.pk).rating_books, .0)
+        self.assertEqual(writers_with_avg_mark_by_rating_of_books.get(pk=self.writer9.pk).rating_books, .0)
+
+    def tests_writers_with_avg_mark_by_rating_of_books_if_books_have_replies(self):
+
+        # Add replies to books
+
+        # 1.333
+        ReplyFactory(content_object=self.book1, mark_for_content=1, mark_for_style=2, mark_for_language=1)  # 1
+
+        # 3
+        ReplyFactory(content_object=self.book2, mark_for_content=1, mark_for_style=1, mark_for_language=3)  # 5 / 3
+        ReplyFactory(content_object=self.book2, mark_for_content=1, mark_for_style=2, mark_for_language=4)  # 7 / 3
+        ReplyFactory(content_object=self.book2, mark_for_content=5, mark_for_style=5, mark_for_language=5)  # 5
+
+        # 3.5
+        ReplyFactory(content_object=self.book3, mark_for_content=4, mark_for_style=4, mark_for_language=4)  # 4
+        ReplyFactory(content_object=self.book3, mark_for_content=1, mark_for_style=1, mark_for_language=1)  # 3
+
+        # 2.333
+        ReplyFactory(content_object=self.book4, mark_for_content=4, mark_for_style=3, mark_for_language=1)  # 8 / 3
+        ReplyFactory(content_object=self.book4, mark_for_content=1, mark_for_style=2, mark_for_language=2)  # 5 / 3
+        ReplyFactory(content_object=self.book4, mark_for_content=4, mark_for_style=3, mark_for_language=1)  # 8 / 3
+
+        # 2.75
+        ReplyFactory(content_object=self.book5, mark_for_content=1, mark_for_style=1, mark_for_language=1)  # 1
+        ReplyFactory(content_object=self.book5, mark_for_content=4, mark_for_style=4, mark_for_language=4)  # 4
+        ReplyFactory(content_object=self.book5, mark_for_content=5, mark_for_style=3, mark_for_language=2)  # 10 / 3
+        ReplyFactory(content_object=self.book5, mark_for_content=2, mark_for_style=2, mark_for_language=4)  # 8 / 3
+
+        # 3.067
+        ReplyFactory(content_object=self.book6, mark_for_content=3, mark_for_style=1, mark_for_language=1)  # 5 / 3
+        ReplyFactory(content_object=self.book6, mark_for_content=5, mark_for_style=5, mark_for_language=4)  # 14 / 3
+        ReplyFactory(content_object=self.book6, mark_for_content=1, mark_for_style=3, mark_for_language=2)  # 3
+        ReplyFactory(content_object=self.book6, mark_for_content=4, mark_for_style=1, mark_for_language=1)  # 3
+        ReplyFactory(content_object=self.book6, mark_for_content=1, mark_for_style=2, mark_for_language=3)  # 3
+
+        # 4.333
+        ReplyFactory(content_object=self.book7, mark_for_content=4, mark_for_style=4, mark_for_language=4)  # 4
+        ReplyFactory(content_object=self.book7, mark_for_content=5, mark_for_style=5, mark_for_language=4)  # 14 / 3
+
+        # 1.667
+        ReplyFactory(content_object=self.book8, mark_for_content=2, mark_for_style=2, mark_for_language=1)  # 3
+
+        writers_with_avg_mark_by_rating_of_books = Writer.objects.writers_with_avg_mark_by_rating_of_books()
+        self.assertEqual(writers_with_avg_mark_by_rating_of_books.get(pk=self.writer1.pk).avg_mark, 2.542)
+        self.assertEqual(writers_with_avg_mark_by_rating_of_books.get(pk=self.writer2.pk).avg_mark, 1.333)
+        self.assertEqual(writers_with_avg_mark_by_rating_of_books.get(pk=self.writer3.pk).avg_mark, 2.664)
+        self.assertEqual(writers_with_avg_mark_by_rating_of_books.get(pk=self.writer4.pk).avg_mark, 2.908)
+        self.assertEqual(writers_with_avg_mark_by_rating_of_books.get(pk=self.writer5.pk).avg_mark, 3.383)
+        self.assertEqual(writers_with_avg_mark_by_rating_of_books.get(pk=self.writer6.pk).avg_mark, 0)
+        self.assertEqual(writers_with_avg_mark_by_rating_of_books.get(pk=self.writer7.pk).avg_mark, 2.83)
+        self.assertEqual(writers_with_avg_mark_by_rating_of_books.get(pk=self.writer8.pk).avg_mark, 2.748)
+        self.assertEqual(writers_with_avg_mark_by_rating_of_books.get(pk=self.writer9.pk).avg_mark, 2.95)
+
+    def test_writers_with_count_books_and_avg_mark_by_rating_of_books(self):
+
+        # Add replies to books
+
+        # 1.333
+        ReplyFactory(content_object=self.book1, mark_for_content=1, mark_for_style=2, mark_for_language=1)  # 1
+
+        # 3
+        ReplyFactory(content_object=self.book2, mark_for_content=1, mark_for_style=1, mark_for_language=3)  # 5 / 3
+        ReplyFactory(content_object=self.book2, mark_for_content=1, mark_for_style=2, mark_for_language=4)  # 7 / 3
+        ReplyFactory(content_object=self.book2, mark_for_content=5, mark_for_style=5, mark_for_language=5)  # 5
+
+        # 3.5
+        ReplyFactory(content_object=self.book3, mark_for_content=4, mark_for_style=4, mark_for_language=4)  # 4
+        ReplyFactory(content_object=self.book3, mark_for_content=1, mark_for_style=1, mark_for_language=1)  # 3
+
+        # 2.333
+        ReplyFactory(content_object=self.book4, mark_for_content=4, mark_for_style=3, mark_for_language=1)  # 8 / 3
+        ReplyFactory(content_object=self.book4, mark_for_content=1, mark_for_style=2, mark_for_language=2)  # 5 / 3
+        ReplyFactory(content_object=self.book4, mark_for_content=4, mark_for_style=3, mark_for_language=1)  # 8 / 3
+
+        # 2.75
+        ReplyFactory(content_object=self.book5, mark_for_content=1, mark_for_style=1, mark_for_language=1)  # 1
+        ReplyFactory(content_object=self.book5, mark_for_content=4, mark_for_style=4, mark_for_language=4)  # 4
+        ReplyFactory(content_object=self.book5, mark_for_content=5, mark_for_style=3, mark_for_language=2)  # 10 / 3
+        ReplyFactory(content_object=self.book5, mark_for_content=2, mark_for_style=2, mark_for_language=4)  # 8 / 3
+
+        # 3.067
+        ReplyFactory(content_object=self.book6, mark_for_content=3, mark_for_style=1, mark_for_language=1)  # 5 / 3
+        ReplyFactory(content_object=self.book6, mark_for_content=5, mark_for_style=5, mark_for_language=4)  # 14 / 3
+        ReplyFactory(content_object=self.book6, mark_for_content=1, mark_for_style=3, mark_for_language=2)  # 3
+        ReplyFactory(content_object=self.book6, mark_for_content=4, mark_for_style=1, mark_for_language=1)  # 3
+        ReplyFactory(content_object=self.book6, mark_for_content=1, mark_for_style=2, mark_for_language=3)  # 3
+
+        # 4.333
+        ReplyFactory(content_object=self.book7, mark_for_content=4, mark_for_style=4, mark_for_language=4)  # 4
+        ReplyFactory(content_object=self.book7, mark_for_content=5, mark_for_style=5, mark_for_language=4)  # 14 / 3
+
+        # 1.667
+        ReplyFactory(content_object=self.book8, mark_for_content=2, mark_for_style=2, mark_for_language=1)  # 3
+
+        writers_with_count_books_and_avg_mark_by_rating_of_books = \
+            Writer.objects.writers_with_count_books_and_avg_mark_by_rating_of_books()
+
+        writer1 = writers_with_count_books_and_avg_mark_by_rating_of_books.get(pk=self.writer1.pk)
+        writer2 = writers_with_count_books_and_avg_mark_by_rating_of_books.get(pk=self.writer2.pk)
+        writer3 = writers_with_count_books_and_avg_mark_by_rating_of_books.get(pk=self.writer3.pk)
+        writer4 = writers_with_count_books_and_avg_mark_by_rating_of_books.get(pk=self.writer4.pk)
+        writer5 = writers_with_count_books_and_avg_mark_by_rating_of_books.get(pk=self.writer5.pk)
+        writer6 = writers_with_count_books_and_avg_mark_by_rating_of_books.get(pk=self.writer6.pk)
+        writer7 = writers_with_count_books_and_avg_mark_by_rating_of_books.get(pk=self.writer7.pk)
+        writer8 = writers_with_count_books_and_avg_mark_by_rating_of_books.get(pk=self.writer8.pk)
+        writer9 = writers_with_count_books_and_avg_mark_by_rating_of_books.get(pk=self.writer9.pk)
+
+        self.assertEqual(writer1.avg_mark, 2.542)
+        self.assertEqual(writer2.avg_mark, 1.333)
+        self.assertEqual(writer3.avg_mark, 2.664)
+        self.assertEqual(writer4.avg_mark, 2.908)
+        self.assertEqual(writer5.avg_mark, 3.383)
+        self.assertEqual(writer6.avg_mark, 0)
+        self.assertEqual(writer7.avg_mark, 2.83)
+        self.assertEqual(writer8.avg_mark, 2.748)
+        self.assertEqual(writer9.avg_mark, 2.95)
+
+        self.assertEqual(writer1.count_books, 4)
+        self.assertEqual(writer2.count_books, 1)
+        self.assertEqual(writer3.count_books, 6)
+        self.assertEqual(writer4.count_books, 2)
+        self.assertEqual(writer5.count_books, 3)
+        self.assertEqual(writer6.count_books, 0)
+        self.assertEqual(writer7.count_books, 5)
+        self.assertEqual(writer8.count_books, 8)
+        self.assertEqual(writer9.count_books, 7)

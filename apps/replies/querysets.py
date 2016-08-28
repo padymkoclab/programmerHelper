@@ -9,17 +9,20 @@ class ReplyQuerySet(models.QuerySet):
     QuerySet for replies.
     """
 
-    def replies_with_total_scope(self):
-        """Determining average scope for each reply by their scopes: for content, for style, for language."""
+    def replies_with_total_mark(self):
+        """Determining average mark for each reply by their marks: for content, for style, for language."""
 
-        # getting total sum all of the scopes
+        # getting total sum all of the marks
         self = self.annotate(
-            sum_scope=models.F('scope_for_content') + models.F('scope_for_style') + models.F('scope_for_language')
+            total_mark=models.F('mark_for_content') + models.F('mark_for_style') + models.F('mark_for_language')
         )
-        # determining avg scope
-        self = self.annotate(total_scope=models.ExpressionWrapper(
-            models.F('sum_scope') / models.Value(3.0), output_field=models.FloatField()
+
+        # determining avg mark
+        self = self.annotate(total_mark=models.ExpressionWrapper(
+            models.F('total_mark') / models.Value(3.0), output_field=models.FloatField()
         ))
-        # make round for avg scope
-        self = self.annotate(total_scope=Round('total_scope'))
+
+        # make round for avg mark
+        self = self.annotate(total_mark=Round('total_mark'))
+
         return self
