@@ -1,6 +1,4 @@
 
-import re
-
 from django.utils import timezone
 from django.db import models
 
@@ -19,17 +17,17 @@ class BookQuerySet(models.QuerySet):
     def books_with_count_tags(self):
         """Queryset with count tags of each the book."""
 
-        return self.annotate(count_tags=models.Count('tags', distinct=True))
+        return self.prefetch_related('tags').annotate(count_tags=models.Count('tags', distinct=True))
 
     def books_with_count_replies(self):
         """Queryset with count replies of each the book."""
 
-        return self.annotate(count_replies=models.Count('replies', distinct=True))
+        return self.prefetch_related('replies').annotate(count_replies=models.Count('replies', distinct=True))
 
     def books_with_rating(self):
         """Queryset with rating of each the book."""
 
-        self = self.annotate(total_mark_reply=(
+        self = self.prefetch_related('replies').annotate(total_mark_reply=(
             models.F('replies__mark_for_content') +
             models.F('replies__mark_for_language') +
             models.F('replies__mark_for_style')
@@ -44,12 +42,16 @@ class BookQuerySet(models.QuerySet):
 
         return self
 
-    def books_with_count_tags_replies_and_rating(self):
+    def books_with_additional_fields(self):
         """Complex queryset with count tags, replies and rating of each the book."""
 
         logger.error('It is worked not properly yet')
 
-        return self.books_with_count_tags().books_with_count_replies().books_with_rating()
+        self = self.books_with_count_tags()
+        self = self.books_with_count_replies()
+        self = self.books_with_rating()
+
+        return self
 
     def new_books(self):
         """Books published in this or past year."""
@@ -115,7 +117,7 @@ class WriterQuerySet(models.QuerySet):
     def writers_with_count_books(self):
         """Determinating count books on each writer."""
 
-        return self.annotate(count_books=models.Count('books', distinct=True))
+        return self.prefetch_related('books').annotate(count_books=models.Count('books', distinct=True))
 
     def writers_with_age(self):
         """Annotate writers and deternimate age of each writer if it is possible."""
@@ -141,8 +143,12 @@ class WriterQuerySet(models.QuerySet):
         logger.error('NotImplementedError yet')
         return self
 
-    def writers_with_count_books_and_avg_mark_by_rating_of_books(self):
-        """ """
+    def writers_with_additional_fields(self):
+        """Return queryset with annotated fields for each writer:
+            - age
+            - average mark by rating of books
+            - count books
+            - status of life"""
 
         logger.error('NotImplementedError yet')
 
@@ -151,3 +157,11 @@ class WriterQuerySet(models.QuerySet):
         self = self.writers_with_status_life()
         self = self.writers_with_avg_mark_by_rating_of_books()
         return self
+
+
+class PublisherQuerySet(models.QuerySet):
+
+    def publishers_with_count_books(self):
+        """ """
+
+        return self.prefetch_related('books').annotate(count_books=models.Count('books', distinct=True))

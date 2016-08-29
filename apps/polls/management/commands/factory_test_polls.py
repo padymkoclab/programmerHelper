@@ -5,7 +5,7 @@ from django.contrib.auth import get_user_model
 
 from mylabour.datetime_utils import get_random_date_from_days_ago_to_now
 from mylabour.basecommands import ExtendedBaseCommand
-from mylabour.utils import create_logger_by_filename
+from mylabour.logging_utils import create_logger_by_filename
 
 from apps.polls.factories import PollFactory, ChoiceFactory
 from apps.polls.models import Poll, Choice, Vote

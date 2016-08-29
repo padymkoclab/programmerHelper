@@ -1,5 +1,4 @@
 
-import datetime
 import random
 
 from django.utils import timezone
@@ -13,10 +12,7 @@ from mylabour.factories_utils import generate_text_by_min_length, generate_image
 from apps.tags.models import Tag
 from apps.replies.factories import ReplyFactory
 
-from .models import Book, Writer
-
-
-NOW_YEAR = datetime.datetime.now().year
+from .models import Book, Writer, Publisher
 
 
 class BookFactory(factory.django.DjangoModelFactory):
@@ -26,20 +22,17 @@ class BookFactory(factory.django.DjangoModelFactory):
 
     language = fuzzy.FuzzyChoice(tuple(code for code, name in Book.LANGUAGES))
     count_pages = fuzzy.FuzzyInteger(1, 1000)
-    year_published = fuzzy.FuzzyInteger(1950, NOW_YEAR)
+    year_published = fuzzy.FuzzyInteger(Book.MIN_YEAR_PUBLISHED, Book.MAX_YEAR_PUBLISHED)
+    publisher = fuzzy.FuzzyChoice(Publisher.objects.all())
 
     @factory.lazy_attribute
-    def picture(self):
+    def image(self):
         return generate_image(filename='factory_book.jpeg')
 
     @factory.lazy_attribute
     def name(self):
         length_book_name = random.randint(10, 100)
         return factory.Faker('text', locale='ru').generate([])[:length_book_name]
-
-    @factory.lazy_attribute
-    def publishers(self):
-        return factory.Faker('text', locale='ru').generate([])[:20]
 
     @factory.lazy_attribute
     def description(self):
@@ -85,20 +78,28 @@ class WriterFactory(factory.django.DjangoModelFactory):
         model = Writer
 
     name = factory.Faker('name', locale='ru')
+    birth_year = fuzzy.FuzzyInteger(Writer.MIN_BIRTH_YEAR, Writer.MAX_BIRTH_YEAR)
 
     @factory.lazy_attribute
     def about(self):
         return generate_text_by_min_length(100)
 
     @factory.lazy_attribute
-    def birth_year(self):
-        max_birth_year = NOW_YEAR - 16
-        return random.randint(1900, max_birth_year)
-
-    @factory.lazy_attribute
     def death_year(self):
-        return random.choice((random.randint(self.birth_year + 16, NOW_YEAR), None))
+        return random.choice((random.randint(Writer.MIN_DEATH_YEAR, Writer.MAX_DEATH_YEAR), None))
 
     @factory.lazy_attribute
     def trends(self):
         return generate_words(1, random.randint(1, 10))
+
+
+class PublisherFactory(factory.DjangoModelFactory):
+
+    class Meta:
+        model = Publisher
+
+    country_origin = fuzzy.FuzzyChoice([code for code, name in Publisher._meta.get_field('country_origin').choices])
+    founded_year = fuzzy.FuzzyInteger(Publisher.MIN_FOUNDED_YEAR, Publisher.MAX_FOUNDED_YEAR)
+    headquarters = factory.Faker('city')
+    website = factory.Faker('url')
+    name = factory.Faker('company')

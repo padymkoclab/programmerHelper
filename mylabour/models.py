@@ -15,7 +15,7 @@ class TimeStampedModel(models.Model):
     """
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    date_modified = models.DateTimeField(_('Date last changed'), auto_now=True)
+    date_modified = models.DateTimeField(_('Date modified'), auto_now=True)
     date_added = models.DateTimeField(_('Date added'), auto_now_add=True)
 
     class Meta:

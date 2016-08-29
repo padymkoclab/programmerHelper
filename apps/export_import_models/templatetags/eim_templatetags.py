@@ -21,7 +21,7 @@ def make_url_for_export_data_model(context):
     # get a current queryset in the ChangeList
     queryset = cl.queryset
 
-    if not queryset:
+    if not queryset.exists():
         return '#'
 
     pks_separated_commas = get_string_primary_keys_separated_commas(queryset)

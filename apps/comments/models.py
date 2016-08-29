@@ -23,11 +23,11 @@ class Comment(BaseGenericModel):
             )
         ]
     )
-    account = models.ForeignKey(
+    user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name='comments',
-        verbose_name=_('Author'),
+        verbose_name=_('User'),
     )
     rating = models.SmallIntegerField(_('Rating'), default=0, editable=False)
     date_modified = models.DateTimeField(_('Date last changed'), auto_now=True)
@@ -47,7 +47,11 @@ class Comment(BaseGenericModel):
         )
 
     def is_new(self):
-        return self.date_added > timezone.now() - timezone.timedelta(days=settings.COUNT_DAYS_DISTINGUISH_ELEMENTS_AS_NEW)
+        """ """
+
+        return self.date_added > timezone.now() - timezone.timedelta(
+            days=settings.COUNT_DAYS_DISTINGUISH_ELEMENTS_AS_NEW
+        )
     is_new.admin_order_field = 'date_added'
     is_new.short_description = _('Is new?')
     is_new.boolean = True

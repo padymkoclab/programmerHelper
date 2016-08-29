@@ -1,9 +1,6 @@
 
-import datetime
-
 from django.utils.translation import ugettext_lazy as _
 from django import forms
-from django.conf import settings
 
 from suit.widgets import AutosizedTextarea
 
@@ -11,7 +8,7 @@ from mylabour.widgets import AdminImageThumbnail
 
 from apps.tags.forms import clean_tags
 
-from .models import Book, Writer
+from .models import Book, Writer, Publisher
 
 
 class BookForm(forms.ModelForm):
@@ -41,8 +38,8 @@ class BookForm(forms.ModelForm):
         # Full width and FileInput
         self.fields['year_published'].widget.attrs['class'] = 'span12'
         self.fields['year_published'].widget.input_type = 'number'
-        self.fields['year_published'].widget.attrs['min'] = 1900
-        self.fields['year_published'].widget.attrs['max'] = datetime.datetime.now().year
+        self.fields['year_published'].widget.attrs['min'] = Book.MIN_YEAR_PUBLISHED
+        self.fields['year_published'].widget.attrs['max'] = Book.MAX_YEAR_PUBLISHED
 
         # Almost full width (considering help_text)
         self.fields['isbn'].widget.attrs['class'] = 'span10'
@@ -74,9 +71,42 @@ class WriterForm(forms.ModelForm):
 
         self.fields['trends'].widget.attrs['class'] = 'span12'
 
+        self.fields['birth_year'].widget.input_type = 'number'
+        self.fields['birth_year'].widget.attrs['min'] = Writer.MIN_BIRTH_YEAR
+        self.fields['birth_year'].widget.attrs['max'] = Writer.MAX_BIRTH_YEAR
+
+        self.fields['death_year'].widget.input_type = 'number'
+        self.fields['death_year'].widget.attrs['min'] = Writer.MIN_DEATH_YEAR
+        self.fields['death_year'].widget.attrs['max'] = Writer.MAX_DEATH_YEAR
+
     class Meta:
         model = Writer
         fields = ('name',)
 
     def clean(self):
         super(WriterForm, self).clean()
+
+
+class PublisherForm(forms.ModelForm):
+
+    class Meta:
+        model = Publisher
+        fields = ['name']
+
+    def __init__(self, *args, **kwargs):
+        super(PublisherForm, self).__init__(*args, **kwargs)
+
+        self.fields['name'].widget.attrs['class'] = 'span12'
+
+        self.fields['slug'].widget.attrs['class'] = 'span12'
+        self.fields['slug'].disabled = True
+
+        self.fields['country_origin'].widget.attrs['class'] = 'span12'
+
+        self.fields['headquarters'].widget.attrs['class'] = 'span12'
+
+        self.fields['founded_year'].widget.input_type = 'number'
+        self.fields['founded_year'].widget.attrs['min'] = Publisher.MIN_FOUNDED_YEAR
+        self.fields['founded_year'].widget.attrs['max'] = Publisher.MAX_FOUNDED_YEAR
+
+        self.fields['website'].widget.attrs['class'] = 'span12'

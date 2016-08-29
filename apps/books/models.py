@@ -17,17 +17,15 @@ from django.utils.translation import ugettext_lazy as _
 from django.db import models
 from django.conf import settings
 
-from mylabour.fields_db import ConfiguredAutoSlugField
+from mylabour.fields_db import ConfiguredAutoSlugField, CountryField
 from mylabour.logging_utils import create_logger_by_filename
 
 from apps.replies.models import Reply
 from apps.tags.models import Tag
 
 from .managers import BookManager, WriterManager
-from .querysets import BookQuerySet, WriterQuerySet
+from .querysets import BookQuerySet, WriterQuerySet, PublisherQuerySet
 
-
-NOW_YEAR = timezone.now().year
 
 # announs book, soon
 #
@@ -35,6 +33,7 @@ NOW_YEAR = timezone.now().year
 
 
 logger = create_logger_by_filename(__name__)
+NOW_YEAR = timezone.now().year
 
 
 class Book(models.Model):
@@ -42,11 +41,14 @@ class Book(models.Model):
     Model for books
     """
 
+    MIN_YEAR_PUBLISHED = 1950
+    MAX_YEAR_PUBLISHED = NOW_YEAR
+
     LANGUAGES = tuple((code, _(name)) for code, name in settings.LANGUAGES)
 
     # display language name on Site Language for user
 
-    def upload_book_picture(instance, filename):
+    def upload_book_image(instance, filename):
         return 'books/{slug}/{filename}'.format(slug=instance.slug, filename=filename)
 
     id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
@@ -62,7 +64,7 @@ class Book(models.Model):
         validators=[MinLengthValidator(100)],
         help_text=_('Minimal length 100 characters.'),
     )
-    picture = models.ImageField(_('Picture'), upload_to=upload_book_picture, max_length=1000)
+    image = models.ImageField(_('Image'), upload_to=upload_book_image, max_length=1000)
     language = models.CharField(_('Language'), max_length=25, choices=LANGUAGES, default='en')
     count_pages = models.PositiveSmallIntegerField(_('Count pages'), validators=[MinValueValidator(1)])
     authorship = models.ManyToManyField(
@@ -70,7 +72,7 @@ class Book(models.Model):
         verbose_name=_('Authorship'),
         related_name='books',
     )
-    publishers = models.CharField(_('Publishers'), max_length=100, blank=True, default='')
+    publisher = models.ForeignKey('Publisher', verbose_name=_('Publisher'), related_name='books')
     isbn = models.CharField(
         _('ISBN'),
         max_length=30,
@@ -87,8 +89,14 @@ class Book(models.Model):
     year_published = models.PositiveSmallIntegerField(
         _('Year published'),
         validators=[
-            MinValueValidator(1950, _('Book doesn`t possible will published early than 1950.')),
-            MaxValueValidator(NOW_YEAR, _('Book doesn`t possible will published in future.')),
+            MinValueValidator(
+                MIN_YEAR_PUBLISHED,
+                _('Book doesn`t possible will published early than {0}.'.format(MIN_YEAR_PUBLISHED))
+            ),
+            MaxValueValidator(
+                MAX_YEAR_PUBLISHED,
+                _('Book doesn`t possible will published in future.')
+            ),
         ]
     )
     date_added = models.DateTimeField(_('Date added'), auto_now_add=True)
@@ -135,11 +143,11 @@ class Book(models.Model):
     def get_rating(self):
         """Getting rating of book on based marks."""
 
-        # return self.__class__.objects.books_with_rating().get(pk=self.pk).rating
-        replies_with_total_mark = self.replies.replies_with_total_mark()
-        rating = replies_with_total_mark.aggregate(rating=models.Avg('total_mark'))['rating']
-        rating = rating or 0
-        return round(rating, 4)
+        if self.replies.exists():
+            replies_with_total_mark = self.replies.replies_with_total_mark()
+            rating = replies_with_total_mark.aggregate(rating=models.Avg('total_mark'))['rating']
+            return round(rating, 3)
+        return
     get_rating.admin_order_field = 'rating'
     get_rating.short_description = _('Rating')
 
@@ -167,9 +175,9 @@ class Book(models.Model):
     get_size_display.admin_order_field = 'pages'
     get_size_display.short_description = _('Size')
 
-    def get_picture_thumbnail(self):
-        return format_html('<image src={0} />', self.picture.url)
-    get_picture_thumbnail.short_description = _('Picture')
+    def get_image_thumbnail(self):
+        return format_html('<image src={0} />', self.image.url)
+    get_image_thumbnail.short_description = _('Picture')
 
     # Whar often tell about this book
     # Display return words by font size: h1 h2 h3 and so.
@@ -195,6 +203,11 @@ class Writer(models.Model):
     Model for writers of books
     """
 
+    MIN_BIRTH_YEAR = 1900
+    MAX_BIRTH_YEAR = NOW_YEAR - 16
+    MIN_DEATH_YEAR = 1916
+    MAX_DEATH_YEAR = NOW_YEAR
+
     id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
     name = models.CharField(
         _('Name'),
@@ -215,8 +228,22 @@ class Writer(models.Model):
         help_text=_('Give a brief character of the writer and his books.')
     )
 
-    birth_year = models.PositiveSmallIntegerField(_('Year of birth'))
-    death_year = models.PositiveSmallIntegerField(_('Year of death'), null=True, blank=True)
+    birth_year = models.PositiveSmallIntegerField(
+        _('Year of birth'),
+        validators=[
+            MinValueValidator(MIN_BIRTH_YEAR, 'Writer not possible born early than {0} year.'.format(MIN_BIRTH_YEAR)),
+            MaxValueValidator(MIN_BIRTH_YEAR, 'Writer not possible born late than {0} year.'.format(MAX_BIRTH_YEAR))
+        ],
+    )
+    death_year = models.PositiveSmallIntegerField(
+        _('Year of death'),
+        null=True,
+        blank=True,
+        validators=[
+            MinValueValidator(MIN_DEATH_YEAR, 'Writer not possible dead early than {0} year.'.format(MIN_DEATH_YEAR)),
+            MaxValueValidator(MAX_DEATH_YEAR, 'Writer not possible dead in future')
+        ],
+    )
 
     class Meta:
         db_table = 'writers'
@@ -238,29 +265,9 @@ class Writer(models.Model):
 
     def clean(self):
 
-        pass
-        # year_birth, year_death = self.years_life.split(' - ')
-
-        # if year_death not in ['', '?']:
-        #     year_death = int(year_death)
-        #     if year_death > NOW_YEAR:
-        #         raise ValidationError({
-        #             'years_life': _('Year death of a writer not possible in future.')
-        #         })
-
-        # if year_birth != '?' and year_death not in ['', '?']:
-        #     year_birth = int(year_birth)
-        #     year_death = int(year_death)
-
-        #     if year_birth >= year_death:
-        #         raise ValidationError({
-        #             'years_life': _('Year of birth can not more or equal year of death.')
-        #         })
-
-        #     if year_death - year_birth < 15:
-        #         raise ValidationError({
-        #             'years_life': _('Very small range years between year of birth and year of death of a writer.')
-        #         })
+        if self.death_year is not None:
+            if self.death_year - self.birth_year < 16:
+                raise ValidationError({'__all__': _('Too less range between birth and death years.')})
 
     def get_count_books(self):
         return self.books.count()
@@ -271,7 +278,7 @@ class Writer(models.Model):
         """Getting age writer if it is possible."""
 
         if self.death_year is None:
-                return NOW_YEAR - self.birth_year
+            return self.MAX_DEATH_YEAR - self.birth_year
         return self.death_year - self.birth_year
     get_age.short_description = _('Age')
     get_age.admin_order_field = 'age'
@@ -282,15 +289,15 @@ class Writer(models.Model):
         return '{0} - {1}'.format(self.birth_year, '' if self.death_year is None else self.death_year)
     get_years_life.short_description = _('Year life')
 
-    def is_alive(self):
+    def is_alive_writer(self):
         """Return boolean - this writer now is living?"""
 
         if self.death_year is None:
             return True
         return False
-    is_alive.short_description = _('Is alive')
-    is_alive.admin_order_field = 'is_alive'
-    is_alive.boolean = True
+    is_alive_writer.short_description = _('Is alive?')
+    is_alive_writer.admin_order_field = 'is_alive'
+    is_alive_writer.boolean = True
 
     def get_avg_mark_for_books(self):
         """Getting avarage mark for books`s writer, on based average rating it books."""
@@ -299,10 +306,57 @@ class Writer(models.Model):
         # books = self.books.books_with_rating()
         # return books.aggregate(rating_avg=Coalesce(Round(models.Avg('rating')), Value(0.0)))['rating_avg']
 
-        if self.books.count():
-            avg_mark_for_books = statistics.mean(book.get_rating() for book in self.books.iterator())
+        if self.books.exists():
+            avg_mark_for_books = statistics.mean(book.get_rating() or 0 for book in self.books.iterator())
             avg_mark_for_books = round(avg_mark_for_books, 3)
             return avg_mark_for_books
         return
     get_avg_mark_for_books.short_description = _('Average mark for books')
     # get_avg_mark_for_books.admin_order_field
+
+
+class Publisher(models.Model):
+
+    MIN_FOUNDED_YEAR = 1900
+    MAX_FOUNDED_YEAR = NOW_YEAR
+
+    name = models.CharField(
+        _('name'), max_length=50, unique=True,
+        error_messages={'unique': _('Publisher with this name already exists.')}
+    )
+    slug = ConfiguredAutoSlugField(_('slug'), populate_from='name', unique=True)
+    country_origin = CountryField()
+    headquarters = models.CharField(_('headquarters'), max_length=50)
+    founded_year = models.PositiveSmallIntegerField(
+        _('Founded year'),
+        validators=[
+            MinValueValidator(
+                MIN_FOUNDED_YEAR,
+                _('Publishing company not possible founded early than {}'.format(MIN_FOUNDED_YEAR))
+            ),
+            MaxValueValidator(MAX_FOUNDED_YEAR, _('Publishing company not possible founded in future')),
+        ])
+    website = models.URLField(_('Official website'))
+
+    objects = models.Manager()
+    objects = PublisherQuerySet.as_manager()
+
+    class Meta:
+        db_table = 'publisher'
+        verbose_name = _('Publisher')
+        verbose_name_plural = _('Publishers')
+        ordering = ['name']
+
+    def __str__(self):
+        return '{0}'.format(self.name)
+
+    def get_absolute_url(self):
+        return reverse('books:publisher', kwargs={'slug': self.slug})
+
+    def get_admin_url(self):
+        return reverse('admin:books_publisher_change', args=(self.pk, ))
+
+    def get_count_books(self):
+        return self.books.count()
+    get_count_books.short_description = _('Count books')
+    get_count_books.admin_order_field = 'count_books'

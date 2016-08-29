@@ -12,5 +12,8 @@ class CommentFactory(factory.DjangoModelFactory):
     class Meta:
         model = Comment
 
-    text_comment = factory.Faker('text', locale='ru')
-    account = fuzzy.FuzzyChoice(get_user_model().objects.all())
+    user = fuzzy.FuzzyChoice(get_user_model()._default_manager.all())
+
+    @factory.lazy_attribute
+    def text_comment(self):
+        return factory.Faker('text', locale='ru')

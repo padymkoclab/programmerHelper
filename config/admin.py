@@ -17,8 +17,8 @@ from apps.articles.admin import ArticleAdmin, ArticleSubsectionAdmin
 from apps.articles.models import Article, ArticleSubsection
 from apps.badges.admin import BadgeAdmin, GettingBadgeAdmin
 from apps.badges.models import Badge, GettingBadge
-from apps.books.admin import BookAdmin, WriterAdmin
-from apps.books.models import Book, Writer
+from apps.books.admin import BookAdmin, WriterAdmin, PublisherAdmin
+from apps.books.models import Book, Writer, Publisher
 from apps.comments.admin import CommentAdmin
 from apps.comments.models import Comment
 
@@ -148,6 +148,7 @@ AdminSite.register(Newsletter, NewsletterAdmin)
 # books
 AdminSite.register(Book, BookAdmin)
 AdminSite.register(Writer, WriterAdmin)
+AdminSite.register(Publisher, PublisherAdmin)
 
 # cources
 # AdminSite.register(Course, CourseAdmin)

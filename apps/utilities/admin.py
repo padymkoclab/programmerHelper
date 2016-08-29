@@ -25,10 +25,8 @@ class UtilityCategoryAdmin(admin.ModelAdmin):
 
     list_display = (
         'name',
-        'picture',
-        'views',
         'get_count_utilities',
-        'get_total_scope',
+        'get_total_mark',
         'get_total_opinions',
         'get_total_comments',
         'is_new',
@@ -39,25 +37,43 @@ class UtilityCategoryAdmin(admin.ModelAdmin):
         UtilityInline,
     ]
     search_fields = ('name',)
-    fieldsets = [
-        [
-            UtilityCategory._meta.verbose_name, {
-                'fields': ['name', 'description', 'picture']
-            }
-        ]
-    ]
 
     def get_queryset(self, request):
         qs = super(UtilityCategoryAdmin, self).get_queryset(request)
-        qs = qs.annotate(
-            count_utilities=Count('utilities', distinct=True),
-        )
+        qs = qs.categories_with_all_additional_fields()
         return qs
 
-    def get_count_utilities(self, obj):
-        return obj.count_utilities
-    get_count_utilities.admin_order_field = 'count_utilities'
-    get_count_utilities.short_description = _('Count utilities')
+    def get_fieldsets(self, request, obj=None):
+
+        fieldsets = [
+            [
+                UtilityCategory._meta.verbose_name, {
+                    'fields': [
+                        'name',
+                        'description',
+                        'image',
+                    ]
+                }
+            ]
+        ]
+
+        if obj:
+            fieldsets.append([
+                _('Additional information'), {
+                    'classes': ('collapse', ),
+                    'fields': [
+                        ''
+                    ]
+                }
+            ])
+        return fieldsets
+
+    def get_inlines_instances(self, request, obj=None):
+
+        if obj and obj.utilities.exists():
+            inlines = []
+            return [inline(self.model, self.admin_site) for inline in inlines]
+        return []
 
 
 class UtilityAdmin(admin.ModelAdmin):
@@ -68,9 +84,9 @@ class UtilityAdmin(admin.ModelAdmin):
     list_display = (
         'name',
         'category',
-        'get_scope',
-        'get_count_opinions',
-        'get_count_comments',
+        'get_mark',
+        # 'get_count_opinions',
+        # 'get_count_comments',
         'is_new',
         'date_modified',
         'date_added')
@@ -87,25 +103,12 @@ class UtilityAdmin(admin.ModelAdmin):
     fieldsets = [
         [
             Utility._meta.verbose_name, {
-                'fields': ['name', 'category', 'web_link', 'picture', 'description']
+                'fields': ['name', 'category', 'web_link', 'image', 'description']
             }
         ]
     ]
 
     def get_queryset(self, request):
         qs = super(UtilityAdmin, self).get_queryset(request)
-        qs = qs.annotate(
-            count_opinions=Count('opinions', distinct=True),
-            count_comments=Count('comments', distinct=True),
-        )
+        qs = qs.utilities_with_all_additional_fields()
         return qs
-
-    def get_count_opinions(self, obj):
-        return obj.count_opinions
-    get_count_opinions.admin_order_field = 'count_opinions'
-    get_count_opinions.short_description = _('Count opinions')
-
-    def get_count_comments(self, obj):
-        return obj.count_comments
-    get_count_comments.admin_order_field = 'count_comments'
-    get_count_comments.short_description = _('Count comments')

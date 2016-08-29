@@ -9,7 +9,7 @@ from mylabour.models import BaseGenericModel
 
 class Opinion(BaseGenericModel):
 
-    account = models.ForeignKey(
+    user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name='opinions',
@@ -25,7 +25,7 @@ class Opinion(BaseGenericModel):
         get_latest_by = 'date_modified'
         ordering = ['date_modified']
         permissions = (('can_view_opinions', _('Can view opinions')),)
-        unique_together = ['account', 'object_id']
+        unique_together = ['user', 'object_id']
 
     def __str__(self):
         return _('Opinion about {0} "{1}"').format(
@@ -38,5 +38,5 @@ class Opinion(BaseGenericModel):
 
     def clean(self):
         if self.content_object:
-            if self.content_object.account == self.account:
+            if self.content_object.user == self.user:
                 raise ValidationError(_('Author not allowed have opinion about hisself labour.'))

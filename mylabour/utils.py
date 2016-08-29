@@ -11,8 +11,11 @@ from django.shortcuts import _get_queryset
 from django.utils import timezone
 from django.core.exceptions import ImproperlyConfigured
 
+import factory
 from dateutil.relativedelta import relativedelta
 from pygments import lexers
+
+from .logging_utils import create_logger_by_filename
 
 
 __all__ = []
@@ -256,6 +259,32 @@ def hex_to_rgb(value):
     if lv == 3:
         return tuple(int(value[i:i + 1], 16) * 17 for i in range(0, 3))
     return tuple(int(value[i:i + lv / 3], 16) for i in range(0, lv, lv / 3))
+
+
+def show_all_possible_fakers():
+
+    all_formatters = list()
+    for attribute in dir(factory.Faker._get_faker()):
+        try:
+            flag = False
+            if not attribute.startswith('_'):
+                flag = True
+                factory.Faker(attribute).generate([])
+        except:
+            pass
+        else:
+            if flag:
+                all_formatters.append(attribute)
+
+    line = '-' * 80
+    for formatter in all_formatters:
+        print(line)
+        print('factory.Faker({0})'.format(formatter))
+        print(line)
+        for i in range(10):
+            output = factory.Faker(formatter).generate([])
+            output = str(output)[:100]
+            print('\t{0}'.format(output))
 
 
 if __name__ == "__main__":

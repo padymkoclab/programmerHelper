@@ -1,62 +1,101 @@
 
 import random
+import inspect
+
+from django.utils import timezone
 
 from factory import fuzzy
 import factory
 
-from apps.generic_models.factories import Factory_CommentGeneric, Factory_OpinionGeneric
+from apps.comments.factories import CommentFactory
+from apps.opinions.factories import OpinionFactory
 
-from .models import *
+from mylabour.factories_utils import generate_image, generate_text_certain_length
+
+from .models import UtilityCategory, Utility
 
 
-class Factory_UtilityCategory(factory.DjangoModelFactory):
+NOW = timezone.now().replace(tzinfo=timezone.get_current_timezone())
+
+
+def generate_text_random_length_for_field(model, field_name, ending_point=True, locale='ru'):
+
+    field = model._meta.get_field(field_name)
+
+    for validator in field.validators:
+        if validator.code == 'min_length':
+            min_length = validator.limit_value
+        elif validator.code == 'max_length':
+            max_length = validator.limit_value
+
+    length = random.randrange(min_length, max_length)
+
+    if ending_point:
+        return generate_text_certain_length(length + 1, locale)[:-1]
+    return generate_text_certain_length(length, locale)
+
+
+class UtilityCategoryFactory(factory.DjangoModelFactory):
 
     class Meta:
         model = UtilityCategory
 
-    description = factory.Faker('text', locale='ru')
-    views = fuzzy.FuzzyInteger(1000)
+    @classmethod
+    def _after_postgeneration(cls, obj, create, results=None):
+        super(UtilityCategoryFactory, cls)._after_postgeneration(obj, create, results)
+        qs = obj.__class__._default_manager.filter(pk=obj.pk)
+        qs.update(date_modified=fuzzy.FuzzyDateTime(obj.date_added, NOW).fuzz())
 
     @factory.lazy_attribute
     def name(self):
-        return factory.Faker('text', locale='ru').generate([])[:40]
+
+        field_name = inspect.stack()[0][3]
+        model = self._LazyStub__model_class._meta.model
+        return generate_text_random_length_for_field(model, field_name, ending_point=False)
 
     @factory.lazy_attribute
-    def picture(self):
-        site_url = factory.Faker('url', locale='ru').generate([])
-        picture_url = factory.Faker('slug', locale='ru').generate([])
-        return site_url + picture_url + '.png'
+    def description(self):
+
+        field_name = inspect.stack()[0][3]
+        model = self._LazyStub__model_class._meta.model
+        return generate_text_random_length_for_field(model, field_name)
+
+    @factory.lazy_attribute
+    def image(self):
+        return generate_image(filename='test_category_utilities.png', imageformat='PNG')
+
+    @factory.post_generation
+    def date_added(self, create, extracted, **kwargs):
+        self.date_added = fuzzy.FuzzyDateTime(NOW - timezone.timedelta(days=500)).fuzz()
+        self.save()
 
 
-class Factory_Utility(factory.DjangoModelFactory):
+class UtilityFactory(factory.DjangoModelFactory):
 
     class Meta:
         model = Utility
 
-    description = factory.Faker('text', locale='ru')
-    picture = factory.Faker('url', locale='ru')
     category = fuzzy.FuzzyChoice(UtilityCategory.objects.all())
     web_link = factory.Faker('url', locale='en')
 
     @factory.lazy_attribute
     def name(self):
-        return factory.Faker('text', locale='ru').generate([])[:40]
+        field_name = inspect.stack()[0][3]
+        model = self._LazyStub__model_class._meta.model
+        return generate_text_random_length_for_field(model, field_name, ending_point=False)
+
+    @factory.lazy_attribute
+    def description(self):
+        field_name = inspect.stack()[0][3]
+        model = self._LazyStub__model_class._meta.model
+        return generate_text_random_length_for_field(model, field_name)
 
     @factory.post_generation
     def comments(self, create, extracted, **kwargs):
-        for i in range(random.randrange(3)):
-            Factory_CommentGeneric(content_object=self)
+        for i in range(random.randrange(0, 10)):
+            CommentFactory(content_object=self)
 
     @factory.post_generation
     def opinions(self, create, extracted, **kwargs):
-        for i in range(random.randrange(10)):
-            Factory_OpinionGeneric(content_object=self)
-
-
-UtilityCategory.objects.filter().delete()
-# create category
-for i in range(10):
-    Factory_UtilityCategory()
-# create utility
-for j in range(30):
-    Factory_Utility()
+        for i in range(random.randrange(0, 10)):
+            OpinionFactory(content_object=self)
