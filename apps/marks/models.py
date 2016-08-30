@@ -28,7 +28,6 @@ class Mark(BaseGenericModel):
         default=MIN_MARK,
         validators=[MinValueValidator(MIN_MARK), MaxValueValidator(MAX_MARK)]
     )
-    date_modified = models.DateTimeField(_('Date last changed'), auto_now=True)
 
     class Meta:
         db_table = 'marks'

@@ -76,7 +76,6 @@ class Reply(BaseGenericModel):
         validators=[
             MaxValueValidator(MAX_MARK, _('The mark for language must be from 1 to %d' % MAX_MARK))
         ])
-    date_added = models.DateTimeField(_('Date aded'), auto_now_add=True)
 
     # managers
     objects = models.Manager()

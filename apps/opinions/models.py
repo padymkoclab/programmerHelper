@@ -16,7 +16,6 @@ class Opinion(BaseGenericModel):
         verbose_name=_('User'),
     )
     is_useful = models.BooleanField(_('Is useful?'))
-    date_modified = models.DateTimeField(_('Date last changed'), auto_now=True)
 
     class Meta:
         db_table = 'opinions'
@@ -38,5 +37,7 @@ class Opinion(BaseGenericModel):
 
     def clean(self):
         if self.content_object:
-            if self.content_object.user == self.user:
-                raise ValidationError(_('Author not allowed have opinion about hisself labour.'))
+
+            if hasattr(self.content_object, 'user'):
+                if self.content_object.user == self.user:
+                    raise ValidationError(_('Author not allowed have opinion about hisself labour.'))

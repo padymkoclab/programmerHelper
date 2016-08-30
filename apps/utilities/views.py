@@ -6,4 +6,4 @@ from .models import UtilityCategory
 
 class UtilityCategoryDetailView(DetailView):
     model = UtilityCategory
-    template_name = "TEMPLATE_NAME"
+    template_name = "utilities/category_detail.html"

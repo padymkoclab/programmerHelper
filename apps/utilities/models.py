@@ -15,11 +15,9 @@ from apps.opinions.models import Opinion
 from .querysets import UtilityQuerySet, UtilityCategoryQuerySet
 
 
-# Are you agree?
-
 class UtilityCategory(TimeStampedModel):
     """
-    Model category of utilities.
+    Model of a category of utilities.
     """
 
     def upload_category_image(instance, filename):
@@ -56,42 +54,62 @@ class UtilityCategory(TimeStampedModel):
         return reverse('admin:utilities_utilitycategory_change', args=(self.pk, ))
 
     def get_total_mark(self):
-        return sum(utility.get_mark() for utility in self.utilities.iterator())
+        """ """
+
+        if hasattr(self, 'total_mark'):
+            return self.total_mark
+
+        return self.utilities.utilities_with_marks().aggregate(
+            total_mark=models.Sum('mark')
+        )['total_mark'] or 0
     get_total_mark.short_description = _('Total mark')
+    get_total_mark.admin_order_field = 'total_mark'
 
-    def get_total_opinions(self):
-        # create new field count_opinions
-        annotated_utilities = self.utilities.annotate(count_opinions=models.Count('opinions'))
-        # summarize aggregation on field count_opinions of utilities
-        aggregate_utilities = annotated_utilities.aggregate(total_count_opinions=models.Sum('count_opinions'))
-        return aggregate_utilities['total_count_opinions'] or 0
-    get_total_opinions.short_description = _('Count opinions')
+    def get_total_count_opinions(self):
 
-    def get_total_comments(self):
+        if hasattr(self, 'total_count_opinions'):
+            return self.total_count_opinions
+
+        utilities_with_count_opinions = self.utilities.utilities_with_count_opinions()
+        return utilities_with_count_opinions.aggregate(
+            total_count_opinions=models.Sum('count_opinions')
+        )['total_count_opinions'] or 0
+    get_total_count_opinions.short_description = _('Total count opinions')
+    get_total_count_opinions.admin_order_field = 'total_count_opinions'
+
+    def get_total_count_comments(self):
+
+        if hasattr(self, 'total_count_comments'):
+            return self.total_count_comments
+
         # create new field count_comments
-        annotated_utilities = self.utilities.annotate(count_comments=models.Count('comments'))
-        # summarize aggregation on field count_comments of utilities
-        aggregate_utilities = annotated_utilities.aggregate(total_count_comments=models.Sum('count_comments'))
-        return aggregate_utilities['total_count_comments'] or 0
-    get_total_comments.short_description = _('Count comments')
+        utilities_with_count_comments = self.utilities.utilities_with_count_comments()
+        return utilities_with_count_comments.aggregate(
+            total_count_comments=models.Sum('count_comments')
+        )['total_count_comments'] or 0
+    get_total_count_comments.short_description = _('Total count comments')
+    get_total_count_comments.admin_order_field = 'total_count_comments'
 
     def get_count_utilities(self):
-        return self.utilities.count()
+
+        if hasattr(self, 'count_utilities'):
+            return self.count_utilities
+
+        return self.utilities.prefetch_related('utilities').count()
+    get_count_utilities.short_description = _('Count utilities')
+    get_count_utilities.admin_order_field = 'count_utilities'
 
 
 class Utility(TimeStampedModel):
     """
-    Model for utility
+    Model of a utility
     """
 
     name = models.CharField(
         _('Name'), max_length=200,
         validators=[MinLengthValidator(settings.MIN_LENGTH_FOR_NAME_OR_TITLE_OBJECT)]
     )
-    description = models.CharField(
-        _('Description'), max_length=500,
-        validators=[MinLengthValidator(50)]
-    )
+    description = models.TextField(_('Description'), validators=[MinLengthValidator(50)])
     category = models.ForeignKey(
         'UtilityCategory',
         related_name='utilities',
@@ -117,13 +135,44 @@ class Utility(TimeStampedModel):
         return '{0.name}'.format(self)
 
     def get_mark(self):
-        good_opinions = self.opinions.filter(is_useful=True).count()
-        bad_opinions = self.opinions.filter(is_useful=False).count()
-        return good_opinions - bad_opinions
+        """ """
+
+        # if queryset is already has need field - return it
+        # otherwise determinate value
+        if hasattr(self, 'mark'):
+            return self.mark
+
+        opinions = self.opinions.prefetch_related('opinions')
+
+        # change Bool to Int
+        opinions = opinions.annotate(is_useful_int=models.Case(
+            models.When(is_useful=True, then=1),
+            models.When(is_useful=False, then=-1),
+            output_field=models.IntegerField()
+        ))
+
+        # make sum by 'is_useful_int'
+        return opinions.aggregate(mark=models.Sum('is_useful_int'))['mark']
+
     get_mark.short_description = _('Mark')
+    get_mark.admin_order_field = 'mark'
 
     def get_count_comments(self):
-        return self.comments.count()
 
-    def get_count_replies(self):
-        return self.replies.count()
+        # if queryset is already annotated with field 'count_comments' - return it
+        if hasattr(self, 'count_comments'):
+            return self.count_comments
+
+        return self.comments.prefetch_related('comments').count()
+    get_count_comments.short_description = _('Count comments')
+    get_count_comments.admin_order_field = 'count_comments'
+
+    def get_count_opinions(self):
+
+        # if queryset is already annotated with field 'count_opinions' - return it
+        if hasattr(self, 'count_opinions'):
+            return self.count_opinions
+
+        return self.opinions.prefetch_related('opinions').count()
+    get_count_opinions.short_description = _('Count opinions')
+    get_count_opinions.admin_order_field = 'count_opinions'

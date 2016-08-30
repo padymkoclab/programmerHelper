@@ -16,7 +16,6 @@ class Favour(BaseGenericModel):
         verbose_name=_('User'),
     )
     is_favour = models.BooleanField(_('Is favour?'))
-    date_modified = models.DateTimeField(_('Date last changed'), auto_now=True)
 
     class Meta:
         db_table = 'favours'

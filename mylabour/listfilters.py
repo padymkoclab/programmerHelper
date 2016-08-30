@@ -7,6 +7,7 @@ from django.contrib import admin
 from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import force_text
 from django.utils import timezone
+from django.conf import settings
 
 from dateutil.relativedelta import relativedelta
 
@@ -84,6 +85,28 @@ class LatestActivityListFilter(admin.SimpleListFilter):
             return queryset.filter(latest_activity__gte=tonow - timezone.timedelta(days=30))
         elif self.value() == 'more_year_ago':
             return queryset.filter(latest_activity__gte=tonow - timezone.timedelta(days=365))
+
+
+class IsNewSimpleListFilter(admin.SimpleListFilter):
+
+    title = _('is new?')
+    parameter_name = 'is_new'
+
+    def lookups(self, request, model_admin):
+
+        return [
+            ('new', _('New')),
+            ('no_new', _('No new')),
+        ]
+
+    def queryset(self, request, queryset):
+
+        date_ago = timezone.now() - timezone.timedelta(days=settings.COUNT_DAYS_DISTINGUISH_ELEMENTS_AS_NEW)
+
+        if self.value() == 'new':
+            return queryset.filter(date_added__gte=date_ago)
+        elif self.value() == 'no_new':
+            return queryset.exclude(date_added__gte=date_ago)
 
 
 class RangeSimpleListFilter(admin.ListFilter):

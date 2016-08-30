@@ -4,8 +4,8 @@ from django.contrib import admin
 from django.utils.html import format_html
 
 from mylabour.listfilters import LatestActivityListFilter
-from apps.opinions.admin import OpinionInline
-from apps.comments.admin import CommentInline
+from apps.opinions.admin import OpinionGenericInline
+from apps.comments.admin import CommentGenericInline
 
 from .listfilters import QualityListFilter
 from .forms import SolutionCategoryForm, SolutionForm
@@ -82,8 +82,8 @@ class SolutionAdmin(admin.ModelAdmin):
     search_fields = ('problem',)
     date_hierarchy = 'date_added'
     inlines = [
-        OpinionInline,
-        CommentInline,
+        OpinionGenericInline,
+        CommentGenericInline,
     ]
     fieldsets = [
         [

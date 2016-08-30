@@ -1,4 +1,5 @@
 
+from django.utils.text import force_text
 from django.utils import timezone
 from django.core.validators import MaxLengthValidator
 from django.utils.translation import ugettext_lazy as _
@@ -30,8 +31,6 @@ class Comment(BaseGenericModel):
         verbose_name=_('User'),
     )
     rating = models.SmallIntegerField(_('Rating'), default=0, editable=False)
-    date_modified = models.DateTimeField(_('Date last changed'), auto_now=True)
-    date_added = models.DateTimeField(_('Date added'), auto_now_add=True)
 
     class Meta:
         db_table = 'comments'
@@ -41,10 +40,7 @@ class Comment(BaseGenericModel):
         ordering = ['date_added']
 
     def __str__(self):
-        return _('Comment on {0} "{1}"').format(
-            self.content_type.model_class()._meta.verbose_name.lower(),
-            self.content_object.__str__()
-        )
+        return '{0.text_comment}'.format(self)
 
     def is_new(self):
         """ """

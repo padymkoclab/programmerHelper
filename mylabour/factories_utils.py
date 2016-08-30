@@ -265,3 +265,26 @@ def random_text(count_sentences=3):
 
     # return random text
     return sentences
+
+
+def generate_text_random_length_for_field_of_model(factory, field_name, ending_point=True, locale='ru'):
+
+    model = factory._LazyStub__model_class._meta.model
+
+    field = model._meta.get_field(field_name)
+
+    min_length = 1
+    max_length = 1000
+
+    for validator in field.validators:
+        if validator.code == 'min_length':
+            min_length = validator.limit_value
+        elif validator.code == 'max_length':
+            max_length = validator.limit_value
+
+    length = random.randrange(min_length, max_length)
+
+    if ending_point:
+        return generate_text_certain_length(length + 1, locale)[:-1]
+
+    return generate_text_certain_length(length, locale)

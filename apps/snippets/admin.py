@@ -8,8 +8,8 @@ from django.conf.urls import url
 from django.utils.translation import ugettext_lazy as _
 from django.contrib import admin
 
-from apps.comments.admin import CommentInline
-from apps.opinions.admin import OpinionInline
+from apps.comments.admin import CommentGenericInline
+from apps.opinions.admin import OpinionGenericInline
 from apps.opinions.admin_mixins import ScopeMixin
 from apps.favours.admin import FavourInline
 
@@ -44,9 +44,9 @@ class SnippetAdmin(ScopeMixin, admin.ModelAdmin):
         'date_added',
     )
     inlines = [
-        OpinionInline,
+        OpinionGenericInline,
         FavourInline,
-        CommentInline,
+        CommentGenericInline,
     ]
     search_fields = ('title', 'account__username')
     filter_horizontal = ['tags']

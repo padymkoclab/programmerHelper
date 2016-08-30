@@ -38,5 +38,8 @@ class BaseGenericModel(models.Model):
     object_id = models.UUIDField()
     content_object = GenericForeignKey('content_type', 'object_id')
 
+    date_modified = models.DateTimeField(_('Date modified'), auto_now=True)
+    date_added = models.DateTimeField(_('Date added'), auto_now_add=True)
+
     class Meta:
         abstract = True

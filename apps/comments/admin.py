@@ -3,18 +3,22 @@ from django.contrib.contenttypes import admin as admin_generic
 from django.contrib import admin
 
 from .models import Comment
+from .forms import CommentModelForm
 
 
-class CommentInline(admin_generic.GenericStackedInline):
+class CommentGenericInline(admin_generic.GenericStackedInline):
     '''
     Stacked Inline View for Comment
     '''
 
+    form = CommentModelForm
     model = Comment
     extra = 0
     ct_field = 'content_type'
     ct_fk_field = 'object_id'
-    template = 'comments/stacked.html'
+
+    fields = ['user', 'text_comment', 'rating', 'date_modified', 'date_added']
+    readonly_fields = ['rating', 'date_modified', 'date_added']
 
 
 class CommentAdmin(admin.ModelAdmin):
