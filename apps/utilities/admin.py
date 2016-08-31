@@ -11,7 +11,7 @@ from apps.opinions.admin import OpinionGenericInline
 from apps.comments.admin import CommentGenericInline
 
 from .models import UtilityCategory, Utility
-from .forms import UtilityCategoryModelForm, UtilityModelForm
+from .forms import UtilityCategoryAdminModelForm, UtilityAdminModelForm
 
 
 logger = create_logger_by_filename(__name__)
@@ -22,7 +22,7 @@ class UtilityInline(admin.StackedInline):
     Stacked Inline View for Utility
     """
 
-    form = UtilityModelForm
+    form = UtilityAdminModelForm
     model = Utility
     extra = 0
     fk_name = 'category'
@@ -45,7 +45,7 @@ class UtilityCategoryAdmin(admin.ModelAdmin):
     Admin View for UtilityCategory
     '''
 
-    form = UtilityCategoryModelForm
+    form = UtilityCategoryAdminModelForm
     list_display = (
         'name',
         'get_count_utilities',
@@ -121,7 +121,7 @@ class UtilityAdmin(admin.ModelAdmin):
         Admin View for Utility
     '''
 
-    form = UtilityModelForm
+    form = UtilityAdminModelForm
     list_display = (
         'truncated_name',
         'category',
@@ -163,7 +163,10 @@ class UtilityAdmin(admin.ModelAdmin):
                     ]
                 }
             ],
-            [
+        ]
+
+        if obj:
+            fieldsets.append([
                 _('Additional information'), {
                     'classes': ('collapse', ),
                     'fields': [
@@ -174,8 +177,7 @@ class UtilityAdmin(admin.ModelAdmin):
                         'date_added',
                     ]
                 }
-            ]
-        ]
+            ])
 
         return fieldsets
 

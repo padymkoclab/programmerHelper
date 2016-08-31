@@ -6,11 +6,11 @@ from suit.widgets import AutosizedTextarea
 from .models import UtilityCategory, Utility
 
 
-class UtilityCategoryModelForm(forms.ModelForm):
+class UtilityCategoryAdminModelForm(forms.ModelForm):
 
     class Meta:
         model = UtilityCategory
-        fields = ['name']
+        fields = ['name', 'slug', 'description']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -23,7 +23,7 @@ class UtilityCategoryModelForm(forms.ModelForm):
         self.fields['description'].widget = AutosizedTextarea(attrs={'class': 'span12'})
 
 
-class UtilityModelForm(forms.ModelForm):
+class UtilityAdminModelForm(forms.ModelForm):
 
     class Meta:
         model = Utility

@@ -1,10 +1,8 @@
 
-import functools
 import tempfile
 import shutil
 
-from django.apps import apps
-from django.test.utils import override_settings
+from django.contrib import admin
 from django.contrib.auth import get_user_model
 from django.core.urlresolvers import reverse
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
@@ -18,13 +16,11 @@ from pyvirtualdisplay import Display
 from selenium.webdriver import Chrome
 
 from mylabour.factories_utils import generate_image
+from mylabour.logging_utils import create_logger_by_filename
 
 
+logger = create_logger_by_filename(__name__)
 webdriver = Chrome
-
-
-class MockRequest:
-    pass
 
 
 class EnhancedTestCase(TestCase):
@@ -33,12 +29,14 @@ class EnhancedTestCase(TestCase):
     django_user_model = get_user_model()
     reverse = reverse
     timezone = timezone
-    mockrequest = MockRequest()
+    mockrequest = type('MockRequest', (), {})()
     call_command = call_command
+    admin_site = admin.AdminSite()
 
     def __init__(self, *args, **kwargs):
         super(EnhancedTestCase, self).__init__(*args, **kwargs)
         self.reverse = reverse
+        self.call_command = call_command
 
     @classmethod
     def setup_class(cls):
@@ -58,6 +56,8 @@ class EnhancedTestCase(TestCase):
         settings._wrapped = override
         for key, new_value in cls.options.items():
             setting_changed.send(sender=settings._wrapped.__class__, setting=key, value=new_value, enter=True)
+
+        logger.debug('Create a tempdir {0} for generated assets while testing'.format(cls.testing_tempdir))
 
     @classmethod
     def teardown_class(cls):

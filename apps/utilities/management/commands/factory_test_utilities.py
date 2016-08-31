@@ -13,6 +13,7 @@ class Command(ExtendedBaseCommand):
     help = 'Factory testing utilities.'
 
     def add_arguments(self, parser):
+
         parser.add_argument('count', nargs='+', type=self._positive_integer_from_1_to_999)
 
     def handle(self, **kwargs):

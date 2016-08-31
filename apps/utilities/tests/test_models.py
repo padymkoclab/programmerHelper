@@ -325,8 +325,8 @@ class UtilityTests(EnhancedTestCase):
     @classmethod
     def setUpTestData(cls):
 
-        cls.call_command('factory_test_users', '9')
-        cls.call_command('factory_test_categories_of_utilities', '3')
+        cls.call_command('factory_test_users', '10')
+        cls.call_command('factory_test_categories_utilities', '3')
 
         cls.category1, cls.category2, cls.category3 = UtilityCategory.objects.all()
 

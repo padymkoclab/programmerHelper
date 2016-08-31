@@ -1,6 +1,10 @@
 
 from django.db import models
 
+from mylabour.logging_utils import create_logger_by_filename
+
+logger = create_logger_by_filename(__name__)
+
 
 class UtilityCategoryQuerySet(models.QuerySet):
 
@@ -38,7 +42,29 @@ class UtilityCategoryQuerySet(models.QuerySet):
         self = self.categories_with_count_utilities()
         self = self.categories_with_total_count_opinions()
         self = self.categories_with_total_count_comments()
+
+        logger.error('Uncompleted SQL query')
+
         self = self.categories_with_total_marks()
+
+        self = self.extra(select={
+            'total_mark': """
+            SELECT
+                SUM(
+                    CASE
+                        WHEN "opinions"."is_useful" = True THEN 1
+                        WHEN "opinions"."is_useful" = FALSE THEN -1
+                        ELSE NULL
+                    END
+                )
+            FROM "utilities"
+            LEFT OUTER JOIN "opinions"
+                ON ("utilities"."id" = "opinions"."object_id" AND ("opinions"."content_type_id" = 40))
+            WHERE
+                "utilities"."id" = "utilities_categories"."id"
+            GROUP BY "utilities"."id"
+            """
+        })
 
         return self
 
@@ -73,6 +99,25 @@ class UtilityQuerySet(models.QuerySet):
 
         self = self.utilities_with_count_opinions()
         self = self.utilities_with_count_comments()
-        self = self.utilities_with_marks()
+
+        logger.warning('If Django ORM will be have support for subqueries rewrite this query.')
+        # self = self.utilities_with_marks()
+
+        # subquery if using combination annotations and aggregations
+        self = self.extra(select={
+            'mark': """
+                SELECT
+                    SUM(
+                        CASE
+                            WHEN "opinions"."is_useful" = True THEN 1
+                            WHEN "opinions"."is_useful" = False THEN -1
+                            ELSE NULL
+                        END
+                    )
+                FROM "opinions"
+                WHERE
+                    "utilities"."id" = "opinions"."object_id"
+            """
+        })
 
         return self

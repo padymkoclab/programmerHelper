@@ -4,16 +4,416 @@
 		"selected_items":
 		[
 			[
+				"Cate",
+				"UtilityCategory"
+			],
+			[
+				"Factory",
+				"UtilityFactory"
+			],
+			[
+				"utili",
+				"Utility	import"
+			],
+			[
+				"Util",
+				"UtilityFactory	import"
+			],
+			[
+				"Utili",
+				"UtilityFactory	class"
+			],
+			[
+				"ass",
+				"assertDictEqual	function"
+			],
+			[
+				"aggre",
+				"aggregate"
+			],
+			[
+				"op",
+				"opinions"
+			],
+			[
+				"admin",
+				"admin_order_field"
+			],
+			[
+				"get_",
+				"get_count_utilities	function"
+			],
+			[
+				"get_user",
+				"get_user_model	function"
+			],
+			[
+				"gne",
+				"generate_text_random_length_for_field_of_model	function"
+			],
+			[
+				"for",
+				"force_text	function"
+			],
+			[
+				"inlin",
+				"get_inlines_instances"
+			],
+			[
+				"get_fie",
+				"get_fieldsets"
+			],
+			[
+				"con",
+				"connection	instance"
+			],
+			[
+				"conte",
+				"contextmanagers	module"
+			],
+			[
+				"list",
+				"listfilters	module"
+			],
+			[
+				"query",
+				"queryset	param"
+			],
+			[
+				"tr",
+				"truncatechars	function"
+			],
+			[
+				"def",
+				"defaultfilters	module"
+			],
+			[
+				"tem",
+				"template	module"
+			],
+			[
+				"dis",
+				"distinct	param"
+			],
+			[
+				"field",
+				"field_name"
+			],
+			[
+				"sta",
+				"stack	function"
+			],
+			[
+				"ran",
+				"randrange	statement"
+			],
+			[
+				"fu",
+				"fuzz	function"
+			],
+			[
+				"Fuzz",
+				"FuzzyDateTime	class"
+			],
+			[
+				"as",
+				"as_manager	function"
+			],
+			[
+				"Uti",
+				"UtilityCategoryQuerySet	class"
+			],
+			[
+				"U",
+				"UtilityQuerySet	class"
+			],
+			[
+				"fiel",
+				"fieldsets"
+			],
+			[
+				"Image",
+				"ImageField	class"
+			],
+			[
+				"gene",
+				"generate_image	function"
+			],
+			[
+				"upload",
+				"upload_to"
+			],
+			[
+				"fie",
+				"fields_db	module"
+			],
+			[
+				"MAX",
+				"MAX_YEAR_PUBLISHED"
+			],
+			[
+				"MIN",
+				"MIN_YEAR_PUBLISHED"
+			],
+			[
+				"Pub",
+				"Publisher	class"
+			],
+			[
+				"in",
+				"input_type"
+			],
+			[
+				"init",
+				"__init__"
+			],
+			[
+				"read",
+				"readonly_fields"
+			],
+			[
+				"Noe",
+				"None	keyword"
+			],
+			[
+				"Publi",
+				"PublisherForm	class"
+			],
+			[
+				"ModelForm",
+				"ModelForm	class"
+			],
+			[
+				"Model",
+				"ModelForm	ModelForm"
+			],
+			[
+				"sele",
+				"select_related	function"
+			],
+			[
+				"Relat",
+				"RelatedOnlyFieldListFilter	class"
+			],
+			[
+				"Rela",
+				"RelatedFieldListFilter	class"
+			],
+			[
+				"_in",
+				"_positive_integer_from_1_to_999	function"
+			],
+			[
+				"E",
+				"ExtendedBaseCommand	class"
+			],
+			[
+				"Fuz",
+				"FuzzyChoice	class"
+			],
+			[
+				"fuzz",
+				"fuzzy	module"
+			],
+			[
+				"help",
+				"help_text"
+			],
+			[
+				"Query",
+				"QuerySet	class"
+			],
+			[
+				"Min",
+				"MinValueValidator"
+			],
+			[
+				"mp",
+				"mpossmallint	PositiveSmallIntegerField (mpossmallint)"
+			],
+			[
+				"db_tab",
+				"db_table"
+			],
+			[
+				"Wri",
+				"Writer	class"
+			],
+			[
+				"Book",
+				"BookInline	class"
+			],
+			[
+				"Boo",
+				"BooleanField	class"
+			],
+			[
+				"requ",
+				"request"
+			],
+			[
+				"dea",
+				"death_year	statement"
+			],
+			[
+				"max",
+				"max_length"
+			],
+			[
+				"Arr",
+				"ArrayField	class"
+			],
+			[
+				"year",
+				"year_birth"
+			],
+			[
+				"Posit",
+				"PositiveSmallIntegerField	class"
+			],
+			[
+				"Ex",
+				"ExpressionWrapper	class"
+			],
+			[
+				"fields",
+				"fieldsets	statement"
+			],
+			[
+				"format",
+				"format_html	function"
+			],
+			[
+				"__init__",
+				"__init__	function"
+			],
+			[
+				"Ad",
+				"AdminImageThumbnail	class"
+			],
+			[
+				"MEDI",
+				"MEDIA_ROOT"
+			],
+			[
+				"url",
+				"urlpatterns	statement"
+			],
+			[
+				"forma",
+				"format_html	function"
+			],
+			[
+				"mar",
+				"mark_safe	function"
+			],
+			[
+				"TIME",
+				"TIME_ZONE"
+			],
+			[
+				"FuzzD",
+				"FuzzyDateTime	class"
+			],
+			[
+				"ug",
+				"ugettext_lazy	statement"
+			],
+			[
+				"tra",
+				"translation	module"
+			],
+			[
+				"cont",
+				"contrib	module"
+			],
+			[
+				"logg",
+				"logging_utils	module"
+			],
+			[
+				"warn",
+				"warning	function"
+			],
+			[
+				"ut",
+				"utils	module"
+			],
+			[
+				"crea",
+				"create_logger_by_filename	function"
+			],
+			[
+				"Repl",
+				"ReplyFactory	import"
+			],
+			[
+				"dj",
+				"django_user_model"
+			],
+			[
+				"count",
+				"count_pages	forstmt"
+			],
+			[
+				"Fac",
+				"BookFactory"
+			],
+			[
+				"model",
+				"models"
+			],
+			[
+				"assertIs",
+				"assertIsInstance	function"
+			],
+			[
+				"text",
+				"text	function"
+			],
+			[
+				"Ima",
+				"Image	module"
+			],
+			[
+				"setU",
+				"setUpTestData"
+			],
+			[
+				"class",
+				"classmethod	class"
+			],
+			[
+				"assertCo",
+				"assertCountEqual	function"
+			],
+			[
+				"Test",
+				"TestCase	class"
+			],
+			[
+				"book",
+				"book1	statement"
+			],
+			[
+				"ove",
+				"override_settings"
+			],
+			[
+				"En",
+				"EnhancedTestCase	class"
+			],
+			[
+				"_m",
+				"_make_data	function"
+			],
+			[
 				"DE",
 				"DEFAULT_FILE_STORAGE"
 			],
 			[
 				"set",
 				"setUp	function"
-			],
-			[
-				"Book",
-				"BookTests	class"
 			],
 			[
 				"me",
@@ -32,14 +432,6 @@
 				"writers"
 			],
 			[
-				"Ex",
-				"ExtendedBaseCommand	class"
-			],
-			[
-				"assertIs",
-				"assertIsNone	function"
-			],
-			[
 				"unit",
 				"unipath	module"
 			],
@@ -50,10 +442,6 @@
 			[
 				"ye",
 				"years_life"
-			],
-			[
-				"year",
-				"year_death	statement"
 			],
 			[
 				"yea",
@@ -76,20 +464,12 @@
 				"active_superuser	statement"
 			],
 			[
-				"_m",
-				"_make_user_as_active_superuser	function"
-			],
-			[
 				"django",
 				"django_user_model	statement"
 			],
 			[
 				"fac",
 				"factories_utils	module"
-			],
-			[
-				"text",
-				"text_utils	module"
 			],
 			[
 				"get",
@@ -106,10 +486,6 @@
 			[
 				"image",
 				"image_format	param"
-			],
-			[
-				"max",
-				"max_value	param"
 			],
 			[
 				"min",
@@ -138,382 +514,6 @@
 			[
 				"find_e",
 				"find_elements_by_xpath	function"
-			],
-			[
-				"for",
-				"force_login	function"
-			],
-			[
-				"uni",
-				"unittest	module"
-			],
-			[
-				"conb",
-				"combination	forstmt"
-			],
-			[
-				"co",
-				"combinations	statement"
-			],
-			[
-				"moc",
-				"mock_now"
-			],
-			[
-				"act",
-				"active_superuser	statement"
-			],
-			[
-				"open",
-				"openpyxl	module"
-			],
-			[
-				"Poll",
-				"PollAdmin"
-			],
-			[
-				"test",
-				"test_utils	module"
-			],
-			[
-				"djan",
-				"convert_date_to_django_date_format"
-			],
-			[
-				"Not",
-				"NotImplementedError	class"
-			],
-			[
-				"sta",
-				"staticmethod	class"
-			],
-			[
-				"data",
-				"data_ordered	statement"
-			],
-			[
-				"theme",
-				"themes	forstmt"
-			],
-			[
-				"_get_text_for_empty_page_vo",
-				"_get_text_for_empty_page_voters	function"
-			],
-			[
-				"pa",
-				"patch	function"
-			],
-			[
-				"month",
-				"month_year_label	statement"
-			],
-			[
-				"loca",
-				"location	statement"
-			],
-			[
-				"TIM",
-				"TIME_ZONE"
-			],
-			[
-				"dj",
-				"convert_date_to_django_date_format	function"
-			],
-			[
-				"SITE",
-				"SITE_NAME"
-			],
-			[
-				"PD",
-				"PdfFileReader	class"
-			],
-			[
-				"wri",
-				"write	function"
-			],
-			[
-				"Re",
-				"RequestFactory	class"
-			],
-			[
-				"Pol",
-				"PollAdmin	statement"
-			],
-			[
-				"str",
-				"str_datetime	statement"
-			],
-			[
-				"iter",
-				"itertools	module"
-			],
-			[
-				"upd",
-				"update	function"
-			],
-			[
-				"i",
-				"ipdb	ipdb debug tool"
-			],
-			[
-				"byte",
-				"bytes	class"
-			],
-			[
-				"b",
-				"bytes	class"
-			],
-			[
-				"PDF",
-				"PDFDocument	class"
-			],
-			[
-				"pdf",
-				"pdfparser	module"
-			],
-			[
-				"Bad",
-				"HttpBadRequest"
-			],
-			[
-				"contex",
-				"context_data"
-			],
-			[
-				"templ",
-				"template_name"
-			],
-			[
-				"status",
-				"status_code"
-			],
-			[
-				"from_",
-				"from_buffer	function"
-			],
-			[
-				"get_",
-				"get_app_config	function"
-			],
-			[
-				"conte",
-				"context_data	statement"
-			],
-			[
-				"url",
-				"urlresolvers	module"
-			],
-			[
-				"Vote",
-				"VoteAdmin	statement"
-			],
-			[
-				"Choic",
-				"ChoiceAdmin	statement"
-			],
-			[
-				"choice",
-				"choice1	statement"
-			],
-			[
-				"Choi",
-				"ChoiceAdmin	statement"
-			],
-			[
-				"Cho",
-				"ChoiceFactory	import"
-			],
-			[
-				"admin",
-				"admin_order_field"
-			],
-			[
-				"form",
-				"format_string"
-			],
-			[
-				"choi",
-				"choice31	statement"
-			],
-			[
-				"mim",
-				"mime	param"
-			],
-			[
-				"fr",
-				"from_buffer	function"
-			],
-			[
-				"POll",
-				"PollAdmin	statement"
-			],
-			[
-				"crea",
-				"create"
-			],
-			[
-				"assert",
-				"assertEqual"
-			],
-			[
-				"AdminSite",
-				"ProgrammerHelperAdminSite	statement"
-			],
-			[
-				"Htt",
-				"Http404	class"
-			],
-			[
-				"cont",
-				"contrib	module"
-			],
-			[
-				"fiel",
-				"fields"
-			],
-			[
-				"Des",
-				"DeserializationError	class"
-			],
-			[
-				"force",
-				"force_text	function"
-			],
-			[
-				"obje",
-				"object_list	param"
-			],
-			[
-				"obj",
-				"object_list	param"
-			],
-			[
-				"xml",
-				"xml_data	statement"
-			],
-			[
-				"server",
-				"server_address	function"
-			],
-			[
-				"if",
-				"ifmain	if __name__ == '__main__'"
-			],
-			[
-				"ma",
-				"main	module"
-			],
-			[
-				"init",
-				"__init__"
-			],
-			[
-				"is_",
-				"is_protected_type	function"
-			],
-			[
-				"op",
-				"options	param"
-			],
-			[
-				"templa",
-				"template_name"
-			],
-			[
-				"Templa",
-				"TemplateView	class"
-			],
-			[
-				"content",
-				"content_type"
-			],
-			[
-				"File",
-				"FileInput	class"
-			],
-			[
-				"IM",
-				"ImportTemplateView	class"
-			],
-			[
-				"render",
-				"render_to_response	function"
-			],
-			[
-				"tem",
-				"template_name	statement"
-			],
-			[
-				"help",
-				"help_text"
-			],
-			[
-				"tra",
-				"translation	module"
-			],
-			[
-				"Import",
-				"ImportTemplateView"
-			],
-			[
-				"Im",
-				"ImportTemplateView	class"
-			],
-			[
-				"Tem",
-				"TemplateView	class"
-			],
-			[
-				"field",
-				"fields	statement"
-			],
-			[
-				"css",
-				"css	.css() - multiple"
-			],
-			[
-				"sty",
-				"style.background	Style CSS"
-			],
-			[
-				"ali",
-				"align-content"
-			],
-			[
-				"stat",
-				"static	static"
-			],
-			[
-				"remo",
-				"removeClass	.removeClass()"
-			],
-			[
-				"alert",
-				"alert(message)	Window"
-			],
-			[
-				"cons",
-				"console.log()"
-			],
-			[
-				"aler",
-				"alert(message)	Window"
-			],
-			[
-				"prop",
-				"prop	.prop() - single"
-			],
-			[
-				"Prog",
-				"ProgrammerHelperAdminSite	instance"
-			],
-			[
-				"Exp",
-				"ExportRedirectView	class"
-			],
-			[
-				"from",
-				"from_iterable	function"
 			]
 		]
 	},
@@ -523,7 +523,7 @@
 			"file": "/media/wlysenko/66ABF2AC3D03BAAA/Web/A",
 			"settings":
 			{
-				"buffer_size": 83104,
+				"buffer_size": 83722,
 				"line_ending": "Unix"
 			}
 		},
@@ -531,31 +531,23 @@
 			"file": "pytest.ini",
 			"settings":
 			{
-				"buffer_size": 179,
+				"buffer_size": 192,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "apps/books/tests/test_models.py",
+			"file": "apps/utilities/tests/test_querysets.py",
 			"settings":
 			{
-				"buffer_size": 17848,
+				"buffer_size": 7737,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "mylabour/test_utils.py",
+			"file": "apps/utilities/querysets.py",
 			"settings":
 			{
-				"buffer_size": 3702,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "apps/books/models.py",
-			"settings":
-			{
-				"buffer_size": 9618,
+				"buffer_size": 3793,
 				"line_ending": "Unix"
 			}
 		}
@@ -635,10 +627,14 @@
 	"build_varint": "",
 	"command_palette":
 	{
-		"height": 137.0,
-		"last_filter": "editcon",
+		"height": 292.0,
+		"last_filter": "remove",
 		"selected_items":
 		[
+			[
+				"remove",
+				"Package Control: Remove Package"
+			],
 			[
 				"editcon",
 				"Set Syntax: EditorConfig"
@@ -908,10 +904,6 @@
 				"Package Control: Remove Package"
 			],
 			[
-				"remove",
-				"Package Control: Remove Package"
-			],
-			[
 				"isort",
 				"ImportSort: Sort imports"
 			],
@@ -1175,158 +1167,140 @@
 	[
 		"/home/wlysenko/.virtualenvs/programmerHelper/project",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/books",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/books/management",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/books/management/commands",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/books/templates",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/books/templates/books",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/books/tests",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/static/polls",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/static/polls/js",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/static/polls/js/admin",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/templates/polls",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/templates/polls/admin",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/tests",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/management",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/management/commands",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/tests",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/config/settings",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/media/books/шынчебюз-июварыт-ажжюм-ы",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/mylabour",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/static/project",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/static/project/js",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/templates/admin/edit_inline"
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/utilities",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/utilities/management/commands",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/utilities/tests"
 	],
 	"file_history":
 	[
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/books/factories.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/media/books/зыд-кевёбюж-адмодум-ёнанй-квюоджёныглэгэнтур-льаорыыт-тебиквюэ-граэко-доктюж-янтэрэсщэт-шэа-июва/factory_book.jpeg",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/media/books/апэриам-граэкйж-ведят-факэр-ты-выро-лэгыры-тинкидюнт-кюм-мыис-юрбанйтаж-долор/factory_book.jpeg",
-		"/home/wlysenko/.virtualenvs/programmerHelper/lib/python3.4/site-packages/django/db/models/query.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/.pdbrc",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/books/querysets.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/replies/querysets.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/books/management/commands/factory_test_books.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/books/management/commands/factory_test_writers.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/books/admin.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/mylabour/basecommands.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/utilities/tests/test_models.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/utilities/managers.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/utilities/models.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/utilities/views.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/utilities/templates/utilities/category_detail.html",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/utilities/__init__.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/utilities/tests/__init__.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/utilities/tests/test_querysets.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/fixtures.json",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/manage.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/utilities/tests/test_views.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/utilities/tests/test_forms.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/utilities/querysets.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/utilities/admin.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/opinions/factories.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/comments/forms.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/comments/admin.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/opinions/admin.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/opinions/forms.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/comments/models.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/utilities/forms.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/opinions/models.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/replies/models.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/favours/models.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/mylabour/models.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/marks/models.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/mylabour/model_utils.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/opinions/formsets.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/utilities/factories.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/mylabour/factories_utils.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/comments/factories.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/comments/templates/comments/stacked.html",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/articles/admin.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/snippets/admin.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/solutions/admin.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/snippets/factories.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/mylabour/forms_db.py",
+		"/home/wlysenko/.virtualenvs/test/testdjango/README",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/mylabour/contextmanagers.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/config/settings/base.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/templates/admin/change_list.html",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/templates/admin/change_form.html",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/templates/admin/base.html",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/templates/index.html",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/mylabour/listfilters.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/comments/migrations/0004_auto_20160829_2035.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/utilities/management/commands/factory_test_utilities.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/utilities/management/commands/factory_test_categories_of_utilities.py",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/books/models.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/books/factories.py",
+		"/home/wlysenko/.config/sublime-text-3/Packages/User/jpdb.sublime-snippet",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/books/migrations/0001_initial.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/books/admin.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/books/querysets.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/utilities/management/__init__.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/tags/models.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/books/forms.py",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/books/urls.py",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/books/views.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/tests/test_models.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/mylabour/model_utils.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/replies/models.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/tags/querysets.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/tags/models.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/tags/managers.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/replies/factories.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/books/management/commands/factory_test_writters.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/config/admin.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/books/forms.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/books/managers.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/books/tests/test_managers.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/books/validators.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/books/tests/test_validators.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/books/management/__init__.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/mylabour/text_utils.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/mylabour/factories_utils.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/books/tests/test_admin.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/books/tests/test_admin_live.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/mylabour/test_utils.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/tests/test_admin_live.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/static/polls/js/admin/admin.js",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/static/polls/js/admin/admin.test.js",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/books/tests/test_models.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/tests/test_.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/lib/python3.4/site-packages/django/apps/registry.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/config/views.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/config/forms.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/config/settings/custom.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/config/urls.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/pytest.ini",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/admin.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/templates/polls/admin/choice_preview_form.html",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/templates/admin/change_form.html",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/tests/test_admin.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/templates/polls/admin/preview.html",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/templates/admin/change_list.html",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/templates/admin/edit_inline/stacked.html",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/export_import_models/urls.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/templates/admin/base.html",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/templates/admin/index.html",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/models.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/templates/admin/app_index.html",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/forms.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/constants.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/management/commands/factory_test_superusers.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/package.json",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/management/commands/create_test_superuser.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/management/commands/factory_test_users.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/.coveragerc",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/.editorconfig",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/.eslintrc.json",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/js_tests/tests.html",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/.coverage",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/.bowerrc",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/static/tests/tests.html",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/templates/polls/admin/report.html",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/static/polls/js/polls.js",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/static/tests/qunit.js",
-		"/home/wlysenko/.virtualenvs/programmerHelper/lib/python3.4/site-packages/django/contrib/staticfiles/testing.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/lib/python3.4/site-packages/django/core/management/commands/runserver.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/lib/python3.4/site-packages/django/contrib/admin/tests.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/reports.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/templates/polls/admin/statistics.html",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/templates/polls/admin/_own_admin_breadcrumbs.html",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/templates/polls/admin/app_index.html",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/templates/polls/admin/poll_change_form.html",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/core/test.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/listfilters.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/tests/test_reports.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/tests/test_actions.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/tests/test_formsets.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/tests/test_forms.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/mylabour/datetime_utils.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/lib/python3.4/site-packages/pdfminer/pdfinterp.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/mylabour/utils.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/mylabour/admin_methods.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/actions.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/views.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/actions.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/management/commands/factory_test_polls.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/export_import_models/views.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/config/settings/development.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/export_import_models/templates/export_import_models/admin/import.html",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/export_import_models/templatetags/eim_templatefilters.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/export_import_models/templates/export_import_models/admin/export.html",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/export_import_models/static/export_import_models/js/export.js",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/export_import_models/static/export_import_models/css/import.css",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/export_import_models/templatetags/eim_templatetags.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/export_import_models/serializers/csv.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/export_import_models/static/export_import_models/js/export_import_models.js",
-		"/home/wlysenko/.virtualenvs/programmerHelper/lib/python3.4/site-packages/django/core/serializers/base.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/lib/python3.4/site-packages/django/core/serializers/python.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/lib/python3.4/site-packages/django/core/serializers/xml_serializer.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/config/admin.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/books/management/commands/factory_test_publishers.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/books/management/commands/create_publishers.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/pytest.ini",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/mylabour/utils.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/lib/python3.4/site-packages/faker/generator.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/books/migrations/0007_auto_20160829_1102.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/books/apps.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/books/constants.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/mylabour/fields_db.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/lib/python3.4/site-packages/suit/templates/admin/edit_inline/tabular.html",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/tasks.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/tests/test_admin.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/admin.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/tests/test_reports.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/reports.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/management/commands/factory_test_polls.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/books/listfilters.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/books/migrations/0004_auto_20160828_2042.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/books/migrations/0003_auto_20160828_1807.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/books/migrations/0005_remove_writer_death_year.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/books/management/commands/factory_test_writers.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/models.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/mylabour/widgets.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/config/urls.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/management/commands/create_levels_of_users.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/tags/management/commands/create_tags.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/forms.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/books/actions.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/management/commands/create_test_superuser.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/management/commands/factory_test_superusers.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/books/managers.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/books/tests/test_querysets.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/books/management/commands/factory_test_books.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/management/commands/factory_test_users.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/export_import_models/views.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/querysets.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/signals.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/tags/signals.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/books/tests/test_models.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/mylabour/logging_utils.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/replies/factories.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/apps.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/tags/apps.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/lib/python3.4/site-packages/django/apps/registry.py",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/models.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/mylabour/web_utils.py",
-		"/home/wlysenko/.jupyter/custom/custom.js",
-		"/home/wlysenko/.config/sublime-text-3/Packages/User/jpdb.sublime-snippet",
-		"/home/wlysenko/.virtualenvs/programmerHelper/lib/python3.4/site-packages/django/core/serializers/json.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/config/settings/base.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/factories.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/managers.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/export_import_models/serializers/__init__.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/requirements/development.txt",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/manage.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/export_import_models/templates/export_import_models/admin/import_result.html",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/export_import_models/static/export_import_models/css/eim_import.css",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/export_import_models/static/export_import_models/css/eim_export.css",
-		"/home/wlysenko/.virtualenvs/programmerHelper/lib/python3.4/site-packages/suit/templates/admin/base_site.html",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/export_import_models/templatetags/export_import_tags.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/export_import_models/forms.py",
-		"/home/wlysenko/Downloads/a.php",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/requirements/base.txt"
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/config/settings/development.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/tests/test_views.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/tests/test_actions.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/mylabour/test_utils.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/mylabour/text_utils.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/replies/querysets.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/books/validators.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/replies/admin.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/books/migrations/0002_auto_20160824_2018.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/books/tests/test_forms.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/books/tests/test_managers.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/lib/python3.4/site-packages/django/test/utils.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/lib/python3.4/site-packages/django/core/files/storage.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/media/books/справочник-смелого-человека-решившегося-пойти-против-течения-и-найти-себя-в-жизни-таким-как-есть/factory_book.jpeg",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/media/books/рыпрэхэндунт-векж-вэл-нэ-тальэ-прё/factory_book.jpeg",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/media/books/пхйложопхяа-торквюатоз-алььтыра-рыквюы-мыис-п/factory_book.jpeg",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/media/books/made-boring-stuff-with-python/factory_book.jpeg",
+		"/home/wlysenko/.virtualenvs/programmerHelper/lib/python3.4/site-packages/factory/django.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/lib/python3.4/site-packages/django/db/models/manager.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/lib/python3.4/site-packages/factory/base.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/lib/python3.4/site-packages/django/db/models/base.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/lib/python3.4/site-packages/factory/declarations.py"
 	],
 	"find":
 	{
@@ -1344,134 +1318,134 @@
 		"case_sensitive": true,
 		"find_history":
 		[
-			"shutil",
-			"tempfile",
-			"MEDIA_ROOT ",
-			"DEFAULT_FILE_STORAGE",
-			" = ''",
-			"MEDIA_ROOT",
+			"comments",
+			"values",
+			"create_logger_by_filename",
+			"cls.call_command('factory_test_users', '10')",
+			"utilities_with_count_opinions",
+			"marks",
+			"count_opinions",
+			"utilities_with_count_opinions",
+			"False",
+			"utility8",
+			"utility7",
+			"True",
+			"utility6",
+			"utility5",
+			"utility2",
+			"utility5",
+			"utility2",
+			"utility1",
+			"utility",
+			"Utility",
+			"user",
+			"category",
+			"utility",
+			"category",
+			"782595",
+			"count_opinions",
+			"545214",
+			"comments",
+			"325466",
+			"total_mark",
+			"get_total_mark",
+			"1525454",
+			"opinions",
+			"75454242",
+			"comments",
+			"del",
+			"comments",
+			"get_total_count_comments",
+			"78458754",
+			"count_utilities",
+			"11111",
+			"opinions",
+			"test_get_total_mark_if_has_utilities_without_opinions",
+			"utility.clear()",
+			"1",
+			"True",
+			"False",
+			"utmark",
+			"opinions",
+			"CommentFactory",
+			"comments",
+			"active_superuser",
+			"utility",
+			"get_count_comments",
+			"get_absolute_url",
+			"response",
+			"utility",
+			"ImageFieldFile",
+			"utility",
+			"UtilityCategory",
+			"UtilityCategoryFactory",
+			"UtilityCategory",
+			"True",
+			"CommentFactory",
+			"OpinionFactory",
+			"test_get_count_comments_if_has_comments",
+			"get_count_comments",
+			"CommentFactory",
+			"comments",
 			"second",
-			"), ",
-			"/",
-			"wlysenko",
-			"home/wlysenko",
-			"/",
-			"mock",
-			"path",
-			"upload_media",
-			"Ques",
-			"Test(",
-			"Test",
-			"10",
-			"15",
-			"@pytest.mark.xfail",
-			"def",
-			"get(",
-			"call_command",
-			"statistics",
-			"logger",
-			"create_logger_by_filename",
-			"otat",
-			"create_logger_by_filename",
-			"Writer",
-			"call_command",
-			"Writer",
-			"year_birth",
+			"category",
+			"utility",
+			"assertNotEqual",
+			"image",
+			"apps.utility",
+			"name",
 			"assertEqual",
-			"assertIsNone",
-			"WriterFactory",
-			"None",
-			"NumericRange",
-			"mock_now",
-			"mock",
-			"Very small range years between year of birth and year of death",
-			"Very small range years between year of birth and year of",
-			"Very small range years between year of birth and year of death of a writer.",
-			"year_death",
-			"assertRaisesMessage",
-			"NumericRange",
-			"dearth",
-			"year_death",
-			"Year death of a writer not possible in future.",
-			"1950",
-			"id",
-			"kwargs",
-			"books",
-			"Torn",
-			"message",
-			"year_death",
-			"convert",
-			"rating",
-			"link",
-			"year_death",
-			"year_birth",
-			"year_death",
-			"datetime",
-			"def",
-			"pytest",
-			"most_common_words_from_replies",
-			"set(",
-			"autorship",
-			"accounts",
-			"links",
-			"account",
-			"random_a",
-			"account",
-			"accounts",
-			"itte",
-			"itt",
-			"ritt",
-			"itte",
-			"ritt",
-			"itte",
-			"tte",
-			"itt",
-			"ugetext_lazy",
-			"tte",
-			"itter",
-			"Writter",
-			"itter",
-			"FIELDNAME",
-			"years_life",
-			"create_logger_by_filename",
-			"WritterFactory",
-			"count",
-			"BaseCommand",
-			"NOW_YEAR",
-			"seNOW_YEAR",
-			"NOW_YEAR",
-			"NumericRange",
-			"Tag",
-			"accounts_factory",
+			"utility",
+			"UtilityFactory",
+			"utility",
+			"UtilityCategory",
 			"EnhancedTestCase",
-			"accounts",
-			"call_command",
-			"get_model",
-			"get_model(",
-			"get_model",
-			"Client",
+			"request",
+			"get_queryset",
+			"hasattr",
+			"comments",
+			"count",
+			"total_count_opinions",
+			"utilities_with_count_opinions",
+			"utilities",
+			"comments",
+			"return",
+			"get_total_mark",
+			"total_",
+			"name",
+			", ",
+			"get_count_utilities",
+			"def",
+			"prefetch_related",
+			"total_count_comments",
+			"count_utilities",
+			"total_count_comments",
+			"total_count_opinions",
+			"total_count_comments",
+			"get_total_opinions",
+			"get_total_count_opinions",
+			"get_count_utilities",
+			"date_added",
+			"max_num",
 			"get_user_model",
-			"call_command",
-			"StaticLiveServerTestCase",
-			"cache",
-			"100",
-			"height",
-			"content",
-			"filebuffer",
-			"form",
-			"height",
-			"PlaceholderForm",
-			"forms",
-			"ExperimentalView",
-			"PlaceholderView",
-			"Pow",
-			"@pytest.mark.xfail(run=False)",
-			"PollAdminLiveTests",
-			"e_add",
-			"polls",
-			"btn_link",
-			"choice_",
-			"Export"
+			"max_num",
+			"user",
+			"account",
+			"user",
+			"AutosizedTextarea",
+			"CommentModel",
+			"CommentModelForm",
+			"description",
+			"field_name",
+			"generate_text_random_length_for_field_of_model",
+			"description",
+			"field_name = inspect.stack()[0][3]",
+			"model",
+			"model = self._LazyStub__model_class._meta.model",
+			"generate_text_random_length_for_field_of_model",
+			"generate_text_random_length_for_field",
+			"force_text",
+			"CommentInline"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -1585,7 +1559,7 @@
 	"groups":
 	[
 		{
-			"selected": 3,
+			"selected": 2,
 			"sheets":
 			[
 				{
@@ -1594,15 +1568,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 83104,
+						"buffer_size": 83722,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								54996,
-								54996
+								228,
+								228
 							]
 						],
 						"settings":
@@ -1625,26 +1599,36 @@
 							},
 							"bracket_highlighter.regions":
 							[
-								"bh_angle",
-								"bh_angle_center",
-								"bh_angle_open",
-								"bh_angle_close",
-								"bh_angle_content",
-								"bh_round",
-								"bh_round_center",
-								"bh_round_open",
-								"bh_round_close",
-								"bh_round_content",
+								"bh_default",
+								"bh_default_center",
+								"bh_default_open",
+								"bh_default_close",
+								"bh_default_content",
 								"bh_square",
 								"bh_square_center",
 								"bh_square_open",
 								"bh_square_close",
 								"bh_square_content",
-								"bh_unmatched",
-								"bh_unmatched_center",
-								"bh_unmatched_open",
-								"bh_unmatched_close",
-								"bh_unmatched_content",
+								"bh_curly",
+								"bh_curly_center",
+								"bh_curly_open",
+								"bh_curly_close",
+								"bh_curly_content",
+								"bh_single_quote",
+								"bh_single_quote_center",
+								"bh_single_quote_open",
+								"bh_single_quote_close",
+								"bh_single_quote_content",
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
+								"bh_regex_content",
+								"bh_c_define",
+								"bh_c_define_center",
+								"bh_c_define_open",
+								"bh_c_define_close",
+								"bh_c_define_content",
 								"bh_double_quote",
 								"bh_double_quote_center",
 								"bh_double_quote_open",
@@ -1655,31 +1639,21 @@
 								"bh_tag_open",
 								"bh_tag_close",
 								"bh_tag_content",
-								"bh_curly",
-								"bh_curly_center",
-								"bh_curly_open",
-								"bh_curly_close",
-								"bh_curly_content",
-								"bh_c_define",
-								"bh_c_define_center",
-								"bh_c_define_open",
-								"bh_c_define_close",
-								"bh_c_define_content",
-								"bh_regex",
-								"bh_regex_center",
-								"bh_regex_open",
-								"bh_regex_close",
-								"bh_regex_content",
-								"bh_single_quote",
-								"bh_single_quote_center",
-								"bh_single_quote_open",
-								"bh_single_quote_close",
-								"bh_single_quote_content",
-								"bh_default",
-								"bh_default_center",
-								"bh_default_open",
-								"bh_default_close",
-								"bh_default_content"
+								"bh_angle",
+								"bh_angle_center",
+								"bh_angle_open",
+								"bh_angle_close",
+								"bh_angle_content",
+								"bh_unmatched",
+								"bh_unmatched_center",
+								"bh_unmatched_open",
+								"bh_unmatched_close",
+								"bh_unmatched_content",
+								"bh_round",
+								"bh_round_center",
+								"bh_round_open",
+								"bh_round_close",
+								"bh_round_content"
 							],
 							"color_scheme": "Packages/User/Color Highlighter/themes/Monokai Extended Bright (SL).tmTheme",
 							"syntax": "Packages/Text/Plain text.tmLanguage",
@@ -1687,10 +1661,10 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 23374.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 4,
+					"stack_index": 3,
 					"type": "text"
 				},
 				{
@@ -1699,15 +1673,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 179,
+						"buffer_size": 192,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								127,
-								127
+								0,
+								0
 							]
 						],
 						"settings":
@@ -1717,12 +1691,27 @@
 							{
 								"close":
 								{
+									"1":
+									[
+										7,
+										8
+									]
 								},
 								"icon":
 								{
+									"1":
+									[
+										"Packages/BracketHighlighter/icons/square_bracket.png",
+										"brackethighlighter.default"
+									]
 								},
 								"open":
 								{
+									"1":
+									[
+										0,
+										1
+									]
 								},
 								"unmatched":
 								{
@@ -1730,63 +1719,62 @@
 							},
 							"bracket_highlighter.regions":
 							[
-								"bh_angle",
-								"bh_angle_center",
-								"bh_angle_open",
-								"bh_angle_close",
-								"bh_angle_content",
-								"bh_round",
-								"bh_round_center",
-								"bh_round_open",
-								"bh_round_close",
-								"bh_round_content",
-								"bh_square",
-								"bh_square_center",
-								"bh_square_open",
-								"bh_square_close",
-								"bh_square_content",
-								"bh_unmatched",
-								"bh_unmatched_center",
-								"bh_unmatched_open",
-								"bh_unmatched_close",
-								"bh_unmatched_content",
-								"bh_double_quote",
-								"bh_double_quote_center",
-								"bh_double_quote_open",
-								"bh_double_quote_close",
-								"bh_double_quote_content",
-								"bh_tag",
-								"bh_tag_center",
-								"bh_tag_open",
-								"bh_tag_close",
-								"bh_tag_content",
-								"bh_curly",
-								"bh_curly_center",
-								"bh_curly_open",
-								"bh_curly_close",
-								"bh_curly_content",
-								"bh_c_define",
-								"bh_c_define_center",
-								"bh_c_define_open",
-								"bh_c_define_close",
-								"bh_c_define_content",
+								"bh_default",
+								"bh_default_center",
+								"bh_default_open",
+								"bh_default_close",
+								"bh_default_content",
 								"bh_regex",
 								"bh_regex_center",
 								"bh_regex_open",
 								"bh_regex_close",
 								"bh_regex_content",
+								"bh_double_quote",
+								"bh_double_quote_center",
+								"bh_double_quote_open",
+								"bh_double_quote_close",
+								"bh_double_quote_content",
+								"bh_square",
+								"bh_square_center",
+								"bh_square_open",
+								"bh_square_close",
+								"bh_square_content",
+								"bh_angle",
+								"bh_angle_center",
+								"bh_angle_open",
+								"bh_angle_close",
+								"bh_angle_content",
+								"bh_curly",
+								"bh_curly_center",
+								"bh_curly_open",
+								"bh_curly_close",
+								"bh_curly_content",
+								"bh_unmatched",
+								"bh_unmatched_center",
+								"bh_unmatched_open",
+								"bh_unmatched_close",
+								"bh_unmatched_content",
+								"bh_c_define",
+								"bh_c_define_center",
+								"bh_c_define_open",
+								"bh_c_define_close",
+								"bh_c_define_content",
+								"bh_tag",
+								"bh_tag_center",
+								"bh_tag_open",
+								"bh_tag_close",
+								"bh_tag_content",
+								"bh_round",
+								"bh_round_center",
+								"bh_round_open",
+								"bh_round_close",
+								"bh_round_content",
 								"bh_single_quote",
 								"bh_single_quote_center",
 								"bh_single_quote_open",
 								"bh_single_quote_close",
-								"bh_single_quote_content",
-								"bh_default",
-								"bh_default_center",
-								"bh_default_open",
-								"bh_default_close",
-								"bh_default_content"
+								"bh_single_quote_content"
 							],
-							"color_scheme": "Packages/User/Color Highlighter/themes/Monokai Extended Bright (SL).tmTheme",
 							"editorconfig": true,
 							"ensure_newline_at_eof_on_save": true,
 							"syntax": "Packages/EditorConfig/INI.tmLanguage",
@@ -1798,24 +1786,24 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 2,
+					"stack_index": 1,
 					"type": "text"
 				},
 				{
 					"buffer": 2,
-					"file": "apps/books/tests/test_models.py",
+					"file": "apps/utilities/tests/test_querysets.py",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 17848,
+						"buffer_size": 7737,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								9947,
-								9947
+								6474,
+								6474
 							]
 						],
 						"settings":
@@ -1827,15 +1815,15 @@
 								{
 									"1":
 									[
-										9946,
-										9947
+										6477,
+										6478
 									]
 								},
 								"icon":
 								{
 									"1":
 									[
-										"Packages/BracketHighlighter/icons/round_bracket.png",
+										"Packages/BracketHighlighter/icons/single_quote.png",
 										"brackethighlighter.default"
 									]
 								},
@@ -1843,8 +1831,8 @@
 								{
 									"1":
 									[
-										9945,
-										9946
+										6462,
+										6463
 									]
 								},
 								"unmatched":
@@ -1853,61 +1841,61 @@
 							},
 							"bracket_highlighter.regions":
 							[
-								"bh_angle",
-								"bh_angle_center",
-								"bh_angle_open",
-								"bh_angle_close",
-								"bh_angle_content",
-								"bh_round",
-								"bh_round_center",
-								"bh_round_open",
-								"bh_round_close",
-								"bh_round_content",
-								"bh_square",
-								"bh_square_center",
-								"bh_square_open",
-								"bh_square_close",
-								"bh_square_content",
-								"bh_unmatched",
-								"bh_unmatched_center",
-								"bh_unmatched_open",
-								"bh_unmatched_close",
-								"bh_unmatched_content",
-								"bh_double_quote",
-								"bh_double_quote_center",
-								"bh_double_quote_open",
-								"bh_double_quote_close",
-								"bh_double_quote_content",
-								"bh_tag",
-								"bh_tag_center",
-								"bh_tag_open",
-								"bh_tag_close",
-								"bh_tag_content",
-								"bh_curly",
-								"bh_curly_center",
-								"bh_curly_open",
-								"bh_curly_close",
-								"bh_curly_content",
-								"bh_c_define",
-								"bh_c_define_center",
-								"bh_c_define_open",
-								"bh_c_define_close",
-								"bh_c_define_content",
+								"bh_default",
+								"bh_default_center",
+								"bh_default_open",
+								"bh_default_close",
+								"bh_default_content",
 								"bh_regex",
 								"bh_regex_center",
 								"bh_regex_open",
 								"bh_regex_close",
 								"bh_regex_content",
+								"bh_double_quote",
+								"bh_double_quote_center",
+								"bh_double_quote_open",
+								"bh_double_quote_close",
+								"bh_double_quote_content",
+								"bh_square",
+								"bh_square_center",
+								"bh_square_open",
+								"bh_square_close",
+								"bh_square_content",
+								"bh_angle",
+								"bh_angle_center",
+								"bh_angle_open",
+								"bh_angle_close",
+								"bh_angle_content",
+								"bh_curly",
+								"bh_curly_center",
+								"bh_curly_open",
+								"bh_curly_close",
+								"bh_curly_content",
+								"bh_unmatched",
+								"bh_unmatched_center",
+								"bh_unmatched_open",
+								"bh_unmatched_close",
+								"bh_unmatched_content",
+								"bh_c_define",
+								"bh_c_define_center",
+								"bh_c_define_open",
+								"bh_c_define_close",
+								"bh_c_define_content",
+								"bh_tag",
+								"bh_tag_center",
+								"bh_tag_open",
+								"bh_tag_close",
+								"bh_tag_content",
+								"bh_round",
+								"bh_round_center",
+								"bh_round_open",
+								"bh_round_close",
+								"bh_round_content",
 								"bh_single_quote",
 								"bh_single_quote_center",
 								"bh_single_quote_open",
 								"bh_single_quote_close",
-								"bh_single_quote_content",
-								"bh_default",
-								"bh_default_center",
-								"bh_default_open",
-								"bh_default_close",
-								"bh_default_content"
+								"bh_single_quote_content"
 							],
 							"color_scheme": "Packages/User/Color Highlighter/themes/Monokai Extended Bright (SL).tmTheme",
 							"editorconfig": true,
@@ -1918,135 +1906,27 @@
 							"trim_trailing_white_space_on_save": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 2404.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 1,
-					"type": "text"
-				},
-				{
-					"buffer": 3,
-					"file": "mylabour/test_utils.py",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 3702,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1142,
-								1142
-							]
-						],
-						"settings":
-						{
-							"bracket_highlighter.busy": false,
-							"bracket_highlighter.locations":
-							{
-								"close":
-								{
-								},
-								"icon":
-								{
-								},
-								"open":
-								{
-								},
-								"unmatched":
-								{
-								}
-							},
-							"bracket_highlighter.regions":
-							[
-								"bh_angle",
-								"bh_angle_center",
-								"bh_angle_open",
-								"bh_angle_close",
-								"bh_angle_content",
-								"bh_round",
-								"bh_round_center",
-								"bh_round_open",
-								"bh_round_close",
-								"bh_round_content",
-								"bh_square",
-								"bh_square_center",
-								"bh_square_open",
-								"bh_square_close",
-								"bh_square_content",
-								"bh_unmatched",
-								"bh_unmatched_center",
-								"bh_unmatched_open",
-								"bh_unmatched_close",
-								"bh_unmatched_content",
-								"bh_double_quote",
-								"bh_double_quote_center",
-								"bh_double_quote_open",
-								"bh_double_quote_close",
-								"bh_double_quote_content",
-								"bh_tag",
-								"bh_tag_center",
-								"bh_tag_open",
-								"bh_tag_close",
-								"bh_tag_content",
-								"bh_curly",
-								"bh_curly_center",
-								"bh_curly_open",
-								"bh_curly_close",
-								"bh_curly_content",
-								"bh_c_define",
-								"bh_c_define_center",
-								"bh_c_define_open",
-								"bh_c_define_close",
-								"bh_c_define_content",
-								"bh_regex",
-								"bh_regex_center",
-								"bh_regex_open",
-								"bh_regex_close",
-								"bh_regex_content",
-								"bh_single_quote",
-								"bh_single_quote_center",
-								"bh_single_quote_open",
-								"bh_single_quote_close",
-								"bh_single_quote_content",
-								"bh_default",
-								"bh_default_center",
-								"bh_default_open",
-								"bh_default_close",
-								"bh_default_content"
-							],
-							"color_scheme": "Packages/User/Color Highlighter/themes/Monokai Extended Bright (SL).tmTheme",
-							"editorconfig": true,
-							"ensure_newline_at_eof_on_save": true,
-							"syntax": "Packages/Djaneiro/Syntaxes/Python Django.tmLanguage",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true,
-							"trim_trailing_white_space_on_save": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 378.0,
+						"translation.y": 1526.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 0,
 					"type": "text"
 				},
 				{
-					"buffer": 4,
-					"file": "apps/books/models.py",
+					"buffer": 3,
+					"file": "apps/utilities/querysets.py",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 9618,
+						"buffer_size": 3793,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								2645,
-								2645
+								2258,
+								2141
 							]
 						],
 						"settings":
@@ -2058,8 +1938,18 @@
 								{
 									"1":
 									[
-										2690,
-										2691
+										3082,
+										3083
+									],
+									"2":
+									[
+										3230,
+										3231
+									],
+									"3":
+									[
+										3230,
+										3231
 									]
 								},
 								"icon":
@@ -2068,14 +1958,34 @@
 									[
 										"Packages/BracketHighlighter/icons/round_bracket.png",
 										"brackethighlighter.default"
+									],
+									"2":
+									[
+										"Packages/BracketHighlighter/icons/double_quote.png",
+										"brackethighlighter.default"
+									],
+									"3":
+									[
+										"Packages/BracketHighlighter/icons/double_quote.png",
+										"brackethighlighter.default"
 									]
 								},
 								"open":
 								{
 									"1":
 									[
-										2383,
-										2384
+										3066,
+										3067
+									],
+									"2":
+									[
+										3010,
+										3011
+									],
+									"3":
+									[
+										3010,
+										3011
 									]
 								},
 								"unmatched":
@@ -2084,61 +1994,61 @@
 							},
 							"bracket_highlighter.regions":
 							[
-								"bh_angle",
-								"bh_angle_center",
-								"bh_angle_open",
-								"bh_angle_close",
-								"bh_angle_content",
-								"bh_round",
-								"bh_round_center",
-								"bh_round_open",
-								"bh_round_close",
-								"bh_round_content",
-								"bh_square",
-								"bh_square_center",
-								"bh_square_open",
-								"bh_square_close",
-								"bh_square_content",
-								"bh_unmatched",
-								"bh_unmatched_center",
-								"bh_unmatched_open",
-								"bh_unmatched_close",
-								"bh_unmatched_content",
-								"bh_double_quote",
-								"bh_double_quote_center",
-								"bh_double_quote_open",
-								"bh_double_quote_close",
-								"bh_double_quote_content",
-								"bh_tag",
-								"bh_tag_center",
-								"bh_tag_open",
-								"bh_tag_close",
-								"bh_tag_content",
-								"bh_curly",
-								"bh_curly_center",
-								"bh_curly_open",
-								"bh_curly_close",
-								"bh_curly_content",
-								"bh_c_define",
-								"bh_c_define_center",
-								"bh_c_define_open",
-								"bh_c_define_close",
-								"bh_c_define_content",
+								"bh_default",
+								"bh_default_center",
+								"bh_default_open",
+								"bh_default_close",
+								"bh_default_content",
 								"bh_regex",
 								"bh_regex_center",
 								"bh_regex_open",
 								"bh_regex_close",
 								"bh_regex_content",
+								"bh_double_quote",
+								"bh_double_quote_center",
+								"bh_double_quote_open",
+								"bh_double_quote_close",
+								"bh_double_quote_content",
+								"bh_square",
+								"bh_square_center",
+								"bh_square_open",
+								"bh_square_close",
+								"bh_square_content",
+								"bh_angle",
+								"bh_angle_center",
+								"bh_angle_open",
+								"bh_angle_close",
+								"bh_angle_content",
+								"bh_curly",
+								"bh_curly_center",
+								"bh_curly_open",
+								"bh_curly_close",
+								"bh_curly_content",
+								"bh_unmatched",
+								"bh_unmatched_center",
+								"bh_unmatched_open",
+								"bh_unmatched_close",
+								"bh_unmatched_content",
+								"bh_c_define",
+								"bh_c_define_center",
+								"bh_c_define_open",
+								"bh_c_define_close",
+								"bh_c_define_content",
+								"bh_tag",
+								"bh_tag_center",
+								"bh_tag_open",
+								"bh_tag_close",
+								"bh_tag_content",
+								"bh_round",
+								"bh_round_center",
+								"bh_round_open",
+								"bh_round_close",
+								"bh_round_content",
 								"bh_single_quote",
 								"bh_single_quote_center",
 								"bh_single_quote_open",
 								"bh_single_quote_close",
-								"bh_single_quote_content",
-								"bh_default",
-								"bh_default_center",
-								"bh_default_open",
-								"bh_default_close",
-								"bh_default_content"
+								"bh_single_quote_content"
 							],
 							"color_scheme": "Packages/User/Color Highlighter/themes/Monokai Extended Bright (SL).tmTheme",
 							"editorconfig": true,
@@ -2149,10 +2059,10 @@
 							"trim_trailing_white_space_on_save": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 1162.0,
+						"translation.y": 952.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 3,
+					"stack_index": 2,
 					"type": "text"
 				}
 			]

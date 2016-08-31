@@ -17,6 +17,6 @@ class ExtendedBaseCommand(BaseCommand):
 
         value = int(value)
         if value not in range(1, 1000, 1):
-            msg = '%d is an invalid positive integer in range from 1 to 999'
+            msg = 'Count must be integer in range from 1 to 999 (passed %d)'
             raise argparse.ArgumentTypeError(msg % value)
         return value
