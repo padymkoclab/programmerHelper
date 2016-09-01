@@ -3,7 +3,6 @@ from mylabour.basecommands import ExtendedBaseCommand
 from mylabour.logging_utils import create_logger_by_filename
 
 from apps.users.factories import UserFactory
-from apps.users.models import User
 
 
 logger = create_logger_by_filename(__name__)
@@ -25,7 +24,7 @@ class Command(ExtendedBaseCommand):
     def handle(self, *args, **kwargs):
 
         # clear all records, about the levels of users, in database
-        User.objects.filter().delete()
+        # User.objects.filter().delete()
 
         # create levels of users
         count_objects = kwargs['count_objects'][0]

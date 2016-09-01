@@ -51,7 +51,6 @@ class UtilityFactory(factory.DjangoModelFactory):
     class Meta:
         model = Utility
 
-    category = fuzzy.FuzzyChoice(UtilityCategory.objects.all())
     web_link = factory.Faker('url', locale='en')
 
     @classmethod
@@ -59,6 +58,10 @@ class UtilityFactory(factory.DjangoModelFactory):
         super(UtilityFactory, cls)._after_postgeneration(obj, create, results)
         qs = obj.__class__._default_manager.filter(pk=obj.pk)
         qs.update(date_modified=fuzzy.FuzzyDateTime(obj.date_added, NOW).fuzz())
+
+    @factory.lazy_attribute
+    def category(self):
+        return fuzzy.FuzzyChoice(UtilityCategory.objects.all()).fuzz()
 
     @factory.lazy_attribute
     def name(self):

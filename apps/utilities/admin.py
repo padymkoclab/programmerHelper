@@ -1,4 +1,6 @@
 
+from django.http import HttpResponse
+from django.conf.urls import url
 from django.utils.text import force_text
 from django.template.defaultfilters import truncatechars
 from django.utils.translation import ugettext_lazy as _
@@ -115,10 +117,24 @@ class UtilityCategoryAdmin(admin.ModelAdmin):
             return [inline(self.model, self.admin_site) for inline in inlines]
         return []
 
+    def get_urls(self):
+
+        urls = super().get_urls()
+
+        additional_urls = [
+            url(r'/admin/utilities/statistics/', self.statistics_view, {}, 'admin_utilities_statistics'),
+        ]
+
+        return additional_urls + urls
+
+    def statistics_view(self, request):
+
+        return HttpResponse('Nice')
+
 
 class UtilityAdmin(admin.ModelAdmin):
     '''
-        Admin View for Utility
+    Admin View for Utility
     '''
 
     form = UtilityAdminModelForm

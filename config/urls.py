@@ -1,12 +1,12 @@
 
 from django.conf import settings
 from django.conf.urls.static import static
-from django.views.decorators.cache import cache_page
+# from django.views.decorators.cache import cache_page
 from django.conf.urls import url, include
 from django.views.i18n import javascript_catalog
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
-from django_js_reverse.views import urls_js
+# from django_js_reverse.views import urls_js
 
 from .admin import AdminSite
 from .views import IndexView, PlaceholderView
@@ -26,7 +26,7 @@ urlpatterns = [
     # project
     url(r'^$', IndexView.as_view(), {}, 'index'),
     url(r'^image/(?P<height>\d+)x(?P<width>\d+)/$', PlaceholderView.as_view(), {}, 'placeholder'),
-    url(r'^django_js_reverse/$', cache_page(3600)(urls_js), name='django_js_reverse'),
+    # url(r'^django_js_reverse/$', cache_page(3600)(urls_js), name='django_js_reverse'),
 
     # apps
     url(r'^users/', include('apps.users.urls')),

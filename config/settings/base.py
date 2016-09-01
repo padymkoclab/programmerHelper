@@ -21,7 +21,6 @@ SECRET_KEY = get_secret_value_for_setting_from_file(filename='secrets.json', set
 # Application definition
 
 DJANGO_APPS = [
-    'suit',
     'django.contrib.admin.apps.SimpleAdminConfig',  # disable auto-discovery
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -60,13 +59,12 @@ MY_APPS = [
 ]
 
 THIRD_PARTY_APPS = [
-    'django_cleanup',
-    'djangobower',
-    'django_js_reverse',
-    'django_gravatar',
+#     'django_js_reverse',
+#     'django_gravatar',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + MY_APPS
+INSTALLED_APPS.insert(0, 'suit')
 
 # Project settings
 
@@ -222,7 +220,6 @@ STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
 STATICFILES_FINDERS = [
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-    'djangobower.finders.BowerFinder',
 ]
 
 MEDIA_URL = '/media/'

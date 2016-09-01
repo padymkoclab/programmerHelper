@@ -106,9 +106,6 @@ class StaticLiveAdminTest(StaticLiveServerTestCase):
     def setUpClass(cls):
         super(StaticLiveAdminTest, cls).setUpClass()
 
-        # cls.call_command('factory_test_superusers', '1')
-        # cls.active_superuser = cls.django_user_model.objects.get()
-
     def setUp(self):
 
         # create and start an invisible web-server
@@ -139,7 +136,7 @@ class StaticLiveAdminTest(StaticLiveServerTestCase):
         client = self.client_class()
 
         self.call_command('factory_test_superusers', '1')
-        self.active_superuser = self.django_user_model.objects.get()
+        self.active_superuser = self.django_user_model.objects.filter(is_active=True, is_superuser=True).first()
 
         client.force_login(self.active_superuser)
         cookie = client.cookies['sessionid']

@@ -1,5 +1,4 @@
 
-
 from mylabour.test_utils import EnhancedTestCase
 
 from apps.comments.factories import CommentFactory
@@ -223,9 +222,6 @@ class UtilityQuerySetTests(EnhancedTestCase):
         for utility in Utility.objects.all():
             utility.opinions.clear()
             utility.comments.clear()
-
-        if Utility.objects.count() == 0:
-            import pdb; pdb.set_trace()
 
         cls.utility1, cls.utility2, cls.utility3, cls.utility4, cls.utility5,\
             cls.utility6, cls.utility7, cls.utility8, cls.utility9 = Utility.objects.all()
