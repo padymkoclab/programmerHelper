@@ -1,0 +1,42 @@
+
+#content h1:nth-child(1){
+    text-align: center;
+    border-bottom: 2px solid rgb(34, 34, 34);
+}
+
+#statistics table caption{
+    font-size: 15px;
+    padding: 10px 0;
+    font-weight: bold;
+}
+
+.div_chart_objects table tr th:first-child{
+    width:  20px;
+}
+
+#table_container{
+    width: 100%;
+}
+
+#table_container table{
+    margin: 0 auto;
+    min-width: 450px;
+}
+
+    #table_container table td:nth-child(1){
+        text-align: left;
+    }
+
+    #table_container table td:nth-child(2){
+        text-align: right;
+    }
+
+.div_chart{
+    margin-top: 37px;
+}
+
+.chart_and_objects, .div_basic_info{
+    padding: 5px;
+    margin:  10px;
+    border:  2px solid rgb(255, 255, 255);
+}

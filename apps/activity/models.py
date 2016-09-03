@@ -7,8 +7,6 @@ from django.utils.translation import ugettext_lazy as _
 from django.db import models
 from django.conf import settings
 
-from model_utils import Choices
-
 from .managers import ActivityManager
 
 
@@ -17,11 +15,16 @@ class Activity(models.Model):
 
     """
 
-    CHOICES_FLAGS = Choices(
-        ('USER', _('Working with profile')),
-        ('ADD', _('Adding')),
-        ('UPDT', _('Updating')),
-        ('DEL', _('Deleting')),
+    USER = 'USER'
+    ADD = 'ADD'
+    UPDT = 'UPDT'
+    DEL = 'DEL'
+
+    CHOICES_FLAGS = (
+        (USER, _('Working with profile')),
+        (ADD, _('Adding')),
+        (UPDT, _('Updating')),
+        (DEL, _('Deleting')),
     )
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

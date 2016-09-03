@@ -1,0 +1,43 @@
+
+{% extends "admin/base_site.html" %}
+
+{% load i18n %}
+{% load static %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  <link rel="stylesheet" href="{% static 'project/css/admin/statistics.css' %}">
+{% endblock extrastyle %}
+
+{% block extrahead %}
+  {{ block.super }}
+  <script src="{% static 'project/js/pygal-tooltips.min.js' %}" type="text/javascript"></script>
+{% endblock extrahead %}
+
+{% block breadcrumbs %}
+  <ul class="breadcrumb">
+    <li>
+        <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+        <span class="divider">&raquo;</span>
+    </li>
+    <li>
+        <a href="{% url 'admin:app_list' app_label=app_label %}">{{ app_name }}</a>
+        <span class="divider">&raquo;</span>
+    </li>
+    <li class="active">
+      {% trans "Statistics" %}
+    </li>
+  </ul>
+{% endblock %}
+
+
+{% block content %}
+  <div id="content">
+      <h1>{% trans "Statistics" %}</h1>
+      <div id="statistics">
+        {% block statistics %}
+
+        {% endblock statistics %}
+      </div>
+  </div>
+{% endblock content %}

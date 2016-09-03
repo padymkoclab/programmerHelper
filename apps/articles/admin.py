@@ -62,7 +62,7 @@ class ArticleAdmin(admin.ModelAdmin):
             ]
         }),
         (_('Status'), {
-            'fields': ['status', 'status_changed']
+            'fields': ['status']
         }),
         (_('Header'), {
             'fields': ['quotation', 'header']
@@ -74,7 +74,6 @@ class ArticleAdmin(admin.ModelAdmin):
     filter_horizontal = ['tags']
     # filter_vertical = ['links']
     date_hierarchy = 'date_added'
-    readonly_fields = ['status_changed']
     prepopulated_fields = {'slug': ['title']}
 
     def get_queryset(self, request):

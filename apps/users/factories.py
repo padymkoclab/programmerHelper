@@ -25,7 +25,7 @@ class UserFactory(factory.DjangoModelFactory):
     username = factory.Faker('name', locale='en')
     date_birthday = factory.Faker('date', locale='ru')
     real_name = factory.Faker('first_name', locale='ru')
-    gender = fuzzy.FuzzyChoice(User.CHOICES_GENDER._db_values)
+    gender = fuzzy.FuzzyChoice([value for value, label in User.CHOICES_GENDER])
 
     password = factory.PostGenerationMethodCall('set_password', 'defaultpassword')
 

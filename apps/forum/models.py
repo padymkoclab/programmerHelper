@@ -5,8 +5,6 @@ from django.utils.translation import ugettext_lazy as _
 from django.db import models
 from django.conf import settings
 
-from model_utils import Choices
-from model_utils.models import MonitorField, StatusField
 from autoslug import AutoSlugField
 
 from mylabour.models import TimeStampedModel
@@ -62,9 +60,12 @@ class ForumTopic(TimeStampedModel):
 
     """
 
-    CHOICES_STATUS = Choices(
-        ('closed', _('Closed')),
-        ('open', _('Open')),
+    CLOSED = 'CLOSED'
+    OPEN = 'OPEN'
+
+    CHOICES_STATUS = (
+        (CLOSED, _('Closed')),
+        (OPEN, _('Open')),
     )
 
     name = models.CharField(
@@ -80,8 +81,7 @@ class ForumTopic(TimeStampedModel):
         limit_choices_to={'is_superuser': True, 'is_active': True},
     )
     description = models.TextField(_('Description'))
-    status = StatusField(verbose_name=_('Status'), choices_name='CHOICES_STATUS', default=CHOICES_STATUS.open)
-    status_changed = MonitorField(verbose_name=_('Status changed'), monitor='status')
+    status = models.CharField(_('Status'), max_length=10, choices=CHOICES_STATUS, default=OPEN)
     views = models.IntegerField(_('Count views'), default=0, editable=False)
 
     # managers
@@ -127,7 +127,7 @@ class ForumPost(TimeStampedModel):
         verbose_name=_('Topic'),
         on_delete=models.CASCADE,
         related_name='posts',
-        limit_choices_to={'status': ForumTopic.CHOICES_STATUS.open},
+        limit_choices_to={'status': ForumTopic.OPEN},
     )
     author = models.ForeignKey(
         settings.AUTH_USER_MODEL,

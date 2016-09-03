@@ -9,9 +9,9 @@ SHELL_PLUS = 'ipython'
 
 # additional autoload
 SHELL_PLUS_PRE_IMPORTS = (
-    ('mylabour', 'utils'),
     ('django.template', ('Template', 'Context')),
     ('django.contrib', 'admin'),
+    ('django.apps', 'apps'),
 )
 
 # what needn`t rename in time autoload

@@ -1,0 +1,39 @@
+/* Common styles */
+
+.clear{
+    clear: both;
+}
+
+/* Styles for page PDF-report */
+
+:root{
+    --block-font-size: 15px;
+}
+
+#table_radio_group_select_report{
+    min-width: 250px;
+}
+
+    #table_radio_group_select_report caption{
+        font-size: 17px;
+        padding: 7px 0;
+    }
+
+    #table_radio_group_select_report td span{
+        font-size: var(--block-font-size);
+        position: relative;
+        left: 10px;
+        top: 4px;
+    }
+
+    #table_radio_group_select_report input[type="submit"]{
+        float: right;
+        background-color: Transparent;
+        background-repeat: no-repeat;
+        border: none;
+        cursor: pointer;
+        overflow: hidden;
+        outline: none;
+        font-size: var(--block-font-size);
+        font-weight: bold;
+    }

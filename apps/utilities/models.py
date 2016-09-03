@@ -13,6 +13,7 @@ from apps.comments.models import Comment
 from apps.opinions.models import Opinion
 
 from .querysets import UtilityQuerySet, UtilityCategoryQuerySet
+from .managers import UtilityCategoryManager, UtilityManager
 
 
 class UtilityCategory(TimeStampedModel):
@@ -42,7 +43,7 @@ class UtilityCategory(TimeStampedModel):
         ordering = ['name']
 
     objects = models.Manager()
-    objects = UtilityCategoryQuerySet.as_manager()
+    objects = UtilityCategoryManager.from_queryset(UtilityCategoryQuerySet)()
 
     def __str__(self):
         return '{0.name}'.format(self)
@@ -129,7 +130,7 @@ class Utility(TimeStampedModel):
         unique_together = ['category', 'name']
 
     objects = models.Manager()
-    objects = UtilityQuerySet.as_manager()
+    objects = UtilityManager.from_queryset(UtilityQuerySet)()
 
     def __str__(self):
         return '{0.name}'.format(self)

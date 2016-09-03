@@ -11,8 +11,6 @@ from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.db import models
 from django.conf import settings
 
-from model_utils import Choices
-
 from apps.polls.managers import PollsManager
 from apps.polls.querysets import UserPollQuerySet
 from apps.articles.models import Article
@@ -34,21 +32,36 @@ class UserLevel(models.Model):
 
     """
 
-    CHOICES_LEVEL = Choices(
-        ('platinum', _('Platinum')),
-        ('golden', _('Gold')),
-        ('silver', _('Silver')),
-        ('diamond', _('Diamond')),
-        ('ruby', _('Ruby')),
-        ('sapphire', _('Sapphire')),
-        ('malachite', _('Malachite')),
-        ('amethyst', _('Amethyst')),
-        ('emerald', _('Emerald')),
-        ('agate', _('Agate')),
-        ('turquoise', _('Turquoise')),
-        ('amber', _('Amber')),
-        ('opal', _('Opal')),
-        ('regular', _('Regular')),
+    PLATINUM = 'PLATINUM'
+    GOLDEN = 'GOLDEN'
+    SILVER = 'SILVER'
+    DIAMOND = 'DIAMOND'
+    RUBY = 'RUBY'
+    SAPPHIRE = 'SAPPHIRE'
+    MALACHITE = 'MALACHITE'
+    AMETHYST = 'AMETHYST'
+    EMERALD = 'EMERALD'
+    AGATE = 'AGATE'
+    TURQUOISE = 'TURQUOISE'
+    AMBER = 'AMBER'
+    OPAL = 'OPAL'
+    REGULAR = 'REGULAR'
+
+    CHOICES_LEVEL = (
+        (PLATINUM, _('Platinum')),
+        (GOLDEN, _('Gold')),
+        (SILVER, _('Silver')),
+        (DIAMOND, _('Diamond')),
+        (RUBY, _('Ruby')),
+        (SAPPHIRE, _('Sapphire')),
+        (MALACHITE, _('Malachite')),
+        (AMETHYST, _('Amethyst')),
+        (EMERALD, _('Emerald')),
+        (AGATE, _('Agate')),
+        (TURQUOISE, _('Turquoise')),
+        (AMBER, _('Amber')),
+        (OPAL, _('Opal')),
+        (REGULAR, _('Regular')),
     )
 
     id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
@@ -80,9 +93,12 @@ class User(AbstractBaseUser, PermissionsMixin):
     Custom auth user model with additional fields and username fields as email
     """
 
-    CHOICES_GENDER = Choices(
-        ('man', _('Man')),
-        ('woman', _('Woman')),
+    MAN = 'MAN'
+    WOMAN = 'WOMAN'
+
+    CHOICES_GENDER = (
+        (MAN, _('Man')),
+        (WOMAN, _('Woman')),
     )
 
     # user detail
@@ -106,7 +122,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         'UserLevel',
         verbose_name='Level',
         related_name='users',
-        default=UserLevel.CHOICES_LEVEL.regular,
+        default=UserLevel.REGULAR,
         to_field='name',
         on_delete=models.PROTECT,
     )
@@ -119,14 +135,16 @@ class User(AbstractBaseUser, PermissionsMixin):
     personal_website = models.URLField(_('Personal website'), default='')
 
     # private fields
-    gender = models.CharField(
-        _('Gender'), max_length=50, choices=CHOICES_GENDER, default=CHOICES_GENDER.man
-    )
+    gender = models.CharField(_('Gender'), max_length=50, choices=CHOICES_GENDER, default=MAN)
     date_birthday = models.DateField(_('Date birthday'))
     real_name = models.CharField(_('Real name'), max_length=200, default='')
 
     # phone = PhoneField(_('Phone'), default='')
     # ваши направления развития верстка, программирование
+    # What are you technologies using?
+    # What you will read?
+    # What you read already?
+    # create own diarly
     # biography (date birth not mention)
 
     USERNAME_FIELD = 'email'

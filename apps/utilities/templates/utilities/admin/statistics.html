@@ -1,0 +1,115 @@
+
+{% extends "admin/statistics.html" %}
+
+{% load i18n %}
+{% load static %}
+
+{% block statistics %}
+
+  <div class="div_basic_info">
+
+    <table id="table_container">
+      <tr>
+        <td>
+          <table class="table-overview applist">
+            <caption>{% trans "Categories of utilities" %}</caption>
+            <tbody>
+              <tr>
+                <td>{% trans "Count categories" %}</td>
+                <td>{{ statistics_data.count_categories }}</td>
+              </tr>
+              <tr>
+                <td>{% trans "Average count utilities in categories" %}</td>
+                <td>{{ statistics_data.avg_count_utilities_in_categories }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </td>
+        <td>
+          <table class="table-overview applist">
+            <caption>{% trans "Utilities" %}</caption>
+            <tbody>
+              <tr>
+                <td>{% trans "Count utilities" %}</td>
+                <td>{{ statistics_data.count_utilities }}</td>
+              </tr>
+              <tr>
+                <td>{% trans "Average count opinions in utilities" %}</td>
+                <td>{{ statistics_data.avg_count_opinions_in_utilities }}</td>
+              </tr>
+              <tr>
+                <td>{% trans "Average count comments in utilities" %}</td>
+                <td>{{ statistics_data.avg_count_comments_in_utilities }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <table class="table-overview applist">
+            <caption>{% trans "Opinions" %}</caption>
+            <tbody>
+              <tr>
+                <td>{% trans "Count opinions" %}</td>
+                <td>{{ statistics_data.count_opinions }}</td>
+              </tr>
+              <tr>
+                <td>{% trans "Count good opinions" %}</td>
+                <td>{{ statistics_data.count_good_opinions }}</td>
+              </tr>
+              <tr>
+                <td>{% trans "Count bad opinions" %}</td>
+                <td>{{ statistics_data.count_bad_opinions }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </td>
+        <td>
+          <table class="table-overview applist">
+            <caption>{% trans "Comments" %}</caption>
+            <tbody>
+              <tr>
+                <td>{% trans "Count comments" %}</td>
+                <td>{{ statistics_data.count_comments }}</td>
+              </tr>
+              <tr>
+                <td>{% trans "Count users posted comments" %}</td>
+                <td>{{ statistics_data.count_users_posted_comments }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="chart_and_objects">
+    <div class="div_chart_objects pull-left">
+      <table class="table">
+      <caption>{% trans "Most popular utilities" %}</caption>
+      <thead>
+        <th>№</th>
+        <th>{% trans "Utility" %}</th>
+        <th>{% trans "Category" %}</th>
+        <th>{% trans "Mark" %}</th>
+      </thead>
+      <tbody>
+        {% for utility in statistics_data.most_popular_utilities %}
+          <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ utility|truncatechars:40 }}</td>
+            <td>{{ utility.category|truncatechars:40 }}</td>
+            <td>{{ utility.mark }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    </div>
+    <div class="div_chart pull-right">
+      {{ statistics_data.chart_most_popular_utilities|safe }}
+    </div>
+    <div class="clearfix"></div>
+  </div>
+
+{% endblock statistics %}

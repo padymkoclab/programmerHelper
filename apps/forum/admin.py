@@ -84,7 +84,6 @@ class ForumTopicAdmin(admin.ModelAdmin):
         'get_count_posts',
         'count_active_users',
         'status',
-        'status_changed',
         'is_new',
         'date_modified',
         'date_added',

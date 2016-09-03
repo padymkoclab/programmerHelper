@@ -261,3 +261,11 @@ def calendar(parser, token):
             raise ValueError('"month" must be in 1..12')
 
         return CalendarNode(year, month, theme)
+
+
+@register.simple_tag(takes_context=True)
+def ipdb(context):
+    """ """
+
+    import ipdb;
+    ipdb.set_trace()

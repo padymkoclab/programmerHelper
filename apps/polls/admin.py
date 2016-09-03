@@ -105,7 +105,6 @@ class PollAdmin(admin.ModelAdmin):
     # object
     form = PollModelForm
     readonly_fields = (
-        'status_changed',
         'get_most_popular_choice_or_choices_as_html',
         'get_date_lastest_voting',
         'get_count_votes',
@@ -150,7 +149,6 @@ class PollAdmin(admin.ModelAdmin):
 
             # fields needed for already exists poll
             additional_fields = [
-                'status_changed',
                 'get_count_votes',
                 'get_count_choices',
             ]

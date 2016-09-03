@@ -1,0 +1,94 @@
+
+{% extends "admin/base_site.html" %}
+
+{% load i18n %}
+{% load static %}
+
+{% block extrastyle %}
+  {{ block.super }}
+
+  {% comment %}
+    Custom CSS
+  {% endcomment %}
+  <link rel="stylesheet" href="{% static 'project/css/admin/reports.css' %}">
+
+{% endblock extrastyle %}
+
+{% block extrahead %}
+  {{ block.super }}
+
+  {% comment %}
+    Access to django.jQuery
+  {% endcomment %}
+  {{ media }}
+
+  {% comment %}
+    Custom JS
+  {% endcomment %}
+  <script type="text/javascript" src="{% static 'project/js/admin/reports.js' %}"></script>
+
+{% endblock extrahead %}
+
+{% block breadcrumbs %}
+  <ul class="breadcrumb">
+    <li>
+        <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+        <span class="divider">&raquo;</span>
+    </li>
+    <li>
+        <a href="{% url 'admin:app_list' app_label=app_label %}">{{ app_name }}</a>
+        <span class="divider">&raquo;</span>
+    </li>
+    <li class="active">
+      {% trans "Reports" %}
+    </li>
+  </ul>
+{% endblock %}
+
+
+{% block content %}
+  <div id="content">
+      <h1>{% trans "Reports" %}</h1>
+      <div id="reports">
+        <div class="content-main">
+            <div class="module">
+                <form action="" method="post" accept-charset="utf-8" id="form_generate_report">
+                    {% csrf_token %}
+                    <table class="table-overview applist" id="table_radio_group_select_report">
+                        <caption>{% trans "Configuration of a report" %}</caption>
+                        <tbody>
+                            <tr>
+                                <td class="section">
+                                    <select name="output_report" id="select_output_report">
+                                        <option value="pdf" selected>{% trans "Report PDF" %}</option>
+                                        <option value="excel">{% trans "Report Excel" %}</option>
+                                    </select>
+                                </td>
+                            </tr>
+
+                            {% block themes %}{% endblock themes %}
+
+                            {% comment %}
+
+                              Listing themes. As example
+
+                              <tr>
+                                  <td class="section">
+                                      <label for="subject_polls">
+                                          <input type="checkbox" name="polls" value="polls" id="subject_polls">
+                                          <span>{% trans "Polls" %}</span>
+                                      </label>
+                                  </td>
+                              </tr>
+
+                            {% endcomment %}
+
+                        </tbody>
+                    </table>
+                    <input type="submit" class="btn btn-default" name="submit" value="Make report" disabled="disabled">
+                </form>
+            </div>
+        </div>
+      </div>
+  </div>
+{% endblock content %}

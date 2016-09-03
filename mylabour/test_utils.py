@@ -130,22 +130,36 @@ class StaticLiveAdminTest(StaticLiveServerTestCase):
     def made_login_in_admin(self):
 
         # get url for the admin`s login page
-        admin_login_url = self.live_server_url + reverse('admin:login')
+        admin_login_url = self.live_server_url + self.reverse('admin:login')
 
-        # simulation login superuser for get needed cookies
-        client = self.client_class()
-
-        self.call_command('factory_test_superusers', '1')
+        # create at least one an active superuser
         self.active_superuser = self.django_user_model.objects.filter(is_active=True, is_superuser=True).first()
+        username = self.active_superuser.get_username()
+        password = 'admin'
+        self.active_superuser.set_password(password)
 
-        client.force_login(self.active_superuser)
-        cookie = client.cookies['sessionid']
-
-        # open the admin`s login page and add the needed cookies, and then the refresh page
-        # it is given a logger superuser in the admin
         self.browser.get(admin_login_url)
-        self.browser.add_cookie({'name': 'sessionid', 'value': cookie.value})
-        self.browser.refresh()
+        username_input = self.browser.find_element_by_xpath('//*[@id="id_username"]')
+        password_input = self.browser.find_element_by_xpath('//*[@id="id_password"]')
+        btn_login = self.browser.find_element_by_xpath('//*[@id="login-form"]/div[4]/input')
+
+        username_input.send_keys(username)
+        password_input.send_keys(password)
+        btn_login.click()
+
+        # Attempt make session for authorization
+        #
+        # simulation login superuser for get needed cookies
+        # client = self.client_class()
+        #
+        # client.force_login(self.active_superuser)
+        # cookie = client.cookies['sessionid']
+
+        # # open the admin`s login page and add the needed cookies, and then the refresh page
+        # # it is given a logger superuser in the admin
+        # self.browser.get(admin_login_url)
+        # self.browser.add_cookie({'name': 'sessionid', 'value': cookie.value})
+        # self.browser.refresh()
 
     def open_page(self, url):
         """Add host to a passed url and to open it in a browser."""

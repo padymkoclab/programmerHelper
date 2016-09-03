@@ -135,10 +135,10 @@ class UtilityAdminTest(StaticLiveAdminTest):
 
     def setUp(self):
 
-        super().setUp()
-
-        self.call_command('factory_test_users', '10')
+        self.call_command('factory_test_superusers', '10')
         self.call_command('factory_test_categories_utilities', '2')
+
+        super().setUp()
 
     def test_changelist_page_presents_three_buttons(self):
 

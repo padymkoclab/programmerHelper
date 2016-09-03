@@ -29,16 +29,25 @@ DJANGO_APPS = [
     'django.contrib.humanize',
 ]
 
-MY_APPS = [
+THIRD_PARTY_APPS = [
+    # 'django_js_reverse',
+    # 'django_gravatar',
+]
+
+COMMON_APPS = [
     'mylabour',
     'apps.core.apps.CoreConfig',
+    'apps.export_import_models.apps.ExportImportModelsConfig',
+    'apps.sessions.apps.SessionsConfig',
+]
+
+CUSTOM_APPS = [
     'apps.activity.apps.ActivityConfig',
     'apps.articles.apps.ArticlesConfig',
     'apps.badges.apps.BadgesConfig',
     'apps.books.apps.BooksConfig',
     'apps.comments.apps.CommentsConfig',
     # 'apps.courses.apps.CoursesConfig',  # temporary is disabled
-    'apps.export_import_models.apps.ExportImportModelsConfig',
     'apps.favours.apps.FavoursConfig',
     'apps.forum.apps.ForumConfig',
     'apps.marks.apps.MarksConfig',
@@ -48,7 +57,6 @@ MY_APPS = [
     'apps.polls.apps.PollsConfig',
     'apps.questions.apps.QuestionsConfig',
     'apps.replies.apps.RepliesConfig',
-    'apps.sessions.apps.SessionsConfig',
     'apps.snippets.apps.SnippetsConfig',
     'apps.solutions.apps.SolutionsConfig',
     'apps.tags.apps.TagsConfig',
@@ -58,12 +66,7 @@ MY_APPS = [
     'apps.visits.apps.VisitsConfig',
 ]
 
-THIRD_PARTY_APPS = [
-#     'django_js_reverse',
-#     'django_gravatar',
-]
-
-INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + MY_APPS
+INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + COMMON_APPS + CUSTOM_APPS
 INSTALLED_APPS.insert(0, 'suit')
 
 # Project settings

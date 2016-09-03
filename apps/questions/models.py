@@ -9,8 +9,6 @@ from django.db import models
 from django.conf import settings
 
 from autoslug import AutoSlugField
-from model_utils import Choices
-from model_utils.managers import QueryManager
 
 from apps.comments.models import Comment
 from apps.opinions.models import Opinion
@@ -27,9 +25,12 @@ class Question(TimeStampedModel):
 
     """
 
-    CHOICES_STATUS = Choices(
-        ('open', _('Open')),
-        ('closed', _('Closed')),
+    OPEN = 'OPEN'
+    CLOSED = 'CLOSED'
+
+    CHOICES_STATUS = (
+        ('OPEN', _('Open')),
+        ('CLOSED', _('Closed')),
     )
 
     title = models.CharField(
@@ -37,7 +38,7 @@ class Question(TimeStampedModel):
     )
     slug = AutoSlugField(_('Slug'), populate_from='title', unique=True, always_update=True, allow_unicode=True)
     text_question = models.TextField(_('Text question'))
-    status = models.CharField(_('Status'), max_length=50, choices=CHOICES_STATUS, default=CHOICES_STATUS.open)
+    status = models.CharField(_('Status'), max_length=50, choices=CHOICES_STATUS, default=OPEN)
     account = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         verbose_name=_('Author'),
@@ -56,10 +57,6 @@ class Question(TimeStampedModel):
     # managers
     objects = models.Manager()
     objects = QuestionManager()
-
-    # simple managers
-    open_questions = QueryManager(status=CHOICES_STATUS.open)
-    closed_questions = QueryManager(status=CHOICES_STATUS.closed)
 
     class Meta:
         db_table = 'questions'
@@ -122,7 +119,7 @@ class Answer(TimeStampedModel):
         verbose_name=_('Question'),
         on_delete=models.CASCADE,
         related_name='answers',
-        limit_choices_to={'status': Question.CHOICES_STATUS.open}
+        limit_choices_to={'status': Question.OPEN}
     )
     account = models.ForeignKey(
         settings.AUTH_USER_MODEL,

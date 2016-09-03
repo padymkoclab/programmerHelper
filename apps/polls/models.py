@@ -11,9 +11,6 @@ from django.utils.translation import ugettext_lazy as _
 from django.db import models
 from django.conf import settings
 
-from model_utils.fields import MonitorField, StatusField
-from model_utils import Choices
-
 from mylabour.datetime_utils import convert_date_to_django_date_format
 from mylabour.fields_db import ConfiguredAutoSlugField
 from mylabour.models import TimeStampedModel
@@ -27,16 +24,18 @@ class Poll(TimeStampedModel):
     Model for poll.
     """
 
-    CHOICES_STATUS = Choices(
-        ('draft', _('Draft')),
-        ('opened', _('Opened')),
-        ('closed', _('Closed')),
+    DRAFT = 'DRAFT'
+    OPENED = 'OPENED'
+    CLOSED = 'CLOSED'
+
+    CHOICES_STATUS = (
+        (DRAFT, _('Draft')),
+        (OPENED, _('Opened')),
+        (CLOSED, _('Closed')),
     )
 
     title = models.CharField(
-        _('Title'),
-        max_length=200,
-        unique=True,
+        _('Title'), max_length=200, unique=True,
         validators=[MinLengthValidator(settings.MIN_LENGTH_FOR_NAME_OR_TITLE_OBJECT)],
         help_text=_('Allowed from {0} to 200 characters.').format(settings.MIN_LENGTH_FOR_NAME_OR_TITLE_OBJECT)
     )
@@ -47,8 +46,7 @@ class Poll(TimeStampedModel):
         max_length=100,
     )
     slug = ConfiguredAutoSlugField(_('Slug'), populate_from='title', unique=True)
-    status = StatusField(verbose_name=_('Status'), choices_name='CHOICES_STATUS', default=CHOICES_STATUS.draft)
-    status_changed = MonitorField(_('Date latest status changed'), monitor='status')
+    status = models.CharField(_('Status'), max_length=10, choices=CHOICES_STATUS, default=DRAFT)
     voters = models.ManyToManyField(
         settings.AUTH_USER_MODEL,
         through='Vote',
@@ -164,7 +162,7 @@ class Choice(models.Model):
         models.CASCADE,
         verbose_name=_('Poll'),
         related_name='choices',
-        limit_choices_to={'status': Poll.CHOICES_STATUS.opened},
+        limit_choices_to={'status': Poll.OPENED},
     )
     text_choice = models.TextField(_('Text choice'))
 

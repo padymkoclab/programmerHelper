@@ -10,8 +10,6 @@ from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 
 from autoslug import AutoSlugField
-from model_utils import Choices
-from model_utils.fields import StatusField
 
 from mylabour.models import TimeStampedModel
 
@@ -26,11 +24,16 @@ class TestingSuit(TimeStampedModel):
     MIN_COUNT_QUESTIONS = 12
     MAX_COUNT_QUESTIONS = 21
 
-    CHOICES_COMPLEXITY = Choices(
-        ('simple', _('Simple')),
-        ('middle', _('Middle')),
-        ('complicated', _('Complicated')),
-        ('from_users', _('From users')),
+    SIMPLE = 'SIMPLE'
+    MIDDLE = 'MIDDLE'
+    COMPLICATED = 'COMPLICATED'
+    FROM_USERS = 'FROM_USERS'
+
+    CHOICES_COMPLEXITY = (
+        (SIMPLE, _('Simple')),
+        (MIDDLE, _('Middle')),
+        (COMPLICATED, _('Complicated')),
+        (FROM_USERS, _('From users')),
     )
 
     name = models.CharField(
@@ -105,9 +108,12 @@ class TestingPassage(models.Model):
     MIN_SCOPE = 0
     MAX_SCOPE = 12
 
-    CHOICES_STATUS = Choices(
-        ('passed', _('Passed')),
-        ('attempt', _('Attempt')),
+    PASSED = 'PASSED'
+    ATTEMPT = 'ATTEMPT'
+
+    CHOICES_STATUS = (
+        (PASSED, _('Passed')),
+        (ATTEMPT, _('Attempt')),
     )
 
     account = models.ForeignKey(
@@ -121,7 +127,7 @@ class TestingPassage(models.Model):
         on_delete=models.CASCADE,
         verbose_name=_('Testing suit'),
     )
-    status = StatusField(_('Status'), choices_name='CHOICES_STATUS')
+    status = models.CharField(_('Status'), max_length=10, choices=CHOICES_STATUS)
     scope = models.SmallIntegerField(_('Scope'), default=0)
     date_passage = models.DateTimeField(_('Date passage'), auto_now_add=True)
 
