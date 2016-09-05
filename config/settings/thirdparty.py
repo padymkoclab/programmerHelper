@@ -24,51 +24,11 @@ SHELL_PLUS_DONT_LOAD = [
     # '',  # app name
 ]
 
-# Django-Password
-
-PASSWORD_MIN_LENGTH = 8
-
-PASSWORD_MAX_LENGTH = 20
-
-PASSWORD_DICTIONARY = None
-
-PASSWORD_MATCH_THRESHOLD = 0.9
-
-# You can omit any or all of these for no limit for that particular set
-
-PASSWORD_COMPLEXITY = {
-    # "UPPER": 1,
-    # "LOWER": 1,
-    "LETTERS": 6,
-    "DIGITS": 2,
-    "SPECIAL": 0,
-    "WORDS": 0,
-}
 
 # Django-AutoSlug
 
 AUTOSLUG_SLUGIFY_FUNCTION = lambda value: slugify(value, allow_unicode=True)
 
-# django_js_reverse
-
-JS_REVERSE_JS_VAR_NAME = 'REVERSE'
-
-# Django-Bower
-# Require Bower, Nmp, NodeJS
-
-# BOWER_COMPONENTS_ROOT = str(BASE_DIR.child('static', 'project', 'js'))
-
-# try !which bower
-BOWER_PATH = '/usr/local/bin/bower'
-
-BOWER_INSTALLED_APPS = (
-    'jquery',
-    'underscore',
-    'pygal-tooltips.min.js',
-    'bootstrap',
-    'select2',
-    'pygal.js',
-)
 
 # Django-Suit (admin theme)
 

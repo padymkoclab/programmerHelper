@@ -3,23 +3,35 @@ import string
 import random
 import io
 
+from django.utils import timezone
 from django.core.files.base import ContentFile
+from django.template import Template, Context
 
 from PIL import ImageColor, ImageDraw, Image
-
-from django.template import Template, Context
 import factory
+from factory import fuzzy
 
 from .text_utils import findall_words
 
 
-"""[summary]
-
-[description]
-"""
+Now = timezone.now().replace(tzinfo=timezone.get_current_timezone())
 
 
-def generate_image(width=100, height=100, filename='setivolkylany.com', imageformat='JPEG', show=False):
+class AbstractTimeStampedFactory(factory.DjangoModelFactory):
+
+    @classmethod
+    def _after_postgeneration(cls, obj, create, results=None):
+        super(AbstractTimeStampedFactory, cls)._after_postgeneration(obj, create, results)
+        qs = obj.__class__._default_manager.filter(pk=obj.pk)
+        qs.update(date_modified=fuzzy.FuzzyDateTime(obj.date_added, Now).fuzz())
+
+    @factory.post_generation
+    def date_added(self, create, extracted, **kwargs):
+        self.date_added = fuzzy.FuzzyDateTime(Now - timezone.timedelta(days=500)).fuzz()
+        self.save()
+
+
+def generate_image(width=100, height=100, filename='setivolkylany', imageformat='JPEG', show=False):
     """Generate image by help Pillow on based width, height and image`s format."""
 
     # generate supported the PIL`s colors in RGB
@@ -100,17 +112,21 @@ def generate_text_certain_length(length, locale='en'):
             # made lower ending last sentence and remove next-to-last point
             ending = text[next_to_last_sentence:].lower()
             text = text[:next_to_last_sentence] + ending[1:]
+
         # replace last space (if is) on character
         if text[-1] == ' ':
             text = text[:-1] + random.choice(string.ascii_lowercase)
+
         # replace next-to-last space (if is) on character
-        if text[-2] == ' ':
+        if len(text) > 1 and text[-2] == ' ':
             text = text[:-2] + random.choice(string.ascii_lowercase) + text[-1]
+
         # replace last point (if is) on character
         if text[-1] == '.':
             text = text[:-1] + random.choice(string.ascii_lowercase)
     if len(text) == length:
         text = text[:-1]
+
     # set point in ending of sentence
     text += '.'
     return text
@@ -267,7 +283,10 @@ def random_text(count_sentences=3):
     return sentences
 
 
-def generate_text_random_length_for_field_of_model(factory, field_name, ending_point=True, locale='ru'):
+def generate_text_random_length_for_field_of_model(factory, field_name, ending_chart='', locale='ru'):
+
+    if ending_chart and len(ending_chart) != 1:
+        raise ValueError('Length of a ending character must be equal 1.')
 
     model = factory._LazyStub__model_class._meta.model
 
@@ -284,7 +303,9 @@ def generate_text_random_length_for_field_of_model(factory, field_name, ending_p
 
     length = random.randrange(min_length, max_length)
 
-    if ending_point:
-        return generate_text_certain_length(length + 1, locale)[:-1]
+    text = generate_text_certain_length(length, locale)
 
-    return generate_text_certain_length(length, locale)
+    if ending_chart:
+        text = text[:-1] + ending_chart
+
+    return text

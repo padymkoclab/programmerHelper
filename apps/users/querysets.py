@@ -1,8 +1,10 @@
 
 from django.db import models
 
+from mylabour.logging_utils import create_logger_by_filename
 from mylabour.model_utils import get_random_objects
-from apps.testing.models import TestingPassage
+
+logger = create_logger_by_filename(__name__)
 
 
 class UserQuerySet(models.QuerySet):
@@ -167,7 +169,8 @@ class UserQuerySet(models.QuerySet):
     def objects_passages_testsuits(self, queryset=None):
         """Getting users what passed at least 1 testing suit."""
 
-        return self.filter(passages__status=TestingPassage.CHOICES_STATUS.passed)
+        logger.debug('Temp does not working')
+        return self.filter(passages__status=Passage.CHOICES_STATUS.passed)
 
     def creators_testing_suits(self):
         """Getting users what passed at least 1 testing suit."""

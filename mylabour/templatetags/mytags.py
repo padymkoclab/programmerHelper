@@ -7,8 +7,8 @@ from django.utils.http import urlencode
 from django.utils.translation import get_language, activate, to_locale
 from django.utils import timezone
 from django.utils.safestring import mark_safe
-from django.utils.html import format_html_join, format_html, remove_tags
-from django.template import Library, Node, resolve_variable
+from django.utils.html import format_html_join, format_html
+from django.template import Library, Node, Variable
 from django import template
 from django.conf import settings
 from django.core.urlresolvers import reverse
@@ -19,9 +19,11 @@ from pygments import lexers
 from pygments.lexers import get_lexer_by_name
 from pygments.formatters import HtmlFormatter
 
+from mylabour.logging_utils import create_logger_by_filename
 from mylabour.constants import PRETTY_COLORS
 
 
+logger = create_logger_by_filename(__name__)
 register = Library()
 
 
@@ -71,7 +73,7 @@ class StylizeNode(Node):
 
     def render(self, context):
         if len(self.vlist) > 0:
-            language = resolve_variable(self.vlist[0], context)
+            language = Variable(self.vlist[0]).resolve(context)
             lexer_name = DICT_NAME_AND_LEXER_NAME[language]
             try:
                 lexer = get_lexer_by_name(lexer_name, encoding='UTF-8')
@@ -147,6 +149,8 @@ def tag_cloud_as_listing(parser, token):
 
 class TagNode(template.Node):
 
+    logger.debug('"remove_tags" was remove in Django 1.10.')
+
     def __init__(self, variable_name, show_url, colors):
         self.variable_name = template.Variable(variable_name)
         self.show_url = show_url
@@ -158,7 +162,8 @@ class TagNode(template.Node):
             value_variable_name = self.variable_name.resolve(context)
             #
             html_spans = list()
-            pattern = '<span style="font-size: {size}em;color: {color};"><a href="{url}" style="color: {color};">{name} ({number})</a></span>'
+            pattern = \
+            '<span style="font-size: {size}em;color: {color};"><a href="{url}" style="color: {color};">{name} ({number})</a></span>'
             for obj, number in value_variable_name:
 
                 if self.colors == 'Black':
@@ -204,7 +209,10 @@ class CalendarNode(template.Node):
             current_locale_name = get_language()
             current_locale_name = to_locale(current_locale_name)
             charset = settings.DEFAULT_CHARSET.upper()
-            calendar = LocaleHTMLCalendar(firstweekday=settings.FIRST_DAY_OF_WEEK, locale=(current_locale_name, charset))
+            calendar = LocaleHTMLCalendar(
+                firstweekday=settings.FIRST_DAY_OF_WEEK,
+                locale=(current_locale_name, charset)
+            )
             weeks_current_month = calendar.formatmonth(self.year, self.month)
             weeks_current_month = BeautifulSoup(weeks_current_month, 'html.parser')
             #
@@ -242,17 +250,20 @@ def calendar(parser, token):
         today = timezone.now().today()
         theme = 'light_theme'
         return CalendarNode(today.year, today.month, theme)
-        # raise template.TemplateSyntaxError('"{0}" tag required two arguments: year and month'.format(token.contents.split()[0]))
+        # raise template.TemplateSyntaxError(
+        #   '"{0}" tag required two arguments: year and month'.format(token.contents.split()[0]))
     else:
         try:
             year = int(year)
             month = int(month)
         except TypeError:
-            raise template.TemplateSyntaxError('An arguments "year" and "month" must be integer'.format())
+            raise template.TemplateSyntaxError(
+                'An arguments "year" and "month" must be integer'.format())
 
         theme = theme.strip('\'')
         if theme not in ['dark_theme', 'light_theme']:
-            raise template.TemplateSyntaxError('Acceced only two theme for calendar "light_theme" and "dark_theme"'.format())
+            raise template.TemplateSyntaxError(
+                'Acceced only two theme for calendar "light_theme" and "dark_theme"'.format())
 
         #
         if not 1 <= year <= 9999:

@@ -1,82 +1,127 @@
 
 import random
 
+from django.contrib.auth import get_user_model
+from django.utils import timezone
+
 import factory
 from factory import fuzzy
 
-from .models import *
+from mylabour.factories_utils import (
+    generate_image,
+    generate_text_random_length_for_field_of_model,
+    AbstractTimeStampedFactory
+)
+
+from .models import Suit, Passage, TestQuestion, Variant
 
 
-class Factory_TestingSuit(factory.DjangoModelFactory):
+User = get_user_model()
+
+
+class SuitFactory(AbstractTimeStampedFactory):
 
     class Meta:
-        model = TestingSuit
+        model = Suit
 
-    description = factory.Faker('text', locale='ru')
-    author = fuzzy.FuzzyChoice(Account.objects.all())
-    complexity = fuzzy.FuzzyChoice(tuple(TestingSuit.CHOICES_COMPLEXITY._db_values))
+    complexity = fuzzy.FuzzyChoice([choice for choice, label in Suit.CHOICES_COMPLEXITY])
 
     @factory.lazy_attribute
     def name(self):
-        return factory.Faker('text', locale='ru').generate([])[:30]
+        return generate_text_random_length_for_field_of_model(self, 'name')
 
     @factory.lazy_attribute
-    def picture(self):
-        site_name = factory.Faker('url', locale='ru').generate([])
-        image_slug_name = factory.Faker('slug', locale='ru').generate([])
-        return site_name + image_slug_name + '.jpg'
+    def image(self):
+        return generate_image(filename='Testing suit')
 
     @factory.lazy_attribute
     def duration(self):
-        duration = factory.Faker('time', locale='ru').generate([])
-        return '00' + duration[2:]
+
+        for validators in Suit._meta.get_field('duration').validators:
+            if validators.code == 'min_value':
+                min_value = validators.limit_value.total_seconds()
+            elif validators.code == 'max_value':
+                max_value = validators.limit_value.total_seconds()
+
+        seconds = random.randint(min_value, max_value)
+        return timezone.timedelta(seconds=seconds)
+
+    @factory.lazy_attribute
+    def description(self):
+        return generate_text_random_length_for_field_of_model(self, 'description')
 
 
-class Factory_TestingPassage(factory.django.DjangoModelFactory):
+class TestQuestionFactory(AbstractTimeStampedFactory):
 
     class Meta:
-        model = TestingPassage
-
-    user = fuzzy.FuzzyChoice(Account.objects.all())
-    testing_suit = fuzzy.FuzzyChoice(TestingSuit.objects.all())
-    status = fuzzy.FuzzyChoice(TestingPassage.CHOICES_STATUS._db_values)
-    scope = fuzzy.FuzzyInteger(TestingPassage.MIN_SCOPE, TestingPassage.MAX_SCOPE)
-
-
-class Factory_TestingQuestion(factory.DjangoModelFactory):
-
-    class Meta:
-        model = TestingQuestion
-
-    testing_suit = fuzzy.FuzzyChoice(TestingSuit.objects.all())
-    text_question = factory.Faker('text', locale='ru')
+        model = TestQuestion
 
     @factory.lazy_attribute
     def title(self):
-        return factory.Faker('text', locale='ru').generate([])[:40]
+        return generate_text_random_length_for_field_of_model(self, 'title')
+
+    @factory.lazy_attribute
+    def text_question(self):
+        return generate_text_random_length_for_field_of_model(self, 'text_question')
+
+    @factory.lazy_attribute
+    def suit(self):
+        if not Suit.objects.count():
+            raise ValueError('Does not exists suits at all.')
+        return fuzzy.FuzzyChoice(Suit.objects.all()).fuzz()
+
+    @factory.post_generation
+    def date_added(self, create, extracted, **kwargs):
+        # a question may added only after a suit was created
+        new_date = fuzzy.FuzzyDateTime(self.suit.date_added).fuzz()
+        self.date_added = new_date
+        self.save()
 
 
-class Factory_TestingVariant(factory.DjangoModelFactory):
+class VariantFactory(factory.DjangoModelFactory):
 
     class Meta:
-        model = TestingVariant
+        model = Variant
 
-    question = fuzzy.FuzzyChoice(TestingQuestion.objects.all())
-    text_variant = factory.Faker('text', locale='ru')
+    @factory.lazy_attribute
+    def question(self):
+        if not TestQuestion.objects.count():
+            raise ValueError('Does not exists questions at all.')
+        return fuzzy.FuzzyChoice(TestQuestion.objects.all()).fuzz()
+
+    @factory.lazy_attribute
+    def text_variant(self):
+        return generate_text_random_length_for_field_of_model(self, 'text_variant')
 
     @factory.lazy_attribute
     def is_right_variant(self):
-        if self.question.have_one_right_variant():
-            return False
         return random.choice([True, False])
 
 
-TestingSuit.objects.filter().delete()
-for i in range(10):
-    testing_suit = Factory_TestingSuit()
-    for j in range(random.randrange(30)):
-        Factory_TestingPassage(testing_suit=testing_suit)
-    for h in range(random.randint(TestingSuit.MIN_COUNT_QUESTIONS, TestingSuit.MAX_COUNT_QUESTIONS)):
-        question = Factory_TestingQuestion(testing_suit=testing_suit)
-        for g in range(random.randint(TestingQuestion.MIN_COUNT_VARIANTS, TestingQuestion.MAX_COUNT_VARIANTS)):
-            Factory_TestingVariant(question=question)
+class PassageFactory(factory.django.DjangoModelFactory):
+
+    class Meta:
+        model = Passage
+
+    status = fuzzy.FuzzyChoice([choice for choice, label in Passage.CHOICES_STATUS])
+    mark = fuzzy.FuzzyInteger(Passage.MIN_MARK, Passage.MAX_MARK)
+
+    @factory.lazy_attribute
+    def user(self):
+        if not User.objects.count():
+            raise ValueError('Does not exists users at all.')
+        return fuzzy.FuzzyChoice(User.objects.all()).fuzz()
+
+    @factory.lazy_attribute
+    def suit(self):
+        if not Suit.objects.count():
+            raise ValueError('Does not exists suits at all.')
+        return fuzzy.FuzzyChoice(Suit.objects.all()).fuzz()
+
+    @factory.post_generation
+    def date_passage(self, create, extracted, **kwargs):
+        # a passage could happen  only after a suit was created and an user existed
+        min_possible_date = max(self.user.date_joined, self.suit.date_added)
+        new_date = fuzzy.FuzzyDateTime(min_possible_date).fuzz()
+        self.date_passage = new_date
+        self.save()

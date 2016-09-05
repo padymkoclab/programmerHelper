@@ -16,7 +16,7 @@ from .actions import (
 )
 from .forms import UserChangeForm, UserCreationForm
 from .models import UserLevel
-from .listfilters import UserLevelRelatedOnlyFieldListFilter, ListFilterLastLogin
+from .listfilters import ListFilterLastLogin
 
 
 class UserAdmin(BaseUserAdmin):
@@ -29,9 +29,23 @@ class UserAdmin(BaseUserAdmin):
     actions = [make_users_as_non_superuser, make_users_as_superuser, make_users_as_non_active, make_users_as_active]
 
     # set it value in empty, since it should be change in following views
-    list_display = []
-    list_filter = []
-    ordering = []
+    list_display = [
+        'email',
+        'username',
+        'level',
+        'is_active',
+        'is_superuser',
+        'last_login',
+        'date_joined',
+    ]
+    list_filter = [
+        ('level', admin.RelatedOnlyFieldListFilter),
+        ('is_active', admin.BooleanFieldListFilter),
+        ('is_superuser', admin.BooleanFieldListFilter),
+        ListFilterLastLogin,
+        ('date_joined', admin.DateFieldListFilter),
+    ]
+    ordering = ['date_joined']
 
     search_fields = ['email', 'username']
     date_hierarchy = 'date_joined'
@@ -218,42 +232,42 @@ class UserAdmin(BaseUserAdmin):
 
         return urls
 
-    def changelist_view(self, request, extra_context=None):
+    # def changelist_view(self, request, extra_context=None):
 
-        # temproraly make a request.GET as a mutable object
-        request.GET._mutable = True
+    #     # temproraly make a request.GET as a mutable object
+    #     request.GET._mutable = True
 
-        # get a custom value from a URL, if presents.
-        # and keep this value on a instance of this class
-        try:
-            self.display_users = request.GET.pop('display_users')[0]
-        except KeyError:
-            self.display_users = None
+    #     # get a custom value from a URL, if presents.
+    #     # and keep this value on a instance of this class
+    #     try:
+    #         self.display_users = request.GET.pop('display_users')[0]
+    #     except KeyError:
+    #         self.display_users = None
 
-        # restore the request.GET as a unmutable object
-        request.GET._mutable = False
+    #     # restore the request.GET as a unmutable object
+    #     request.GET._mutable = False
 
-        if request.path == reverse('admin:users_user_changelist'):
-            self.list_display = [
-                'email',
-                'username',
-                'level',
-                'is_active',
-                'is_superuser',
-                'last_login',
-                'date_joined',
-            ]
-            self.list_filter = [
-                ('level', UserLevelRelatedOnlyFieldListFilter),
-                ('is_active', admin.BooleanFieldListFilter),
-                ('is_superuser', admin.BooleanFieldListFilter),
-                ListFilterLastLogin,
-                ('date_joined', admin.DateFieldListFilter),
-            ]
-            self.ordering = ['date_joined']
+    #     if request.path == reverse('admin:users_user_changelist'):
+    #         self.list_display = [
+    #             'email',
+    #             'username',
+    #             'level',
+    #             'is_active',
+    #             'is_superuser',
+    #             'last_login',
+    #             'date_joined',
+    #         ]
+    #         self.list_filter = [
+    #             ('level', UserLevelRelatedOnlyFieldListFilter),
+    #             ('is_active', admin.BooleanFieldListFilter),
+    #             ('is_superuser', admin.BooleanFieldListFilter),
+    #             ListFilterLastLogin,
+    #             ('date_joined', admin.DateFieldListFilter),
+    #         ]
+    #         self.ordering = ['date_joined']
 
-        response = super(UserAdmin, self).changelist_view(request, extra_context)
-        return response
+    #     response = super(UserAdmin, self).changelist_view(request, extra_context)
+    #     return response
 
     def voters_view(self, request):
         """ """

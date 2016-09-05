@@ -138,11 +138,8 @@ class UtilityAdmin(admin.ModelAdmin):
         'date_added',
     )
 
-    logger.error('Does not working (\'category\', admin.RelatedOnlyFieldListFilter),')
-
     list_filter = (
-        # ('category', admin.RelatedOnlyFieldListFilter),
-        # https://code.djangoproject.com/ticket/26979
+        ('category', admin.RelatedOnlyFieldListFilter),
         IsNewSimpleListFilter,
         'date_modified',
         'date_added',
@@ -202,28 +199,12 @@ class UtilityAdmin(admin.ModelAdmin):
     truncated_name.admin_order_field = 'name'
 
 
-class AppAdmin:
+class UtilitiesAppAdmin:
 
-    @property
-    def admin_site(self):
-        return admin.AdminSite()
+    def add_statistics_data_to_context(self, context):
+        """Add statictis data to a context."""
 
-    @property
-    def media(self):
-        return admin.ModelAdmin(mock.Mock(), self.admin_site).media
-
-    def statistics_view(self, request, app_label):
-        """ """
-
-        # each custom app must be has template for statistics in own folder templates/app_label/admin/...
-        template = '{0}/admin/statistics.html'.format(app_label)
-
-        app_config = apps.get_app_config(app_label)
-
-        app_name = app_config.verbose_name
-
-        # context with statictis data
-        app_statistics_context = {
+        context['statistics_data'] = {
             'count_categories': UtilityCategory.objects.count(),
             'avg_count_utilities_in_categories': UtilityCategory.objects.get_avg_count_utilities_in_categories(),
             'count_utilities': Utility.objects.count(),
@@ -238,60 +219,15 @@ class AppAdmin:
             'most_popular_utilities': Utility.objects.get_most_popular_utilities(),
         }
 
-        context = dict(
-            self.admin_site.each_context(request),
-            title=_('{0} statistics').format(app_name),
-            app_name=app_name,
-            app_label=app_label,
-            statistics_data=app_statistics_context,
-        )
+    def add_context_to_report_page(self, context):
 
-        # for Django-Suit, especially for left Menu
-        request.current_app = self.name
+        # context with statictis data
+        context['themes_for_reports'] = {
+            UtilityCategory._meta.verbose_name_plural: 'categories',
+            Utility._meta.verbose_name_plural: 'utilities',
+        }
 
-        return TemplateResponse(request, template, context)
+    def get_report(self, output_report, themes):
 
-    def reports_view(self, request, app_label):
-
-        if request.method == 'GET':
-
-            # each custom app must be has template for statistics in own folder templates/app_label/admin/...
-            template = '{0}/admin/reports.html'.format(app_label)
-
-            app_config = apps.get_app_config(app_label)
-
-            app_name = app_config.verbose_name
-
-            # context with statictis data
-            app_themes_for_reports = {
-                UtilityCategory._meta.verbose_name_plural: 'categories',
-                Utility._meta.verbose_name_plural: 'utilities',
-            }
-
-            context = dict(
-                self.admin_site.each_context(request),
-                title=_('{0} reports').format(app_name),
-                app_name=app_name,
-                app_label=app_label,
-                themes_for_reports=app_themes_for_reports,
-                media=self.media,
-            )
-
-            # for Django-Suit, especially for left Menu
-            request.current_app = self.name
-
-            return TemplateResponse(request, template, context)
-
-        elif request.method == 'POST':
-
-            app_config = apps.get_app_config(app_label)
-
-            output_report = request.POST['output_report']
-
-            themes = request.POST.getlist('themes')
-
-            themes = ', '.join(themes)
-
-            msg = 'Report must generated in {0} on themes: {1}'.format(output_report.upper(), themes)
-
-            return HttpResponse(msg)
+        msg = 'Report must generated in {0} on themes: {1}'.format(output_report.upper(), themes)
+        return msg

@@ -7,11 +7,6 @@ from .custom import *
 from .thirdparty import *
 
 
-# --------------------------------
-# CORE SETTINGS
-# --------------------------------
-
-
 BASE_DIR = Path(__file__).ancestor(3)
 
 SITE_ID = 1
@@ -72,7 +67,6 @@ INSTALLED_APPS.insert(0, 'suit')
 # Project settings
 
 DJANGO_MIDDLEWARE_CLASSES = [
-    'mylabour.middleware.TimeLoadPageMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.locale.LocaleMiddleware',
@@ -91,7 +85,7 @@ MY_MIDDLEWARE_CLASSES = [
     # 'apps.visits.middleware.RegistratorVisitAccountMiddleware',
 ]
 
-MIDDLEWARE_CLASSES = DJANGO_MIDDLEWARE_CLASSES + MY_MIDDLEWARE_CLASSES
+MIDDLEWARE = DJANGO_MIDDLEWARE_CLASSES + MY_MIDDLEWARE_CLASSES
 
 ROOT_URLCONF = 'config.urls'
 
@@ -111,7 +105,7 @@ TEMPLATES = [
                 'django.template.context_processors.i18n',
                 'django.template.context_processors.media',
                 'django.template.context_processors.static',
-                'django.core.context_processors.request',
+                # 'django.core.context_processors.request',
                 # 'django.template.context_processors.tz',
             ],
         },
@@ -119,7 +113,7 @@ TEMPLATES = [
 ]
 
 MY_CONTEXT_PROCCESSORS = [
-    'mylabour.context_processors.date_creating_website',
+    # 'mylabour.context_processors.date_creating_website',
     # 'apps.visits.context_processors.count_visits',
     # 'apps.sessions.context_processors.users_online',
 ]

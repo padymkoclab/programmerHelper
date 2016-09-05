@@ -1,6 +1,8 @@
 
+import io
 from unittest import mock
 
+from django.http import HttpResponse
 from django.conf.urls import url
 from django.template.response import TemplateResponse
 from django.apps import apps
@@ -9,6 +11,8 @@ from django.utils.translation import ugettext_lazy as _
 from django.contrib import admin
 from django.conf import settings
 from django.apps import AppConfig
+
+from mylabour.utils import get_filename_with_datetime
 
 # auth
 from apps.users.admin import UserAdmin, UserLevelAdmin
@@ -54,9 +58,9 @@ from apps.solutions.admin import SolutionCategoryAdmin, SolutionAdmin
 from apps.solutions.models import SolutionCategory, Solution
 from apps.tags.admin import TagAdmin
 from apps.tags.models import Tag
-from apps.testing.admin import TestingSuitAdmin, TestingPassageAdmin, TestingQuestionAdmin, TestingVariantAdmin
-from apps.testing.models import TestingSuit, TestingPassage, TestingQuestion, TestingVariant
-from apps.utilities.admin import UtilityCategoryAdmin, UtilityAdmin
+from apps.testing.admin import SuitAdmin, PassageAdmin, TestQuestionAdmin, VariantAdmin
+from apps.testing.models import Suit, Passage, TestQuestion, Variant
+from apps.utilities.admin import UtilitiesAppAdmin, UtilityCategoryAdmin, UtilityAdmin
 from apps.utilities.models import UtilityCategory, Utility
 
 
@@ -128,8 +132,6 @@ class AdminSite(admin.AdminSite):
     def statistics_view(self, request, app_label):
         """ """
 
-        from apps.utilities.admin import AppAdmin
-
         # each custom app must be has template for statistics in own folder templates/app_label/admin/...
         template = '{0}/admin/statistics.html'.format(app_label)
 
@@ -137,33 +139,20 @@ class AdminSite(admin.AdminSite):
 
         app_name = app_config.verbose_name
 
-        # context with statictis data
-        app_statistics_context = {
-            'count_categories': UtilityCategory.objects.count(),
-            'avg_count_utilities_in_categories': UtilityCategory.objects.get_avg_count_utilities_in_categories(),
-            'count_utilities': Utility.objects.count(),
-            'avg_count_opinions_in_utilities': Utility.objects.get_avg_count_opinions_in_utilities(),
-            'avg_count_comments_in_utilities': Utility.objects.get_avg_count_comments_in_utilities(),
-            'count_opinions': Utility.objects.get_count_opinions(),
-            'count_good_opinions': Utility.objects.get_count_good_opinions(),
-            'count_bad_opinions': Utility.objects.get_count_bad_opinions(),
-            'count_comments': Utility.objects.get_count_comments(),
-            'count_users_posted_comments': Utility.objects.get_count_users_posted_comments(),
-            'chart_most_popular_utilities': Utility.objects.get_chart_most_popular_utilities(),
-            'most_popular_utilities': Utility.objects.get_most_popular_utilities(),
-        }
-
         context = dict(
             self.each_context(request),
             title=_('{0} statistics').format(app_name),
             app_name=app_name,
             app_label=app_label,
-            statistics_data=app_statistics_context,
-            media=self.media,
         )
 
         # for Django-Suit, especially for left Menu
         request.current_app = self.name
+
+        if app_label == 'utilities':
+            app_admin = UtilitiesAppAdmin()
+
+        app_admin.add_statistics_data_to_context(context)
 
         return TemplateResponse(request, template, context)
 
@@ -178,39 +167,58 @@ class AdminSite(admin.AdminSite):
 
             app_name = app_config.verbose_name
 
-            # context with statictis data
-            app_themes_for_reports = {
-                UtilityCategory._meta.verbose_name_plural: 'categories',
-                Utility._meta.verbose_name_plural: 'utilities',
-            }
+            # for Django-Suit, especially for left Menu
+            request.current_app = self.name
+
+            # access to the Django`s built-in the jQuery
+            media = admin.ModelAdmin(mock.Mock(), admin.AdminSite()).media
 
             context = dict(
                 self.each_context(request),
                 title=_('{0} reports').format(app_name),
                 app_name=app_name,
                 app_label=app_label,
-                themes_for_reports=app_themes_for_reports,
-                media=self.media,
+                media=media,
             )
 
-            # for Django-Suit, especially for left Menu
-            request.current_app = self.name
+            if app_label == 'utilities':
+                app_admin = UtilitiesAppAdmin()
+
+            app_admin.add_context_to_report_page(context)
 
             return TemplateResponse(request, template, context)
 
         elif request.method == 'POST':
 
             app_config = apps.get_app_config(app_label)
+            output_buffer = io.BytesIO()
+            type_output_report = request.POST['type_output_report']
 
-            output_report = request.POST['output_report']
+            if type_output_report == 'pdf':
+                content_type = 'application/pdf'
+                extension = 'pdf'
+            elif type_output_report == 'excel':
+                content_type = 'application/vnd.ms-excel'
+                extension = 'xlsx'
+
+            filename = get_filename_with_datetime(app_label.title(), extension)
+
+            response = HttpResponse(content_type=content_type)
+            response['Content-Disposition'] = 'attachment; filename="{}"'.format(filename)
 
             themes = request.POST.getlist('themes')
-
             themes = ', '.join(themes)
 
-            msg = 'Report must generated in {0} on themes: {1}'.format(output_report.upper(), themes)
+            if app_label == 'utilities':
+                app_admin = UtilitiesAppAdmin()
 
-            return HttpResponse(msg)
+            report = app_admin.get_report(type_output_report, themes)
+
+            output = output_buffer.getvalue()
+            output_buffer.close()
+
+            response.write(output)
+            return response
 
 
 AdminSite = AdminSite(name='admin')
@@ -234,10 +242,10 @@ AdminSite.register(UtilityCategory, UtilityCategoryAdmin)
 AdminSite.register(Utility, UtilityAdmin)
 
 # tester
-AdminSite.register(TestingSuit, TestingSuitAdmin)
-AdminSite.register(TestingPassage, TestingPassageAdmin)
-AdminSite.register(TestingQuestion, TestingQuestionAdmin)
-AdminSite.register(TestingVariant, TestingVariantAdmin)
+AdminSite.register(Suit, SuitAdmin)
+AdminSite.register(Passage, PassageAdmin)
+AdminSite.register(TestQuestion, TestQuestionAdmin)
+AdminSite.register(Variant, VariantAdmin)
 
 # solution
 AdminSite.register(SolutionCategory, SolutionCategoryAdmin)

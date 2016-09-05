@@ -6,7 +6,7 @@ import uuid
 
 from django.contrib.postgres.fields import ArrayField
 from django.utils.html import format_html
-from django.db.models.functions import Coalesce, Value
+from django.db.models.functions import Coalesce
 from mylabour.functions_db import Round
 from django.core.exceptions import ValidationError
 from django.contrib.contenttypes.fields import GenericRelation

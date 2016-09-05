@@ -1,6 +1,6 @@
 
 from django.db import models
-from django.db.models.functions import Func
+from django.db.models.expressions import Func
 
 
 class Round(Func):

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>QUnit basic example</title>
+  <link rel="stylesheet" href="qunit/qunit-2.0.1.css">
+</head>
+<body>
+  <div id="qunit"></div>
+  <div id="qunit-fixture"></div>
+  <script src='../../lib/python3.4/site-packages/django/contrib/admin/static/admin/js/vendor/jquery/jquery.min.js'></script>
+  <script src='../../lib/python3.4/site-packages/django/contrib/admin/static/admin/js/jquery.init.js'></script>
+  <script src="qunit/qunit-2.0.1.js"></script>
+  <script>
+
+var $ = django.jQuery;
+
+
+$('body').click(function(){
+  console.log(1);
+});
+
+
+QUnit.module('magicTricks', {
+    beforeEach: function() {
+        var $ = django.jQuery;
+        $('#qunit-fixture').append('<button class="button"></button>');
+    }
+});
+
+
+QUnit.test('Show', function(assert) {
+    var $ = django.jQuery;
+    // $('button').trigger('click');
+    assert.ok(1 == $('button').length);
+});
+
+
+  </script>
+</body>
+</html>

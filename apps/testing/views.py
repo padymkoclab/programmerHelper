@@ -1,9 +1,9 @@
 
 from django.views.generic import DetailView
 
-from .models import TestingSuit
+from .models import Suit
 
 
-class TestingSuitDetailView(DetailView):
-    model = TestingSuit
-    template_name = "testing/test_suit_detail.html"
+class SuitDetailView(DetailView):
+    model = Suit
+    template_name = "testing/suit_detail.html"

@@ -390,3 +390,8 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     # https://www.digitalocean.com/community/users/jellingwood?primary_filter=upvotes_given
     # answer, queations, hearts, opinons and more
+
+
+# class Profile(models.Model):
+
+#     user = models.OneToOneField('User')
