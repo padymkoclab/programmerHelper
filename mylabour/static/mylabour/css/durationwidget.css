@@ -1,0 +1,15 @@
+
+.div_input_ranges_durationfield{
+    display: inline-block;
+    margin-left: 10px;
+}
+
+    .div_input_ranges_durationfield table td:nth-child(2){
+        padding-left: 10px;
+    }
+
+
+.correct_possition_input_with_ranges_inputs{
+    position:  relative;
+    top:  -50px;
+}

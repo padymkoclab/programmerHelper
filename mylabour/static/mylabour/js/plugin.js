@@ -71,6 +71,16 @@ var Module = (function() {
         (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(script);
     };
 
+    public_methods.fillzeros = function(value, needed_length){
+
+        /*
+        Write this function
+        Do learn underscore.js function
+        If has free time, write str.format() function in for JS
+         */
+
+    };
+
     return public_methods
 
 })();

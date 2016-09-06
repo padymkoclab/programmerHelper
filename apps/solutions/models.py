@@ -13,7 +13,7 @@ from django.contrib.postgres.fields import ArrayField
 from apps.comments.models import Comment
 from apps.opinions.models import Opinion
 from apps.tags.models import Tag
-from mylabour.fields_db import ConfiguredAutoSlugField
+from mylabour.models_fields import ConfiguredAutoSlugField
 from mylabour.models import TimeStampedModel
 
 from .managers import SolutionCategoryManager

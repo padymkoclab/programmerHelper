@@ -25,6 +25,7 @@ class TestQuestionInline(admin.StackedInline):
     can_delete = True
     fk_name = 'suit'
     fields = ['title', 'slug', 'text_question']
+    classes = ['collapse']
 
 
 class VariantInline(admin.TabularInline):
@@ -32,6 +33,7 @@ class VariantInline(admin.TabularInline):
     Tabular Inline View for Variant
     """
 
+    classes = ['collapse']
     form = VariantAdminModelForm
     model = Variant
     min_num = TestQuestion.MIN_COUNT_VARIANTS_FOR_FULL_QUESTION
@@ -52,6 +54,7 @@ class PassageInline(admin.TabularInline):
     can_delete = False
     fields = ['user', 'status', 'mark', 'date_passage']
     readonly_fields = ['user', 'status', 'mark', 'date_passage']
+    classes = ['collapse']
 
 
 class SuitAdmin(admin.ModelAdmin):

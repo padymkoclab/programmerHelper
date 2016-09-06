@@ -3,7 +3,8 @@ from django import forms
 
 from suit.widgets import AutosizedTextarea
 
-from mylabour.widgets import AdminImageThumbnail
+from mylabour.widgets import AdminImageThumbnail, DurationWidget
+# from mylabour.forms_fields import DurationSplitField
 
 from .models import Suit, TestQuestion, Variant
 
@@ -65,6 +66,7 @@ class SuitAdminModelForm(forms.ModelForm):
         fields = ['name', 'slug', 'duration', 'status', 'description', 'complexity']
 
     def __init__(self, *args, **kwargs):
+
         super(SuitAdminModelForm, self).__init__(*args, **kwargs)
 
         self.fields['name'].widget.attrs['class'] = 'span12'
@@ -75,7 +77,9 @@ class SuitAdminModelForm(forms.ModelForm):
         self.fields['image'].widget = AdminImageThumbnail()
 
         self.fields['status'].widget.attrs['class'] = 'span12'
-        self.fields['duration'].widget.attrs['class'] = 'span12'
+
+        self.fields['duration'].widget = DurationWidget(attrs={'class': 'span2'})
+
         self.fields['complexity'].widget.attrs['class'] = 'span12'
 
         self.fields['description'].widget = AutosizedTextarea(attrs={'class': 'span12'})

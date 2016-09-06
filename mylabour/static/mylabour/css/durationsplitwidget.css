@@ -1,0 +1,8 @@
+
+.div_input_durationfield{
+    display: inline-block;
+}
+
+.div_input_durationfield input, .div_input_durationfield select{
+    width: 50px;
+}

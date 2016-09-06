@@ -19,8 +19,8 @@ from apps.forum.models import ForumTopic
 from apps.badges.managers import BadgeManager
 from apps.sessions.models import ExpandedSession
 from mylabour import utils
-# from mylabour.fields_db import PhoneField
-from mylabour.fields_db import ConfiguredAutoSlugField
+# from mylabour.models_fields import PhoneField
+from mylabour.models_fields import ConfiguredAutoSlugField
 
 from .managers import UserManager
 from .querysets import UserQuerySet

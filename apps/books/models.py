@@ -17,7 +17,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.db import models
 from django.conf import settings
 
-from mylabour.fields_db import ConfiguredAutoSlugField, CountryField
+from mylabour.models_fields import ConfiguredAutoSlugField, CountryField
 from mylabour.logging_utils import create_logger_by_filename
 
 from apps.replies.models import Reply

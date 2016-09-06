@@ -13,7 +13,7 @@ from apps.comments.models import Comment
 from apps.replies.models import Reply
 from mylabour.models import TimeStampedModel
 from mylabour.constants import CHOICES_LEXERS
-from mylabour.fields_db import ConfiguredAutoSlugField
+from mylabour.models_fields import ConfiguredAutoSlugField
 
 from .managers import CourseManager, CourseQuerySet
 

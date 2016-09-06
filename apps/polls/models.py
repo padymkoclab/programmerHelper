@@ -12,7 +12,7 @@ from django.db import models
 from django.conf import settings
 
 from mylabour.datetime_utils import convert_date_to_django_date_format
-from mylabour.fields_db import ConfiguredAutoSlugField
+from mylabour.models_fields import ConfiguredAutoSlugField
 from mylabour.models import TimeStampedModel
 
 from .managers import PollManager, VoteManager
