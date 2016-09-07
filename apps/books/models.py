@@ -7,7 +7,7 @@ import uuid
 from django.contrib.postgres.fields import ArrayField
 from django.utils.html import format_html
 from django.db.models.functions import Coalesce
-from mylabour.functions_db import Round
+from utils.django.functions_db import Round
 from django.core.exceptions import ValidationError
 from django.contrib.contenttypes.fields import GenericRelation
 from django.core.validators import MinLengthValidator, RegexValidator, MinValueValidator, MaxValueValidator
@@ -17,8 +17,8 @@ from django.utils.translation import ugettext_lazy as _
 from django.db import models
 from django.conf import settings
 
-from mylabour.models_fields import ConfiguredAutoSlugField, CountryField
-from mylabour.logging_utils import create_logger_by_filename
+from utils.django.models_fields import ConfiguredAutoSlugField, CountryField
+from utils.python.logging_utils import create_logger_by_filename
 
 from apps.replies.models import Reply
 from apps.tags.models import Tag

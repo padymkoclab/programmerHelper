@@ -3,7 +3,7 @@ from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext_lazy as _
 from django.db import models
 
-from mylabour.models import TimeStampedModel
+from utils.django.models import TimeStampedModel
 
 from .managers import PurelyTagManager
 from .querysets import TagQuerySet

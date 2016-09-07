@@ -11,13 +11,13 @@ import pytest
 from PyPDF2 import PdfFileReader
 import openpyxl
 
-from mylabour.datetime_utils import (
+from utils.django.datetime_utils import (
     convert_date_to_django_date_format,
     get_current_timezone_offset,
     get_year_by_slavic_aryan_calendar
 )
-from mylabour.utils import get_location
-from mylabour.test_utils import EnhancedTestCase
+from utils.django.utils import get_location
+from utils.django.test_utils import EnhancedTestCase
 
 from config.admin import AdminSite
 from apps.polls.models import Poll, Vote

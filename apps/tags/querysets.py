@@ -1,7 +1,7 @@
 
 from django.db import models
 
-from mylabour.model_utils import get_random_objects
+from utils.django.model_utils import get_random_objects
 
 
 class TagQuerySet(models.QuerySet):

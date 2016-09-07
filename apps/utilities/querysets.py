@@ -1,7 +1,7 @@
 
 from django.db import models
 
-from mylabour.logging_utils import create_logger_by_filename
+from utils.python.logging_utils import create_logger_by_filename
 
 logger = create_logger_by_filename(__name__)
 

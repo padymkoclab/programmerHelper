@@ -11,9 +11,9 @@ from django.contrib.postgres.fields import ArrayField
 from apps.comments.models import Comment
 from apps.marks.models import Mark
 from apps.tags.models import Tag
-from mylabour.models_fields import ConfiguredAutoSlugField
-from mylabour.models import TimeStampedModel
-from mylabour.validators import MinCountWordsValidator
+from utils.django.models_fields import ConfiguredAutoSlugField
+from utils.django.models import TimeStampedModel
+from utils.django.validators import MinCountWordsValidator
 
 from .managers import ArticleManager
 from .querysets import ArticleQuerySet

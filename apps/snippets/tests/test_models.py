@@ -12,7 +12,7 @@ from apps.comments.factories import CommentFactory
 from apps.opinions.factories import OpinionFactory
 from apps.favours.factories import FavourFactory
 from apps.tags.models import Tag
-from mylabour.utils import generate_text_certain_length
+from utils.django.utils import generate_text_certain_length
 
 from apps.snippets.factories import SnippetFactory
 from apps.snippets.models import Snippet

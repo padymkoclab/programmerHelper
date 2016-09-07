@@ -7,8 +7,8 @@ from django.utils.translation import ugettext_lazy as _
 from django.db import models
 from django.conf import settings
 
-from mylabour.models import BaseGenericModel
-from mylabour.validators import MaxCountWordsValidator, MinCountWordsValidator, OnlyLettersValidator
+from utils.django.models import BaseGenericModel
+from utils.django.validators import MaxCountWordsValidator, MinCountWordsValidator, OnlyLettersValidator
 
 from .querysets import ReplyQuerySet
 

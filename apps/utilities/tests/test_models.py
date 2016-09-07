@@ -1,7 +1,7 @@
 
 from django.db.models.fields.files import ImageFieldFile
 
-from mylabour.test_utils import EnhancedTestCase
+from utils.django.test_utils import EnhancedTestCase
 
 from apps.comments.factories import CommentFactory
 from apps.opinions.factories import OpinionFactory

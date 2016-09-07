@@ -1,5 +1,5 @@
 
-from mylabour.test_utils import StaticLiveAdminTest
+from utils.django.test_utils import StaticLiveAdminTest
 
 from apps.polls.factories import PollFactory, ChoiceFactory
 from apps.polls.models import Poll

@@ -2,14 +2,20 @@
 from django.utils.html import format_html
 from django.template.defaultfilters import truncatechars
 from django.utils.translation import ugettext_lazy as _
-from django.db.models import Count
 from django.contrib import admin
 
-from mylabour.listfilters import IsNewSimpleListFilter
+from utils.django.admin_utils import remove_url_from_admin_urls
+from utils.django.listfilters import IsNewSimpleListFilter
 
 from .models import Suit, TestQuestion, Variant, Passage
-from .formsets import VariantInlineFormSet
-from .forms import SuitAdminModelForm, TestQuestionAdminInlineModelForm, TestQuestionAdminModelForm, VariantAdminModelForm
+from .formsets import TestQuestionInlineFormSet, VariantInlineFormSet
+from .forms import (
+    SuitAdminModelForm,
+    TestQuestionAdminInlineModelForm,
+    TestQuestionAdminModelForm,
+    VariantAdminModelForm,
+)
+from .listfilters import IsCompletedSimpleListFilter
 
 
 class TestQuestionInline(admin.StackedInline):
@@ -17,6 +23,7 @@ class TestQuestionInline(admin.StackedInline):
     Stacked Inline View for TestQuestion
     """
 
+    formset = TestQuestionInlineFormSet
     form = TestQuestionAdminInlineModelForm
     model = TestQuestion
     min_num = Suit.MIN_COUNT_QUESTIONS_FOR_COMPLETED_SUIT
@@ -66,7 +73,8 @@ class SuitAdmin(admin.ModelAdmin):
     search_fields = ('name', )
     list_display = (
         'truncated_name',
-        'colored_status',
+        'status',
+        'get_count_questions',
         'duration',
         'complexity',
         'is_new',
@@ -82,17 +90,12 @@ class SuitAdmin(admin.ModelAdmin):
     )
 
     date_hierarchy = 'date_added'
-    fieldsets = [
-        [
-            Suit._meta.verbose_name, {
-                'fields': ['name', 'slug', 'status', 'image', 'duration', 'complexity', 'description'],
-            }
-        ]
-    ]
+    readonly_fields = ['get_count_questions', 'date_modified', 'date_added']
+    prepopulated_fields = {'slug': ('name', )}
 
     def get_queryset(self, request):
         qs = super(SuitAdmin, self).get_queryset(request)
-        qs = qs
+        qs = qs.suits_with_all_additional_fields()
         return qs
 
     def get_inline_instances(self, request, obj=None):
@@ -106,19 +109,43 @@ class SuitAdmin(admin.ModelAdmin):
             return [inline(self.model, self.admin_site) for inline in inlines]
         return []
 
+    def get_fieldsets(self, request, obj=None):
+
+        fieldsets = [
+            [
+                Suit._meta.verbose_name, {
+                    'fields': [
+                        'name',
+                        'slug',
+                        'status',
+                        'image',
+                        'duration',
+                        'complexity',
+                        'description',
+                    ],
+                }
+            ]
+        ]
+
+        if obj is not None:
+
+            fieldsets.append([
+                _('Additional information'), {
+                    'classes': ('collapse', ),
+                    'fields': [
+                        'get_count_questions',
+                        'date_modified',
+                        'date_added',
+                    ]
+                }
+            ])
+
+        return fieldsets
+
     def truncated_name(self, obj):
         return truncatechars(obj.name, 50)
     truncated_name.short_description = Suit._meta.get_field('name').verbose_name
     truncated_name.admin_order_field = 'name'
-
-    def colored_status(self, obj):
-        if obj.status == Suit.COMPLETED:
-            color = 'rgb(0, 255, 0)'
-        elif obj.status == Suit.UNCOMPLETED:
-            color = 'rgb(255, 0, 0)'
-        return format_html('<span style="color: {}">{}</span>', color, obj.status)
-    colored_status.short_description = Suit._meta.get_field('status').verbose_name
-    colored_status.admin_order_field = 'status'
 
 
 class TestQuestionAdmin(admin.ModelAdmin):
@@ -128,26 +155,29 @@ class TestQuestionAdmin(admin.ModelAdmin):
 
     form = TestQuestionAdminModelForm
     search_fields = ('title',)
-    list_display = ('truncated_text_question', 'truncated_suit', 'is_new', 'date_modified', 'date_added')
+    list_display = (
+        'truncated_text_question',
+        'truncated_suit',
+        'get_count_variants',
+        'is_completed',
+        'is_new',
+        'date_modified',
+        'date_added'
+    )
     list_filter = (
         ('suit', admin.RelatedOnlyFieldListFilter),
+        IsCompletedSimpleListFilter,
         IsNewSimpleListFilter,
         'date_modified',
         'date_added',
     )
     date_hierarchy = 'date_added'
-    fieldsets = [
-        [
-            TestQuestion._meta.verbose_name, {
-                'fields': ['title', 'slug', 'suit', 'text_question'],
-            }
-        ]
-    ]
     prepopulated_fields = {'slug': ('title', )}
+    readonly_fields = ['get_count_variants', 'is_completed', 'date_modified', 'date_added']
 
     def get_queryset(self, request):
         qs = super(TestQuestionAdmin, self).get_queryset(request)
-        qs = qs
+        qs = qs.questions_with_all_additional_fields()
         return qs
 
     def get_inline_instances(self, request, obj=None):
@@ -156,6 +186,31 @@ class TestQuestionAdmin(admin.ModelAdmin):
             inlines = [VariantInline]
             return [inline(self.model, self.admin_site) for inline in inlines]
         return []
+
+    def get_fieldsets(self, request, obj=None):
+
+        fieldsets = [
+            [
+                TestQuestion._meta.verbose_name, {
+                    'fields': ['title', 'slug', 'suit', 'text_question'],
+                }
+            ]
+        ]
+
+        if obj is not None:
+            fieldsets.append([
+                _("Additional information"), {
+                    'classes': ('collapse', ),
+                    'fields': [
+                        'get_count_variants',
+                        'is_completed',
+                        'date_modified',
+                        'date_added'
+                    ]
+                }
+            ])
+
+        return fieldsets
 
     def truncated_suit(self, obj):
         return truncatechars(obj.suit, 50)
@@ -187,6 +242,20 @@ class VariantAdmin(admin.ModelAdmin):
             }
         ]
     ]
+
+    def get_urls(self):
+
+        urls = super().get_urls()
+
+        urls += [
+        ]
+
+        remove_url_from_admin_urls(urls, 'add'),
+        remove_url_from_admin_urls(urls, 'change'),
+        remove_url_from_admin_urls(urls, 'history'),
+        remove_url_from_admin_urls(urls, 'delete'),
+
+        return urls
 
     def truncated_text_variant(self, obj):
         return truncatechars(obj, 70)
@@ -220,6 +289,20 @@ class PassageAdmin(admin.ModelAdmin):
         ]
     ]
     readonly_fields = ['suit', 'user', 'status', 'mark']
+
+    def get_urls(self):
+
+        urls = super().get_urls()
+
+        urls += [
+        ]
+
+        remove_url_from_admin_urls(urls, 'add'),
+        remove_url_from_admin_urls(urls, 'change'),
+        remove_url_from_admin_urls(urls, 'history'),
+        remove_url_from_admin_urls(urls, 'delete'),
+
+        return urls
 
     def truncated_suit(self, obj):
         return truncatechars(obj.suit, 60)

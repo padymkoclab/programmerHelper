@@ -2,7 +2,7 @@
 from django.template.loader import get_template
 from django.http import HttpResponse
 
-from mylabour.test_utils import EnhancedTestCase
+from utils.django.test_utils import EnhancedTestCase
 
 from apps.opinions.admin import OpinionGenericInline
 from apps.comments.admin import CommentGenericInline

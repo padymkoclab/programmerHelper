@@ -4,7 +4,7 @@ import numbers
 from django.utils import timezone
 from django.db import models
 
-from mylabour.functions_db import Round
+from utils.django.functions_db import Round
 
 
 class ArticleQuerySet(models.QuerySet):

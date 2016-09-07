@@ -40,14 +40,14 @@ from reportlab.graphics.widgets.markers import makeMarker
 import xlsxwriter
 
 # from apps.core.reports import SitePDFReportTemplate
-from mylabour.utils import (
+from utils.django.utils import (
     get_filename_with_datetime,
     get_latest_or_none,
     get_location,
     join_enumarate,
 )
-from mylabour.logging_utils import create_logger_by_filename
-from mylabour.datetime_utils import (
+from utils.python.logging_utils import create_logger_by_filename
+from utils.django.datetime_utils import (
     convert_date_to_django_date_format,
     get_year_by_slavic_aryan_calendar,
     get_current_timezone_offset,

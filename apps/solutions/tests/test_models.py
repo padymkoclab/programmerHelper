@@ -14,7 +14,7 @@ from apps.comments.factories import CommentFactory
 from apps.opinions.factories import OpinionFactory
 from apps.tags.models import Tag
 from apps.web_links.models import WebLink
-from mylabour.utils import generate_text_by_min_length
+from utils.django.utils import generate_text_by_min_length
 
 from apps.solutions.factories import SolutionFactory, SolutionCategoryFactory, solutions_categories_factory
 from apps.solutions.models import Solution, SolutionCategory

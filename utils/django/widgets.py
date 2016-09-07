@@ -1,10 +1,11 @@
 
+from django.db.models.fields.files import ImageFieldFile
 from django.utils.translation import ugettext_lazy as _
 from django.utils.html import mark_safe
 from django.contrib.admin.widgets import AdminFileWidget
 from django import forms
 
-from .logging_utils import create_logger_by_filename
+from ..python.logging_utils import create_logger_by_filename
 
 
 logger = create_logger_by_filename(__name__)
@@ -20,9 +21,11 @@ class AdminImageThumbnail(AdminFileWidget):
         # if an object has image
         if value:
             img_styles = 'float: left; margin-right: 15px; width: 100px; height: 100px;'
-            html = mark_safe(
-                '<image src="{0}" style="{1}"></image>{2}'.format(value.url, img_styles, html)
-            )
+
+            if isinstance(value, ImageFieldFile):
+                return mark_safe(
+                    '<image src="{0}" style="{1}"></image>{2}'.format(value.url, img_styles, html)
+                )
         return html
 
 

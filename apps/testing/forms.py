@@ -3,8 +3,7 @@ from django import forms
 
 from suit.widgets import AutosizedTextarea
 
-from mylabour.widgets import AdminImageThumbnail, DurationWidget
-# from mylabour.forms_fields import DurationSplitField
+from utils.django.widgets import AdminImageThumbnail, DurationWidget
 
 from .models import Suit, TestQuestion, Variant
 
@@ -75,8 +74,6 @@ class SuitAdminModelForm(forms.ModelForm):
         self.fields['slug'].disabled = True
 
         self.fields['image'].widget = AdminImageThumbnail()
-
-        self.fields['status'].widget.attrs['class'] = 'span12'
 
         self.fields['duration'].widget = DurationWidget(attrs={'class': 'span2'})
         self.fields['duration'].disabled = True

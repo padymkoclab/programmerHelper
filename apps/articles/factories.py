@@ -10,7 +10,7 @@ from factory import fuzzy
 from apps.comments.factories import CommentFactory
 from apps.marks.factories import MarkFactory
 
-from mylabour.utils import generate_text_by_min_length
+from utils.django.utils import generate_text_by_min_length
 
 from .models import *
 

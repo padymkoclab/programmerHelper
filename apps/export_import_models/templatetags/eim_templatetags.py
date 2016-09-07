@@ -3,7 +3,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.urlresolvers import reverse
 from django import template
 
-from mylabour.model_utils import get_string_primary_keys_separated_commas
+from utils.django.model_utils import get_string_primary_keys_separated_commas
 
 
 register = template.Library()

@@ -1,7 +1,7 @@
 
 from django.contrib.contenttypes.models import ContentType
 
-from mylabour.test_utils import StaticLiveAdminTest
+from utils.django.test_utils import StaticLiveAdminTest
 
 from apps.utilities.factories import UtilityCategoryFactory, UtilityFactory
 from apps.utilities.models import UtilityCategory

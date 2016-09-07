@@ -11,7 +11,7 @@ from dateutil.relativedelta import relativedelta
 
 from apps.users.factories import UserFactory
 
-from mylabour.model_utils import leave_only_predetermined_number_of_objects
+from utils.django.model_utils import leave_only_predetermined_number_of_objects
 
 from apps.polls.factories import ChoiceFactory
 from apps.polls.models import Poll, Choice, Vote

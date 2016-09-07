@@ -3,7 +3,7 @@ from django.contrib import admin
 
 from suit.widgets import AutosizedTextarea
 
-from mylabour.test_utils import EnhancedTestCase
+from utils.django.test_utils import EnhancedTestCase
 
 from apps.utilities.forms import UtilityCategoryAdminModelForm, UtilityAdminModelForm
 

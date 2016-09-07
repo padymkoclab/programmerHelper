@@ -10,7 +10,7 @@ from apps.comments.factories import CommentFactory
 from apps.marks.factories import MarkFactory
 from apps.tags.models import Tag
 from apps.web_links.models import WebLink
-from mylabour.utils import generate_text_certain_length
+from utils.django.utils import generate_text_certain_length
 
 from apps.articles.factories import articles_factory, ArticleSubsectionFactory
 from apps.articles.models import Article

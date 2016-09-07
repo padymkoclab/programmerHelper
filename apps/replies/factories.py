@@ -6,7 +6,7 @@ from django.contrib.auth import get_user_model
 import factory
 from factory import fuzzy
 
-from mylabour.factories_utils import generate_words
+from utils.django.factories_utils import generate_words
 
 from .models import Reply
 

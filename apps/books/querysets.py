@@ -2,8 +2,8 @@
 from django.utils import timezone
 from django.db import models
 
-from mylabour.functions_db import Round
-from mylabour.logging_utils import create_logger_by_filename
+from utils.django.functions_db import Round
+from utils.python.logging_utils import create_logger_by_filename
 
 
 logger = create_logger_by_filename(__name__)

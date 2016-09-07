@@ -11,7 +11,7 @@ from apps.web_links.factories import web_links_factory
 # from apps.scopes.factories import ScopeFactory
 # from apps.tags.models import Tag
 # from apps.web_links.models import WebLink
-# from mylabour.utils import generate_text_certain_length
+# from utils.django.utils import generate_text_certain_length
 
 from apps.solutions.factories import solutions_factory, SolutionFactory
 # from apps.solutions.models import Solution

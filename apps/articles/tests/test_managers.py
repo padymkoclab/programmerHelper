@@ -7,7 +7,7 @@ from apps.accounts.factories import accounts_factory
 from apps.tags.factories import tags_factory
 from apps.badges.factories import badges_factory
 from apps.web_links.factories import web_links_factory
-from mylabour.utils import has_connect_to_internet
+from utils.django.utils import has_connect_to_internet
 
 from apps.articles.factories import ArticleFactory
 from apps.articles.models import Article

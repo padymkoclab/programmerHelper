@@ -1,7 +1,7 @@
 
 from django.core.management import call_command
 
-from mylabour.test_utils import EnhancedTestCase
+from utils.django.test_utils import EnhancedTestCase
 from config.admin import AdminSite
 
 from apps.polls.actions import make_draft, make_opened, make_closed

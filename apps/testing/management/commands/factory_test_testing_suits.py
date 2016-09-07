@@ -1,8 +1,8 @@
 
 import random
 
-from mylabour.logging_utils import create_logger_by_filename
-from mylabour.basecommands import ExtendedBaseCommand
+from utils.python.logging_utils import create_logger_by_filename
+from utils.django.basecommands import ExtendedBaseCommand
 
 from ...factories import SuitFactory, TestQuestionFactory, VariantFactory, PassageFactory
 
@@ -43,7 +43,7 @@ class Command(ExtendedBaseCommand):
             exists_count_questions = suit.questions.count()
             if SuitModel.MIN_COUNT_QUESTIONS_FOR_COMPLETED_SUIT <=\
                     exists_count_questions <= SuitModel.MAX_COUNT_QUESTIONS_FOR_COMPLETED_SUIT:
-                suit.status = random.choice([SuitModel.UNCOMPLETED, SuitModel.COMPLETED])
+                suit.status = random.choice([True, False])
                 suit.full_clean()
                 suit.save()
 

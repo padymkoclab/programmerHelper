@@ -9,8 +9,8 @@ from django.template.defaultfilters import truncatechars
 from django.utils.translation import ugettext_lazy as _
 from django.contrib import admin
 
-from mylabour.logging_utils import create_logger_by_filename
-from mylabour.listfilters import IsNewSimpleListFilter
+from utils.python.logging_utils import create_logger_by_filename
+from utils.django.listfilters import IsNewSimpleListFilter
 
 from apps.opinions.admin import OpinionGenericInline
 from apps.comments.admin import CommentGenericInline

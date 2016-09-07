@@ -7,7 +7,7 @@ from django.utils import timezone
 import factory
 from factory import fuzzy
 
-from mylabour.factories_utils import (
+from utils.django.factories_utils import (
     generate_image,
     generate_text_random_length_for_field_of_model,
     AbstractTimeStampedFactory
@@ -25,6 +25,7 @@ class SuitFactory(AbstractTimeStampedFactory):
         model = Suit
 
     complexity = fuzzy.FuzzyChoice([choice for choice, label in Suit.CHOICES_COMPLEXITY])
+    status = fuzzy.FuzzyChoice([True, False])
 
     @factory.lazy_attribute
     def name(self):

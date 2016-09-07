@@ -10,9 +10,9 @@ import pytest
 from apps.replies.factories import ReplyFactory
 from apps.tags.models import Tag
 
-from mylabour.logging_utils import create_logger_by_filename
-from mylabour.test_utils import EnhancedTestCase
-from mylabour.factories_utils import generate_text_by_min_length
+from utils.python.logging_utils import create_logger_by_filename
+from utils.django.test_utils import EnhancedTestCase
+from utils.django.factories_utils import generate_text_by_min_length
 
 from apps.books.factories import BookFactory, WriterFactory
 from apps.books.models import Book, Writer

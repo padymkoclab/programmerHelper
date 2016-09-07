@@ -1,8 +1,8 @@
 
 from django.db import models
 
-from mylabour.logging_utils import create_logger_by_filename
-from mylabour.model_utils import get_random_objects
+from utils.python.logging_utils import create_logger_by_filename
+from utils.django.model_utils import get_random_objects
 
 logger = create_logger_by_filename(__name__)
 

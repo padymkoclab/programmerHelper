@@ -3,7 +3,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.contrib import admin
 from django.utils.html import format_html
 
-from mylabour.listfilters import LatestActivityListFilter
+from utils.django.listfilters import LatestActivityListFilter
 from apps.opinions.admin import OpinionGenericInline
 from apps.comments.admin import CommentGenericInline
 

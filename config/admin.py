@@ -12,7 +12,7 @@ from django.contrib import admin
 from django.conf import settings
 from django.apps import AppConfig
 
-from mylabour.utils import get_filename_with_datetime
+from utils.django.utils import get_filename_with_datetime
 
 # auth
 from apps.users.admin import UserAdmin, UserLevelAdmin

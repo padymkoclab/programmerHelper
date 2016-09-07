@@ -7,7 +7,7 @@ from django.conf import settings
 
 from autoslug import AutoSlugField
 
-from mylabour.models import TimeStampedModel
+from utils.django.models import TimeStampedModel
 
 
 class Newsletter(TimeStampedModel):

@@ -18,9 +18,9 @@ from apps.activity.models import Activity
 from apps.forum.models import ForumTopic
 from apps.badges.managers import BadgeManager
 from apps.sessions.models import ExpandedSession
-from mylabour import utils
-# from mylabour.models_fields import PhoneField
-from mylabour.models_fields import ConfiguredAutoSlugField
+from utils.django import utils
+# from utils.django.models_fields import PhoneField
+from utils.django.models_fields import ConfiguredAutoSlugField
 
 from .managers import UserManager
 from .querysets import UserQuerySet

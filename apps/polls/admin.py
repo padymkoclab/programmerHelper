@@ -15,7 +15,8 @@ from django.contrib import admin
 
 import pygal
 
-from mylabour.utils import get_statistics_count_objects_by_year, get_latest_or_none
+from utils.django.admin_utils import remove_url_from_admin_urls
+from utils.django.utils import get_statistics_count_objects_by_year, get_latest_or_none
 
 from .models import Poll, Choice, Vote
 from .forms import PollModelForm, ChoiceModelForm
@@ -39,13 +40,6 @@ def add_current_app_to_request_in_admin_view_for_django_suit(view):
         response = view(modelAdmin, request, **kwargs)
         return response
     return wrapped_view
-
-
-def remove_url_from_admin_urls(urls, url_name):
-    for admin_url in urls:
-        if admin_url.name == url_name:
-            u = admin_url
-    urls.remove(u)
 
 
 class ChoiceInline(admin.StackedInline):
@@ -496,9 +490,9 @@ class ChoiceAdmin(admin.ModelAdmin):
         urls.remove(url_polls_choice_change)
         urls.insert(index_url_polls_choice_change, url_polls_choice_view)
 
-        remove_url_from_admin_urls(urls, 'polls_choice_add')
-        remove_url_from_admin_urls(urls, 'polls_choice_history')
-        remove_url_from_admin_urls(urls, 'polls_choice_delete')
+        remove_url_from_admin_urls(urls, 'add')
+        remove_url_from_admin_urls(urls, 'history')
+        remove_url_from_admin_urls(urls, 'delete')
 
         return urls
 
@@ -540,9 +534,9 @@ class VoteAdmin(admin.ModelAdmin):
         urls = super(VoteAdmin, self).get_urls()
 
         # remove urls for add and change vote
-        remove_url_from_admin_urls(urls, 'polls_vote_add')
-        remove_url_from_admin_urls(urls, 'polls_vote_change')
-        remove_url_from_admin_urls(urls, 'polls_vote_history')
-        remove_url_from_admin_urls(urls, 'polls_vote_delete')
+        remove_url_from_admin_urls(urls, 'add')
+        remove_url_from_admin_urls(urls, 'change')
+        remove_url_from_admin_urls(urls, 'history')
+        remove_url_from_admin_urls(urls, 'delete')
 
         return urls

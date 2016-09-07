@@ -9,7 +9,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.db import models
 from django.conf import settings
 
-from mylabour.models_fields import ConfiguredAutoSlugField
+from utils.django.models_fields import ConfiguredAutoSlugField
 from apps.comments.models import Comment
 from apps.opinions.models import Opinion
 from apps.opinions.managers import OpinionManager
@@ -18,8 +18,8 @@ from apps.favours.models import Favour
 from apps.visits.models import Visit
 from apps.tags.models import Tag
 from apps.tags.model_mixins import RelatedObjectsByTags
-from mylabour.models import TimeStampedModel
-from mylabour.constants import CHOICES_LEXERS
+from utils.django.models import TimeStampedModel
+from utils.django.constants import CHOICES_LEXERS
 
 from .managers import SnippetManager, PythonSnippetManager
 from .querysets import SnippetQuerySet

@@ -85,7 +85,7 @@ class ComprehensiveSessionJSONSerializer(JSONSerializer):
 """
 import json
 import uuid
-from mylabour.serializers import ComprehensiveSessionJSONDecoder, ComprehensiveSessionJSONEncoder
+from utils.django.serializers import ComprehensiveSessionJSONDecoder, ComprehensiveSessionJSONEncoder
 from decimal import Decimal
 import datetime
 data = json.dumps([timezone.now(), datetime.datetime.now(), Decimal(3213.2132123), datetime.date.today(), uuid.uuid4()], cls=ComprehensiveSessionJSONEncoder)

@@ -11,7 +11,7 @@ from PIL import ImageColor, ImageDraw, Image
 import factory
 from factory import fuzzy
 
-from .text_utils import findall_words
+from ..python.text_utils import findall_words
 
 
 Now = timezone.now().replace(tzinfo=timezone.get_current_timezone())

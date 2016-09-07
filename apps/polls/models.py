@@ -11,9 +11,9 @@ from django.utils.translation import ugettext_lazy as _
 from django.db import models
 from django.conf import settings
 
-from mylabour.datetime_utils import convert_date_to_django_date_format
-from mylabour.models_fields import ConfiguredAutoSlugField
-from mylabour.models import TimeStampedModel
+from utils.django.datetime_utils import convert_date_to_django_date_format
+from utils.django.models_fields import ConfiguredAutoSlugField
+from utils.django.models import TimeStampedModel
 
 from .managers import PollManager, VoteManager
 from .querysets import PollQuerySet, ChoiceQuerySet

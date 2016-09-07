@@ -4,7 +4,7 @@ import random
 
 from django.db import models
 
-from .logging_utils import create_logger_by_filename
+from ..python.logging_utils import create_logger_by_filename
 
 
 logger = create_logger_by_filename(__name__)

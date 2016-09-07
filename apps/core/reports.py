@@ -23,7 +23,7 @@ from reportlab.lib.units import inch
 from reportlab.lib import colors
 from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 
-from mylabour.utils import (
+from utils.django.utils import (
     get_year_by_slavic_aryan_calendar,
     convert_date_to_django_date_format,
     get_filename_with_datetime,

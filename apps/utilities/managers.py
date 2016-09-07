@@ -7,7 +7,7 @@ import pygal
 from pygal.style import DefaultStyle
 from pygal import Config
 
-from mylabour.functions_db import Round
+from utils.django.functions_db import Round
 
 
 class UtilityCategoryManager(models.Manager):

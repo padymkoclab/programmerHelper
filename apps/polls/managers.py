@@ -8,7 +8,7 @@ from django.utils import timezone
 
 from dateutil.relativedelta import relativedelta
 
-from mylabour.functions_db import Round
+from utils.django.functions_db import Round
 
 
 class PollsManager(models.Manager):

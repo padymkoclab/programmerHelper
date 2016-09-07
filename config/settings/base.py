@@ -1,7 +1,7 @@
 
 from unipath import Path
 
-from mylabour.utils import get_secret_value_for_setting_from_file
+from utils.django.utils import get_secret_value_for_setting_from_file
 
 from .custom import *
 from .thirdparty import *
@@ -30,7 +30,7 @@ THIRD_PARTY_APPS = [
 ]
 
 COMMON_APPS = [
-    'mylabour',
+    'utils.django',
     'apps.core.apps.CoreConfig',
     'apps.export_import_models.apps.ExportImportModelsConfig',
     'apps.sessions.apps.SessionsConfig',
@@ -79,8 +79,8 @@ DJANGO_MIDDLEWARE_CLASSES = [
 ]
 
 MY_MIDDLEWARE_CLASSES = [
-    # 'mylabour.middleware.TimeLoadPageMiddleware',
-    # 'mylabour.middleware.CountQueriesMiddleware',
+    # 'utils.middleware.TimeLoadPageMiddleware',
+    # 'utils.middleware.CountQueriesMiddleware',
     # 'apps.visits.middleware.CountVisitsPageMiddleware',
     # 'apps.visits.middleware.RegistratorVisitAccountMiddleware',
 ]
@@ -113,7 +113,7 @@ TEMPLATES = [
 ]
 
 MY_CONTEXT_PROCCESSORS = [
-    # 'mylabour.context_processors.date_creating_website',
+    # 'utils.context_processors.date_creating_website',
     # 'apps.visits.context_processors.count_visits',
     # 'apps.sessions.context_processors.users_online',
 ]

@@ -7,7 +7,7 @@ from django.conf import settings
 import factory
 from factory import fuzzy
 
-from mylabour.factories_utils import generate_text_by_min_length, generate_image, generate_words
+from utils.django.factories_utils import generate_text_by_min_length, generate_image, generate_words
 
 from apps.tags.models import Tag
 from apps.replies.factories import ReplyFactory

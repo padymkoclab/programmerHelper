@@ -9,7 +9,7 @@ from django.core.management import call_command
 import magic
 import pytest
 
-from mylabour.test_utils import EnhancedTestCase
+from utils.django.test_utils import EnhancedTestCase
 from config.admin import AdminSite
 
 from apps.polls.admin import PollAdmin, ChoiceAdmin, VoteAdmin, ChoiceInline, VoteInline

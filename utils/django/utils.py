@@ -15,7 +15,7 @@ import factory
 from dateutil.relativedelta import relativedelta
 from pygments import lexers
 
-from .logging_utils import create_logger_by_filename
+from ..python.logging_utils import create_logger_by_filename
 
 
 __all__ = []

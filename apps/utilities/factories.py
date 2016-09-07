@@ -7,7 +7,7 @@ import factory
 from apps.comments.factories import CommentFactory
 from apps.opinions.factories import OpinionFactory
 
-from mylabour.factories_utils import (
+from utils.django.factories_utils import (
     generate_image,
     generate_text_random_length_for_field_of_model,
     AbstractTimeStampedFactory

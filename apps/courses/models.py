@@ -11,9 +11,9 @@ from django.conf import settings
 from apps.opinions.models import Opinion
 from apps.comments.models import Comment
 from apps.replies.models import Reply
-from mylabour.models import TimeStampedModel
-from mylabour.constants import CHOICES_LEXERS
-from mylabour.models_fields import ConfiguredAutoSlugField
+from utils.django.models import TimeStampedModel
+from utils.django.constants import CHOICES_LEXERS
+from utils.django.models_fields import ConfiguredAutoSlugField
 
 from .managers import CourseManager, CourseQuerySet
 

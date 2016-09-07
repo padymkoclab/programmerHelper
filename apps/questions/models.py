@@ -13,7 +13,7 @@ from autoslug import AutoSlugField
 from apps.comments.models import Comment
 from apps.opinions.models import Opinion
 from apps.tags.models import Tag
-from mylabour.models import TimeStampedModel
+from utils.django.models import TimeStampedModel
 
 from .managers import QuestionManager, AnswerManager
 

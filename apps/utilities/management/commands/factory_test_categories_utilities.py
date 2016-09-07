@@ -1,6 +1,6 @@
 
-from mylabour.logging_utils import create_logger_by_filename
-from mylabour.basecommands import ExtendedBaseCommand
+from utils.python.logging_utils import create_logger_by_filename
+from utils.django.basecommands import ExtendedBaseCommand
 
 from apps.utilities.factories import UtilityCategoryFactory
 

@@ -4,7 +4,7 @@ from django.contrib.auth import get_user_model
 import factory
 from factory import fuzzy
 
-from mylabour.factories_utils import generate_text_random_length_for_field_of_model
+from utils.django.factories_utils import generate_text_random_length_for_field_of_model
 
 from .models import Comment
 

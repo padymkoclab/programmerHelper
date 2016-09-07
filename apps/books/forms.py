@@ -4,7 +4,7 @@ from django import forms
 
 from suit.widgets import AutosizedTextarea
 
-from mylabour.widgets import AdminImageThumbnail
+from utils.django.widgets import AdminImageThumbnail
 
 from apps.tags.forms import clean_tags
 

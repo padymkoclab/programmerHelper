@@ -1,5 +1,5 @@
 
-from mylabour.basecommands import ExtendedBaseCommand
+from utils.django.basecommands import ExtendedBaseCommand
 
 
 class Command(ExtendedBaseCommand):

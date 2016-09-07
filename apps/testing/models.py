@@ -8,10 +8,11 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 
-from mylabour.models_fields import ConfiguredAutoSlugField
-from mylabour.models import TimeStampedModel
+from utils.django.models_fields import ConfiguredAutoSlugField
+from utils.django.models import TimeStampedModel
 
-from .managers import TestQuestionManager, SuitQuerySet
+from .managers import TestQuestionManager
+from .querysets import SuitQuerySet, TestQuestionQuerySet
 
 
 class Suit(TimeStampedModel):
@@ -32,20 +33,12 @@ class Suit(TimeStampedModel):
         (COMPLICATED, _('Complicated')),
     )
 
-    UNCOMPLETED = 'uncompleted'
-    COMPLETED = 'completed'
-
-    CHOICES_STATUS = (
-        (UNCOMPLETED, 'Uncompleted'),
-        (COMPLETED, 'Completed'),
-    )
-
     name = models.CharField(
         _('Name'), max_length=200, unique=True,
         validators=[MinLengthValidator(settings.MIN_LENGTH_FOR_NAME_OR_TITLE_OBJECT)]
     )
     slug = ConfiguredAutoSlugField(_('Slug'), populate_from='name', unique=True)
-    status = models.CharField(_('Status'), max_length=20, choices=CHOICES_STATUS, default=UNCOMPLETED)
+    status = models.BooleanField(('Status'), default=False)
     description = models.CharField(
         ('Description'), max_length=500,
         validators=[MinLengthValidator(settings.MIN_LENGTH_FOR_NAME_OR_TITLE_OBJECT)]
@@ -81,13 +74,25 @@ class Suit(TimeStampedModel):
         return reverse('testing:suit', kwargs={'slug': self.slug})
 
     def get_admin_url(self):
-        return reverse('admin:testing_suit_change', args=(self.pk, ))
+        return reverse('admin:{0}_{1}_change'.format(
+            self._meta.app_label,
+            self._meta.model_name,
+        ), args=(self.pk, ))
+
+    def get_count_questions(self):
+        """ """
+
+        return self.questions.count()
+    get_count_questions.short_description = _('Count questions')
+    get_count_questions.admin_order_field = 'count_questions'
 
 
 class TestQuestion(TimeStampedModel):
     """
 
     """
+
+    MSG_UNIQUE_TOGETHER_TITLE_AND_SUIT = _('This suit already has a question with this title')
 
     MIN_COUNT_VARIANTS_FOR_FULL_QUESTION = 3
     MAX_COUNT_VARIANTS_FOR_FULL_QUESTION = 8
@@ -112,29 +117,45 @@ class TestQuestion(TimeStampedModel):
         ordering = ['suit', 'title']
 
     objects = models.Manager()
-    objects = TestQuestionManager()
+    objects = TestQuestionManager.from_queryset(TestQuestionQuerySet)()
 
     def __str__(self):
         return '{0.title}'.format(self)
 
     def unique_error_message(self, model_class, unique_check):
         if model_class == type(self) and unique_check == ('title', 'suit'):
-            return _('This suit already has question with this title')
+            return self.MSG_UNIQUE_TOGETHER_TITLE_AND_SUIT
         return super().unique_error_message(model_class, unique_check)
 
     def get_admin_url(self):
-        pass
+        return reverse('admin:{0}_{1}_change'.format(
+            self._meta.app_label,
+            self._meta.model_name,
+        ), args=(self.pk, ))
 
-    def is_completed_question(self):
+    def is_completed(self):
         """ """
 
-        return self.MIN_COUNT_VARIANTS <= self.variants <= self.MAX_COUNT_VARIANTS
+        return self.MIN_COUNT_VARIANTS_FOR_FULL_QUESTION <= self.variants.count() \
+            <= self.MAX_COUNT_VARIANTS_FOR_FULL_QUESTION
+    is_completed.short_description = _('Is completed?')
+    is_completed.admin_order_field = 'status_completeness'
+    is_completed.boolean = True
+
+    def get_count_variants(self):
+        """ """
+
+        return self.variants.count()
+    get_count_variants.short_description = _('Count variants')
+    get_count_variants.admin_order_field = 'count_variants'
 
 
 class Variant(models.Model):
     """
 
     """
+
+    MSG_UNIQUE_TOGETHER_QUESTION_AND_TEXT_VARIANT = _('This question already has a variant with this text')
 
     id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
     text_variant = models.CharField(_('Text variant'), max_length=300)
@@ -156,7 +177,7 @@ class Variant(models.Model):
 
     def unique_error_message(self, model_class, unique_check):
         if model_class == type(self) and unique_check == ('question', 'text_variant'):
-            return _('This question already has variant with this text')
+            return self.MSG_UNIQUE_TOGETHER_QUESTION_AND_TEXT_VARIANT
         return super().unique_error_message(model_class, unique_check)
 
 

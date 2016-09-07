@@ -5,7 +5,7 @@ from django.core.exceptions import ValidationError
 from django.test import TestCase
 
 from apps.users.factories import UserFactory
-from mylabour.datetime_utils import convert_date_to_django_date_format
+from utils.django.datetime_utils import convert_date_to_django_date_format
 
 from apps.polls.models import Poll, Choice, Vote
 from apps.polls.factories import PollFactory, ChoiceFactory

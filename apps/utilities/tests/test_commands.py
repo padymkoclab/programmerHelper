@@ -1,7 +1,7 @@
 
 from django.core.management.base import CommandError
 
-from mylabour.test_utils import EnhancedTestCase
+from utils.django.test_utils import EnhancedTestCase
 
 from apps.utilities.models import UtilityCategory, Utility
 

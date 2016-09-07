@@ -3,7 +3,7 @@ from unittest import mock
 
 import pytest
 
-from mylabour.test_utils import EnhancedTestCase
+from utils.django.test_utils import EnhancedTestCase
 
 from apps.replies.factories import ReplyFactory
 from apps.tags.models import Tag

@@ -2,7 +2,7 @@
 from django.utils import timezone
 from django.db import models
 
-from mylabour.functions_db import ToStr, ToChar
+from utils.django.functions_db import ToStr, ToChar
 
 
 class SolutionCategoryQuerySet(models.QuerySet):
