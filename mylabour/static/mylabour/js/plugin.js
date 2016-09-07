@@ -73,12 +73,15 @@ var Module = (function() {
 
     public_methods.fillzeros = function(value, needed_length){
 
-        /*
-        Write this function
-        Do learn underscore.js function
-        If has free time, write str.format() function in for JS
-         */
+        var value = value.toString();
+        var value_length = value.length;
+        var needed_length = Number.parseInt(needed_length);
+        var diff_length = needed_length - value_length;
 
+        if (diff_length > 0){
+            value = '0'.repeat(diff_length) + value
+        }
+        return value
     };
 
     return public_methods

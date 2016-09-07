@@ -110,7 +110,7 @@ class DurationSplitWidget(forms.MultiWidget):
         return mark_safe(self.format_output(output))
 
 
-class DurationWidget(forms.widgets.Input):
+class DurationWidget(forms.widgets.TextInput):
 
     class Media:
         css = {
@@ -118,23 +118,18 @@ class DurationWidget(forms.widgets.Input):
         }
         js = ('mylabour/js/durationwidget.js', )
 
-    def format_value(self, value):
-
-        # keep default values of a timedelta
-        if value:
-            if ' ' not in value:
-                fullvalue = '0:' + value
-            else:
-                fullvalue = value
-            self.days, self.hours, self.minutes, self.seconds = map(int, fullvalue.split(':'))
-        return value
-
     def render(self, name, value, attrs=None):
 
         rendered_html = super().render(name, value, attrs)
 
-        rendered_html = rendered_html[:rendered_html.find('/>')] + 'disabled="disabled" />'
-
+        if value:
+            if ' ' not in value:
+                fullvalue = '0:' + value
+            else:
+                fullvalue = value.replace(' ', ':')
+            self.days, self.hours, self.minutes, self.seconds = map(int, fullvalue.split(':'))
+        else:
+            self.days, self.hours, self.minutes, self.seconds = (0, 0, 0, 0)
         additional_markup = self.additional_markup()
 
         return mark_safe(rendered_html + additional_markup)

@@ -79,6 +79,7 @@ class SuitAdminModelForm(forms.ModelForm):
         self.fields['status'].widget.attrs['class'] = 'span12'
 
         self.fields['duration'].widget = DurationWidget(attrs={'class': 'span2'})
+        self.fields['duration'].disabled = True
 
         self.fields['complexity'].widget.attrs['class'] = 'span12'
 
