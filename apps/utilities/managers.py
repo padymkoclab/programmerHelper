@@ -10,50 +10,63 @@ from pygal import Config
 from utils.django.functions_db import Round
 
 
-class UtilityCategoryManager(models.Manager):
+class CategoryManager(models.Manager):
 
     def get_avg_count_utilities_in_categories(self):
+        """ """
 
-        return self.categories_with_count_utilities().aggregate(
-            avg=Round(models.Avg('count_utilities'))
-        )['avg']
+        self = self.categories_with_count_utilities()
+        avg = self.aggregate(avg=Round(models.Avg('count_utilities')))['avg']
+        return avg or 0
 
 
 class UtilityManager(models.Manager):
 
     def get_avg_count_opinions_in_utilities(self):
+        """ """
 
-        return self.utilities_with_count_opinions().aggregate(
-            avg=Round(models.Avg('count_opinions'))
-        )['avg']
+        self = self.utilities_with_count_opinions()
+        avg = self.aggregate(avg=Round(models.Avg('count_opinions')))['avg']
+        return avg or 0
 
     def get_avg_count_comments_in_utilities(self):
+        """ """
 
-        return self.utilities_with_count_comments().aggregate(
-            avg=Round(models.Avg('count_comments'))
-        )['avg']
+        self = self.utilities_with_count_comments()
+        avg = self.aggregate(avg=Round(models.Avg('count_comments')))['avg']
+        return avg or 0
 
     def get_count_opinions(self):
+        """ """
 
-        return self.utilities_with_count_opinions().aggregate(sum=models.Sum('count_opinions'))['sum']
+        self = self.utilities_with_count_opinions()
+        count_opinions = self.aggregate(sum=models.Sum('count_opinions'))['sum']
+        return count_opinions or 0
 
     def get_count_comments(self):
+        """ """
 
-        return self.utilities_with_count_comments().aggregate(sum=models.Sum('count_comments'))['sum']
+        self = self.utilities_with_count_comments()
+        count_comments = self.aggregate(sum=models.Sum('count_comments'))['sum']
+        return count_comments or 0
 
     def get_count_users_posted_comments(self):
+        """ """
 
         return self.values('comments__user').distinct().count()
 
     def get_count_good_opinions(self):
+        """ """
 
         return self.filter(opinions__is_useful=True).aggregate(count=models.Count('opinions'))['count']
 
     def get_count_bad_opinions(self):
+        """ """
 
         return self.filter(opinions__is_useful=False).aggregate(count=models.Count('opinions'))['count']
 
     def get_most_popular_utilities(self):
+        """ """
 
         utilities_with_marks = self.utilities_with_marks().filter(mark__isnull=False)
         if utilities_with_marks.exists():
@@ -75,15 +88,20 @@ class UtilityManager(models.Manager):
         config.width = 500
         config.height = 500
         config.explicit_size = True
+
+        if most_popular_utilities is None:
+            config.width = 800
+
         chart = pygal.HorizontalBar(config)
 
         # add data to the chart and the conf
-        for i, utility in enumerate(most_popular_utilities):
-            chart.add(str(i + 1), utility.mark)
-
+        if most_popular_utilities is not None:
+            for i, utility in enumerate(most_popular_utilities):
+                chart.add(str(i + 1), utility.mark)
         svg = chart.render()
         return svg
 
     def get_10_most_discussed_utilities(self):
+        """ """
 
-        return
+        raise NotImplementedError

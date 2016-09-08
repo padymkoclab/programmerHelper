@@ -16,34 +16,32 @@ from apps.tags.models import Tag
 from utils.django.models_fields import ConfiguredAutoSlugField
 from utils.django.models import TimeStampedModel
 
-from .managers import SolutionCategoryManager
-from .querysets import SolutionQuerySet, SolutionCategoryQuerySet
+from .managers import CategoryManager
+from .querysets import SolutionQuerySet, CategoryQuerySet
 
 
 # Sort by count solutions
 
-class SolutionCategory(TimeStampedModel):
+class Category(TimeStampedModel):
     """
     Model for category of solution.
     """
 
-    name = models.CharField(
-        _('name'),
-        max_length=50,
-        unique=True,
-    )
+    name = models.CharField(_('Name'), max_length=50, unique=True)
     slug = ConfiguredAutoSlugField(_('Slug'), populate_from='name', unique=True)
-    description = models.TextField(_('Description'), validators=[MinLengthValidator(100)])
+    description = models.CharField(
+        _('Description'), max_length=300, validators=[MinLengthValidator(100)]
+    )
 
     class Meta:
         db_table = 'solutions_categories'
-        verbose_name = _("Category of solutions")
-        verbose_name_plural = _("Categories of solutions")
+        verbose_name = _("Category")
+        verbose_name_plural = _("Categories")
         get_latest_by = 'date_added'
         ordering = ['name']
 
     objects = models.Manager()
-    objects = SolutionCategoryManager.from_queryset(SolutionCategoryQuerySet)()
+    objects = CategoryManager.from_queryset(CategoryQuerySet)()
 
     def __str__(self):
         return '{0.name}'.format(self)
@@ -52,7 +50,7 @@ class SolutionCategory(TimeStampedModel):
         # make strip of description
         # self.description = self.description.strip()
         # self.name = self.name.strip()
-        super(SolutionCategory, self).clean()
+        super(Category, self).clean()
 
     def get_absolute_url(self):
         return reverse('solutions:category', kwargs={'pk': self.pk, 'slug': self.slug})
@@ -88,7 +86,7 @@ class Solution(TimeStampedModel):
     slug = ConfiguredAutoSlugField(_('Slug'), populate_from='problem', unique_with=['category'])
     body = models.TextField(_('Text solution'), validators=[MinLengthValidator(100)])
     category = models.ForeignKey(
-        'SolutionCategory',
+        'Category',
         on_delete=models.CASCADE,
         related_name='solutions',
         verbose_name=_('Category'),

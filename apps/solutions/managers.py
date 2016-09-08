@@ -2,7 +2,7 @@
 from django.db import models
 
 
-class SolutionCategoryManager(models.Manager):
+class CategoryManager(models.Manager):
     """
     Model manager for categories of solutions.
     """

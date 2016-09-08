@@ -5,7 +5,7 @@ from django.db import models
 from utils.django.functions_db import ToStr, ToChar
 
 
-class SolutionCategoryQuerySet(models.QuerySet):
+class CategoryQuerySet(models.QuerySet):
     """
     QuerySet for categories of solutions.
     """

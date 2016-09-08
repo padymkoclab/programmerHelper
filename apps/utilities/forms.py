@@ -3,13 +3,13 @@ from django import forms
 
 from suit.widgets import AutosizedTextarea
 
-from .models import UtilityCategory, Utility
+from .models import Category, Utility
 
 
-class UtilityCategoryAdminModelForm(forms.ModelForm):
+class CategoryAdminModelForm(forms.ModelForm):
 
     class Meta:
-        model = UtilityCategory
+        model = Category
         fields = ['name', 'slug', 'description']
 
     def __init__(self, *args, **kwargs):

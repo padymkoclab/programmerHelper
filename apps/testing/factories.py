@@ -13,7 +13,7 @@ from utils.django.factories_utils import (
     AbstractTimeStampedFactory
 )
 
-from .models import Suit, Passage, TestQuestion, Variant
+from .models import Suit, Passage, Question, Variant
 
 
 User = get_user_model()
@@ -33,7 +33,7 @@ class SuitFactory(AbstractTimeStampedFactory):
 
     @factory.lazy_attribute
     def image(self):
-        return generate_image(filename='Testing suit')
+        return generate_image(filename='Testing Suit')
 
     @factory.lazy_attribute
     def duration(self):
@@ -52,10 +52,10 @@ class SuitFactory(AbstractTimeStampedFactory):
         return generate_text_random_length_for_field_of_model(self, 'description')
 
 
-class TestQuestionFactory(AbstractTimeStampedFactory):
+class QuestionFactory(AbstractTimeStampedFactory):
 
     class Meta:
-        model = TestQuestion
+        model = Question
 
     @factory.lazy_attribute
     def title(self):
@@ -86,9 +86,9 @@ class VariantFactory(factory.DjangoModelFactory):
 
     @factory.lazy_attribute
     def question(self):
-        if not TestQuestion.objects.count():
+        if not Question.objects.count():
             raise ValueError('Does not exists questions at all.')
-        return fuzzy.FuzzyChoice(TestQuestion.objects.all()).fuzz()
+        return fuzzy.FuzzyChoice(Question.objects.all()).fuzz()
 
     @factory.lazy_attribute
     def text_variant(self):
@@ -120,9 +120,9 @@ class PassageFactory(factory.django.DjangoModelFactory):
         return fuzzy.FuzzyChoice(Suit.objects.all()).fuzz()
 
     @factory.post_generation
-    def date_passage(self, create, extracted, **kwargs):
+    def date(self, create, extracted, **kwargs):
         # a passage could happen  only after a suit was created and an user existed
         min_possible_date = max(self.user.date_joined, self.suit.date_added)
         new_date = fuzzy.FuzzyDateTime(min_possible_date).fuzz()
-        self.date_passage = new_date
+        self.date = new_date
         self.save()

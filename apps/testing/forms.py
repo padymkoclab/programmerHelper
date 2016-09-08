@@ -5,7 +5,7 @@ from suit.widgets import AutosizedTextarea
 
 from utils.django.widgets import AdminImageThumbnail, DurationWidget
 
-from .models import Suit, TestQuestion, Variant
+from .models import Suit, Question, Variant
 
 
 class VariantAdminModelForm(forms.ModelForm):
@@ -22,14 +22,14 @@ class VariantAdminModelForm(forms.ModelForm):
         self.fields['text_variant'].widget = AutosizedTextarea(attrs={'class': 'span12'})
 
 
-class TestQuestionAdminModelForm(forms.ModelForm):
+class QuestionAdminModelForm(forms.ModelForm):
 
     class Meta:
-        model = TestQuestion
+        model = Question
         fields = ['title', 'suit', 'text_question', 'slug']
 
     def __init__(self, *args, **kwargs):
-        super(TestQuestionAdminModelForm, self).__init__(*args, **kwargs)
+        super(QuestionAdminModelForm, self).__init__(*args, **kwargs)
 
         self.fields['title'].widget.attrs['class'] = 'span12'
 
@@ -41,14 +41,14 @@ class TestQuestionAdminModelForm(forms.ModelForm):
         self.fields['text_question'].widget = AutosizedTextarea(attrs={'class': 'span12'})
 
 
-class TestQuestionAdminInlineModelForm(forms.ModelForm):
+class QuestionAdminInlineModelForm(forms.ModelForm):
 
     class Meta:
-        model = TestQuestion
+        model = Question
         fields = ['title', 'suit', 'text_question', 'slug']
 
     def __init__(self, *args, **kwargs):
-        super(TestQuestionAdminInlineModelForm, self).__init__(*args, **kwargs)
+        super(QuestionAdminInlineModelForm, self).__init__(*args, **kwargs)
 
         self.fields['title'].widget.attrs['class'] = 'span12'
 

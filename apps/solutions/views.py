@@ -1,11 +1,11 @@
 
 from django.views.generic import DetailView
 
-from .models import SolutionCategory, Solution
+from .models import Category, Solution
 
 
 class CategoryDetailView(DetailView):
-    model = SolutionCategory
+    model = Category
     template_name = "solutions/category_detail.html"
 
 

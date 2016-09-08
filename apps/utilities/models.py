@@ -12,17 +12,20 @@ from utils.django.models import TimeStampedModel
 from apps.comments.models import Comment
 from apps.opinions.models import Opinion
 
-from .querysets import UtilityQuerySet, UtilityCategoryQuerySet
-from .managers import UtilityCategoryManager, UtilityManager
+from .querysets import UtilityQuerySet, CategoryQuerySet
+from .managers import CategoryManager, UtilityManager
 
 
-class UtilityCategory(TimeStampedModel):
+class Category(TimeStampedModel):
     """
     Model of a category of utilities.
     """
 
     def upload_category_image(instance, filename):
-        return 'utilities/categories/{0}/{1}'.format(instance.slug, filename)
+        return '{}/{}/{}/{}'.format(
+            instance._meta.app_label, instance._meta.model_name,
+            instance.slug, filename
+        )
 
     name = models.CharField(
         _('Name'), max_length=100, unique=True,
@@ -37,13 +40,13 @@ class UtilityCategory(TimeStampedModel):
 
     class Meta:
         db_table = 'utilities_categories'
-        verbose_name = _("Category of utilities")
-        verbose_name_plural = _("Categories of utilities")
+        verbose_name = _("Category")
+        verbose_name_plural = _("Categories")
         get_latest_by = 'date_modified'
         ordering = ['name']
 
     objects = models.Manager()
-    objects = UtilityCategoryManager.from_queryset(UtilityCategoryQuerySet)()
+    objects = CategoryManager.from_queryset(CategoryQuerySet)()
 
     def __str__(self):
         return '{0.name}'.format(self)
@@ -112,7 +115,7 @@ class Utility(TimeStampedModel):
     )
     description = models.TextField(_('Description'), validators=[MinLengthValidator(50)])
     category = models.ForeignKey(
-        'UtilityCategory',
+        'Category',
         related_name='utilities',
         verbose_name=_('Category'),
         on_delete=models.CASCADE,

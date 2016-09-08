@@ -3,20 +3,20 @@ from django import forms
 
 from apps.tags.forms import clean_tags
 
-from .models import Solution, SolutionCategory
+from .models import Solution, Category
 
 
-class SolutionCategoryForm(forms.ModelForm):
+class CategoryForm(forms.ModelForm):
     """
-    ModelForm for SolutionCategory.
+    ModelForm for Category.
     """
 
     class Meta:
-        model = SolutionCategory
+        model = Category
         fields = ('name', 'slug', 'description')
 
     def __init__(self, *args, **kwargs):
-        super(SolutionCategoryForm, self).__init__(*args, **kwargs)
+        super(CategoryForm, self).__init__(*args, **kwargs)
         self.fields['slug'].disabled = True
 
 

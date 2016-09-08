@@ -4,7 +4,7 @@ import random
 from utils.python.logging_utils import create_logger_by_filename
 from utils.django.basecommands import ExtendedBaseCommand
 
-from ...factories import SuitFactory, TestQuestionFactory, VariantFactory, PassageFactory
+from ...factories import SuitFactory, QuestionFactory, VariantFactory, PassageFactory
 
 
 logger = create_logger_by_filename(__name__)
@@ -22,7 +22,7 @@ class Command(ExtendedBaseCommand):
         count = kwargs['count'][0]
 
         SuitModel = SuitFactory._meta.model
-        TestQuestionModel = TestQuestionFactory._meta.model
+        QuestionModel = QuestionFactory._meta.model
         VariantModel = VariantFactory._meta.model
         PassageModel = PassageFactory._meta.model
 
@@ -34,9 +34,9 @@ class Command(ExtendedBaseCommand):
 
             count_questions = random.randint(0, SuitModel.MAX_COUNT_QUESTIONS_FOR_COMPLETED_SUIT)
             for j in range(count_questions):
-                question = TestQuestionFactory(suit=suit)
+                question = QuestionFactory(suit=suit)
 
-                count_variants = random.randint(0, TestQuestionModel.MAX_COUNT_VARIANTS_FOR_FULL_QUESTION)
+                count_variants = random.randint(0, QuestionModel.MAX_COUNT_VARIANTS_FOR_FULL_QUESTION)
                 for k in range(count_variants):
                     VariantFactory(question=question)
 
@@ -62,7 +62,7 @@ class Command(ExtendedBaseCommand):
                 Passages: {}
             """.format(
                 SuitModel._default_manager.count(),
-                TestQuestionModel._default_manager.count(),
+                QuestionModel._default_manager.count(),
                 VariantModel._default_manager.count(),
                 PassageModel._default_manager.count(),
             )

@@ -54,14 +54,17 @@ from apps.sessions.admin import ExpandedSessionAdmin
 from apps.sessions.models import ExpandedSession
 from apps.snippets.admin import SnippetAdmin
 from apps.snippets.models import Snippet
-from apps.solutions.admin import SolutionCategoryAdmin, SolutionAdmin
-from apps.solutions.models import SolutionCategory, Solution
+from apps.solutions.admin import CategoryAdmin as SolutionCategoryAdmin, SolutionAdmin
+from apps.solutions.models import Category as SolutionCategory, Solution
 from apps.tags.admin import TagAdmin
 from apps.tags.models import Tag
-from apps.testing.admin import SuitAdmin, PassageAdmin, TestQuestionAdmin, VariantAdmin
-from apps.testing.models import Suit, Passage, TestQuestion, Variant
-from apps.utilities.admin import UtilitiesAppAdmin, UtilityCategoryAdmin, UtilityAdmin
-from apps.utilities.models import UtilityCategory, Utility
+from apps.testing.admin import (
+    SuitAdmin, PassageAdmin, QuestionAdmin as TestQuestionAdmin,
+    VariantAdmin, TestingAppAdmin
+)
+from apps.testing.models import Suit, Passage, Question as TestQuestion, Variant
+from apps.utilities.admin import UtilitiesAppAdmin, CategoryAdmin as UtilityCategoryAdmin, UtilityAdmin
+from apps.utilities.models import Category as UtilityCategory, Utility
 
 
 class AdminSite(admin.AdminSite):
@@ -151,6 +154,8 @@ class AdminSite(admin.AdminSite):
 
         if app_label == 'utilities':
             app_admin = UtilitiesAppAdmin()
+        elif app_label == 'testing':
+            app_admin = TestingAppAdmin()
 
         app_admin.add_statistics_data_to_context(context)
 
@@ -183,6 +188,8 @@ class AdminSite(admin.AdminSite):
 
             if app_label == 'utilities':
                 app_admin = UtilitiesAppAdmin()
+            elif app_label == 'testing':
+                app_admin = TestingAppAdmin()
 
             app_admin.add_context_to_report_page(context)
 
@@ -211,6 +218,8 @@ class AdminSite(admin.AdminSite):
 
             if app_label == 'utilities':
                 app_admin = UtilitiesAppAdmin()
+            elif app_label == 'testing':
+                app_admin = TestingAppAdmin()
 
             report = app_admin.get_report(type_output_report, themes)
 

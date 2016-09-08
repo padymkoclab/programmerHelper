@@ -8,13 +8,13 @@ from apps.opinions.admin import OpinionGenericInline
 from apps.comments.admin import CommentGenericInline
 
 from .listfilters import QualityListFilter
-from .forms import SolutionCategoryForm, SolutionForm
-from .models import SolutionCategory, Solution
+from .forms import CategoryForm, SolutionForm
+from .models import Category, Solution
 
 
-class SolutionCategoryAdmin(admin.ModelAdmin):
+class CategoryAdmin(admin.ModelAdmin):
     """
-    Admin View for SolutionCategory
+    Admin View for Category
     """
 
     list_display = (
@@ -34,16 +34,16 @@ class SolutionCategoryAdmin(admin.ModelAdmin):
     search_fields = ('name',)
     fieldsets = [
         [
-            SolutionCategory._meta.verbose_name, {
+            Category._meta.verbose_name, {
                 'fields': ['name', 'slug', 'description']
             }
         ]
     ]
     prepopulated_fields = {'slug': ['name']}
-    form = SolutionCategoryForm
+    form = CategoryForm
 
     def get_queryset(self, request):
-        qs = super(SolutionCategoryAdmin, self).get_queryset(request)
+        qs = super(CategoryAdmin, self).get_queryset(request)
         qs = qs.categories_with_count_solutions_total_scope_and_latest_activity()
         return qs
 

@@ -13,13 +13,13 @@ from utils.django.factories_utils import (
     AbstractTimeStampedFactory
 )
 
-from .models import UtilityCategory, Utility
+from .models import Category, Utility
 
 
-class UtilityCategoryFactory(AbstractTimeStampedFactory):
+class CategoryFactory(AbstractTimeStampedFactory):
 
     class Meta:
-        model = UtilityCategory
+        model = Category
 
     @factory.lazy_attribute
     def name(self):
@@ -43,7 +43,7 @@ class UtilityFactory(AbstractTimeStampedFactory):
 
     @factory.lazy_attribute
     def category(self):
-        return fuzzy.FuzzyChoice(UtilityCategory.objects.all()).fuzz()
+        return fuzzy.FuzzyChoice(Category.objects.all()).fuzz()
 
     @factory.lazy_attribute
     def name(self):

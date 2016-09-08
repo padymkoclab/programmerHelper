@@ -6,7 +6,7 @@ from utils.python.logging_utils import create_logger_by_filename
 logger = create_logger_by_filename(__name__)
 
 
-class UtilityCategoryQuerySet(models.QuerySet):
+class CategoryQuerySet(models.QuerySet):
 
     def categories_with_count_utilities(self):
         """ """

@@ -12,6 +12,7 @@ SHELL_PLUS_PRE_IMPORTS = (
     ('django.template', ('Template', 'Context')),
     ('django.contrib', 'admin'),
     ('django.apps', 'apps'),
+    ('utils', 'django'),
 )
 
 # what needn`t rename in time autoload

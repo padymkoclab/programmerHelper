@@ -8,11 +8,12 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 
+from utils.django.functions_db import Round
 from utils.django.models_fields import ConfiguredAutoSlugField
 from utils.django.models import TimeStampedModel
 
-from .managers import TestQuestionManager
-from .querysets import SuitQuerySet, TestQuestionQuerySet
+from .managers import SuitManager, QuestionManager, PassageManager
+from .querysets import SuitQuerySet, QuestionQuerySet
 
 
 class Suit(TimeStampedModel):
@@ -33,17 +34,26 @@ class Suit(TimeStampedModel):
         (COMPLICATED, _('Complicated')),
     )
 
+    def upload_image(instance, filename):
+
+        return '{}/{}/{}/{}'.format(
+            instance._meta.app_label,
+            instance._meta.model_name,
+            instance.slug,
+            filename,
+        )
+
     name = models.CharField(
         _('Name'), max_length=200, unique=True,
         validators=[MinLengthValidator(settings.MIN_LENGTH_FOR_NAME_OR_TITLE_OBJECT)]
     )
     slug = ConfiguredAutoSlugField(_('Slug'), populate_from='name', unique=True)
-    status = models.BooleanField(('Status'), default=False)
+    status = models.BooleanField(('Is completed'), default=False)
     description = models.CharField(
         ('Description'), max_length=500,
         validators=[MinLengthValidator(settings.MIN_LENGTH_FOR_NAME_OR_TITLE_OBJECT)]
     )
-    image = models.ImageField(_('Image'), max_length=1000)
+    image = models.ImageField(_('Image'), max_length=1000, upload_to=upload_image)
     duration = models.DurationField(
         _('Duration'), default=timedelta(minutes=1),
         validators=[
@@ -52,18 +62,18 @@ class Suit(TimeStampedModel):
         ]
     )
     complexity = models.CharField(_('Complexity'), max_length=30, choices=CHOICES_COMPLEXITY)
-    passages = models.ManyToManyField(
-        settings.AUTH_USER_MODEL, verbose_name=_('Passages'),
+    testers = models.ManyToManyField(
+        settings.AUTH_USER_MODEL, verbose_name=_('Testers'),
         through='Passage', through_fields=['suit', 'user'],
     )
 
     objects = models.Manager()
-    objects = SuitQuerySet.as_manager()
+    objects = SuitManager.from_queryset(SuitQuerySet)()
 
     class Meta:
         db_table = 'testing_suits'
-        verbose_name = _("Testing suit")
-        verbose_name_plural = _("Testing suits")
+        verbose_name = _("Suit")
+        verbose_name_plural = _("Suits")
         ordering = ['date_added']
         get_latest_by = 'date_modified'
 
@@ -86,8 +96,39 @@ class Suit(TimeStampedModel):
     get_count_questions.short_description = _('Count questions')
     get_count_questions.admin_order_field = 'count_questions'
 
+    def get_count_passages(self):
+        """ """
 
-class TestQuestion(TimeStampedModel):
+        return self.passages.count()
+    get_count_passages.short_description = _('Count passages')
+    get_count_passages.admin_order_field = 'count_passages'
+
+    def get_count_attempt_passages(self):
+        """ """
+
+        return self.passages.filter(status=self.testers.through.ATTEMPT).count()
+    get_count_attempt_passages.short_description = _('Count attempt passages')
+
+    def get_count_passed_passages(self):
+        """ """
+
+        return self.passages.filter(status=self.testers.through.PASSED).count()
+    get_count_passed_passages.short_description = _('Count passed passages')
+
+    def get_count_distinct_testers(self):
+        """ """
+
+        return self.testers.distinct().count()
+    get_count_distinct_testers.short_description = _('Count distinct testers')
+
+    def get_avg_mark(self):
+        """ """
+
+        return self.passages.aggregate(avg=Round(models.Avg('mark')))['avg']
+    get_avg_mark.short_description = _('Average mark')
+
+
+class Question(TimeStampedModel):
     """
 
     """
@@ -110,14 +151,14 @@ class TestQuestion(TimeStampedModel):
 
     class Meta:
         db_table = 'testing_questions'
-        verbose_name = _("Testing question")
-        verbose_name_plural = _("Testing questions")
+        verbose_name = _("Question")
+        verbose_name_plural = _("Questions")
         unique_together = ('title', 'suit')
         get_latest_by = 'date_modified'
         ordering = ['suit', 'title']
 
     objects = models.Manager()
-    objects = TestQuestionManager.from_queryset(TestQuestionQuerySet)()
+    objects = QuestionManager.from_queryset(QuestionQuerySet)()
 
     def __str__(self):
         return '{0.title}'.format(self)
@@ -160,7 +201,7 @@ class Variant(models.Model):
     id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
     text_variant = models.CharField(_('Text variant'), max_length=300)
     question = models.ForeignKey(
-        'TestQuestion', verbose_name=_('Question'),
+        'Question', verbose_name=_('Question'),
         related_name='variants', on_delete=models.CASCADE,
     )
     is_right_variant = models.BooleanField(_('Is right variant of answer?'), default=False)
@@ -198,7 +239,10 @@ class Passage(models.Model):
         settings.AUTH_USER_MODEL, verbose_name=_('User'),
         on_delete=models.CASCADE, related_name='passages',
     )
-    suit = models.ForeignKey('Suit', verbose_name=_('Suit'), on_delete=models.CASCADE)
+    suit = models.ForeignKey(
+        'Suit', verbose_name=_('Suit'),
+        on_delete=models.CASCADE, related_name='passages',
+    )
     status = models.CharField(_('Status'), max_length=10, choices=CHOICES_STATUS)
     mark = models.SmallIntegerField(
         _('Mark'),
@@ -207,14 +251,17 @@ class Passage(models.Model):
             MaxValueValidator(MAX_MARK),
         ]
     )
-    date_passage = models.DateTimeField(_('Date passage'), auto_now_add=True)
+    date = models.DateTimeField(_('Date'), auto_now_add=True)
+
+    objects = models.Manager()
+    objects = PassageManager()
 
     class Meta:
-        db_table = 'testing_passages'
+        db_table = 'testing_results'
         verbose_name = _("Passage")
         verbose_name_plural = _("Passages")
-        get_latest_by = 'date_passage'
-        ordering = ['date_passage']
+        get_latest_by = 'date'
+        ordering = ['date']
 
     def __str__(self):
-        return 'Passage of user {self.user} on suit {0.suit} on {self.date_passage}'.format(self)
+        return 'Passage of user {0.user} on suit {0.suit} on {0.date}'.format(self)

@@ -1,9 +1,9 @@
 
 from django.views.generic import DetailView
 
-from .models import UtilityCategory
+from .models import Category
 
 
-class UtilityCategoryDetailView(DetailView):
-    model = UtilityCategory
+class CategoryDetailView(DetailView):
+    model = Category
     template_name = "utilities/category_detail.html"

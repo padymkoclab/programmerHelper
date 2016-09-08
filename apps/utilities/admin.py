@@ -15,8 +15,8 @@ from utils.django.listfilters import IsNewSimpleListFilter
 from apps.opinions.admin import OpinionGenericInline
 from apps.comments.admin import CommentGenericInline
 
-from .models import UtilityCategory, Utility
-from .forms import UtilityCategoryAdminModelForm, UtilityAdminModelForm
+from .models import Category, Utility
+from .forms import CategoryAdminModelForm, UtilityAdminModelForm
 
 
 logger = create_logger_by_filename(__name__)
@@ -45,12 +45,12 @@ class UtilityInline(admin.StackedInline):
     ]
 
 
-class UtilityCategoryAdmin(admin.ModelAdmin):
+class CategoryAdmin(admin.ModelAdmin):
     '''
-    Admin View for UtilityCategory
+    Admin View for Category
     '''
 
-    form = UtilityCategoryAdminModelForm
+    form = CategoryAdminModelForm
     list_display = (
         'name',
         'get_count_utilities',
@@ -78,7 +78,7 @@ class UtilityCategoryAdmin(admin.ModelAdmin):
 
     def get_queryset(self, request):
 
-        qs = super(UtilityCategoryAdmin, self).get_queryset(request)
+        qs = super(CategoryAdmin, self).get_queryset(request)
         qs = qs.categories_with_all_additional_fields()
         return qs
 
@@ -86,7 +86,7 @@ class UtilityCategoryAdmin(admin.ModelAdmin):
 
         fieldsets = [
             [
-                UtilityCategory._meta.verbose_name, {
+                Category._meta.verbose_name, {
                     'fields': [
                         'name',
                         'slug',
@@ -205,8 +205,8 @@ class UtilitiesAppAdmin:
         """Add statictis data to a context."""
 
         context['statistics_data'] = {
-            'count_categories': UtilityCategory.objects.count(),
-            'avg_count_utilities_in_categories': UtilityCategory.objects.get_avg_count_utilities_in_categories(),
+            'count_categories': Category.objects.count(),
+            'avg_count_utilities_in_categories': Category.objects.get_avg_count_utilities_in_categories(),
             'count_utilities': Utility.objects.count(),
             'avg_count_opinions_in_utilities': Utility.objects.get_avg_count_opinions_in_utilities(),
             'avg_count_comments_in_utilities': Utility.objects.get_avg_count_comments_in_utilities(),
@@ -223,7 +223,7 @@ class UtilitiesAppAdmin:
 
         # context with statictis data
         context['themes_for_reports'] = {
-            UtilityCategory._meta.verbose_name_plural: 'categories',
+            Category._meta.verbose_name_plural: 'categories',
             Utility._meta.verbose_name_plural: 'utilities',
         }
 

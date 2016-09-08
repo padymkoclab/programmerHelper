@@ -4,20 +4,63 @@ from django.db import models
 
 class SuitQuerySet(models.QuerySet):
 
-    def suit_with_count_questions(self):
+    def suits_with_count_questions(self):
         """ """
 
         return self.annotate(count_questions=models.Count('questions', distinct=True))
 
+    def suits_with_count_passages(self):
+        """ """
+
+        return self.annotate(count_passages=models.Count('passages', distinct=True))
+
+    def suits_with_count_attempt_passages(self):
+        """ """
+
+        Warning('Don`t use')
+
+        TestResultModel = self.model.testers.through
+        return self.annotate(
+            count_attempt_passages=models.Sum(
+                models.Case(
+                    models.When(passages__status=TestResultModel.ATTEMPT, then=1),
+                    default=0,
+                    output_field=models.IntegerField()
+                )
+            )
+        )
+
+    def suits_with_count_passed_passages(self):
+        """ """
+
+        Warning('Don`t use')
+
+        TestResultModel = self.model.testers.through
+        return self.annotate(
+            count_passed_passages=models.Sum(
+                models.Case(
+                    models.When(passages__status=TestResultModel.PASSED, then=1),
+                    default=0,
+                    output_field=models.IntegerField()
+                )
+            )
+        )
+
+    def suits_with_avg_marks(self):
+        """ """
+
+        raise NotImplementedError
+
     def suits_with_all_additional_fields(self):
         """ """
 
-        self = self.suit_with_count_questions()
+        self = self.suits_with_count_questions()
+        self = self.suits_with_count_passages()
 
         return self
 
 
-class TestQuestionQuerySet(models.QuerySet):
+class QuestionQuerySet(models.QuerySet):
 
     def questions_with_count_variants(self):
         """ """
