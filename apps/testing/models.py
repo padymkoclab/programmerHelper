@@ -71,7 +71,6 @@ class Suit(TimeStampedModel):
     objects = SuitManager.from_queryset(SuitQuerySet)()
 
     class Meta:
-        db_table = 'testing_suits'
         verbose_name = _("Suit")
         verbose_name_plural = _("Suits")
         ordering = ['date_added']
@@ -150,7 +149,6 @@ class Question(TimeStampedModel):
     text_question = models.CharField(_('Text question'), max_length=300)
 
     class Meta:
-        db_table = 'testing_questions'
         verbose_name = _("Question")
         verbose_name_plural = _("Questions")
         unique_together = ('title', 'suit')
@@ -207,7 +205,6 @@ class Variant(models.Model):
     is_right_variant = models.BooleanField(_('Is right variant of answer?'), default=False)
 
     class Meta:
-        db_table = 'testing_variants'
         verbose_name = _("Variant")
         verbose_name_plural = _("Variants")
         unique_together = ['question', 'text_variant']
@@ -257,7 +254,6 @@ class Passage(models.Model):
     objects = PassageManager()
 
     class Meta:
-        db_table = 'testing_results'
         verbose_name = _("Passage")
         verbose_name_plural = _("Passages")
         get_latest_by = 'date'

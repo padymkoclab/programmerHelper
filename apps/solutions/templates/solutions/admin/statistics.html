@@ -1,0 +1,160 @@
+
+{% extends "admin/statistics.html" %}
+
+{% load i18n %}
+{% load static %}
+
+{% block statistics %}
+
+  <div class="div_basic_info">
+
+    <table id="table_container">
+      <tr>
+        <td>
+          <table class="table-overview applist">
+            <caption>{% trans "Solutions" %}</caption>
+            <tbody>
+              <tr>
+                <td>{% trans "Count solutions" %}</td>
+                <td>{{ statistics_data.count_solutions }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </td>
+        <td>
+          <table class="table-overview applist">
+            <caption>{% trans "Comments" %}</caption>
+            <tbody>
+              <tr>
+                <td>{% trans "Count comments" %}</td>
+                <td>{{ statistics_data.count_comments }}</td>
+              </tr>
+              <tr>
+                <td>{% trans "Average count comments in solutions" %}</td>
+                <td>{{ statistics_data.avg_count_comments }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <table class="table-overview applist">
+            <caption>{% trans "Tags" %}</caption>
+            <tbody>
+              <tr>
+                <td>{% trans "Total count usaged tags" %}</td>
+                <td>{{ statistics_data.count_usaged_tags }}</td>
+              </tr>
+              <tr>
+                <td>{% trans "Average count tags in solutions" %}</td>
+                <td>{{ statistics_data.avg_count_tags }}</td>
+              </tr>
+              <tr>
+                <td>{% trans "Count unique usaged tags" %}</td>
+                <td>{{ statistics_data.count_unique_usaged_tags }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </td>
+        <td>
+          <table class="table-overview applist">
+            <caption>{% trans "Opinions" %}</caption>
+            <tbody>
+              <tr>
+                <td>{% trans "Count opinions" %}</td>
+                <td>{{ statistics_data.count_opinions }}</td>
+              </tr>
+              <tr>
+                <td>{% trans "Average count opinions in solutions" %}</td>
+                <td>{{ statistics_data.avg_count_opinions }}</td>
+              </tr>
+              <tr>
+                <td>{% trans "Count critics" %}</td>
+                <td>{{ statistics_data.count_critics }}</td>
+              </tr>
+              <tr>
+                <td>{% trans "Count supporters" %}</td>
+                <td>{{ statistics_data.count_supporters }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="chart_and_objects">
+    <p class="lead">{% trans "Chart count opinions for the past year" %}</p>
+    <div class="div_chart_objects pull-left">
+      <table class="table">
+      <thead>
+        <th>{% trans "Month, year" %}</th>
+        <th>{% trans "Total count" %}</th>
+        <th>{% trans "Coutn critics" %}</th>
+        <th>{% trans "Count supporters" %}</th>
+      </thead>
+      <tbody>
+        {% for month_year, data in statistics_data.statistics_count_opinions_for_the_past_year %}
+          <tr>
+            <td>{{ month_year }}</td>
+            {% for count in data %}
+              <td>{{ count }}</td>
+            {% endfor %}
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    </div>
+    <div class="div_chart pull-right">
+      {{ statistics_data.chart_count_opinions_for_the_past_year|safe }}
+    </div>
+    <div class="clearfix"></div>
+  </div>
+  <div class="chart_and_objects">
+    <p class="lead">{% trans "Chart count comments for the past year" %}</p>
+    <div class="div_chart_objects pull-left">
+      <table class="table">
+      <thead>
+        <th>{% trans "Month, year" %}</th>
+        <th>{% trans "Count comments" %}</th>
+      </thead>
+      <tbody>
+        {% for month_year, count in statistics_data.statistics_count_comments_for_the_past_year %}
+          <tr>
+            <td>{{ month_year }}</td>
+            <td>{{ count }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    </div>
+    <div class="div_chart pull-right">
+      {{ statistics_data.chart_count_comments_for_the_past_year|safe }}
+    </div>
+    <div class="clearfix"></div>
+  </div>
+  <div class="chart_and_objects">
+    <p class="lead">{% trans "Chart count solutions for the past year" %}</p>
+    <div class="div_chart_objects pull-left">
+      <table class="table">
+      <thead>
+        <th>{% trans "Month, year" %}</th>
+        <th>{% trans "Count solutions" %}</th>
+      </thead>
+      <tbody>
+        {% for month_year, count in statistics_data.statistics_count_solutions_for_the_past_year %}
+          <tr>
+            <td>{{ month_year }}</td>
+            <td>{{ count }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    </div>
+    <div class="div_chart pull-right">
+      {{ statistics_data.chart_count_solutions_for_the_past_year|safe }}
+    </div>
+    <div class="clearfix"></div>
+  </div>
+{% endblock statistics %}

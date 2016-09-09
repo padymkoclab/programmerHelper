@@ -10,6 +10,14 @@
     font-weight: bold;
 }
 
+.div_chart_objects table{
+    width:  250px;
+}
+
+.div_chart_objects table tr th, .div_chart_objects table tr td{
+    text-align: center;
+}
+
 .div_chart_objects table tr th:first-child{
     width:  20px;
 }
@@ -30,10 +38,6 @@
     #table_container table td:nth-child(2){
         text-align: right;
     }
-
-.div_chart{
-    margin-top: 37px;
-}
 
 .chart_and_objects, .div_basic_info{
     padding: 5px;

@@ -19,6 +19,12 @@ Now = timezone.now().replace(tzinfo=timezone.get_current_timezone())
 
 class AbstractTimeStampedFactory(factory.DjangoModelFactory):
 
+    def __init__(self, *args, **kwargs):
+        super(AbstractTimeStampedFactory, self).__init__(*args, **kwargs)
+
+        self.timezone = timezone
+        self.now = timezone.now().replace(tzinfo=timezone.get_current_timezone())
+
     @classmethod
     def _after_postgeneration(cls, obj, create, results=None):
         super(AbstractTimeStampedFactory, cls)._after_postgeneration(obj, create, results)
@@ -27,7 +33,7 @@ class AbstractTimeStampedFactory(factory.DjangoModelFactory):
 
     @factory.post_generation
     def date_added(self, create, extracted, **kwargs):
-        self.date_added = fuzzy.FuzzyDateTime(Now - timezone.timedelta(days=500)).fuzz()
+        self.date_added = fuzzy.FuzzyDateTime(self.now - self.timezone.timedelta(days=500)).fuzz()
         self.save()
 
 

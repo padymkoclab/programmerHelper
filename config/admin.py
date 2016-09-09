@@ -54,8 +54,8 @@ from apps.sessions.admin import ExpandedSessionAdmin
 from apps.sessions.models import ExpandedSession
 from apps.snippets.admin import SnippetAdmin
 from apps.snippets.models import Snippet
-from apps.solutions.admin import CategoryAdmin as SolutionCategoryAdmin, SolutionAdmin
-from apps.solutions.models import Category as SolutionCategory, Solution
+from apps.solutions.admin import SolutionAdmin, SolutionAppAdmin
+from apps.solutions.models import Solution
 from apps.tags.admin import TagAdmin
 from apps.tags.models import Tag
 from apps.testing.admin import (
@@ -156,6 +156,8 @@ class AdminSite(admin.AdminSite):
             app_admin = UtilitiesAppAdmin()
         elif app_label == 'testing':
             app_admin = TestingAppAdmin()
+        elif app_label == 'solutions':
+            app_admin = SolutionAppAdmin()
 
         app_admin.add_statistics_data_to_context(context)
 
@@ -190,6 +192,8 @@ class AdminSite(admin.AdminSite):
                 app_admin = UtilitiesAppAdmin()
             elif app_label == 'testing':
                 app_admin = TestingAppAdmin()
+            elif app_label == 'solutions':
+                app_admin = SolutionAppAdmin()
 
             app_admin.add_context_to_report_page(context)
 
@@ -220,6 +224,8 @@ class AdminSite(admin.AdminSite):
                 app_admin = UtilitiesAppAdmin()
             elif app_label == 'testing':
                 app_admin = TestingAppAdmin()
+            elif app_label == 'solutions':
+                app_admin = SolutionAppAdmin()
 
             report = app_admin.get_report(type_output_report, themes)
 
@@ -256,11 +262,10 @@ AdminSite.register(Passage, PassageAdmin)
 AdminSite.register(TestQuestion, TestQuestionAdmin)
 AdminSite.register(Variant, VariantAdmin)
 
-# solution
-AdminSite.register(SolutionCategory, SolutionCategoryAdmin)
+# solutions
 AdminSite.register(Solution, SolutionAdmin)
 
-# question
+# questions
 AdminSite.register(Question, QuestionAdmin)
 AdminSite.register(Answer, AnswerAdmin)
 

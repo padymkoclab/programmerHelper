@@ -1,12 +1,7 @@
 
 from django.views.generic import DetailView
 
-from .models import Category, Solution
-
-
-class CategoryDetailView(DetailView):
-    model = Category
-    template_name = "solutions/category_detail.html"
+from .models import Solution
 
 
 class SolutionDetailView(DetailView):

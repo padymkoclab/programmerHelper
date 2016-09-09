@@ -4,10 +4,12 @@ from django.contrib.auth import get_user_model
 import factory
 from factory import fuzzy
 
+from utils.django.factories_utils import AbstractTimeStampedFactory
+
 from .models import Opinion
 
 
-class OpinionFactory(factory.DjangoModelFactory):
+class OpinionFactory(AbstractTimeStampedFactory):
 
     class Meta:
         model = Opinion
@@ -33,3 +35,8 @@ class OpinionFactory(factory.DjangoModelFactory):
             raise ValueError(msg)
 
         return users_without_opinions.random_users(1)
+
+    @factory.post_generation
+    def date_added(self, create, extracted, **kwargs):
+        self.date_added = fuzzy.FuzzyDateTime(self.user.date_joined).fuzz()
+        self.save()

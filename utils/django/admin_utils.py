@@ -1,10 +1,35 @@
 
+from django.utils.html import format_html_join
 
-def listing_accounts_with_admin_url(accounts):
+from ..python.logging_utils import create_logger_by_filename
+from ..python.utils import check_method_of_object
+
+logger = create_logger_by_filename(__name__)
+
+
+def listing_objects_with_admin_url(queryset, method_get_admin_url, method_get_str_obj, default_text):
     """ """
 
-    if not accounts:
-        return None
+    logger.warning('If raised AttributeError or ValueError, Django replace value on empty in the Admin.')
+    # details there
+    # https://github.com/django/django/blob/master/django/contrib/admin/helpers.py
+    # line 201
+
+    if not queryset.exists():
+        return default_text
+
+    obj = queryset.first()
+    check_method_of_object(obj, method_get_admin_url)
+    check_method_of_object(obj, method_get_str_obj)
+
+    return format_html_join(
+        ', ',
+        '<a href="{}">{}</a>',
+        (
+            (getattr(obj, method_get_admin_url)(), getattr(obj, method_get_str_obj)())
+            for obj in queryset
+        ),
+    )
 
 
 def remove_url_from_admin_urls(urls, url_name):

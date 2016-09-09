@@ -1,4 +1,6 @@
 
+from django.utils.translation import ugettext_lazy as _
+from django.utils.text import force_text
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes import admin as admin_generic
 from django.contrib import admin
@@ -43,4 +45,15 @@ class OpinionAdmin(admin.ModelAdmin):
     Admin View for Comment
     '''
 
-    list_display = ('content_object',)
+    list_display = (
+        'truncated_content_object',
+        'content_type',
+        'user',
+        'is_useful',
+        'date_modified',
+        'date_added',
+    )
+
+    def truncated_content_object(self, obj):
+        return force_text(obj.content_object)
+    truncated_content_object.short_description = _('Object')

@@ -39,7 +39,6 @@ class Category(TimeStampedModel):
     image = models.ImageField(_('Picture'), max_length=1000, upload_to=upload_category_image)
 
     class Meta:
-        db_table = 'utilities_categories'
         verbose_name = _("Category")
         verbose_name_plural = _("Categories")
         get_latest_by = 'date_modified'
@@ -126,7 +125,6 @@ class Utility(TimeStampedModel):
     comments = GenericRelation(Comment)
 
     class Meta:
-        db_table = 'utilities'
         verbose_name = _("Utility")
         verbose_name_plural = _("Utilities")
         ordering = ['category', 'name']

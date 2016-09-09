@@ -1,0 +1,20 @@
+
+{% extends "admin/reports.html" %}
+
+{% load i18n %}
+
+{% block themes %}
+
+  {% for theme_verbose_name, theme_name in themes_for_reports.items %}
+    <tr>
+        <td class="section">
+            <label for="subject_{{ theme_name }}">
+                <input type="checkbox" name="themes" value="{{ theme_name }}" id="subject_{{ theme_name }}">
+                <span>{{ theme_verbose_name }}</span>
+            </label>
+        </td>
+    </tr>
+  {% endfor %}
+
+{% endblock themes %}
+

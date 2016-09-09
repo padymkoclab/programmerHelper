@@ -14,7 +14,7 @@ from ..python.logging_utils import create_logger_by_filename
 logger = create_logger_by_filename(__name__)
 
 
-def get_statistics_count_objects_by_the_past_year(queryset, date_field_name):
+def get_statistics_count_objects_for_the_past_year(queryset, date_field_name):
     """ """
 
     now = timezone.now()

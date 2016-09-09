@@ -2,58 +2,36 @@
 import random
 
 from django.contrib.auth import get_user_model
+from django.conf import settings
 
 import factory
 from factory import fuzzy
 
+from utils.django.factories_utils import AbstractTimeStampedFactory, generate_text_random_length_for_field_of_model
+
+from apps.tags.models import Tag
 from apps.comments.factories import CommentFactory
 from apps.opinions.factories import OpinionFactory
-from utils.django.utils import generate_text_certain_length, generate_text_by_min_length
 
-from .constants import CATEGORIES_OF_SOLUTIONS
-from .models import *
+from .models import Solution
 
 
-class SolutionCategoryFactory(factory.DjangoModelFactory):
-
-    class Meta:
-        model = SolutionCategory
-
-    @factory.lazy_attribute
-    def name(self):
-        max_length = SolutionCategory._meta.get_field('name').max_length
-        random_length = random.randint(1, max_length)
-        return factory.Faker('text', locale='ru').generate([])[:random_length]
-
-    @factory.lazy_attribute
-    def description(self):
-        return factory.Faker('text', locale='ru').generate([])
-
-
-class SolutionFactory(factory.DjangoModelFactory):
+class SolutionFactory(AbstractTimeStampedFactory):
 
     class Meta:
         model = Solution
 
     @factory.lazy_attribute
-    def category(self):
-        return fuzzy.FuzzyChoice(SolutionCategory.objects.all()).fuzz()
+    def user(self):
+        return fuzzy.FuzzyChoice(get_user_model()._default_manager.all()).fuzz()
 
     @factory.lazy_attribute
-    def account(self):
-        return fuzzy.FuzzyChoice(get_user_model().objects.active_accounts()).fuzz()
-
-    @factory.lazy_attribute
-    def title(self):
-        max_length = Solution._meta.get_field('title').max_length
-        min_length = 10
-        length = random.randint(min_length, max_length)
-        return generate_text_by_min_length(min_length)[:length]
+    def problem(self):
+        return generate_text_random_length_for_field_of_model(self, 'problem')
 
     @factory.lazy_attribute
     def body(self):
-        length = random.randint(100, 10000)
-        return generate_text_certain_length(length)
+        return generate_text_random_length_for_field_of_model(self, 'body')
 
     @factory.post_generation
     def tags(self, created, extracted, **kwargs):
@@ -62,14 +40,8 @@ class SolutionFactory(factory.DjangoModelFactory):
         self.tags.set(tags)
 
     @factory.post_generation
-    def links(self, created, extracted, **kwargs):
-        count_links = random.randint(settings.MIN_COUNT_WEBLINKS_ON_OBJECT, settings.MAX_COUNT_WEBLINKS_ON_OBJECT)
-        links = random.sample(tuple(WebLink.objects.all()), count_links)
-        self.links.set(links)
-
-    @factory.post_generation
     def comments(self, created, extracted, **kwargs):
-        for i in range(random.randint(0, 3)):
+        for i in range(random.randint(0, 5)):
             CommentFactory(content_object=self)
 
     @factory.post_generation
@@ -79,26 +51,5 @@ class SolutionFactory(factory.DjangoModelFactory):
 
     @factory.post_generation
     def date_added(self, created, extracted, **kwargs):
-        self.date_added = fuzzy.FuzzyDateTime(self.account.date_joined).fuzz()
+        self.date_added = fuzzy.FuzzyDateTime(self.user.date_joined).fuzz()
         self.save()
-        assert self.date_added >= self.account.date_joined
-
-    @factory.post_generation
-    def date_modified(self, created, extracted, **kwargs):
-        self.date_modified = fuzzy.FuzzyDateTime(self.date_added).fuzz()
-        self.save()
-        assert self.date_modified >= self.date_added
-
-
-def solutions_categories_factory():
-    SolutionCategory.objects.filter().delete()
-    random.shuffle(CATEGORIES_OF_SOLUTIONS)
-    for category_name in CATEGORIES_OF_SOLUTIONS:
-        SolutionCategoryFactory(name=category_name)
-
-
-def solutions_factory(count_solutions):
-    if not SolutionCategory.objects.count():
-        solutions_categories_factory()
-    for i in range(count_solutions):
-        SolutionFactory()

@@ -1,6 +1,6 @@
 
 from django.utils.translation import ugettext as _
-from utils.django.model_utils import get_statistics_count_objects_by_the_past_year
+from utils.django.model_utils import get_statistics_count_objects_for_the_past_year
 from django.db import models
 
 import pygal
@@ -72,15 +72,15 @@ class PassageManager(models.Manager):
 
         # statistics for all passages
         # unpack it as dates and statistical data for all passages
-        dates, stat_total = zip(*get_statistics_count_objects_by_the_past_year(self, 'date'))
+        dates, stat_total = zip(*get_statistics_count_objects_for_the_past_year(self, 'date'))
 
         # statistics for passages with status "attempt"
         attempt_passages = self.filter(status=self.model.ATTEMPT)
-        stat_attept = tuple(zip(*get_statistics_count_objects_by_the_past_year(attempt_passages, 'date')))[1]
+        stat_attept = tuple(zip(*get_statistics_count_objects_for_the_past_year(attempt_passages, 'date')))[1]
 
         # statistics for passages with status "passed"
         passed_passages = self.filter(status=self.model.PASSED)
-        stat_passed = tuple(zip(*get_statistics_count_objects_by_the_past_year(passed_passages, 'date')))[1]
+        stat_passed = tuple(zip(*get_statistics_count_objects_for_the_past_year(passed_passages, 'date')))[1]
 
         # packing values in tuple by each month
         stat = zip(stat_total, stat_attept, stat_passed)

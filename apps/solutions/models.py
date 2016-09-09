@@ -1,6 +1,4 @@
 
-import statistics
-
 from django.conf import settings
 from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.auth import get_user_model
@@ -8,7 +6,6 @@ from django.core.urlresolvers import reverse
 from django.core.validators import MinLengthValidator
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-from django.contrib.postgres.fields import ArrayField
 
 from apps.comments.models import Comment
 from apps.opinions.models import Opinion
@@ -16,63 +13,8 @@ from apps.tags.models import Tag
 from utils.django.models_fields import ConfiguredAutoSlugField
 from utils.django.models import TimeStampedModel
 
-from .managers import CategoryManager
-from .querysets import SolutionQuerySet, CategoryQuerySet
-
-
-# Sort by count solutions
-
-class Category(TimeStampedModel):
-    """
-    Model for category of solution.
-    """
-
-    name = models.CharField(_('Name'), max_length=50, unique=True)
-    slug = ConfiguredAutoSlugField(_('Slug'), populate_from='name', unique=True)
-    description = models.CharField(
-        _('Description'), max_length=300, validators=[MinLengthValidator(100)]
-    )
-
-    class Meta:
-        db_table = 'solutions_categories'
-        verbose_name = _("Category")
-        verbose_name_plural = _("Categories")
-        get_latest_by = 'date_added'
-        ordering = ['name']
-
-    objects = models.Manager()
-    objects = CategoryManager.from_queryset(CategoryQuerySet)()
-
-    def __str__(self):
-        return '{0.name}'.format(self)
-
-    def clean(self, *args, **kwargs):
-        # make strip of description
-        # self.description = self.description.strip()
-        # self.name = self.name.strip()
-        super(Category, self).clean()
-
-    def get_absolute_url(self):
-        return reverse('solutions:category', kwargs={'pk': self.pk, 'slug': self.slug})
-
-    def get_total_scope(self):
-        """Getting total scope of category of solutions, on based scopes their solutions."""
-
-        if not self.solutions.count():
-            return None
-        all_scopes_of_solutions = (solution.get_scope() for solution in self.solutions.iterator())
-        mean_value = statistics.mean(all_scopes_of_solutions)
-        return round(mean_value, 4)
-    get_total_scope.short_description = _('Total scope')
-    get_total_scope.admin_order_field = 'total_scope'
-
-    def get_latest_activity(self):
-        """Determined date and time last activity in category of solution,
-        on based latest datetime chages in itself category or their solutions."""
-
-        return self.__class__.objects.categories_with_latest_activity().get(pk=self.pk).latest_activity
-    get_latest_activity.short_description = _('Latest activity')
-    get_latest_activity.admin_order_field = 'latest_activity'
+from .managers import SolutionManager
+from .querysets import SolutionQuerySet
 
 
 class Solution(TimeStampedModel):
@@ -81,47 +23,36 @@ class Solution(TimeStampedModel):
     """
 
     problem = models.CharField(
-        _('Title'), max_length=100, validators=[MinLengthValidator(settings.MIN_LENGTH_FOR_NAME_OR_TITLE_OBJECT)]
+        _('Title'), max_length=100, unique=True,
+        validators=[
+            MinLengthValidator(settings.MIN_LENGTH_FOR_NAME_OR_TITLE_OBJECT)
+        ],
+        error_messages={'unique': _('Solution with this problem already exists.')}
     )
-    slug = ConfiguredAutoSlugField(_('Slug'), populate_from='problem', unique_with=['category'])
+    slug = ConfiguredAutoSlugField(_('Slug'), populate_from='problem', unique=True)
     body = models.TextField(_('Text solution'), validators=[MinLengthValidator(100)])
-    category = models.ForeignKey(
-        'Category',
-        on_delete=models.CASCADE,
-        related_name='solutions',
-        verbose_name=_('Category'),
-    )
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         related_name='solutions',
         verbose_name=_('User'),
         on_delete=models.CASCADE,
-        limit_choices_to={'is_active': True}
     )
     tags = models.ManyToManyField(
         Tag,
         related_name='solutions',
         verbose_name=_('Tags'),
     )
-    links = ArrayField(
-        models.URLField(max_length=1000, blank=True),
-        size=10,
-        verbose_name=_('Links'),
-        help_text=_('Useful links'),
-    )
+
     comments = GenericRelation(Comment, related_query_name='solutions')
     opinions = GenericRelation(Opinion, related_query_name='solutions')
 
-    # managers
     objects = models.Manager()
-    objects = SolutionQuerySet.as_manager()
+    objects = SolutionManager.from_queryset(SolutionQuerySet)()
 
     class Meta:
-        db_table = 'solutions'
         verbose_name = _("Solution")
         verbose_name_plural = _("Solutions")
-        ordering = ['category', 'problem']
-        unique_together = ['problem', 'category']
+        ordering = ['problem']
         get_latest_by = 'date_modified'
         permissions = (("can_view_opinions_about_solutions", "Can view opinions about solutions"),)
 
@@ -137,54 +68,61 @@ class Solution(TimeStampedModel):
             args=(self.pk,)
         )
 
-    def unique_error_message(self, model_class, unique_check):
-        if isinstance(self, model_class) and unique_check == ('problem', 'category'):
-            return _('Solution with this problem already exists in this category of solutions.')
-        return super(Solution, self).unique_error_message(model_class, unique_check)
+    def get_count_opinions(self):
+        """ """
+        return self.opinions.count()
+    get_count_opinions.short_description = _('Count opinions')
+    get_count_opinions.admin_order_field = 'count_opinions'
 
-    def get_scope(self):
-        """Getting scope of solution on based their opinions."""
+    def get_count_comments(self):
+        """ """
 
-        return self.__class__.objects.solutions_with_scopes().get(pk=self.pk).scope
-    get_scope.short_description = _('Scope')
-    get_scope.admin_order_field = 'scope'
+        return self.comments.count()
+    get_count_comments.short_description = _('Count comments')
+    get_count_comments.admin_order_field = 'count_comments'
 
-    def get_quality(self):
-        """Getting quality of solution on based its scope."""
+    def get_count_tags(self):
+        """ """
 
-        # this is approved solution and so, it had sign "Sign quality"
-        return self.__class__.objects.solutions_with_qualities().get(pk=self.pk).quality
-    get_quality.short_description = _('Quality')
-    get_quality.admin_order_field = 'scope'
+        return self.tags.count()
+    get_count_tags.short_description = _('Count tags')
+    get_count_tags.admin_order_field = 'count_tags'
 
-    def get_quality_detail(self):
-        """Get detail about quality of solution, namely: name, description and color."""
+    def get_mark(self):
+        """Getting mark of solution on based their opinions."""
 
-        quality = self.get_quality()
-        if quality == 'Approved':
-            return _('Approved quality solution, tells about what solution is have many possitive opinions from users.')
-        elif quality == 'Good':
-            return _('Good quality solution, tells about what solution is have more possitive opinions of users. than negative.')
-        elif quality == 'Vague':
-            return _('Vague quality solution, tells about what solution is have not clear definition of quality.')
-        elif quality == 'Bad':
-            return _('Bad quality solution, tells about what solution is have more negative opinions of users, than possitive.')
-        elif quality == 'Heinously':
-            return _('Heinously quality solution, tells about what solution is have many negative opinions from users.')
+        # in opinions, convert boolean to int
+        self = self.opinions.annotate(is_useful_int=models.Case(
+            models.When(is_useful=True, then=1),
+            models.When(is_useful=False, then=-1),
+            output_field=models.IntegerField()
+        ))
+        return self.aggregate(
+            mark=models.functions.Coalesce(models.Sum('is_useful_int'), 0)
+        )['mark']
+    get_mark.short_description = _('Mark')
+    get_mark.admin_order_field = 'mark'
 
-    def critics_of_solution(self):
-        """Determination users given negative opinions about solution."""
+    def get_critics(self):
+        users = self.opinions.filter(is_useful=False).values('user')
+        return get_user_model()._default_manager.filter(pk__in=users)
 
-        return get_user_model().objects.filter(pk__in=self.opinions.filter(is_useful=False).values('account__pk'))
+    def get_supporters(self):
+        users = self.opinions.filter(is_useful=True).values('user')
+        return get_user_model()._default_manager.filter(pk__in=users)
 
-    def supporters_of_solution(self):
-        """Determination users given possitive opinions about solution."""
+    def get_count_critics(self):
+        return self.opinions.filter(is_useful=False).count()
+    get_count_critics.short_description = _('Count critics')
 
-        return get_user_model().objects.filter(pk__in=self.opinions.filter(is_useful=True).values('account__pk'))
+    def get_count_supporters(self):
+        """ """
+        return self.opinions.filter(is_useful=True).count()
+    get_count_supporters.short_description = _('Count supporters')
 
     def related_solutions(self):
         """ """
 
-        raise NotImplementedError
         # analysis tags
         # analysis problem
+        raise NotImplementedError

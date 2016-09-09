@@ -16,7 +16,7 @@ from django.contrib import admin
 import pygal
 
 from utils.django.admin_utils import remove_url_from_admin_urls
-from utils.django.model_utils import get_statistics_count_objects_by_the_past_year, get_latest_or_none
+from utils.django.model_utils import get_statistics_count_objects_for_the_past_year, get_latest_or_none
 
 from .models import Poll, Choice, Vote
 from .forms import PollModelForm, ChoiceModelForm
@@ -413,7 +413,7 @@ class PollAdmin(admin.ModelAdmin):
         """Return chart in SVG format on based statistics of count votes by year."""
 
         # get a statistics data by votes
-        statistics_count_votes_by_year = get_statistics_count_objects_by_the_past_year(Vote, 'date_voting')
+        statistics_count_votes_by_year = get_statistics_count_objects_for_the_past_year(Vote, 'date_voting')
 
         # create a line chart
         chart_statistics_count_votes_by_year = pygal.Line()
