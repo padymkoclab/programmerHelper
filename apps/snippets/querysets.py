@@ -7,33 +7,6 @@ class SnippetQuerySet(models.QuerySet):
     QuerySet for using with queryset model Snippet
     """
 
-    def objects_with_marks(self):
-        """Added to each snippet new field 'mark' where storage her mark."""
-
-        return self.annotate(mark=models.Sum(
-            models.Case(
-                models.When(opinions__is_useful=True, then=1),
-                models.When(opinions__is_useful=False, then=-1),
-                default=0,
-                output_field=models.IntegerField()
-            )
-        ))
-
-    def snippets_with_count_tags(self):
-        """Added to each snippet new field with count of tags of the a each snippet."""
-
-        return self.annotate(count_tags=models.Count('tags', distinct=True))
-
-    def snippets_with_count_opinions(self):
-        """Added to each snippet new field with count of opinions of the a each snippet."""
-
-        return self.annotate(count_opinions=models.Count('opinions', distinct=True))
-
-    def snippets_with_count_comments(self):
-        """Added to each snippet new field with count of comments of the a each snippet."""
-
-        return self.annotate(count_comments=models.Count('comments', distinct=True))
-
     def snippets_by_marks(self, min_mark=None, max_mark=None):
         """Snippets with certain range of marks."""
 
@@ -74,15 +47,32 @@ class SnippetQuerySet(models.QuerySet):
             )
         ))
 
-    def snippets_with_total_counters_on_related_fields(self):
+    def snippets_with_all_additional_fields(self):
         """Determinating for each snippet count_tags, opinions, favours, comments,
         getting mark, count good/bad opinions, and count likes/dislikes favours."""
 
-        self = self.objects_with_marks()
-        self = self.snippets_with_count_tags()
-        self = self.snippets_with_count_comments()
-        self = self.snippets_with_count_opinions()
-        self = self.snippets_with_count_favours()
-        self = self.snippets_with_count_like_favours()
-        self = self.snippets_with_count_dislike_favours()
+        self = self.annotate(count_tags=models.Count('tags', distinct=True))
+
+        self = self.annotate(count_opinions=models.Count('opinions', distinct=True))
+
+        self = self.annotate(count_comments=models.Count('comments', distinct=True))
+
+        self = self.extra(
+            select={
+                'rating': """
+                    SELECT
+                        SUM(
+                            CASE
+                                WHEN "opinions"."is_useful" = True THEN 1
+                                WHEN "opinions"."is_useful" = False THEN -1
+                                ELSE 6
+                            END
+                        )
+                    FROM
+                        "opinions"
+                    WHERE
+                        "opinions"."object_id" = "snippets"."id"
+                """
+            }
+        )
         return self

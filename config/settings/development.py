@@ -30,5 +30,5 @@ TEMPLATES[0]['OPTIONS']['string_if_invalid'] = mark_safe(
 
 INSTALLED_APPS += [
     'django_extensions',
-    'debug_toolbar',
+    # 'debug_toolbar',
 ]

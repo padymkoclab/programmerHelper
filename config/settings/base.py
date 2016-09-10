@@ -27,6 +27,7 @@ DJANGO_APPS = [
 THIRD_PARTY_APPS = [
     # 'django_js_reverse',
     # 'django_gravatar',
+    'suit_ckeditor',
 ]
 
 COMMON_APPS = [

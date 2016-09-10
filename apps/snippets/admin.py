@@ -1,155 +1,214 @@
 
-import random
-import datetime
-import time
-
-from django.template.response import TemplateResponse
-from django.conf.urls import url
+from django.template.defaultfilters import truncatechars
 from django.utils.translation import ugettext_lazy as _
 from django.contrib import admin
 
+from utils.django.admin_utils import listing_objects_with_admin_url
+from utils.django.listfilters import IsNewSimpleListFilter
+
 from apps.comments.admin import CommentGenericInline
 from apps.opinions.admin import OpinionGenericInline
-from apps.opinions.admin_mixins import ScopeMixin
-from apps.favours.admin import FavourInline
+# from apps.opinions.admin_mixins import ScopeMixin
+# from apps.favours.admin import FavourInline
 
 from .models import Snippet
-from .forms import SnippetForm
+from .forms import SnippetAdminModelForm
 
 
-class SnippetAdmin(ScopeMixin, admin.ModelAdmin):
+class SnippetAppAdmin:
+
+    def add_statistics_data_to_context(self, context):
+        """Add statictis data to a context."""
+
+        context['statistics_data'] = {
+            'count_snippets': Snippet.objects.count(),
+            'get_statistics_usage_lexers': Snippet.objects.get_statistics_usage_lexers(),
+            'chart_statistics_usage_lexers': Snippet.objects.get_chart_statistics_usage_lexers(),
+            'statistics_count_snippets_for_the_past_year':
+                Snippet.objects.get_statistics_count_snippets_for_the_past_year(),
+            'chart_count_snippets_for_the_past_year':
+                Snippet.objects.get_chart_count_snippets_for_the_past_year(),
+
+            'avg_count_comments': Snippet.comments_manager.get_avg_count_comments(),
+            'count_comments': Snippet.comments_manager.get_count_comments(),
+            'statistics_count_comments_for_the_past_year':
+                Snippet.comments_manager.get_statistics_count_comments_for_the_past_year(),
+            'chart_count_comments_for_the_past_year':
+                Snippet.comments_manager.get_chart_count_comments_for_the_past_year(),
+
+            'avg_count_opinions': Snippet.opinions_manager.get_avg_count_opinions(),
+            'count_opinions': Snippet.opinions_manager.get_count_opinions(),
+            'count_critics': Snippet.opinions_manager.get_count_critics(),
+            'count_supporters': Snippet.opinions_manager.get_count_supporters(),
+            'statistics_count_opinions_for_the_past_year':
+                Snippet.opinions_manager.get_statistics_count_opinions_for_the_past_year(),
+            'chart_count_opinions_for_the_past_year':
+                Snippet.opinions_manager.get_chart_count_opinions_for_the_past_year(),
+
+            'avg_count_tags': Snippet.tags_manager.get_avg_count_tags(),
+            'count_usaged_tags': Snippet.tags_manager.get_count_usaged_tags(),
+            'count_unique_usaged_tags': Snippet.tags_manager.get_count_unique_usaged_tags(),
+        }
+
+    def add_context_to_report_page(self, context):
+
+        # context with statictis data
+        context['themes_for_reports'] = {
+            Snippet._meta.verbose_name_plural: 'snippets',
+        }
+
+    def get_report(self, output_report, themes):
+
+        msg = 'Report must generated in {0} on themes: {1}'.format(output_report.upper(), themes)
+        return msg
+
+
+# class SnippetAdmin(ScopeMixin, admin.ModelAdmin):
+class SnippetAdmin(admin.ModelAdmin):
     '''
     Admin View for Snippet.
     '''
 
-    form = SnippetForm
+    form = SnippetAdminModelForm
     list_display = (
-        'title',
-        'account',
+        'truncated_title',
+        'user',
         'lexer',
-        # 'views',
-        'colored_scope',
-        'get_count_comments',
+        'get_rating',
         'get_count_tags',
         'get_count_opinions',
-        'get_count_favours',
+        'get_count_comments',
         'is_new',
         'date_modified',
         'date_added',
     )
     list_filter = (
-        ('account', admin.RelatedOnlyFieldListFilter),
+        ('user', admin.RelatedOnlyFieldListFilter),
         ('lexer', admin.AllValuesFieldListFilter),
+        IsNewSimpleListFilter,
         'date_modified',
         'date_added',
     )
-    inlines = [
-        OpinionGenericInline,
-        FavourInline,
-        CommentGenericInline,
-    ]
-    search_fields = ('title', 'account__username')
-    filter_horizontal = ['tags']
+
+    search_fields = ('title', )
+    # filter_horizontal = ['tags']
     date_hierarchy = 'date_added'
-    fieldsets = [
-        [
-            Snippet._meta.verbose_name, {
-                'fields': ['title', 'account', 'lexer', 'description', 'code', 'tags']
-            }
-        ]
+
+    readonly_fields = [
+        'get_rating',
+        'get_count_tags',
+        'get_count_opinions',
+        'get_count_comments',
+        'date_modified',
+        'date_added',
+        'get_count_critics',
+        'get_count_supporters',
+        'get_listing_critics_with_admin_urls',
+        'get_listing_supporters_with_admin_urls',
     ]
 
     def get_queryset(self, request):
         qs = super(SnippetAdmin, self).get_queryset(request)
-        qs = qs.snippets_with_total_counters_on_related_fields()
+        qs = qs.snippets_with_all_additional_fields()
         return qs
 
-    def get_urls(self):
-        urls = super(SnippetAdmin, self).get_urls()
+    def get_inline_instances(self, request, obj=None):
 
-        # a url name must be as 'snippets_snippet_statistics'
-        url_name = 'statistics'
-        name_for_url = '{0}_{1}_{2}'.format(self.model._meta.app_label, self.model._meta.model_name, url_name)
+        if obj is not None:
+            inlines = [OpinionGenericInline, CommentGenericInline]
+            return [inline(self.model, self.admin_site) for inline in inlines]
+        return []
 
-        # adding new url
-        additional_urls = [
-            url(r'^{0}/$'.format(url_name), self.admin_site.admin_view(self.statistics_view), {}, name_for_url),
+    def get_fieldsets(self, request, obj=None):
+
+        fieldsets = [
+            [
+                Snippet._meta.verbose_name, {
+                    'fields': [
+                        'title',
+                        'slug',
+                        'user',
+                        'lexer',
+                        'description',
+                        'tags',
+                    ]
+                }
+            ],
+            [
+                Snippet._meta.get_field('code').verbose_name, {
+                    'classes': ('full-width', ),
+                    'fields': ['code']
+                }
+            ]
         ]
-        return additional_urls + urls
 
-    def statistics_view(self, request):
-        """ """
+        if obj is not None:
 
-        # get data for charts
-        # statistics_by_usage_lexers = Snippet.objects.get_statistics_by_usage_all_lexers()
-        # only_used_lexers = tuple(couple[0] for couple in statistics_by_usage_lexers if couple[1] > 0)
-        # only_values_of_used_lexers = tuple(couple[1] for couple in statistics_by_usage_lexers if couple[1] > 0)
-        # # make charts
-        # xdata = only_used_lexers
-        # ydata = only_values_of_used_lexers
-        # extra_serie = {"tooltip": {"y_start": "", "y_end": " cal"}}
-        # usage_lexers_chartdata = {'x': xdata, 'y1': ydata, 'extra1': extra_serie}
-        # usage_lexers_charttype = "pieChart"
-        # piechart_usage_lexers_container = 'piechart_usage_lexers_container'
-        # data = {
-        #     'usage_lexers_charttype': usage_lexers_charttype,
-        #     'usage_lexers_chartdata': usage_lexers_chartdata,
-        #     'piechart_usage_lexers_container': piechart_usage_lexers_container,
-        # }
-        # adding variables to context
-        context = dict(
-            # Include common variables for rendering the admin template
-            self.admin_site.each_context(request),
-            title=_('Statistics by tags'),
-            opts=self.model._meta,
-            # root_path=self.admin_site.root_path,
-        )
-        # context.update(data)
-        # context['statistics_by_usage_all_lexers'] = Snippet.objects.get_statistics_by_usage_all_lexers()
-        # context['statistics_by_usage_tags'] = Snippet.tags_manager.get_statistics_by_count_used_tags()
+            fieldsets.append([
+                _('Additional information'), {
+                    'classes': ('collapse', ),
+                    'fields': [
+                        'get_count_tags',
+                        'get_count_comments',
+                        'get_count_opinions',
+                        'get_rating',
+                        'get_count_critics',
+                        'get_count_supporters',
+                        'get_listing_critics_with_admin_urls',
+                        'get_listing_supporters_with_admin_urls',
+                        'date_modified',
+                        'date_added',
+                    ],
+                }
+            ])
 
-        #
-        #
-        #
+        return fieldsets
 
-        xdata = [datetime.date(11, 11, 11), datetime.date(11, 11, 12), datetime.date(11, 11, 13), datetime.date(11, 11, 14)]
-        ydata = [4, 2, 2, 1]
-        tooltip_date = "%d %b %Y %H:%M:%S %p"
-        extra_serie1 = {"tooltip": {"y_start": "", "y_end": " calls"}, "date_format": tooltip_date}
-        chartdata = {
-            'x': xdata,
-            'name1': 'series 1', 'y1': ydata, 'extra1': extra_serie1,
-        }
-        charttype = "cumulativeLineChart"
-        data = {
-            'charttype': charttype,
-            'chartdata': chartdata,
-        }
-        context.update(data)
+    def truncated_title(self, obj):
+        return truncatechars(obj.title, 50)
+    truncated_title.short_description = Snippet._meta.get_field('title').verbose_name
+    truncated_title.admin_order_field = 'title'
 
-        return TemplateResponse(request, 'admin/snippets/statistics.html', context)
+    def suit_row_attributes(self, obj, request):
+
+        if obj.rating is not None:
+            if obj.rating < 0:
+                return {'class': 'error'}
+            elif obj.rating > 0:
+                return {'class': 'success'}
+
+    def suit_cell_attributes(self, obj, column):
+
+        if column in ['truncated_title']:
+            return {'class': 'text-left'}
+        elif column in ['date_modified', 'date_added']:
+            return {'class': 'text-right'}
+        else:
+            return {'class': 'text-center'}
 
     def preview_snippet(self):
         """ """
 
         raise NotImplementedError
 
-    def get_count_comments(self, obj):
-        return obj.count_comments
-    get_count_comments.admin_order_field = 'count_comments'
-    get_count_comments.short_description = _('Count comments')
+    def get_listing_critics_with_admin_urls(self, obj):
+        """ """
 
-    def get_count_opinions(self, obj):
-        return obj.count_opinions
-    get_count_opinions.admin_order_field = 'count_opinions'
-    get_count_opinions.short_description = _('Count opinions')
+        return listing_objects_with_admin_url(
+            obj.get_critics(),
+            'get_admin_url',
+            'get_full_name',
+            _('No body')
+        )
+    get_listing_critics_with_admin_urls.short_description = _('Critics')
 
-    def get_count_tags(self, obj):
-        return obj.count_tags
-    get_count_tags.admin_order_field = 'count_tags'
-    get_count_tags.short_description = _('Count tags')
+    def get_listing_supporters_with_admin_urls(self, obj):
+        """ """
 
-    def get_count_favours(self, obj):
-        return obj.count_favours
-    get_count_favours.admin_order_field = 'count_favours'
-    get_count_favours.short_description = _('Count favours')
+        return listing_objects_with_admin_url(
+            obj.get_supporters(),
+            'get_admin_url',
+            'get_full_name',
+            _('No body')
+        )
+    get_listing_supporters_with_admin_urls.short_description = _('Supporters')

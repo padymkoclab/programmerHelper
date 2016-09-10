@@ -88,8 +88,8 @@ class Solution(TimeStampedModel):
     get_count_tags.short_description = _('Count tags')
     get_count_tags.admin_order_field = 'count_tags'
 
-    def get_mark(self):
-        """Getting mark of solution on based their opinions."""
+    def get_rating(self):
+        """Getting rating of solution on based their opinions."""
 
         # in opinions, convert boolean to int
         self = self.opinions.annotate(is_useful_int=models.Case(
@@ -98,10 +98,10 @@ class Solution(TimeStampedModel):
             output_field=models.IntegerField()
         ))
         return self.aggregate(
-            mark=models.functions.Coalesce(models.Sum('is_useful_int'), 0)
-        )['mark']
-    get_mark.short_description = _('Mark')
-    get_mark.admin_order_field = 'mark'
+            rating=models.functions.Coalesce(models.Sum('is_useful_int'), 0)
+        )['rating']
+    get_rating.short_description = _('Rating')
+    get_rating.admin_order_field = 'rating'
 
     def get_critics(self):
         users = self.opinions.filter(is_useful=False).values('user')

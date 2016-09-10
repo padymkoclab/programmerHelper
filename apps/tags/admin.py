@@ -17,15 +17,15 @@ class SolutionInline(admin.TabularInline):
     verbose_name_plural = _('Solutions')
 
 
-class SnippetInline(admin.TabularInline):
-    '''
-    Tabular Inline View for Solution
-    '''
+# class SnippetInline(admin.TabularInline):
+#     '''
+#     Tabular Inline View for Solution
+#     '''
 
-    model = Tag.snippets.through
-    extra = 1
-    verbose_name = _('Snippet')
-    verbose_name_plural = _('Snippets')
+#     model = Tag.snippets.through
+#     extra = 1
+#     verbose_name = _('Snippet')
+#     verbose_name_plural = _('Snippets')
 
 
 class ArticleInline(admin.TabularInline):
@@ -81,7 +81,7 @@ class TagAdmin(admin.ModelAdmin):
     ]
     inlines = [
         SolutionInline,
-        SnippetInline,
+        # SnippetInline,
         ArticleInline,
         QuestionInline,
     ]

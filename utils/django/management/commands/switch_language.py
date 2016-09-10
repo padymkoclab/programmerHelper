@@ -4,6 +4,11 @@ from django.utils.translation import get_language_info, activate
 from django.conf import settings
 
 
+raise NotImplementedError(
+    'Problem is there https://docs.djangoproject.com/en/1.8/topics/settings/#altering-settings-at-runtime'
+)
+
+
 def _get_help_text():
     """Return detailed help_text for command."""
 

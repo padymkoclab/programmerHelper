@@ -20,7 +20,7 @@ from pygments.lexers import get_lexer_by_name
 from pygments.formatters import HtmlFormatter
 
 from ...python.logging_utils import create_logger_by_filename
-from ..constants import PRETTY_COLORS
+from ...python.constants import PRETTY_COLORS
 
 
 logger = create_logger_by_filename(__name__)

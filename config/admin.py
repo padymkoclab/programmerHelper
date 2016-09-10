@@ -52,7 +52,7 @@ from apps.marks.admin import MarkAdmin
 from apps.marks.models import Mark
 from apps.sessions.admin import ExpandedSessionAdmin
 from apps.sessions.models import ExpandedSession
-from apps.snippets.admin import SnippetAdmin
+from apps.snippets.admin import SnippetAdmin, SnippetAppAdmin
 from apps.snippets.models import Snippet
 from apps.solutions.admin import SolutionAdmin, SolutionAppAdmin
 from apps.solutions.models import Solution
@@ -158,6 +158,8 @@ class AdminSite(admin.AdminSite):
             app_admin = TestingAppAdmin()
         elif app_label == 'solutions':
             app_admin = SolutionAppAdmin()
+        elif app_label == 'snippets':
+                app_admin = SnippetAppAdmin()
 
         app_admin.add_statistics_data_to_context(context)
 
@@ -194,6 +196,8 @@ class AdminSite(admin.AdminSite):
                 app_admin = TestingAppAdmin()
             elif app_label == 'solutions':
                 app_admin = SolutionAppAdmin()
+            elif app_label == 'snippets':
+                app_admin = SnippetAppAdmin()
 
             app_admin.add_context_to_report_page(context)
 
@@ -226,6 +230,8 @@ class AdminSite(admin.AdminSite):
                 app_admin = TestingAppAdmin()
             elif app_label == 'solutions':
                 app_admin = SolutionAppAdmin()
+            elif app_label == 'snippets':
+                app_admin = SnippetAppAdmin()
 
             report = app_admin.get_report(type_output_report, themes)
 

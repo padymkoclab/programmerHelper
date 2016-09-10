@@ -1,13 +1,11 @@
 
-import itertools
 import collections
 
-from django.utils import timezone
 from django.db import models
 
-from dateutil.relativedelta import relativedelta
+import pygal
 
-from apps.tags.models import Tag
+from utils.django.model_utils import get_statistics_count_objects_for_the_past_year as get_statistics
 
 
 class SnippetManager(models.Manager):
@@ -27,61 +25,66 @@ class SnippetManager(models.Manager):
 
         self.change_lexer_of_snippet(snippet=snippet, lexer='python3')
 
-    def get_statistics_by_usage_all_lexers(self):
+    def get_statistics_usage_lexers(self):
         """Getting a statistics by total usage of each a lexer on all a snippets."""
 
-        # found and count used lexers
         used_lexers = self.values_list('lexer', flat=True)
-        counter_used_lexers = collections.Counter(used_lexers).most_common()
 
-        # got codes of used lexer to find non used lexers
-        codes_used_lexers = tuple(itertools.chain.from_iterable(counter_used_lexers))
-        do_not_used_lexers = ((code, 0) for code, name in self.model.CHOICES_LEXERS if code not in codes_used_lexers)
+        count_used_lexers = collections.Counter(used_lexers).most_common()
 
-        # contate counters used and don`t used lexers
-        counter_lexers = list(counter_used_lexers) + list(do_not_used_lexers)
+        count_used_lexers.sort(key=lambda x: x[1], reverse=True)
 
-        #
-        result = list()
-        for code_lexer, value in counter_lexers:
-            for code_lexer2, display_lexer_name in self.model.CHOICES_LEXERS:
-                if code_lexer2 == code_lexer:
-                    result.append((display_lexer_name, value))
+        lexers_and_labels = dict(self.model._meta.get_field('lexer').choices)
 
-        return tuple(result)
+        return [(lexers_and_labels[lexer], count)for lexer, count in count_used_lexers]
 
-    def get_statistics_by_usage_tags(self):
-        """Getting a statistics by total usage of each a tag on all a snippets."""
+    def get_chart_statistics_usage_lexers(self):
+        """Getting a statistics by total usage of each a lexer on all a snippets."""
 
-        # get primary keys a tags used in all a snippets
-        pks_used_tags = self.values_list('tags__pk', flat=True)
+        config = pygal.Config()
 
-        # counter primary keys the tags
-        counter_used_tags = collections.Counter(pks_used_tags).most_common()
+        config.width = 800
+        # config.height = 500
+        config.explicit_size = True
+        config.legend_at_bottom = True
+        config.legend_at_bottom_columns = 3
+        config.show_legend = True
+        config.style = pygal.style.DefaultStyle()
 
-        # replace primary key of each the tag on itself object
-        counter_used_tags = tuple(
-            (Tag.objects.get(pk=tag_pk), count_usage_tag) for tag_pk, count_usage_tag in counter_used_tags
-        )
+        chart = pygal.Pie(config)
 
-        return counter_used_tags
+        data = self.get_statistics_usage_lexers()
 
-    def get_statistics_count_snippets_by_months_for_past_year(self):
-        """Get statistics by count snippets for past year."""
+        for lexer, count_usage in data:
+            chart.add(lexer, count_usage)
 
-        now = timezone.now()
-        result = list()
-        for month in range(13, 0, -1):
-            datetime_ago = now - relativedelta(months=month)
-            count_snippets = self.filter(
-                date_added__month__lte=datetime_ago.month,
-                date_added__year__lte=datetime_ago.year
-            ).count()
-            result.append(((datetime_ago.year, datetime_ago.month), count_snippets))
-        return result
+        svg = chart.render()
+        return svg
 
+    def get_statistics_count_snippets_for_the_past_year(self):
+        """ """
 
-class PythonSnippetManager(models.Manager):
+        return get_statistics(self, 'date_added')
 
-    def get_queryset(self):
-        return super(PythonSnippetManager, self).get_queryset().filter(lexer='python')
+    def get_chart_count_snippets_for_the_past_year(self):
+        """ """
+
+        config = pygal.Config()
+        config.width = 800
+        config.height = 500
+        config.explicit_size = True
+        config.fill = True
+        config.show_legend = False
+        config.interpolate = 'hermite'
+        config.interpolation_parameters = {'type': 'cardinal', 'c': .75}
+
+        chart = pygal.StackedLine(config)
+
+        statistics = self.get_statistics_count_snippets_for_the_past_year()
+
+        dates, data = zip(*statistics)
+
+        chart.x_labels = dates
+        chart.add('Count snippets', data)
+        svg = chart.render()
+        return svg

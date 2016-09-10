@@ -63,7 +63,7 @@ class SolutionAdmin(admin.ModelAdmin):
     list_display = (
         'problem',
         'user',
-        'get_mark',
+        'get_rating',
         'get_count_opinions',
         'get_count_comments',
         'get_count_tags',
@@ -83,7 +83,7 @@ class SolutionAdmin(admin.ModelAdmin):
     prepopulated_fields = {'slug': ['problem']}
     form = SolutionAdminModelForm
     readonly_fields = [
-        'get_mark',
+        'get_rating',
         'get_count_opinions',
         'get_count_comments',
         'get_count_tags',
@@ -121,7 +121,7 @@ class SolutionAdmin(admin.ModelAdmin):
                 _('Additional information'), {
                     'classes': ('collapse', ),
                     'fields': [
-                        'get_mark',
+                        'get_rating',
                         'get_count_opinions',
                         'get_count_critics',
                         'get_count_supporters',
@@ -147,18 +147,18 @@ class SolutionAdmin(admin.ModelAdmin):
     def get_ordering(self, request):
 
         # ordering on base dynamic fields
-        return ['-mark', '-count_opinions']
+        return ['-rating', '-count_opinions']
 
     def suit_row_attributes(self, obj, request):
-        if obj.mark > 0:
+        if obj.rating > 0:
             return {'class': 'success', 'data': obj.problem}
-        elif obj.mark < 0:
+        elif obj.rating < 0:
             return {'class': 'error', 'data': obj.problem}
 
     def suit_cell_attributes(self, obj, column):
 
         if column in [
-            'get_mark',
+            'get_rating',
             'get_count_opinions',
             'get_count_comments',
             'get_count_tags',

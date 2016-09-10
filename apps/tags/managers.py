@@ -3,12 +3,33 @@ import collections
 
 from django.db import models
 
+from .querysets import TagQuerySet
+
 
 class TagManager(models.Manager):
     """
     Manager of a tags for other object had the tags.
     Important towards other model have field 'tags'.
     """
+
+    def get_count_usaged_tags(self):
+        """ """
+
+        return self.values('tags').count()
+
+    def get_count_unique_usaged_tags(self):
+        """ """
+
+        return self.values('tags').distinct().count()
+
+    def get_avg_count_tags(self):
+        """ """
+
+        return self.objects_with_count_tags().aggregate(
+            result=models.functions.Coalesce(
+                models.Avg('count_tags'), 0
+            )
+        )['result']
 
     def get_related_objects_by_tags(self, obj):
         """Return objects the same type, with common tags in a decsent order by a level similarity, as next:
@@ -45,6 +66,9 @@ class TagManager(models.Manager):
         counter_used_tags = collections.Counter(used_tags).most_common()
 
         return counter_used_tags
+
+
+TagManager = TagManager.from_queryset(TagQuerySet)
 
 
 class PurelyTagManager(models.Manager):

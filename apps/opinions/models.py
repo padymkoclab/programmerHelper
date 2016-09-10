@@ -6,6 +6,9 @@ from django.conf import settings
 
 from utils.django.models import BaseGenericModel
 
+from .managers import OpinionManager
+from .querysets import OpinionQuerySet
+
 
 class Opinion(BaseGenericModel):
 
@@ -16,6 +19,9 @@ class Opinion(BaseGenericModel):
         verbose_name=_('User'),
     )
     is_useful = models.BooleanField(_('Is useful?'))
+
+    objects = models.Manager()
+    objects = OpinionManager.from_queryset(OpinionQuerySet)()
 
     class Meta:
         db_table = 'opinions'

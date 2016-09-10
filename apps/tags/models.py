@@ -6,7 +6,7 @@ from django.db import models
 from utils.django.models import TimeStampedModel
 
 from .managers import PurelyTagManager
-from .querysets import TagQuerySet
+from .querysets import PurelyTagQuerySet
 
 
 class Tag(TimeStampedModel):
@@ -36,7 +36,7 @@ class Tag(TimeStampedModel):
 
     # managers
     objects = models.Manager()
-    objects = PurelyTagManager.from_queryset(TagQuerySet)()
+    objects = PurelyTagManager.from_queryset(PurelyTagQuerySet)()
 
     def __str__(self):
         return '{0.name}'.format(self)

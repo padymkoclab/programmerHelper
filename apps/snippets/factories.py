@@ -6,33 +6,42 @@ from django.contrib.auth import get_user_model
 import factory
 from factory import fuzzy
 
+from utils.django.factories_utils import AbstractTimeStampedFactory, generate_text_random_length_for_field_of_model
+
+from apps.tags.models import Tag
 from apps.opinions.factories import OpinionFactory
 from apps.comments.factories import CommentFactory
-from apps.favours.factories import FavourFactory
 
-from .models import *
+from .models import Snippet
 
 
-class SnippetFactory(factory.DjangoModelFactory):
+class SnippetFactory(AbstractTimeStampedFactory):
 
     class Meta:
         model = Snippet
 
-    description = factory.Faker('text', locale='ru')
-    code = factory.Faker('text', locale='en')
+    @factory.lazy_attribute
+    def lexer(self):
+        field = Snippet._meta.get_field('lexer')
+        choices = field.choices
+        values_choices = tuple(zip(*choices))[0]
+        return fuzzy.FuzzyChoice(values_choices).fuzz()
 
     @factory.lazy_attribute
-    def account(self):
-        return fuzzy.FuzzyChoice(get_user_model().objects.active_accounts()).fuzz()
+    def user(self):
+        return fuzzy.FuzzyChoice(get_user_model()._default_manager.all()).fuzz()
 
     @factory.lazy_attribute
     def title(self):
-        length_snippet_title = random.randint(20, 200)
-        return factory.Faker('text', locale='ru').generate([])[:length_snippet_title]
+        return generate_text_random_length_for_field_of_model(self, 'title')
 
     @factory.lazy_attribute
-    def lexer(self):
-        return random.choice(CHOICES_LEXERS)[0]
+    def description(self):
+        return generate_text_random_length_for_field_of_model(self, 'description')
+
+    @factory.lazy_attribute
+    def code(self):
+        return generate_text_random_length_for_field_of_model(self, 'code')
 
     @factory.post_generation
     def tags(self, created, extracted, **kwargs):
@@ -42,7 +51,7 @@ class SnippetFactory(factory.DjangoModelFactory):
 
     @factory.post_generation
     def comments(self, created, extracted, **kwargs):
-        for i in range(random.randrange(3)):
+        for i in range(random.randrange(5)):
             CommentFactory(content_object=self)
 
     @factory.post_generation
@@ -51,24 +60,6 @@ class SnippetFactory(factory.DjangoModelFactory):
             OpinionFactory(content_object=self)
 
     @factory.post_generation
-    def favours(self, created, extracted, **kwargs):
-        for i in range(random.randrange(5)):
-            FavourFactory(content_object=self)
-
-    @factory.post_generation
     def date_added(self, created, extracted, **kwargs):
-        self.date_added = fuzzy.FuzzyDateTime(self.account.date_joined).fuzz()
+        self.date_added = fuzzy.FuzzyDateTime(self.user.date_joined).fuzz()
         self.save()
-        assert self.date_added >= self.account.date_joined
-
-    @factory.post_generation
-    def date_modified(self, created, extracted, **kwargs):
-        self.date_modified = fuzzy.FuzzyDateTime(self.date_added).fuzz()
-        self.save()
-        assert self.date_modified >= self.date_added
-
-
-def snippets_factory(count):
-    Snippet.objects.filter().delete()
-    for i in range(count):
-        SnippetFactory()

@@ -17,8 +17,13 @@ class CommentGenericInline(admin_generic.GenericStackedInline):
     ct_field = 'content_type'
     ct_fk_field = 'object_id'
 
-    fields = ['user', 'text_comment', 'rating', 'date_modified', 'date_added']
     readonly_fields = ['rating', 'date_modified', 'date_added']
+
+    def get_fields(self, request, obj=None):
+
+        fields = ['user', 'text_comment', 'rating', 'date_modified', 'date_added']
+
+        return fields
 
 
 class CommentAdmin(admin.ModelAdmin):

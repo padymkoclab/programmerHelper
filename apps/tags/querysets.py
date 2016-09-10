@@ -5,6 +5,14 @@ from utils.django.model_utils import get_random_objects
 
 
 class TagQuerySet(models.QuerySet):
+
+    def objects_with_count_tags(self):
+        """Added to each object new field with count of tags of the a each object."""
+
+        return self.annotate(count_tags=models.Count('tags', distinct=True))
+
+
+class PurelyTagQuerySet(models.QuerySet):
     """
 
     """
