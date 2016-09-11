@@ -7,3 +7,4 @@ class UtilitiesConfig(AppConfig):
 
     name = 'apps.utilities'
     verbose_name = _('Utilities')
+    label = 'utilities'

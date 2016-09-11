@@ -12,10 +12,11 @@ from django.contrib import admin
 from utils.python.logging_utils import create_logger_by_filename
 from utils.django.listfilters import IsNewSimpleListFilter
 
-from apps.core.admin import AdminSite, AppAdmin
+from apps.core.admin import AppAdmin
 from apps.opinions.admin import OpinionGenericInline
 from apps.comments.admin import CommentGenericInline
 
+from .apps import UtilitiesConfig
 from .models import Category, Utility
 from .forms import CategoryAdminModelForm, UtilityAdminModelForm
 
@@ -24,6 +25,8 @@ logger = create_logger_by_filename(__name__)
 
 
 class UtilitiesAppAdmin(AppAdmin):
+
+    label = UtilitiesConfig.label
 
     def get_context_for_tables_of_statistics(self):
         """ """
@@ -274,7 +277,3 @@ class UtilityAdmin(admin.ModelAdmin):
         return truncatechars(force_text(obj), 50)
     truncated_name.short_description = Utility._meta.get_field('name').verbose_name
     truncated_name.admin_order_field = 'name'
-
-
-# AdminSite.register(Category, CategoryAdmin)
-# AdminSite.register(Utility, UtilityAdmin)

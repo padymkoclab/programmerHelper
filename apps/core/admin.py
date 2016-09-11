@@ -115,9 +115,14 @@ class AdminSite(admin.AdminSite):
     def media(self):
         return admin.ModelAdmin(mock.Mock(), self).media
 
-    def register_app_admin_class(self, appadmin, app_label):
+    def register_app_admin_class(self, appadmin_class):
+        """ """
 
-        self._regiter_app_admin[app_label] = appadmin
+        app_label = appadmin_class.label
+
+        appadmin_class = appadmin_class()
+
+        self._regiter_app_admin[app_label] = appadmin_class
 
     def statistics_view(self, request, app_label):
         """ """
@@ -138,14 +143,8 @@ class AdminSite(admin.AdminSite):
         # for Django-Suit, especially for left Menu
         request.current_app = self.name
 
-        if app_label == 'utilities':
-            app_admin = UtilitiesAppAdmin()
-        elif app_label == 'testing':
-            app_admin = TestingAppAdmin()
-        elif app_label == 'solutions':
-            app_admin = SolutionAppAdmin()
-        elif app_label == 'snippets':
-            app_admin = SnippetAppAdmin()
+        # get a AppAdmin for the app
+        app_admin = self._regiter_app_admin[app_label]
 
         context['tables_data'] = app_admin.get_context_for_tables_of_statistics()
         context['tables_charts_data'] = app_admin.get_context_for_charts_of_statistics()
@@ -177,14 +176,8 @@ class AdminSite(admin.AdminSite):
                 media=media,
             )
 
-            if app_label == 'utilities':
-                app_admin = UtilitiesAppAdmin()
-            elif app_label == 'testing':
-                app_admin = TestingAppAdmin()
-            elif app_label == 'solutions':
-                app_admin = SolutionAppAdmin()
-            elif app_label == 'snippets':
-                app_admin = SnippetAppAdmin()
+            # get a AppAdmin for the app
+            app_admin = self._regiter_app_admin[app_label]
 
             app_admin.add_context_to_report_page(context)
 
@@ -211,14 +204,8 @@ class AdminSite(admin.AdminSite):
             themes = request.POST.getlist('themes')
             themes = ', '.join(themes)
 
-            if app_label == 'utilities':
-                app_admin = UtilitiesAppAdmin()
-            elif app_label == 'testing':
-                app_admin = TestingAppAdmin()
-            elif app_label == 'solutions':
-                app_admin = SolutionAppAdmin()
-            elif app_label == 'snippets':
-                app_admin = SnippetAppAdmin()
+            # get a AppAdmin for the app
+            app_admin = self._regiter_app_admin[app_label]
 
             report = app_admin.get_report(type_output_report, themes)
 
@@ -285,6 +272,11 @@ def register_models_admin():
     from apps.testing.models import Suit, Passage, Question as TestQuestion, Variant
     from apps.utilities.admin import UtilitiesAppAdmin, CategoryAdmin as UtilityCategoryAdmin, UtilityAdmin
     from apps.utilities.models import Category as UtilityCategory, Utility
+
+    AdminSite.register_app_admin_class(UtilitiesAppAdmin)
+    AdminSite.register_app_admin_class(SnippetAppAdmin)
+    AdminSite.register_app_admin_class(SolutionAppAdmin)
+    AdminSite.register_app_admin_class(TestingAppAdmin)
 
     # users
     AdminSite.register(Group)
@@ -363,10 +355,3 @@ def register_models_admin():
 
 
 register_models_admin()
-
-
-# from apps.utilities.admin import UtilitiesAppAdmin, CategoryAdmin as UtilityCategoryAdmin, UtilityAdmin
-# from apps.utilities.models import Category as UtilityCategory, Utility
-
-# AdminSite.register(UtilityCategory, UtilityCategoryAdmin)
-# AdminSite.register(Utility, UtilityAdmin)

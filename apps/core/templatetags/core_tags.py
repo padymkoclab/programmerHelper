@@ -1,7 +1,10 @@
 
 from django import template
 
+from apps.core.logging import get_logger
 
+
+logger = get_logger(__name__)
 register = template.Library()
 
 
@@ -16,7 +19,7 @@ class MakeMarkupTableTag(template.Node):
         try:
             tables_data = self.tables_data.resolve(context)
 
-            template_ = template.loader.get_template('core/_statistics_tables.html')
+            template_ = template.loader.get_template('core/admin/_statistics_tables.html')
 
             return template_.render(
                 template.Context({
@@ -24,6 +27,7 @@ class MakeMarkupTableTag(template.Node):
                 })
             )
         except:
+            logger.error('Templatetag does not working')
             return ''
 
 
@@ -36,13 +40,14 @@ class StatisticsTableAndChartTag(template.Node):
 
         try:
             tables_charts_data = self.tables_charts_data.resolve(context)
-            template_ = template.loader.get_template('core/_statistics_charts.html')
+            template_ = template.loader.get_template('core/admin/_statistics_charts.html')
             return template_.render(
                 template.Context({
                     'tables_charts_data': tables_charts_data,
                 })
             )
         except:
+            logger.error('Templatetag does not working')
             return ''
 
 

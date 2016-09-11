@@ -9,11 +9,14 @@ from apps.core.admin import AppAdmin
 from apps.opinions.admin import OpinionGenericInline
 from apps.comments.admin import CommentGenericInline
 
+from .apps import SolutionsConfig
 from .forms import SolutionAdminModelForm
 from .models import Solution
 
 
 class SolutionAppAdmin(AppAdmin):
+
+    label = SolutionsConfig.label
 
     def get_context_for_tables_of_statistics(self):
         """Add statictis data to a context."""

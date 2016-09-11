@@ -9,6 +9,7 @@ from utils.django.listfilters import IsNewSimpleListFilter
 
 from apps.core.admin import AppAdmin
 
+from .apps import TestingConfig
 from .models import Suit, Question, Variant, Passage
 from .formsets import QuestionInlineFormSet, VariantInlineFormSet
 from .forms import (
@@ -21,6 +22,8 @@ from .listfilters import IsCompletedSimpleListFilter
 
 
 class TestingAppAdmin(AppAdmin):
+
+    label = TestingConfig.label
 
     def get_context_for_tables_of_statistics(self):
         """ """

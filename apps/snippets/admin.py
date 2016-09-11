@@ -9,14 +9,15 @@ from utils.django.listfilters import IsNewSimpleListFilter
 from apps.core.admin import AppAdmin
 from apps.comments.admin import CommentGenericInline
 from apps.opinions.admin import OpinionGenericInline
-# from apps.opinions.admin_mixins import ScopeMixin
-# from apps.favours.admin import FavourInline
 
+from .apps import SnippetsConfig
 from .models import Snippet
 from .forms import SnippetAdminModelForm
 
 
 class SnippetAppAdmin(AppAdmin):
+
+    label = SnippetsConfig.label
 
     def get_context_for_tables_of_statistics(self):
         """Add statictis data to a context."""
@@ -103,7 +104,6 @@ class SnippetAppAdmin(AppAdmin):
         return msg
 
 
-# class SnippetAdmin(ScopeMixin, admin.ModelAdmin):
 class SnippetAdmin(admin.ModelAdmin):
     '''
     Admin View for Snippet.
@@ -131,7 +131,7 @@ class SnippetAdmin(admin.ModelAdmin):
     )
 
     search_fields = ('title', )
-    # filter_horizontal = ['tags']
+    filter_horizontal = ['tags']
     date_hierarchy = 'date_added'
 
     readonly_fields = [

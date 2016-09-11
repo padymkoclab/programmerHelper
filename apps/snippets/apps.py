@@ -6,3 +6,4 @@ from django.apps import AppConfig
 class SnippetsConfig(AppConfig):
     name = "apps.snippets"
     verbose_name = _("Snippets")
+    label = 'snippets'
