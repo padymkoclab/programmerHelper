@@ -6,6 +6,7 @@ from django.contrib import admin
 from utils.django.admin_utils import listing_objects_with_admin_url
 from utils.django.listfilters import IsNewSimpleListFilter
 
+from apps.core.admin import AppAdmin
 from apps.comments.admin import CommentGenericInline
 from apps.opinions.admin import OpinionGenericInline
 # from apps.opinions.admin_mixins import ScopeMixin
@@ -15,40 +16,79 @@ from .models import Snippet
 from .forms import SnippetAdminModelForm
 
 
-class SnippetAppAdmin:
+class SnippetAppAdmin(AppAdmin):
 
-    def add_statistics_data_to_context(self, context):
+    def get_context_for_tables_of_statistics(self):
         """Add statictis data to a context."""
 
-        context['statistics_data'] = {
-            'count_snippets': Snippet.objects.count(),
-            'get_statistics_usage_lexers': Snippet.objects.get_statistics_usage_lexers(),
-            'chart_statistics_usage_lexers': Snippet.objects.get_chart_statistics_usage_lexers(),
-            'statistics_count_snippets_for_the_past_year':
-                Snippet.objects.get_statistics_count_snippets_for_the_past_year(),
-            'chart_count_snippets_for_the_past_year':
-                Snippet.objects.get_chart_count_snippets_for_the_past_year(),
+        return (
+            (
+                _('Snippets'), (
+                    (_('Count snippets'), Snippet.objects.count()),
+                )
+            ),
+            (
+                _('Comments'), (
+                    (_('Average count comments'), Snippet.comments_manager.get_avg_count_comments()),
+                    (_('Count comments'), Snippet.comments_manager.get_count_comments()),
+                    (_('Count disticnt users posted comments'),
+                        Snippet.comments_manager.get_count_distinct_users_posted_comments()),
+                )
+            ),
+            (
+                _('Opinions'), (
+                    (_('Average count opinions'), Snippet.opinions_manager.get_avg_count_opinions()),
+                    (_('Count opinions'), Snippet.opinions_manager.get_count_opinions()),
+                    (_('Count critics'), Snippet.opinions_manager.get_count_critics()),
+                    (_('Count supporters'), Snippet.opinions_manager.get_count_supporters()),
+                )
+            ),
+            (
+                _('Tags'), (
+                    (_('Average count tags'), Snippet.tags_manager.get_avg_count_tags()),
+                    (_('Count usaged tags'), Snippet.tags_manager.get_count_usaged_tags()),
+                    (_('Count unique usaged tags'), Snippet.tags_manager.get_count_unique_usaged_tags()),
+                )
+            ),
+        )
 
-            'avg_count_comments': Snippet.comments_manager.get_avg_count_comments(),
-            'count_comments': Snippet.comments_manager.get_count_comments(),
-            'statistics_count_comments_for_the_past_year':
-                Snippet.comments_manager.get_statistics_count_comments_for_the_past_year(),
-            'chart_count_comments_for_the_past_year':
-                Snippet.comments_manager.get_chart_count_comments_for_the_past_year(),
+    def get_context_for_charts_of_statistics(self):
+        """ """
 
-            'avg_count_opinions': Snippet.opinions_manager.get_avg_count_opinions(),
-            'count_opinions': Snippet.opinions_manager.get_count_opinions(),
-            'count_critics': Snippet.opinions_manager.get_count_critics(),
-            'count_supporters': Snippet.opinions_manager.get_count_supporters(),
-            'statistics_count_opinions_for_the_past_year':
-                Snippet.opinions_manager.get_statistics_count_opinions_for_the_past_year(),
-            'chart_count_opinions_for_the_past_year':
-                Snippet.opinions_manager.get_chart_count_opinions_for_the_past_year(),
-
-            'avg_count_tags': Snippet.tags_manager.get_avg_count_tags(),
-            'count_usaged_tags': Snippet.tags_manager.get_count_usaged_tags(),
-            'count_unique_usaged_tags': Snippet.tags_manager.get_count_unique_usaged_tags(),
-        }
+        return (
+            {
+                'title': _('Chart count snippets for the past year'),
+                'table': {
+                    'fields': (_('Month, year'), _('Count snippets')),
+                    'data': Snippet.objects.get_statistics_count_snippets_for_the_past_year(),
+                },
+                'chart': Snippet.objects.get_chart_count_snippets_for_the_past_year(),
+            },
+            {
+                'title': _('Chart count lexers for the past year'),
+                'table': {
+                    'fields': (_('Month, year'), _('Count lexers')),
+                    'data': Snippet.objects.get_statistics_usage_lexers(),
+                },
+                'chart': Snippet.objects.get_chart_statistics_usage_lexers(),
+            },
+            {
+                'title': _('Chart count comments for the past year'),
+                'table': {
+                    'fields': (_('Month, year'), _('Count comments')),
+                    'data': Snippet.comments_manager.get_statistics_count_comments_for_the_past_year(),
+                },
+                'chart': Snippet.comments_manager.get_chart_count_comments_for_the_past_year(),
+            },
+            {
+                'title': _('Chart count opinions for the past year'),
+                'table': {
+                    'fields': (_('Month, year'), _('Count opinions')),
+                    'data': Snippet.opinions_manager.get_statistics_count_opinions_for_the_past_year(),
+                },
+                'chart': Snippet.opinions_manager.get_chart_count_opinions_for_the_past_year(),
+            },
+        )
 
     def add_context_to_report_page(self, context):
 

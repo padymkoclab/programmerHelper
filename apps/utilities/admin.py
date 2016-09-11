@@ -12,6 +12,7 @@ from django.contrib import admin
 from utils.python.logging_utils import create_logger_by_filename
 from utils.django.listfilters import IsNewSimpleListFilter
 
+from apps.core.admin import AdminSite, AppAdmin
 from apps.opinions.admin import OpinionGenericInline
 from apps.comments.admin import CommentGenericInline
 
@@ -20,6 +21,82 @@ from .forms import CategoryAdminModelForm, UtilityAdminModelForm
 
 
 logger = create_logger_by_filename(__name__)
+
+
+class UtilitiesAppAdmin(AppAdmin):
+
+    def get_context_for_tables_of_statistics(self):
+        """ """
+
+        return (
+            (
+                _('Categories'), (
+                    (_('Count categories'), Category.objects.count()),
+                    (_('Average count utilities'), Category.objects.get_avg_count_utilities()),
+                ),
+            ),
+            (
+                _('Utilities'), (
+                    (_('Count utilities'), Utility.objects.count()),
+                )
+            ),
+            (
+                _('Opinions'), (
+                    (_('Average count opinions'), Utility.opinions_manager.get_avg_count_opinions()),
+                    (_('Count opinions'), Utility.opinions_manager.get_count_opinions()),
+                    (_('Count critics'), Utility.opinions_manager.get_count_critics()),
+                    (_('Count supporters'), Utility.opinions_manager.get_count_supporters()),
+                )
+            ),
+            (
+                _('Comments'), (
+                    (_('Count comments'), Utility.comments_manager.get_count_comments()),
+                    (_('Average count comments'), Utility.comments_manager.get_avg_count_comments()),
+                    (_('Count disticnt users posted comments'),
+                        Utility.comments_manager.get_count_distinct_users_posted_comments()),
+                )
+            ),
+        )
+
+    def get_context_for_charts_of_statistics(self):
+        """ """
+
+        return (
+            {
+                'title': _('Chart count opinions for the past year'),
+                'table': {
+                    'fields': (
+                        _('Month, year'),
+                        _('Total count opinions'),
+                        _('Count critical opinions'),
+                        _('Count supporting opinions'),
+                    ),
+                    'data': Utility.opinions_manager.get_statistics_count_opinions_for_the_past_year(),
+                },
+                'chart': Utility.opinions_manager.get_chart_count_opinions_for_the_past_year(),
+            },
+            {
+                'title': _('Chart count comments for the past year'),
+                'table': {
+                    'fields': (_('Month, year'), _('Count comments')),
+                    'data': Utility.comments_manager.get_statistics_count_comments_for_the_past_year(),
+                },
+                'chart': Utility.comments_manager.get_chart_count_comments_for_the_past_year(),
+            },
+        )
+
+    def add_context_to_report_page(self, context):
+
+        # context with statictis data
+        context['themes_for_reports'] = {
+            Category._meta.verbose_name_plural: 'categories',
+            Utility._meta.verbose_name_plural: 'utilities',
+        }
+
+    def get_report(self, output_report, themes):
+
+        msg = 'Report must generated in {0} on themes: {1}'.format(output_report.upper(), themes)
+        return msg
 
 
 class UtilityInline(admin.StackedInline):
@@ -199,35 +276,5 @@ class UtilityAdmin(admin.ModelAdmin):
     truncated_name.admin_order_field = 'name'
 
 
-class UtilitiesAppAdmin:
-
-    def add_statistics_data_to_context(self, context):
-        """Add statictis data to a context."""
-
-        context['statistics_data'] = {
-            'count_categories': Category.objects.count(),
-            'avg_count_utilities_in_categories': Category.objects.get_avg_count_utilities_in_categories(),
-            'count_utilities': Utility.objects.count(),
-            'avg_count_opinions_in_utilities': Utility.objects.get_avg_count_opinions_in_utilities(),
-            'avg_count_comments_in_utilities': Utility.objects.get_avg_count_comments_in_utilities(),
-            'count_opinions': Utility.objects.get_count_opinions(),
-            'count_good_opinions': Utility.objects.get_count_good_opinions(),
-            'count_bad_opinions': Utility.objects.get_count_bad_opinions(),
-            'count_comments': Utility.objects.get_count_comments(),
-            'count_users_posted_comments': Utility.objects.get_count_users_posted_comments(),
-            'chart_most_popular_utilities': Utility.objects.get_chart_most_popular_utilities(),
-            'most_popular_utilities': Utility.objects.get_most_popular_utilities(),
-        }
-
-    def add_context_to_report_page(self, context):
-
-        # context with statictis data
-        context['themes_for_reports'] = {
-            Category._meta.verbose_name_plural: 'categories',
-            Utility._meta.verbose_name_plural: 'utilities',
-        }
-
-    def get_report(self, output_report, themes):
-
-        msg = 'Report must generated in {0} on themes: {1}'.format(output_report.upper(), themes)
-        return msg
+# AdminSite.register(Category, CategoryAdmin)
+# AdminSite.register(Utility, UtilityAdmin)

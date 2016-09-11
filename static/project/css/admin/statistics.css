@@ -1,46 +1,63 @@
-
-#content h1:nth-child(1){
+#content h1:nth-child(1)
+{
     text-align: center;
+
     border-bottom: 2px solid rgb(34, 34, 34);
 }
 
-#statistics table caption{
-    font-size: 15px;
-    padding: 10px 0;
-    font-weight: bold;
+.div_chart_objects table
+{
+    width: 250px;
 }
 
-.div_chart_objects table{
-    width:  250px;
-}
-
-.div_chart_objects table tr th, .div_chart_objects table tr td{
+.div_chart_objects table tr th,
+.div_chart_objects table tr td
+{
     text-align: center;
 }
 
-.div_chart_objects table tr th:first-child{
-    width:  20px;
+.div_chart_objects table tr th:first-child
+{
+    width: 20px;
 }
 
-#table_container{
-    width: 100%;
+.div_table_tables
+{
 }
 
-#table_container table{
-    margin: 0 auto;
+.div_table_table{
+    float: left;
+    width: 50%;
+}
+
+.div_table_table table
+{
     min-width: 450px;
+    margin: 0 auto;
 }
 
-    #table_container table td:nth-child(1){
-        text-align: left;
-    }
+.div_table_table table caption
+{
+    font-size: 15px;
+    font-weight: bold;
 
-    #table_container table td:nth-child(2){
-        text-align: right;
-    }
+    padding: 10px 0;
+}
 
-.chart_and_objects, .div_basic_info{
-    padding: 5px;
-    margin:  10px;
-    border:  2px solid rgb(255, 255, 255);
+.div_table_table table td:nth-child(1)
+{
+    text-align: left;
+}
+
+.div_table_table table td:nth-child(2)
+{
+    text-align: right;
+}
+
+.chart_and_objects,
+.div_table_tables
+{
+    margin: 10px 0;
+    padding: 5px 15px;
+    border: 2px solid rgb(255, 255, 255);
 }

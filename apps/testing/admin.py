@@ -7,6 +7,8 @@ from django.contrib import admin
 from utils.django.admin_utils import remove_url_from_admin_urls
 from utils.django.listfilters import IsNewSimpleListFilter
 
+from apps.core.admin import AppAdmin
+
 from .models import Suit, Question, Variant, Passage
 from .formsets import QuestionInlineFormSet, VariantInlineFormSet
 from .forms import (
@@ -18,26 +20,60 @@ from .forms import (
 from .listfilters import IsCompletedSimpleListFilter
 
 
-class TestingAppAdmin:
+class TestingAppAdmin(AppAdmin):
 
-    def add_statistics_data_to_context(self, context):
-        """Add statictis data to a context."""
+    def get_context_for_tables_of_statistics(self):
+        """ """
 
-        context['statistics_data'] = {
-            'count_suits': Suit.objects.count(),
-            'count_passages': Passage.objects.count(),
-            'count_questions': Question.objects.count(),
-            'count_variants': Variant.objects.count(),
-            'avg_count_questions_for_suits': Suit.objects.get_avg_count_questions(),
-            'avg_count_passages_for_suits': Suit.objects.get_avg_count_passages(),
-            'avg_count_variants_in_questions': Question.objects.get_avg_count_variants_in_questions(),
-            'count_attempt_passages': Passage.objects.get_count_attempt_passages(),
-            'count_passed_passages': Passage.objects.get_count_passed_passages(),
-            'count_distinct_testers': Passage.objects.get_count_distinct_testers(),
-            'avg_mark_for_passages': Passage.objects.get_avg_mark_passages(),
-            'chart_count_passages_for_the_past_year': Passage.objects.get_chart_count_passages_for_the_past_year(),
-            'statistics_count_passages_by_the_past_year': Passage.objects.get_statistics_count_passages_by_the_past_year(),
-        }
+        return (
+            (
+                _('Suits'), (
+                    (_('Count_suits'), Suit.objects.count()),
+                    (_('Average count questions'), Suit.objects.get_avg_count_questions()),
+                    (_('Average count passages'), Suit.objects.get_avg_count_passages()),
+
+                )
+            ),
+            (
+                _('Questions'), (
+                    (_('Count questions'), Question.objects.count()),
+                    (_('Average count variants'), Question.objects.get_avg_count_variants()),
+                )
+            ),
+            (
+                _('Variants'), (
+                    (_('Count variants'), Variant.objects.count()),
+                )
+            ),
+            (
+                _('Passages'), (
+                    (_('Count passages'), Passage.objects.count()),
+                    (_('Count attempt passages'), Passage.objects.get_count_attempt_passages()),
+                    (_('Count passed passages'), Passage.objects.get_count_passed_passages()),
+                    (_('Count distinct testers'), Passage.objects.get_count_distinct_testers()),
+                    (_('Average mark'), Passage.objects.get_avg_mark_passages()),
+                )
+            )
+        )
+
+    def get_context_for_charts_of_statistics(self):
+        """ """
+
+        return (
+            {
+                'title': _('Chart count passages for the past year'),
+                'table': {
+                    'fields': (
+                        _('Month, year'),
+                        _('Total count passages'),
+                        _('Count attempt passages'),
+                        _('Count passed passages')
+                    ),
+                    'data': Passage.objects.get_statistics_count_passages_by_the_past_year(),
+                },
+                'chart': Passage.objects.get_chart_count_passages_for_the_past_year(),
+            },
+        )
 
     def add_context_to_report_page(self, context):
 

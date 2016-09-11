@@ -5,6 +5,7 @@ from django.contrib import admin
 from utils.django.listfilters import IsNewSimpleListFilter
 from utils.django.admin_utils import listing_objects_with_admin_url
 
+from apps.core.admin import AppAdmin
 from apps.opinions.admin import OpinionGenericInline
 from apps.comments.admin import CommentGenericInline
 
@@ -12,35 +13,71 @@ from .forms import SolutionAdminModelForm
 from .models import Solution
 
 
-class SolutionAppAdmin:
+class SolutionAppAdmin(AppAdmin):
 
-    def add_statistics_data_to_context(self, context):
+    def get_context_for_tables_of_statistics(self):
         """Add statictis data to a context."""
 
-        context['statistics_data'] = {
-            'count_solutions': Solution.objects.count(),
-            'avg_count_tags': Solution.objects.get_avg_count_tags(),
-            'count_usaged_tags': Solution.objects.get_count_usaged_tags(),
-            'count_unique_usaged_tags': Solution.objects.get_count_unique_usaged_tags(),
-            'avg_count_comments': Solution.objects.get_avg_count_comments(),
-            'avg_count_opinions': Solution.objects.get_avg_count_opinions(),
-            'count_opinions': Solution.objects.get_count_opinions(),
-            'count_comments': Solution.objects.get_count_comments(),
-            'count_critics': Solution.objects.get_count_critics(),
-            'count_supporters': Solution.objects.get_count_supporters(),
-            'statistics_count_comments_for_the_past_year':
-                Solution.objects.get_statistics_count_comments_for_the_past_year(),
-            'statistics_count_opinions_for_the_past_year':
-                Solution.objects.get_statistics_count_opinions_for_the_past_year(),
-            'statistics_count_solutions_for_the_past_year':
-                Solution.objects.get_statistics_count_solutions_for_the_past_year(),
-            'chart_count_comments_for_the_past_year':
-                Solution.objects.get_chart_count_comments_for_the_past_year(),
-            'chart_count_opinions_for_the_past_year':
-                Solution.objects.get_chart_count_opinions_for_the_past_year(),
-            'chart_count_solutions_for_the_past_year':
-                Solution.objects.get_chart_count_solutions_for_the_past_year(),
-        }
+        return (
+            (
+                _('Solutions'), (
+                    ('Count solutions', Solution.objects.count()),
+                ),
+            ),
+            (
+                _('Comments'), (
+                    ('Average count comments', Solution.comments_manager.get_avg_count_comments()),
+                    ('Count comments', Solution.comments_manager.get_count_comments()),
+                    (_('Count distinct users posted comments'),
+                        Solution.comments_manager.get_count_distinct_users_posted_comments()),
+                ),
+            ),
+            (
+                _('Opinions'), (
+                    ('Average count opinions', Solution.opinions_manager.get_avg_count_opinions()),
+                    ('Count opinions', Solution.opinions_manager.get_count_opinions()),
+                    ('Count critics', Solution.opinions_manager.get_count_critics()),
+                    ('Count supporters', Solution.opinions_manager.get_count_supporters()),
+                ),
+            ),
+            (
+                _('Tags'), (
+                    ('Average count tags', Solution.tags_manager.get_avg_count_tags()),
+                    ('Count usaged tags', Solution.tags_manager.get_count_usaged_tags()),
+                    ('Count unique usaged tags', Solution.tags_manager.get_count_unique_usaged_tags()),
+                ),
+            ),
+        )
+
+    def get_context_for_charts_of_statistics(self):
+        """ """
+
+        return (
+            {
+                'title': _('Chart count solutions for the past year'),
+                'table': {
+                    'fields': (_('Month, year'), _('Count solutions')),
+                    'data': Solution.objects.get_statistics_count_solutions_for_the_past_year(),
+                },
+                'chart': Solution.objects.get_chart_count_solutions_for_the_past_year(),
+            },
+            {
+                'title': _('Chart count opinions for the past year'),
+                'table': {
+                    'fields': (_('Month, year'), _('Total count opinions'), _('Coutn critics'), _('Count supporters')),
+                    'data': Solution.opinions_manager.get_statistics_count_opinions_for_the_past_year(),
+                },
+                'chart': Solution.opinions_manager.get_chart_count_opinions_for_the_past_year(),
+            },
+            {
+                'title': _('Chart count comments for the past year'),
+                'table': {
+                    'fields': (_('Month, year'), _('Count comments')),
+                    'data': Solution.comments_manager.get_statistics_count_comments_for_the_past_year(),
+                },
+                'chart': Solution.comments_manager.get_chart_count_comments_for_the_past_year(),
+            },
+        )
 
     def add_context_to_report_page(self, context):
 
@@ -150,10 +187,12 @@ class SolutionAdmin(admin.ModelAdmin):
         return ['-rating', '-count_opinions']
 
     def suit_row_attributes(self, obj, request):
-        if obj.rating > 0:
-            return {'class': 'success', 'data': obj.problem}
-        elif obj.rating < 0:
-            return {'class': 'error', 'data': obj.problem}
+
+        if obj.rating is not None:
+            if obj.rating > 0:
+                return {'class': 'success', 'data': obj.problem}
+            elif obj.rating < 0:
+                return {'class': 'error', 'data': obj.problem}
 
     def suit_cell_attributes(self, obj, column):
 

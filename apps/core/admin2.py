@@ -68,10 +68,16 @@ from apps.utilities.models import Category as UtilityCategory, Utility
 
 
 class AdminSite(admin.AdminSite):
+    """ """
+
     site_title = _('ProgrammerHelper administration')
     site_header = site_title
     index_title = _('AdminIndex')
     empty_value_display = '-'
+
+    def __init__(self, *args, **kwargs):
+        super(AdminSite, self).__init__(*args, **kwargs)
+        self._regiter_app_admin = dict()
 
     def app_index(self, request, app_label, extra_context=None):
 
@@ -132,11 +138,14 @@ class AdminSite(admin.AdminSite):
     def media(self):
         return admin.ModelAdmin(mock.Mock(), self).media
 
+    def register_app_admin_class(self, appadmin, app_label):
+
+        self._regiter_app_admin[app_label] = appadmin
+
     def statistics_view(self, request, app_label):
         """ """
 
-        # each custom app must be has template for statistics in own folder templates/app_label/admin/...
-        template = '{0}/admin/statistics.html'.format(app_label)
+        template = 'admin/statistics.html'
 
         app_config = apps.get_app_config(app_label)
 
@@ -159,9 +168,10 @@ class AdminSite(admin.AdminSite):
         elif app_label == 'solutions':
             app_admin = SolutionAppAdmin()
         elif app_label == 'snippets':
-                app_admin = SnippetAppAdmin()
+            app_admin = SnippetAppAdmin()
 
-        app_admin.add_statistics_data_to_context(context)
+        context['tables_data'] = app_admin.get_context_for_tables_of_statistics()
+        context['tables_charts_data'] = app_admin.get_context_for_charts_of_statistics()
 
         return TemplateResponse(request, template, context)
 
@@ -244,6 +254,16 @@ class AdminSite(admin.AdminSite):
 
 AdminSite = AdminSite(name='admin')
 
+
+class AppAdmin:
+
+    def get_context_for_tables_of_statistics(self):
+
+        raise NotImplementedError
+
+    def get_context_for_charts_of_statistics(self):
+
+        raise NotImplementedError
 
 # Register models
 #

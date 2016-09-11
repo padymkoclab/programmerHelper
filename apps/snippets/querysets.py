@@ -1,6 +1,8 @@
 
 from django.db import models
 
+from apps.opinions.utils import annotate_queryset_for_determinate_rating
+
 
 class SnippetQuerySet(models.QuerySet):
     """
@@ -57,22 +59,6 @@ class SnippetQuerySet(models.QuerySet):
 
         self = self.annotate(count_comments=models.Count('comments', distinct=True))
 
-        self = self.extra(
-            select={
-                'rating': """
-                    SELECT
-                        SUM(
-                            CASE
-                                WHEN "opinions"."is_useful" = True THEN 1
-                                WHEN "opinions"."is_useful" = False THEN -1
-                                ELSE 6
-                            END
-                        )
-                    FROM
-                        "opinions"
-                    WHERE
-                        "opinions"."object_id" = "snippets"."id"
-                """
-            }
-        )
+        self = annotate_queryset_for_determinate_rating(self)
+
         return self

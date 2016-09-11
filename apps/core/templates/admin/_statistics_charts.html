@@ -1,0 +1,25 @@
+ {% for table_chart in tables_charts_data %}
+<div class="chart_and_objects">
+    <p class="lead">{{ table_chart.title }}</p>
+    <div class="div_chart_objects pull-left">
+        <table class="table">
+            <thead>
+                {% for field in table_chart.table.fields %}
+                <th>{{ field }}</th>
+                {% endfor %}
+            </thead>
+            <tbody>
+                {% for args in table_chart.table.data %}
+                <tr>
+                    {% for arg in args %}
+                    <td>{{ arg }}</td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="div_chart pull-right">{{ table_chart.chart|safe }}</div>
+    <div class="clearfix"></div>
+</div>
+{% endfor %}

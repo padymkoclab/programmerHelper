@@ -3,6 +3,8 @@ from django.db import models
 
 from utils.python.logging_utils import create_logger_by_filename
 
+from apps.opinions.utils import annotate_queryset_for_determinate_rating
+
 logger = create_logger_by_filename(__name__)
 
 
@@ -100,24 +102,6 @@ class UtilityQuerySet(models.QuerySet):
         self = self.utilities_with_count_opinions()
         self = self.utilities_with_count_comments()
 
-        logger.warning('If Django ORM will be have support for subqueries rewrite this query.')
-        # self = self.utilities_with_marks()
-
-        # subquery if using combination annotations and aggregations
-        self = self.extra(select={
-            'mark': """
-                SELECT
-                    SUM(
-                        CASE
-                            WHEN "opinions"."is_useful" = True THEN 1
-                            WHEN "opinions"."is_useful" = False THEN -1
-                            ELSE NULL
-                        END
-                    )
-                FROM "opinions"
-                WHERE
-                    "utilities"."id" = "opinions"."object_id"
-            """
-        })
+        self = annotate_queryset_for_determinate_rating(self)
 
         return self

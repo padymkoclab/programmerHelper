@@ -11,6 +11,7 @@ from django.conf import settings
 from utils.django.functions_db import Round
 from utils.django.models_fields import ConfiguredAutoSlugField
 from utils.django.models import TimeStampedModel
+from utils.django.model_utils import get_admin_url
 
 from .managers import SuitManager, QuestionManager, PassageManager
 from .querysets import SuitQuerySet, QuestionQuerySet
@@ -83,10 +84,7 @@ class Suit(TimeStampedModel):
         return reverse('testing:suit', kwargs={'slug': self.slug})
 
     def get_admin_url(self):
-        return reverse('admin:{0}_{1}_change'.format(
-            self._meta.app_label,
-            self._meta.model_name,
-        ), args=(self.pk, ))
+        return get_admin_url(self)
 
     def get_count_questions(self):
         """ """
@@ -167,10 +165,7 @@ class Question(TimeStampedModel):
         return super().unique_error_message(model_class, unique_check)
 
     def get_admin_url(self):
-        return reverse('admin:{0}_{1}_change'.format(
-            self._meta.app_label,
-            self._meta.model_name,
-        ), args=(self.pk, ))
+        return get_admin_url(self)
 
     def is_completed(self):
         """ """

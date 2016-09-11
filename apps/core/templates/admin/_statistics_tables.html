@@ -1,0 +1,18 @@
+<div class="div_table_tables">
+  {% for table_data in tables_data %}
+    <div class="div_table_table">
+      <table class="table-overview applist">
+          <caption>{{ table_data.0 }}</caption>
+          <tbody>
+              {% for data in table_data.1 %}
+              <tr>
+                  <td>{{ data.0 }}</td>
+                  <td>{{ data.1 }}</td>
+              </tr>
+              {% endfor %}
+          </tbody>
+      </table>
+    </div>
+  {% endfor %}
+  <div class="clearfix"></div>
+</div>

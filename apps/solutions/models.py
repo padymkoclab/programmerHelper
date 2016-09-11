@@ -7,11 +7,16 @@ from django.core.validators import MinLengthValidator
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
-from apps.comments.models import Comment
-from apps.opinions.models import Opinion
-from apps.tags.models import Tag
+from utils.django.model_utils import get_admin_url
 from utils.django.models_fields import ConfiguredAutoSlugField
 from utils.django.models import TimeStampedModel
+
+from apps.comments.models import Comment
+from apps.comments.managers import CommentManager
+from apps.opinions.models import Opinion
+from apps.opinions.managers import OpinionManager
+from apps.tags.models import Tag
+from apps.tags.managers import TagManager
 
 from .managers import SolutionManager
 from .querysets import SolutionQuerySet
@@ -49,6 +54,10 @@ class Solution(TimeStampedModel):
     objects = models.Manager()
     objects = SolutionManager.from_queryset(SolutionQuerySet)()
 
+    comments_manager = CommentManager()
+    tags_manager = TagManager()
+    opinions_manager = OpinionManager()
+
     class Meta:
         verbose_name = _("Solution")
         verbose_name_plural = _("Solutions")
@@ -62,20 +71,24 @@ class Solution(TimeStampedModel):
     def get_absolute_url(self):
         return reverse('solutions:solution', kwargs={'pk': self.pk, 'slug': self.slug})
 
-    def get_admin_page_url(self):
-        return reverse(
-            'admin:{0}_{1}_change'.format(self._meta.app_label, self._meta.model_name),
-            args=(self.pk,)
-        )
+    def get_admin_url(self):
+        return get_admin_url(self)
 
     def get_count_opinions(self):
         """ """
+
+        if hasattr(self, 'count_opinions'):
+            return self.count_opinions
+
         return self.opinions.count()
     get_count_opinions.short_description = _('Count opinions')
     get_count_opinions.admin_order_field = 'count_opinions'
 
     def get_count_comments(self):
         """ """
+
+        if hasattr(self, 'count_comments'):
+            return self.count_comments
 
         return self.comments.count()
     get_count_comments.short_description = _('Count comments')
@@ -84,12 +97,18 @@ class Solution(TimeStampedModel):
     def get_count_tags(self):
         """ """
 
+        if hasattr(self, 'count_tags'):
+            return self.count_tags
+
         return self.tags.count()
     get_count_tags.short_description = _('Count tags')
     get_count_tags.admin_order_field = 'count_tags'
 
     def get_rating(self):
         """Getting rating of solution on based their opinions."""
+
+        if hasattr(self, 'rating'):
+            return self.rating
 
         # in opinions, convert boolean to int
         self = self.opinions.annotate(is_useful_int=models.Case(
@@ -112,12 +131,12 @@ class Solution(TimeStampedModel):
         return get_user_model()._default_manager.filter(pk__in=users)
 
     def get_count_critics(self):
-        return self.opinions.filter(is_useful=False).count()
+        return self.get_critics().count()
     get_count_critics.short_description = _('Count critics')
 
     def get_count_supporters(self):
         """ """
-        return self.opinions.filter(is_useful=True).count()
+        return self.get_supporters().count()
     get_count_supporters.short_description = _('Count supporters')
 
     def related_solutions(self):

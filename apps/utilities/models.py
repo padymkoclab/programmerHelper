@@ -8,9 +8,12 @@ from django.conf import settings
 
 from utils.django.models_fields import ConfiguredAutoSlugField
 from utils.django.models import TimeStampedModel
+from utils.django.model_utils import get_admin_url
 
 from apps.comments.models import Comment
+from apps.comments.managers import CommentManager
 from apps.opinions.models import Opinion
+from apps.opinions.managers import OpinionManager
 
 from .querysets import UtilityQuerySet, CategoryQuerySet
 from .managers import CategoryManager, UtilityManager
@@ -54,7 +57,7 @@ class Category(TimeStampedModel):
         return reverse('utilities:category', kwargs={'slug': self.slug})
 
     def get_admin_url(self):
-        return reverse('admin:utilities_utilitycategory_change', args=(self.pk, ))
+        return get_admin_url(self)
 
     def get_total_mark(self):
         """ """
@@ -132,6 +135,9 @@ class Utility(TimeStampedModel):
 
     objects = models.Manager()
     objects = UtilityManager.from_queryset(UtilityQuerySet)()
+
+    comments_manager = CommentManager()
+    opinions_manager = OpinionManager()
 
     def __str__(self):
         return '{0.name}'.format(self)

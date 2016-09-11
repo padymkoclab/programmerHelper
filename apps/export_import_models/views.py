@@ -20,7 +20,8 @@ from django.core import serializers
 
 import magic
 
-from config.admin import AdminSite
+from apps.core.admin import AdminSite
+
 from utils.django.utils import get_filename_with_datetime
 from utils.python.logging_utils import create_logger_by_filename
 

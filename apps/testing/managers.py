@@ -33,7 +33,7 @@ class QuestionManager(models.Manager):
     Model manager
     """
 
-    def get_avg_count_variants_in_questions(self):
+    def get_avg_count_variants(self):
         """ """
 
         self = self.questions_with_count_variants()
@@ -76,17 +76,14 @@ class PassageManager(models.Manager):
 
         # statistics for passages with status "attempt"
         attempt_passages = self.filter(status=self.model.ATTEMPT)
-        stat_attept = tuple(zip(*get_statistics_count_objects_for_the_past_year(attempt_passages, 'date')))[1]
+        stat_attempt = tuple(zip(*get_statistics_count_objects_for_the_past_year(attempt_passages, 'date')))[1]
 
         # statistics for passages with status "passed"
         passed_passages = self.filter(status=self.model.PASSED)
         stat_passed = tuple(zip(*get_statistics_count_objects_for_the_past_year(passed_passages, 'date')))[1]
 
-        # packing values in tuple by each month
-        stat = zip(stat_total, stat_attept, stat_passed)
-
-        # tuple of tuples (date, (total_count, attempt_count, passed_count))
-        stat = zip(dates, stat)
+        # tuple of tuples (date, total_count, attempt_count, passed_count)
+        stat = zip(dates, stat_total, stat_attempt, stat_passed)
 
         return tuple(stat)
 
@@ -102,10 +99,10 @@ class PassageManager(models.Manager):
         statistics_count_passages_by_the_past_year = self.get_statistics_count_passages_by_the_past_year()
 
         # unpack the statdata to dates and values
-        dates_labels, data = zip(*statistics_count_passages_by_the_past_year)
+        dates_labels, *data = zip(*statistics_count_passages_by_the_past_year)
 
         # unpack the values on three types
-        stat_all_passages, stat_atempt_passages, stat_passed_passages = zip(*data)
+        stat_all_passages, stat_atempt_passages, stat_passed_passages = data
 
         # a config for a chart
         config = pygal.Config()

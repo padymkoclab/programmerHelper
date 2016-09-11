@@ -23,7 +23,7 @@ class CategoryFactory(AbstractTimeStampedFactory):
 
     @factory.lazy_attribute
     def name(self):
-        return generate_text_random_length_for_field_of_model(self, 'name', ending_point=False)
+        return generate_text_random_length_for_field_of_model(self, 'name')
 
     @factory.lazy_attribute
     def description(self):
@@ -47,7 +47,7 @@ class UtilityFactory(AbstractTimeStampedFactory):
 
     @factory.lazy_attribute
     def name(self):
-        return generate_text_random_length_for_field_of_model(self, 'name', ending_point=False)
+        return generate_text_random_length_for_field_of_model(self, 'name')
 
     @factory.lazy_attribute
     def description(self):
@@ -62,3 +62,8 @@ class UtilityFactory(AbstractTimeStampedFactory):
     def opinions(self, create, extracted, **kwargs):
         for i in range(random.randrange(0, 10)):
             OpinionFactory(content_object=self)
+
+    @factory.post_generation
+    def date_added(self, create, extracted, **kwargs):
+        self.date_added = fuzzy.FuzzyDateTime(self.category.date_added).fuzz()
+        self.save()

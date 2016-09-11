@@ -79,13 +79,12 @@ class OpinionManager(models.Manager):
         count_supporters_opinions_for_objects_by_the_past_year = \
             tuple(zip(*statistics_for_supporters_opinions_for_objects))[1]
 
-        stat_data = zip(
+        statistics = zip(
+            dates,
             count_opinions_by_the_past_year,
             count_critic_opinions_for_objects_by_the_past_year,
             count_supporters_opinions_for_objects_by_the_past_year,
         )
-
-        statistics = zip(dates, stat_data)
         return tuple(statistics)
 
     def get_chart_count_opinions_for_the_past_year(self):
@@ -106,9 +105,9 @@ class OpinionManager(models.Manager):
 
         statistics = self.get_statistics_count_opinions_for_the_past_year()
 
-        dates, data = zip(*statistics)
+        dates, *data = zip(*statistics)
 
-        list_total_count_opinions, list_count_critical_opinions, list_count_supporting_opinions = zip(*data)
+        list_total_count_opinions, list_count_critical_opinions, list_count_supporting_opinions = data
 
         chart.x_labels = dates
         chart.add('Total count opinions', list_total_count_opinions)

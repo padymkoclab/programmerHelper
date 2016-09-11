@@ -33,6 +33,11 @@ class CommentManager(models.Manager):
             )
         )['result']
 
+    def get_count_distinct_users_posted_comments(self):
+        """ """
+
+        return self.values('comments__user').distinct().filter(comments__isnull=False).count()
+
     def get_statistics_count_comments_for_the_past_year(self):
         """ """
 

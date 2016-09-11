@@ -3,6 +3,7 @@
 
 {% load i18n %}
 {% load static %}
+{% load core_tags %}
 
 {% block extrastyle %}
   {{ block.super }}
@@ -34,10 +35,11 @@
 {% block content %}
   <div id="content">
       <h1>{% trans "Statistics" %}</h1>
-      <div id="statistics">
-        {% block statistics %}
-
-        {% endblock statistics %}
+      <div>
+          {% generate_statistics_table tables_data %}
+      </div>
+      <div>
+        {% generate_statistics_tables_with_charts tables_charts_data %}
       </div>
   </div>
 {% endblock content %}

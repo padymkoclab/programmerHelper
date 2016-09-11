@@ -2,6 +2,7 @@
 import itertools
 import random
 
+from django.core.urlresolvers import reverse
 from django.utils import timezone
 from django.shortcuts import _get_queryset
 from django.db import models
@@ -12,6 +13,15 @@ from ..python.logging_utils import create_logger_by_filename
 
 
 logger = create_logger_by_filename(__name__)
+
+
+def get_admin_url(obj):
+    """ """
+
+    return reverse(
+        'admin:{0}_{1}_change'.format(obj._meta.app_label, obj._meta.model_name),
+        args=(obj.pk,)
+    )
 
 
 def get_statistics_count_objects_for_the_past_year(queryset, date_field_name):

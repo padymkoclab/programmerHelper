@@ -10,6 +10,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.db import models
 from django.conf import settings
 
+from utils.django.model_utils import get_admin_url
 from utils.django.models_fields import ConfiguredAutoSlugField
 from utils.django.models import TimeStampedModel
 from utils.python.constants import CHOICES_LEXERS
@@ -81,10 +82,7 @@ class Snippet(TimeStampedModel):
 
     def get_admin_url(self):
 
-        return reverse('admin:{}_{}_change'.format(
-            self._meta.app_label,
-            self._meta.model_name,
-        ), args=(self.pk, ))
+        return get_admin_url(self)
 
     def get_count_comments(self):
 
