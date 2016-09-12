@@ -41,7 +41,7 @@ import xlsxwriter
 
 # from apps.core.reports import SitePDFReportTemplate
 from utils.django.utils import get_filename_with_datetime, get_location, join_enumarate
-from utils.django.model_utils import get_latest_or_none
+from utils.django.models_utils import get_latest_or_none
 from utils.python.logging_utils import create_logger_by_filename
 from utils.django.datetime_utils import (
     convert_date_to_django_date_format,

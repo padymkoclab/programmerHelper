@@ -10,7 +10,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.db import models
 from django.conf import settings
 
-from utils.django.model_utils import get_admin_url
+from utils.django.models_utils import get_admin_url
 from utils.django.models_fields import ConfiguredAutoSlugField
 from utils.django.models import TimeStampedModel
 from utils.python.constants import CHOICES_LEXERS
@@ -41,7 +41,7 @@ class Snippet(TimeStampedModel):
         _('Title'), max_length=200, unique=True,
         validators=[MinLengthValidator(settings.MIN_LENGTH_FOR_NAME_OR_TITLE_OBJECT)]
     )
-    slug = ConfiguredAutoSlugField(_('Slug'), populate_from='title', unique=True)
+    slug = ConfiguredAutoSlugField(populate_from='title', unique=True)
     lexer = models.CharField(_('Lexer'), max_length=50, choices=CHOICES_LEXERS)
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, verbose_name=_('User'),

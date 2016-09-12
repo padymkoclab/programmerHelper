@@ -293,6 +293,8 @@ class ConfiguredAutoSlugField(AutoSlugField):
     """
 
     def __init__(self, *args, **kwargs):
+
+        kwargs['verbose_name'] = _('Slug')
         kwargs['max_length'] = kwargs.get('max_length', 300)
         kwargs['blank'] = True
         kwargs['editable'] = True
@@ -300,6 +302,7 @@ class ConfiguredAutoSlugField(AutoSlugField):
         kwargs['db_index'] = True
         kwargs['allow_unicode'] = True
         kwargs['help_text'] = _('Slug will be generate automaticaly, on based main field.')
+
         super(ConfiguredAutoSlugField, self).__init__(*args, **kwargs)
         # replace SlugValidator and SlugUnicodeValidator
         self.validators[0] = validate_unicode_slug

@@ -2,7 +2,7 @@
 from django.db import models
 
 
-class FavourManager(models.Manager):
+class FlavourManager(models.Manager):
     """
 
     """

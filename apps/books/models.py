@@ -58,7 +58,7 @@ class Book(models.Model):
         validators=[MinLengthValidator(settings.MIN_LENGTH_FOR_NAME_OR_TITLE_OBJECT)],
         unique=True,
     )
-    slug = ConfiguredAutoSlugField(_('Slug'), populate_from='name', unique=True)
+    slug = ConfiguredAutoSlugField(populate_from='name', unique=True)
     description = models.TextField(
         _('Description'),
         validators=[MinLengthValidator(100)],
@@ -216,7 +216,7 @@ class Writer(models.Model):
         unique=True,
         error_messages={'unique': _('Writer with this name already exists.')}
     )
-    slug = ConfiguredAutoSlugField(_('Slug'), populate_from='name', unique=True)
+    slug = ConfiguredAutoSlugField(populate_from='name', unique=True)
     trends = ArrayField(
         models.CharField(max_length=100),
         size=10,
@@ -324,7 +324,7 @@ class Publisher(models.Model):
         _('name'), max_length=50, unique=True,
         error_messages={'unique': _('Publisher with this name already exists.')}
     )
-    slug = ConfiguredAutoSlugField(_('slug'), populate_from='name', unique=True)
+    slug = ConfiguredAutoSlugField(populate_from='name', unique=True)
     country_origin = CountryField()
     headquarters = models.CharField(_('headquarters'), max_length=50)
     founded_year = models.PositiveSmallIntegerField(

@@ -33,7 +33,7 @@ class Course(TimeStampedModel):
         unique=True,
         validators=[MinLengthValidator(settings.MIN_LENGTH_FOR_NAME_OR_TITLE_OBJECT)],
     )
-    slug = ConfiguredAutoSlugField(_('Slug'), populate_from='name', unique=True)
+    slug = ConfiguredAutoSlugField(populate_from='name', unique=True)
     picture = models.ImageField(_('Picture'))
     description = models.TextField(_('Description'))
     lexer = models.CharField(_('Lexer'), max_length=30, choices=CHOICES_LEXERS)

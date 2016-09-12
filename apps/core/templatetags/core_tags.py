@@ -1,10 +1,9 @@
 
+import logging
+
 from django import template
 
-from apps.core.logging import get_logger
-
-
-logger = get_logger(__name__)
+logger = logging.getLogger(__name__)
 register = template.Library()
 
 
@@ -41,6 +40,7 @@ class StatisticsTableAndChartTag(template.Node):
         try:
             tables_charts_data = self.tables_charts_data.resolve(context)
             template_ = template.loader.get_template('core/admin/_statistics_charts.html')
+            logger.error('Templatetag does not working')
             return template_.render(
                 template.Context({
                     'tables_charts_data': tables_charts_data,

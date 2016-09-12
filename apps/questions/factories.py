@@ -7,32 +7,38 @@ from django.contrib.auth import get_user_model
 import factory
 from factory import fuzzy
 
-from apps.generic_models.factories import Factory_OpinionGeneric, Factory_CommentGeneric, Factory_LikeGeneric
+from utils.django.factories_utils import generate_text_random_length_for_field_of_model, AbstractTimeStampedFactory
 
-from .models import *
+from apps.tags.models import Tag
+from apps.opinions.factories import OpinionFactory
+from apps.comments.factories import CommentFactory
+from apps.flavours.factories import FlavourFactory
+
+from .models import Question, Answer
 
 Accounts = get_user_model().objects.all()
 
 
-class Factory_Question(factory.DjangoModelFactory):
+class QuestionFactory(AbstractTimeStampedFactory):
 
     class Meta:
         model = Question
 
     text_question = factory.Faker('text', locale='ru')
-    author = fuzzy.FuzzyChoice(Accounts)
-    status = fuzzy.FuzzyChoice(Question.CHOICES_STATUS._db_values)
+    status = fuzzy.FuzzyChoice([value for label, value in Question.CHOICES_STATUS])
     views = fuzzy.FuzzyInteger(1000)
 
     @factory.lazy_attribute
     def title(self):
-        return factory.Faker('text', locale='ru').generate([])[:30]
+        return generate_text_random_length_for_field_of_model(self, 'title')
 
     @factory.lazy_attribute
-    def is_dublicated(self):
-        if divmod(random.random(), 0.1)[0] > 8:
-            return True
-        return False
+    def user(self):
+        return fuzzy.FuzzyChoice(get_user_model()._default_manager.all()).fuzz()
+
+    @factory.lazy_attribute
+    def text_question(self):
+        return generate_text_random_length_for_field_of_model(self, 'text_question')
 
     @factory.post_generation
     def tags(self, create, extracted, **kwargs):
@@ -42,18 +48,29 @@ class Factory_Question(factory.DjangoModelFactory):
 
     @factory.post_generation
     def opinions(self, create, extracted, **kwargs):
-        for i in range(random.randint(0, 12)):
-            Factory_OpinionGeneric(content_object=self)
+        for i in range(random.randint(0, 5)):
+            OpinionFactory(content_object=self)
+
+    @factory.post_generation
+    def comments(self, create, extracted, **kwargs):
+        for i in range(random.randint(0, 5)):
+            CommentFactory(content_object=self)
+
+    @factory.post_generation
+    def flavours(self, create, extracted, **kwargs):
+        for i in range(random.randint(0, 5)):
+            FlavourFactory(content_object=self)
+
+    @factory.post_generation
+    def date_added(self, create, extracted, **kwargs):
+        self.date_added = fuzzy.FuzzyDateTime(self.user.date_joined).fuzz()
+        self.save()
 
 
-class Factory_Answer(factory.DjangoModelFactory):
+class AnswerFactory(AbstractTimeStampedFactory):
 
     class Meta:
         model = Answer
-
-    text_answer = factory.Faker('text', locale='ru')
-    author = fuzzy.FuzzyChoice(Accounts)
-    question = fuzzy.FuzzyChoice(Question.objects.all())
 
     @factory.lazy_attribute
     def is_accepted(self):
@@ -61,24 +78,25 @@ class Factory_Answer(factory.DjangoModelFactory):
             return False
         return random.choice([True, False])
 
+    @factory.lazy_attribute
+    def text_answer(self):
+        return generate_text_random_length_for_field_of_model(self, 'text_answer')
+
+    @factory.lazy_attribute
+    def user(self):
+        return fuzzy.FuzzyChoice(get_user_model()._default_manager.all()).fuzz()
+
     @factory.post_generation
-    def likes(self, create, extracted, **kwargs):
-        for i in range(random.randint(0, 12)):
-            Factory_LikeGeneric(content_object=self)
+    def opinions(self, create, extracted, **kwargs):
+        for i in range(random.randint(0, 5)):
+            OpinionFactory(content_object=self)
 
     @factory.post_generation
     def comments(self, create, extracted, **kwargs):
-        for i in range(random.randint(0, 6)):
-            Factory_CommentGeneric(content_object=self)
+        for i in range(random.randint(0, 5)):
+            CommentFactory(content_object=self)
 
-
-def factory_questions_and_answers(count_questions, count_answers):
-    Question.objects.filter().delete()
-    for i in range(count_questions):
-        question = Factory_Question()
-        # change date_added
-        date_added = fuzzy.FuzzyDateTime(timezone.now() - timezone.timedelta(weeks=1), timezone.now()).fuzz()
-        question.date_added = date_added
-        question.save()
-    for j in range(count_answers):
-        Factory_Answer()
+    @factory.post_generation
+    def date_added(self, create, extracted, **kwargs):
+        self.date_added = fuzzy.FuzzyDateTime(self.user.date_joined).fuzz()
+        self.save()

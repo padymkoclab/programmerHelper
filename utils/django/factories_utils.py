@@ -14,7 +14,7 @@ from factory import fuzzy
 from ..python.text_utils import findall_words
 
 
-Now = timezone.now().replace(tzinfo=timezone.get_current_timezone())
+Now = timezone.now()
 
 
 class AbstractTimeStampedFactory(factory.DjangoModelFactory):

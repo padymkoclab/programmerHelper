@@ -66,7 +66,7 @@ class UserLevel(models.Model):
 
     id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
     name = models.CharField(_('Name'), max_length=50, choices=CHOICES_LEVEL, unique=True)
-    slug = ConfiguredAutoSlugField(_('Slug'), populate_from='name', unique=True)
+    slug = ConfiguredAutoSlugField(populate_from='name', unique=True)
     description = models.TextField(_('Description'))
     color = models.CharField(_('Color'), max_length=50)
 

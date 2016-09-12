@@ -47,7 +47,7 @@ class Article(TimeStampedModel):
         _('Title'), max_length=200,
         validators=[MinLengthValidator(settings.MIN_LENGTH_FOR_NAME_OR_TITLE_OBJECT)],
     )
-    slug = ConfiguredAutoSlugField(_('Slug'), populate_from='title', unique_with=['account'])
+    slug = ConfiguredAutoSlugField(populate_from='title', unique_with=['account'])
     quotation = models.CharField(_('Quotation'), max_length=200, validators=[MinLengthValidator(10)])
     picture = models.ImageField(_('Picture'), upload_to=upload_media, max_length=1000)
     header = models.TextField(_('Header'), validators=[MinCountWordsValidator(10)])
@@ -141,7 +141,7 @@ class ArticleSubsection(TimeStampedModel):
         max_length=200,
         validators=[MinLengthValidator(settings.MIN_LENGTH_FOR_NAME_OR_TITLE_OBJECT)],
     )
-    slug = ConfiguredAutoSlugField(_('Slug'), populate_from='title', unique_with=['article'])
+    slug = ConfiguredAutoSlugField(populate_from='title', unique_with=['article'])
     content = models.TextField(_('Content'), validators=[MinLengthValidator(100)])
 
     class Meta:

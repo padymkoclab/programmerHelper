@@ -45,7 +45,7 @@ class Poll(TimeStampedModel):
         help_text=_('Enter at least 10 characters.'),
         max_length=100,
     )
-    slug = ConfiguredAutoSlugField(_('Slug'), populate_from='title', unique=True)
+    slug = ConfiguredAutoSlugField(populate_from='title', unique=True)
     status = models.CharField(_('Status'), max_length=10, choices=CHOICES_STATUS, default=DRAFT)
     voters = models.ManyToManyField(
         settings.AUTH_USER_MODEL,

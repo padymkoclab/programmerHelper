@@ -44,7 +44,7 @@ CUSTOM_APPS = [
     'apps.books.apps.BooksConfig',
     'apps.comments.apps.CommentsConfig',
     # 'apps.courses.apps.CoursesConfig',  # temporary is disabled
-    'apps.favours.apps.FavoursConfig',
+    'apps.flavours.apps.FlavoursConfig',
     'apps.forum.apps.ForumConfig',
     'apps.marks.apps.MarksConfig',
     'apps.newsletters.apps.NewslettersConfig',
@@ -241,7 +241,7 @@ SESSION_SERIALIZER = 'apps.sessions.serializers.ComprehensiveSessionJSONSerializ
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
-        'LOCATION': 'chachetable_for_website',
+        'LOCATION': 'chachetable',
     }
 }
 
@@ -272,5 +272,5 @@ DEFAULT_FROM_EMAIL = 'programmerHelper@gmail.com'
 GEOIP_PATH = str(BASE_DIR.child('static', 'project', 'files'))
 
 # SERIALIZERS
-#
+
 SERIALIZATION_MODULES = {'csv': 'apps.export_import_models.serializers.csv'}

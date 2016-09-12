@@ -1,7 +1,7 @@
 
 from django.db import models
 
-from utils.django.model_utils import get_random_objects
+from utils.django.models_utils import get_random_objects
 
 
 class TagQuerySet(models.QuerySet):

@@ -5,7 +5,7 @@ from django.db import models
 
 import pygal
 
-from utils.django.model_utils import get_statistics_count_objects_for_the_past_year as get_statistics
+from utils.django.models_utils import get_statistics_count_objects_for_the_past_year as get_statistics
 
 from .querysets import CommentQuerySet
 

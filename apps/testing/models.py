@@ -11,7 +11,7 @@ from django.conf import settings
 from utils.django.functions_db import Round
 from utils.django.models_fields import ConfiguredAutoSlugField
 from utils.django.models import TimeStampedModel
-from utils.django.model_utils import get_admin_url
+from utils.django.models_utils import get_admin_url
 
 from .managers import SuitManager, QuestionManager, PassageManager
 from .querysets import SuitQuerySet, QuestionQuerySet
@@ -48,7 +48,7 @@ class Suit(TimeStampedModel):
         _('Name'), max_length=200, unique=True,
         validators=[MinLengthValidator(settings.MIN_LENGTH_FOR_NAME_OR_TITLE_OBJECT)]
     )
-    slug = ConfiguredAutoSlugField(_('Slug'), populate_from='name', unique=True)
+    slug = ConfiguredAutoSlugField(populate_from='name', unique=True)
     status = models.BooleanField(('Is completed'), default=False)
     description = models.CharField(
         ('Description'), max_length=500,

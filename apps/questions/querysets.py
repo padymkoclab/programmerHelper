@@ -7,6 +7,11 @@ class QuestionQuerySet(models.QuerySet):
     Quesryset for questions.
     """
 
+    def questions_with_count_answers(self):
+        """ """
+
+        return self.annotate(count_answers=models.Count('answers', distinct=True))
+
     def unanswered_questions(self):
         """Question without any answers."""
 
@@ -54,3 +59,21 @@ class QuestionQuerySet(models.QuerySet):
 
     def top_questions_by_week(self):
         pass
+
+    def queryset_with_all_additional_fields(self):
+        """ """
+
+        # self.annotate(count_answers=)
+
+        return self
+
+
+class AnswerQuerySet(models.QuerySet):
+    """
+
+    """
+
+    def queryset_with_all_additional_fields(self):
+        """ """
+
+        return self

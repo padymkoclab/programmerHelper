@@ -1,6 +1,6 @@
 
 from django.utils.translation import ugettext as _
-from utils.django.model_utils import get_statistics_count_objects_for_the_past_year
+from utils.django.models_utils import get_statistics_count_objects_for_the_past_year
 from django.db import models
 
 import pygal

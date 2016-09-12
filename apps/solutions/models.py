@@ -7,7 +7,7 @@ from django.core.validators import MinLengthValidator
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
-from utils.django.model_utils import get_admin_url
+from utils.django.models_utils import get_admin_url
 from utils.django.models_fields import ConfiguredAutoSlugField
 from utils.django.models import TimeStampedModel
 
@@ -34,7 +34,7 @@ class Solution(TimeStampedModel):
         ],
         error_messages={'unique': _('Solution with this problem already exists.')}
     )
-    slug = ConfiguredAutoSlugField(_('Slug'), populate_from='problem', unique=True)
+    slug = ConfiguredAutoSlugField(populate_from='problem', unique=True)
     body = models.TextField(_('Text solution'), validators=[MinLengthValidator(100)])
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
