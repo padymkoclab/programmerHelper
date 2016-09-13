@@ -30,24 +30,24 @@ class SnippetAppAdmin(AppAdmin):
             ),
             (
                 _('Comments'), (
-                    (_('Average count comments'), Snippet.comments_manager.get_avg_count_comments()),
                     (_('Count comments'), Snippet.comments_manager.get_count_comments()),
+                    (_('Average count comments'), Snippet.comments_manager.get_avg_count_comments()),
                     (_('Count disticnt users posted comments'),
                         Snippet.comments_manager.get_count_distinct_users_posted_comments()),
                 )
             ),
             (
                 _('Opinions'), (
-                    (_('Average count opinions'), Snippet.opinions_manager.get_avg_count_opinions()),
                     (_('Count opinions'), Snippet.opinions_manager.get_count_opinions()),
+                    (_('Average count opinions'), Snippet.opinions_manager.get_avg_count_opinions()),
                     (_('Count critics'), Snippet.opinions_manager.get_count_critics()),
                     (_('Count supporters'), Snippet.opinions_manager.get_count_supporters()),
                 )
             ),
             (
                 _('Tags'), (
-                    (_('Average count tags'), Snippet.tags_manager.get_avg_count_tags()),
                     (_('Count usaged tags'), Snippet.tags_manager.get_count_usaged_tags()),
+                    (_('Average count tags'), Snippet.tags_manager.get_avg_count_tags()),
                     (_('Count unique usaged tags'), Snippet.tags_manager.get_count_unique_usaged_tags()),
                 )
             ),

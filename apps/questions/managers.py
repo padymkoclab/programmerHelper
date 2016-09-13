@@ -8,103 +8,21 @@ class QuestionManager(models.Manager):
     Model manager for model Question
     """
 
-    def questions_with_scopes(self):
-        """Auxiliary method for creating field 'scope' for futher proccesing."""
-        return self.annotate(scope=models.Sum(
-                models.Case(
-                    models.When(opinions__is_useful=True, then=1),
-                    models.When(opinions__is_useful=False, then=-1),
-                    output_field=models.IntegerField()
-                )
-            )
-        )
+    def get_avg_count_answers(self):
+        """ """
 
-    def non_interesting_questions(self):
-        """Filter question with scope 0 or less and without answers."""
-        # annotated questions with scopes
-        questions_with_scopes = self.questions_with_scopes()
-        # questions without answers
-        questions_without_answers = questions_with_scopes.filter(answers=None)
-        # questions without answers and with scope 0 and less
-        non_interesting_questions = questions_without_answers.exclude(scope__gt=0)
-        return non_interesting_questions
+        self = self.questions_with_count_answers()
+        return self.aggregate(avg=models.Avg('count_answers'))['avg']
 
-    def questions_for_past_24_hours(self):
-        """Questions for past 24 hours."""
-        now = timezone.now()
-        last_24_hours = now - timezone.timedelta(days=1)
-        return self.filter(date_added__range=(last_24_hours, now))
+    def get_statistics_count_questions_for_the_past_year(self):
 
-    def questions_by_min_count_favorits(self, min_count_favorits):
-        """Question with certain minimum count favorites."""
-        # annotate questions by favorites
-        annotated_questions = self.annotate(favorits=models.Count(
-            models.Case(
-                models.When(opinions__is_favorite=True, then=1)
-                )
-            )
-        )
-        # restrict questions by count favorites
-        question_with_certain_favorites = annotated_questions.filter(favorits__gte=min_count_favorits)
-        return question_with_certain_favorites
-
-    def questions_by_scopes(self, min_scope=None, max_scope=None):
-        """Questions with certain range of scopes."""
-        # annotated questions with scopes
-        questions_with_scopes = self.questions_with_scopes()
-        # conditional branches
-        if min_scope is not None and max_scope is None:
-            return questions_with_scopes.filter(scope__gte=min_scope)
-        elif min_scope is None and max_scope is not None:
-            return questions_with_scopes.filter(scope__lte=max_scope)
-        elif min_scope is not None and max_scope is not None:
-            if isinstance(min_scope, int) and isinstance(max_scope, int):
-                return questions_with_scopes.filter(scope__gte=min_scope).filter(scope__lte=max_scope)
-            raise ValueError('min_scope or max_scope is not integer number.')
-        else:
-            raise TypeError('Missing 1 required argument: min_scope or max_scope.')
+        return 1
 
 
 class AnswerManager(models.Manager):
     """
     Model manager for model Answer
     """
-
-    def accepted_answers(self):
-        return self.filter(is_accepted=True)
-
-    def answers_with_scopes(self):
-        """Auxiliary method for creating field 'scope' for futher proccesing."""
-        return self.annotate(scope=models.Sum(
-                models.Case(
-                    models.When(likes__liked_it=True, then=1),
-                    models.When(likes__liked_it=False, then=-1),
-                    output_field=models.IntegerField()
-                )
-            )
-        )
-
-    def answers_by_scopes(self, min_scope=None, max_scope=None):
-        """Answers with certain range of scopes."""
-        # answers with scopes
-        answers_with_scopes = self.answers_with_scopes()
-        # conditional branches
-        if min_scope is not None and max_scope is None:
-            return answers_with_scopes.filter(scope__gte=min_scope)
-        elif min_scope is None and max_scope is not None:
-            return answers_with_scopes.filter(scope__lte=max_scope)
-        elif min_scope is not None and max_scope is not None:
-            if isinstance(min_scope, int) and isinstance(max_scope, int):
-                return answers_with_scopes.filter(scope__gte=min_scope).filter(scope__lte=max_scope)
-            raise ValueError('min_scope or max_scope is not integer number.')
-        else:
-            raise TypeError('Missing 1 required argument: min_scope or max_scope.')
-
-    def answers_for_past_24_hours(self):
-        """Answers for past 24 hours."""
-        now = timezone.now()
-        last_24_hours = now - timezone.timedelta(days=1)
-        return self.filter(date_added__range=(last_24_hours, now))
 
     def quickly_answers(self):
         """Answers published not earlier 24 hours after published their questions."""

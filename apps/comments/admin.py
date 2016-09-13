@@ -3,7 +3,7 @@ from django.contrib.contenttypes import admin as admin_generic
 from django.contrib import admin
 
 from .models import Comment
-from .forms import CommentModelForm
+from .forms import CommentInlineAdminModelForm
 
 
 class CommentGenericInline(admin_generic.GenericStackedInline):
@@ -11,7 +11,7 @@ class CommentGenericInline(admin_generic.GenericStackedInline):
     Stacked Inline View for Comment
     '''
 
-    form = CommentModelForm
+    form = CommentInlineAdminModelForm
     model = Comment
     extra = 0
     ct_field = 'content_type'

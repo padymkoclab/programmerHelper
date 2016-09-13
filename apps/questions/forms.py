@@ -1,35 +1,73 @@
 
-from django.utils.translation import ungettext_lazy
 from django import forms
 
-from .models import Question, Tag
+from suit_ckeditor.widgets import CKEditorWidget
+
+from utils.django.forms_utils import BooleanRadioSelect
+
+from apps.tags.forms import clean_tags
+
+from .models import Question, Answer
 
 
-class QuestionForm(forms.ModelForm):
+class QuestionAdminModelForm(forms.ModelForm):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields['title'].widget.attrs['class'] = 'span12'
+
+        self.fields['slug'].widget.attrs['class'] = 'span12'
+        self.fields['slug'].disabled = True
+
+        self.fields['user'].widget.widget.attrs['class'] = 'span11'
+
+        self.fields['text_question'].widget = CKEditorWidget()
+
     class Meta:
         model = Question
-        fields = ('title',)
+        fields = ('title', 'slug')
+        widgets = {
+            'status': forms.RadioSelect()
+        }
 
     def clean(self):
-        super(QuestionForm, self).clean()
-        count_tags = len(self.cleaned_data.get('tags', '0'))
-        if count_tags < Tag.MIN_COUNT_TAGS_ON_OBJECT:
-            raise forms.ValidationError({
-                'tags': ungettext_lazy(
-                    'Question must be have at least %(number)d tag',
-                    'Question must be have at least %(number)d tags',
-                    'number',
-                ) % {
-                    'number': Tag.MIN_COUNT_TAGS_ON_OBJECT,
-                }
-            })
-        if count_tags > Tag.MAX_COUNT_TAGS_ON_OBJECT:
-            raise forms.ValidationError({
-                'tags': ungettext_lazy(
-                    'Question must be have no more %(number)d tag',
-                    'Question must be have no more %(number)d tags',
-                    'number',
-                ) % {
-                    'number': Tag.MAX_COUNT_TAGS_ON_OBJECT,
-                }
-            })
+        super().clean()
+
+        clean_tags(self)
+
+
+class AnswerAdminModelForm(forms.ModelForm):
+
+    class Meta:
+        model = Answer
+        fields = ('text_answer', )
+        widgets = {
+            'is_accepted': BooleanRadioSelect(),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields['user'].widget.widget.attrs['class'] = 'span11'
+
+        self.fields['question'].widget.widget.attrs['class'] = 'span11'
+
+        self.fields['text_answer'].widget = CKEditorWidget()
+
+
+class AnswerInlineAdminModelForm(forms.ModelForm):
+
+    class Meta:
+        model = Answer
+        fields = ('text_answer', )
+        widgets = {
+            'is_accepted': BooleanRadioSelect(),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields['user'].widget.widget.attrs['class'] = 'span11'
+
+        self.fields['text_answer'].widget = CKEditorWidget()

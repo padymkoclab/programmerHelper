@@ -253,7 +253,7 @@ def register_models_admin():
     from apps.opinions.models import Opinion
     from apps.polls.admin import PollAdmin, VoteAdmin, ChoiceAdmin
     from apps.polls.models import Poll, Choice, Vote
-    from apps.questions.admin import QuestionAdmin, AnswerAdmin
+    from apps.questions.admin import QuestionAdmin, AnswerAdmin, QuestionsAppAdmin
     from apps.questions.models import Question, Answer
     from apps.marks.admin import MarkAdmin
     from apps.marks.models import Mark
@@ -274,6 +274,7 @@ def register_models_admin():
     from apps.utilities.models import Category as UtilityCategory, Utility
 
     AdminSite.register_app_admin_class(UtilitiesAppAdmin)
+    AdminSite.register_app_admin_class(QuestionsAppAdmin)
     AdminSite.register_app_admin_class(SnippetAppAdmin)
     AdminSite.register_app_admin_class(SolutionAppAdmin)
     AdminSite.register_app_admin_class(TestingAppAdmin)

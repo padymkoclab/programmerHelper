@@ -6,7 +6,7 @@ from .models import Mark
 from .forms import MarkFormSet
 
 
-class MarkInline(admin_generic.GenericTabularInline):
+class MarkGenericInline(admin_generic.GenericTabularInline):
     '''
     Stacked Inline View for Mark
     '''

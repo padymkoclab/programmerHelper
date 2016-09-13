@@ -1,7 +1,6 @@
 
 import random
 
-from django.utils import timezone
 from django.contrib.auth import get_user_model
 
 import factory
@@ -16,8 +15,6 @@ from apps.flavours.factories import FlavourFactory
 
 from .models import Question, Answer
 
-Accounts = get_user_model().objects.all()
-
 
 class QuestionFactory(AbstractTimeStampedFactory):
 
@@ -25,7 +22,7 @@ class QuestionFactory(AbstractTimeStampedFactory):
         model = Question
 
     text_question = factory.Faker('text', locale='ru')
-    status = fuzzy.FuzzyChoice([value for label, value in Question.CHOICES_STATUS])
+    status = fuzzy.FuzzyChoice([value for value, label in Question.CHOICES_STATUS])
     views = fuzzy.FuzzyInteger(1000)
 
     @factory.lazy_attribute
@@ -52,11 +49,6 @@ class QuestionFactory(AbstractTimeStampedFactory):
             OpinionFactory(content_object=self)
 
     @factory.post_generation
-    def comments(self, create, extracted, **kwargs):
-        for i in range(random.randint(0, 5)):
-            CommentFactory(content_object=self)
-
-    @factory.post_generation
     def flavours(self, create, extracted, **kwargs):
         for i in range(random.randint(0, 5)):
             FlavourFactory(content_object=self)
@@ -74,7 +66,7 @@ class AnswerFactory(AbstractTimeStampedFactory):
 
     @factory.lazy_attribute
     def is_accepted(self):
-        if self.question.has_accepted_answer():
+        if any(self.question.answers.values_list('is_accepted', flat=True)):
             return False
         return random.choice([True, False])
 
@@ -84,7 +76,8 @@ class AnswerFactory(AbstractTimeStampedFactory):
 
     @factory.lazy_attribute
     def user(self):
-        return fuzzy.FuzzyChoice(get_user_model()._default_manager.all()).fuzz()
+        users = get_user_model()._default_manager.exclude(pk__in=self.question.answers.values('user'))
+        return fuzzy.FuzzyChoice(users).fuzz()
 
     @factory.post_generation
     def opinions(self, create, extracted, **kwargs):

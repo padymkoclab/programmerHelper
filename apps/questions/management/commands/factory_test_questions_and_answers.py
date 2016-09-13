@@ -32,7 +32,7 @@ class Command(ExtendedBaseCommand):
 
             count_answers = random.randint(0, 10)
             for j in range(count_answers):
-                AnswerModel(question=question)
+                AnswerFactory(question=question)
 
         logger.critical(
             'Made factory {} questions and {} answers'.format(

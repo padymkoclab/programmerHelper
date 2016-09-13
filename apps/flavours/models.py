@@ -13,7 +13,7 @@ class Flavour(BaseGenericModel):
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
         related_name='flavours', verbose_name=_('User'),
     )
-    status = models.NullBooleanField(_('Are you like it?'), default=None)
+    status = models.BooleanField(_('Are you like it?'), default=False)
 
     class Meta:
         verbose_name = _('Flavour')

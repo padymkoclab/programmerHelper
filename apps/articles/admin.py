@@ -2,7 +2,7 @@
 from django.utils.translation import ugettext_lazy as _
 from django.contrib import admin
 
-from apps.marks.admin import MarkInline
+from apps.marks.admin import MarkGenericInline
 from apps.comments.admin import CommentGenericInline
 
 from .forms import ArticleForm, ArticleSubsectionFormset
@@ -52,7 +52,7 @@ class ArticleAdmin(admin.ModelAdmin):
     search_fields = ('title',)
     inlines = [
         ArticleSubsectionInline,
-        MarkInline,
+        MarkGenericInline,
         CommentGenericInline,
     ]
     fieldsets = [

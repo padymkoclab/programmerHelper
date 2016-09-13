@@ -6,7 +6,7 @@ from suit.widgets import AutosizedTextarea
 from .models import Comment
 
 
-class CommentModelForm(forms.ModelForm):
+class CommentInlineAdminModelForm(forms.ModelForm):
 
     class Meta:
         model = Comment

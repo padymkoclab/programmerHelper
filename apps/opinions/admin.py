@@ -7,6 +7,7 @@ from django.contrib import admin
 
 from .models import Opinion
 from .formsets import OpinionFormSet
+from .forms import OpinionInlineAdminModelForm
 
 
 User = get_user_model()
@@ -17,6 +18,7 @@ class OpinionGenericInline(admin_generic.GenericTabularInline):
     Stacked Inline View for Opinion
     '''
 
+    form = OpinionInlineAdminModelForm
     formset = OpinionFormSet
     model = Opinion
     extra = 0

@@ -14,7 +14,7 @@ class FlavourFactory(AbstractTimeStampedFactory):
     class Meta:
         model = Flavour
 
-    status = fuzzy.FuzzyChoice([True, None, False])
+    status = fuzzy.FuzzyChoice([True, False])
 
     @factory.lazy_attribute
     def user(self):
