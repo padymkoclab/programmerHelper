@@ -1,11 +1,12 @@
 
 from django.utils.translation import ugettext as _
-from utils.django.models_utils import get_statistics_count_objects_for_the_past_year
 from django.db import models
 
 import pygal
 
 from utils.django.functions_db import Round
+
+from apps.core.utils import get_statistics_count_objects_for_the_past_year
 
 
 class SuitManager(models.Manager):

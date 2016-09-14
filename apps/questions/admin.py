@@ -36,7 +36,7 @@ class QuestionsAppAdmin(AppAdmin):
                 ),
             ),
             (
-                _('Opinions about questions'), (
+                _('Opinions to questions'), (
                     (_('Count opinions'), Question.opinions_manager.get_count_opinions()),
                     (_('Average count opinions'), Question.opinions_manager.get_avg_count_opinions()),
                     (_('Count critics'), Question.opinions_manager.get_count_critics()),
@@ -44,7 +44,7 @@ class QuestionsAppAdmin(AppAdmin):
                 ),
             ),
             (
-                _('Opinions about answers'), (
+                _('Opinions to answers'), (
                     (_('Count opinions'), Answer.opinions_manager.get_count_opinions()),
                     (_('Average count opinions'), Answer.opinions_manager.get_avg_count_opinions()),
                     (_('Count critics'), Answer.opinions_manager.get_count_critics()),
@@ -52,7 +52,7 @@ class QuestionsAppAdmin(AppAdmin):
                 ),
             ),
             (
-                _('Flavours about questions'), (
+                _('Flavours to questions'), (
                     (_('Count flavours'), Question.flavours_manager.get_count_flavours()),
                 ),
             ),
@@ -60,12 +60,12 @@ class QuestionsAppAdmin(AppAdmin):
                 _('Comments to answers'), (
                     (_('Count comments'), Answer.comments_manager.get_count_comments()),
                     (_('Average count comments'), Answer.comments_manager.get_avg_count_comments()),
-                    (_('Count disticnt users posted comments'),
+                    (_('Count distinct users posted comments'),
                         Answer.comments_manager.get_count_distinct_users_posted_comments()),
                 ),
             ),
             (
-                _('Tags'), (
+                _('Tags to questions'), (
                     (_('Count usaged tags'), Question.tags_manager.get_count_usaged_tags()),
                     (_('Average count tags'), Question.tags_manager.get_avg_count_tags()),
                     (_('Count unique usaged tags'), Question.tags_manager.get_count_unique_usaged_tags()),
@@ -93,7 +93,7 @@ class QuestionsAppAdmin(AppAdmin):
                 'chart': Answer.objects.get_chart_count_answers_for_the_past_year(),
             },
             {
-                'title': _('Chart count comments for the past year'),
+                'title': _('Chart count comments to answers for the past year'),
                 'table': {
                     'fields': (_('Month, year'), _('Count comments')),
                     'data': Answer.comments_manager.get_statistics_count_comments_for_the_past_year(),
@@ -101,12 +101,28 @@ class QuestionsAppAdmin(AppAdmin):
                 'chart': Answer.comments_manager.get_chart_count_comments_for_the_past_year(),
             },
             {
-                'title': _('Chart count opinions for the past year'),
+                'title': _('Chart count opinions to questions for the past year'),
                 'table': {
                     'fields': (_('Month, year'), _('Count opinions')),
                     'data': Question.opinions_manager.get_statistics_count_opinions_for_the_past_year(),
                 },
                 'chart': Question.opinions_manager.get_chart_count_opinions_for_the_past_year(),
+            },
+            {
+                'title': _('Chart count opinions to answers for the past year'),
+                'table': {
+                    'fields': (_('Month, year'), _('Count opinions')),
+                    'data': Answer.opinions_manager.get_statistics_count_opinions_for_the_past_year(),
+                },
+                'chart': Answer.opinions_manager.get_chart_count_opinions_for_the_past_year(),
+            },
+            {
+                'title': _('Chart count flavours to questions for the past year'),
+                'table': {
+                    'fields': (_('Month, year'), _('Count flavours')),
+                    'data': Question.flavours_manager.get_statistics_count_flavours_for_the_past_year(),
+                },
+                'chart': Question.flavours_manager.get_chart_count_flavours_for_the_past_year(),
             },
         )
 

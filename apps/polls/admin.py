@@ -16,7 +16,9 @@ from django.contrib import admin
 import pygal
 
 from utils.django.admin_utils import remove_url_from_admin_urls
-from utils.django.models_utils import get_statistics_count_objects_for_the_past_year, get_latest_or_none
+from utils.django.models_utils import get_latest_or_none
+
+from apps.core.utils import get_statistics_count_objects_for_the_past_year
 
 from .models import Poll, Choice, Vote
 from .forms import PollModelForm, ChoiceModelForm

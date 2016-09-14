@@ -5,7 +5,10 @@ from django.db import models
 
 import pygal
 
-from utils.django.models_utils import get_statistics_count_objects_for_the_past_year as get_statistics
+from apps.core.utils import (
+    get_statistics_count_objects_for_the_past_year,
+    get_chart_count_objects_for_the_past_year,
+)
 
 
 class SnippetManager(models.Manager):
@@ -44,7 +47,6 @@ class SnippetManager(models.Manager):
         config = pygal.Config()
 
         config.width = 800
-        # config.height = 500
         config.explicit_size = True
         config.legend_at_bottom = True
         config.legend_at_bottom_columns = 3
@@ -64,27 +66,11 @@ class SnippetManager(models.Manager):
     def get_statistics_count_snippets_for_the_past_year(self):
         """ """
 
-        return get_statistics(self, 'date_added')
+        return get_statistics_count_objects_for_the_past_year(self, 'date_added')
 
     def get_chart_count_snippets_for_the_past_year(self):
         """ """
 
-        config = pygal.Config()
-        config.width = 800
-        config.height = 500
-        config.explicit_size = True
-        config.fill = True
-        config.show_legend = False
-        config.interpolate = 'hermite'
-        config.interpolation_parameters = {'type': 'cardinal', 'c': .75}
-
-        chart = pygal.StackedLine(config)
-
-        statistics = self.get_statistics_count_snippets_for_the_past_year()
-
-        dates, data = zip(*statistics)
-
-        chart.x_labels = dates
-        chart.add('Count snippets', data)
-        svg = chart.render()
-        return svg
+        return get_chart_count_objects_for_the_past_year(
+            self.get_statistics_count_snippets_for_the_past_year()
+        )
