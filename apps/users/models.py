@@ -11,6 +11,9 @@ from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.db import models
 from django.conf import settings
 
+from utils.django.models_fields import ConfiguredAutoSlugField
+from utils.django.models_utils import get_admin_url
+
 from apps.polls.managers import PollsManager
 from apps.polls.querysets import UserPollQuerySet
 from apps.articles.models import Article
@@ -20,7 +23,6 @@ from apps.badges.managers import BadgeManager
 from apps.sessions.models import ExpandedSession
 from utils.django import utils
 # from utils.django.models_fields import PhoneField
-from utils.django.models_fields import ConfiguredAutoSlugField
 
 from .managers import UserManager
 from .querysets import UserQuerySet
@@ -188,10 +190,8 @@ class User(AbstractBaseUser, PermissionsMixin):
         return reverse('users:detail', kwargs={'email': self.email})
 
     def get_admin_url(self):
-        return reverse(
-            'admin:{0}_{1}_change'.format(self._meta.app_label, self._meta.model_name),
-            args=(self.pk, )
-        )
+
+        return get_admin_url(self)
 
     def get_full_name(self):
         return '{0.username} ({0.email})'.format(self)

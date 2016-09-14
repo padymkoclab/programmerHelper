@@ -1,47 +1,73 @@
 
-import functools
-
+from django.template.defaultfilters import truncatechars
 from django.shortcuts import get_object_or_404
-from django.conf.urls import url
 from django.contrib.auth import get_user_model
-from django.apps import apps
-from django.template.response import TemplateResponse
-from django.http import HttpResponseBadRequest
 from django.utils.safestring import mark_safe
 from django.utils.html import format_html_join, format_html, conditional_escape
 from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ungettext
 from django.contrib import admin
 
-import pygal
-
 from utils.django.admin_utils import remove_url_from_admin_urls
-from utils.django.models_utils import get_latest_or_none
 
-from apps.core.utils import get_statistics_count_objects_for_the_past_year
+from apps.core.admin import AppAdmin, AdminSite
 
 from .models import Poll, Choice, Vote
-from .forms import PollModelForm, ChoiceModelForm
+from .forms import PollAdminModelForm, ChoiceAdminInlineModelForm
 from .formsets import ChoiceInlineFormSet
 from .actions import make_closed, make_draft, make_opened
-from .reports import ExcelReport, PollPDFReport
 from .constants import MIN_COUNT_CHOICES_IN_POLL, MAX_COUNT_CHOICES_IN_POLL
+from .apps import PollsConfig
+from .listfilters import LatestVotingSimpleListFilter
 
 
 User = get_user_model()
 
 
-# only for admin theme Django-Suit
-# it is give feature display menu in left sidebar
-def add_current_app_to_request_in_admin_view_for_django_suit(view):
-    @functools.wraps(view)
-    def wrapped_view(modelAdmin, request, **kwargs):
+@AdminSite.register_app_admin_class
+class AppAdmin(AppAdmin):
 
-        request.current_app = 'admin'
+    label = PollsConfig.label
 
-        response = view(modelAdmin, request, **kwargs)
-        return response
-    return wrapped_view
+    def get_context_for_tables_of_statistics(self):
+
+        return (
+            (
+                _('Polls'), (
+                    (_('Count polls'), Poll.objects.count()),
+                    (_('Average count choices'), Poll.objects.get_avg_count_choices()),
+                    (_('Average count votes'), Poll.objects.get_avg_count_votes()),
+                    (_('Count opened polls'), Poll.objects.get_count_opened_polls()),
+                    (_('Count closed polls'), Poll.objects.get_count_closed_polls()),
+                    (_('Count draft polls'), Poll.objects.get_count_draft_polls()),
+                ),
+            ),
+            (
+                _('Choices'), (
+                    (_('Count choices'), Choice.objects.count()),
+                    (_('Average count votes'), Choice.objects.get_avg_count_votes()),
+                ),
+            ),
+            (
+                _('Votes'), (
+                    (_('Count votes'), Vote.objects.count()),
+                    (_('Count distinct voters'), Vote.objects.get_count_distinct_voters()),
+                ),
+            ),
+        )
+
+    def get_context_for_charts_of_statistics(self):
+
+        return (
+            {
+                'title': _('Chart count votes for the past year'),
+                'table': {
+                    'fields': (_('Month, year'), _('Count votes')),
+                    'data': Vote.objects.get_statistics_count_votes_for_the_past_year(),
+                },
+                'chart': Vote.objects.get_chart_count_votes_for_the_past_year(),
+            },
+        )
 
 
 class ChoiceInline(admin.StackedInline):
@@ -50,7 +76,7 @@ class ChoiceInline(admin.StackedInline):
     '''
 
     model = Choice
-    form = ChoiceModelForm
+    form = ChoiceAdminInlineModelForm
     formset = ChoiceInlineFormSet
     min_num = MIN_COUNT_CHOICES_IN_POLL
     max_num = MAX_COUNT_CHOICES_IN_POLL
@@ -76,6 +102,7 @@ class VoteInline(admin.TabularInline):
     readonly_fields = ['get_truncated_text_choice', 'user', 'date_voting']
 
 
+@admin.register(Poll, site=AdminSite)
 class PollAdmin(admin.ModelAdmin):
     '''
     Admin View for Poll
@@ -89,22 +116,28 @@ class PollAdmin(admin.ModelAdmin):
         'title',
         'get_count_votes',
         'get_count_choices',
-        'colored_status_display',
-        'get_date_lastest_voting',
+        'status',
+        'get_date_latest_voting',
         'date_modified',
         'date_added',
     )
-    list_filter = ('status', 'date_modified', 'date_added')
+    list_filter = (
+        'status',
+        LatestVotingSimpleListFilter,
+        'date_modified',
+        'date_added',
+    )
     search_fields = ('title',)
     actions = [make_closed, make_draft, make_opened]
 
     # object
-    form = PollModelForm
+    form = PollAdminModelForm
     readonly_fields = (
         'get_most_popular_choice_or_choices_as_html',
-        'get_date_lastest_voting',
+        'get_date_latest_voting',
         'get_count_votes',
-        'get_count_choices'
+        'get_count_choices',
+        'get_chart_results',
     )
     prepopulated_fields = {'slug': ('title', )}
 
@@ -124,65 +157,58 @@ class PollAdmin(admin.ModelAdmin):
                 inlines.append(VoteInline)
         return [inline(self.model, self.admin_site) for inline in inlines]
 
-    def change_view(self, request, object_id, form_url='', extra_context=None):
-
-        extra_context = extra_context or {}
-
-        # if poll has votes, add in context of view a chart of result of a poll
-        poll = get_object_or_404(Poll, pk=object_id)
-        if poll.votes.count():
-            extra_context['chart_poll_result'] = self._build_chart_poll_result(object_id)
-
-        return super(PollAdmin, self).change_view(request, object_id, form_url, extra_context)
-
     def get_fieldsets(self, request, obj=None):
 
-        # fields for exists and non exists polls
-        fields = ['title', 'slug', 'status']
-
-        # add fields if a poll already exists
-        if obj is not None:
-
-            # fields needed for already exists poll
-            additional_fields = [
-                'get_count_votes',
-                'get_count_choices',
-            ]
-
-            # fields needed if poll has votes
-            if obj.votes.count():
-                additional_fields.append('get_date_lastest_voting')
-                additional_fields.append('get_most_popular_choice_or_choices_as_html')
-
-            fields.extend(additional_fields)
-        return [
-            [
-                Poll._meta.verbose_name, {'fields': fields}
-            ]
+        fieldsets = [
+            (
+                Poll._meta.verbose_name, {
+                    'fields': (
+                        'title',
+                        'slug',
+                        'status',
+                    )
+                }
+            ),
         ]
 
-    def get_urls(self):
+        if obj is not None:
 
-        urls = super(PollAdmin, self).get_urls()
+            fieldsets.extend((
+                (
+                    _('Additional information'), {
+                        'classes': ('collapse', ),
+                        'fields': (
+                            'get_count_votes',
+                            'get_count_choices',
+                            'get_date_latest_voting',
+                        )
+                    }
+                ),
+                (
+                    _(''), {
+                        'classes': ('full-width', ),
+                        'fields': ('get_chart_results', )
+                    }
+                ),
+            ))
 
-        # create additional urls as django admin`s standart
+        return fieldsets
 
-        # 'polls_poll_preview'
-        preview = '{0}_{1}_{2}'.format(self.model._meta.app_label, self.model._meta.model_name, 'preview')
-        # 'polls_make_report'
-        make_report = '{0}_{1}'.format(self.model._meta.app_label, 'make_report')
-        # 'polls_statistics'
-        statistics = '{0}_{1}'.format(self.model._meta.app_label, 'statistics')
+    def suit_cell_attributes(self, obj, column):
 
-        # add urls
-        additional_urls = [
-            url(r'^preview/$', self.admin_site.admin_view(self.view_preview), {}, preview),
-            url(r'^make_report/$', self.admin_site.admin_view(self.view_make_report), {}, make_report),
-            url(r'^statistics/$', self.admin_site.admin_view(self.view_statistics), {}, statistics), ]
+        if column in ['get_count_votes', 'get_count_choices', 'status']:
+            return {'class': 'text-center'}
+        elif column in ['get_date_latest_voting', 'date_modified', 'date_added']:
+            return {'class': 'text-right'}
 
-        # additional urls must be placed early standartic urls,
-        # since the second will be capture more needed urls
-        return additional_urls + urls
+    def suit_row_attributes(self, obj, request):
+
+        if obj.status == Poll.OPENED:
+            return {'class': 'success'}
+        elif obj.status == Poll.DRAFT:
+            return {'class': 'info'}
+        elif obj.status == Poll.CLOSED:
+            return {'class': 'error'}
 
     def get_listing_voters_with_admin_url_and_count_votes(self):
         """Return a listing of voters as links to their admin pages, full names and count votes.
@@ -265,178 +291,13 @@ class PollAdmin(admin.ModelAdmin):
             return format_html('<i>{0}</i>', _('Poll does not have a choices at all.'))
     get_most_popular_choice_or_choices_as_html.short_description = _('Most popular choice or choices')
 
-    def colored_status_display(self, obj):
-        """ """
-
-        # choice a color
-        if obj.status == 'draft':
-            color = 'rgb(0, 0, 255)'
-        elif obj.status == 'opened':
-            color = 'rgb(0, 255, 0)'
-        elif obj.status == 'closed':
-            color = 'rgb(255, 0, 0)'
-
-        return format_html('<span style="color: {0}">{1}</span>', color, obj.get_status_display())
-    colored_status_display.short_description = _('Status')
-    colored_status_display.admin_order_field = 'status'
-
-    @add_current_app_to_request_in_admin_view_for_django_suit
     def view_preview(self, request):
         """ """
 
         raise NotImplementedError
 
-    @add_current_app_to_request_in_admin_view_for_django_suit
-    def view_statistics(self, request):
-        """Admin view for display statistics about polls, choices, votes and a chart statistics count votes by year"""
 
-        # get a total statistics for the polls, choices and votes
-        statistics = {
-            'count_polls': Poll.objects.count(),
-            'count_opened_polls': Poll.objects.opened_polls().count(),
-            'count_closed_polls': Poll.objects.closed_polls().count(),
-            'count_draft_polls': Poll.objects.draft_polls().count(),
-            'count_choices': Choice.objects.count(),
-            'count_votes': Vote.objects.count(),
-            'count_voters': Vote.objects.get_count_voters(),
-            'all_voters': self.get_listing_voters_with_admin_url_and_count_votes(),
-        }
-
-        # add detail about latest changes in polls, if is
-        latest_vote = get_latest_or_none(Vote)
-        statistics['date_latest_vote'] = getattr(latest_vote, 'date_voting', None)
-        statistics['latest_active_poll'] = getattr(latest_vote, 'poll', None)
-        statistics['latest_voter'] = getattr(latest_vote, 'user', None)
-        statistics['latest_selected_choice'] = getattr(latest_vote, 'choice', None)
-
-        # get a chart statistics of count votes by year
-        chart_statistics_count_votes_by_year = self._build_chart_polls_statistics()
-
-        # add a custom context to the view
-        # and a context, needed for any admin view
-        context = dict(
-            self.admin_site.each_context(request),
-            title=_('Statistics about polls'),
-            statistics=statistics,
-            django_admin_media=self.media,
-            current_app=apps.get_app_config(Poll._meta.app_label),
-            chart_statistics_count_votes_by_year=chart_statistics_count_votes_by_year,
-        )
-
-        # return a response, on based a template and passed the context
-        return TemplateResponse(request, "polls/admin/statistics.html", context)
-
-    @add_current_app_to_request_in_admin_view_for_django_suit
-    def view_make_report(self, request):
-        """View for ability of creating an Pdf reports in the admin."""
-
-        # if request`s method is GET,
-        # then return simple view for customization creating of Pdf report
-        if request.method == 'GET':
-            context = dict(
-                self.admin_site.each_context(request),
-                title=_('Make a report about polls'),
-                current_app=apps.get_app_config(Poll._meta.app_label),
-                django_admin_media=self.media,
-            )
-            return TemplateResponse(request, "polls/admin/report.html", context)
-
-        # if request`s method is POST,
-        # then Pdf report as file
-        elif request.method == 'POST':
-
-            # get type output of report: pdf or excel
-            output_report = request.POST.get('output_report', None)
-
-            # get subjects of report
-            subjects = [
-                request.POST.get('polls', None),
-                request.POST.get('choices', None),
-                request.POST.get('votes', None),
-                request.POST.get('voters', None),
-                request.POST.get('results', None),
-            ]
-
-            subjects = [subject for subject in subjects if subject]
-            if not subjects:
-                return HttpResponseBadRequest('Not specified any theme for report.')
-
-            # generate pdf-report by subject
-            if output_report == 'report_pdf':
-                report = PollPDFReport(request, subjects)
-
-            # generate excel-report
-            elif output_report == 'report_excel':
-                report = ExcelReport(request, subjects)
-
-            else:
-                return HttpResponseBadRequest(_('Type of report is not supplied.'))
-
-            response = report.make_report()
-            return response
-
-    def _build_chart_poll_result(self, object_id):
-        """Return chart as SVG, what reveal result a poll."""
-
-        # chart configuration
-        config = pygal.Config()
-        config.half_pie = True
-        config.legend_at_bottom = True
-        config.legend_at_bottom_columns = True
-        config.human_readable = True
-        config.half_pie = True
-        config.truncate_legend = 80
-        config.height = 500
-        config.margin_right = 50
-        config.margin_left = 50
-        config.dynamic_print_values = True
-        config.style = pygal.style.DefaultStyle(
-            value_font_family='googlefont:Raleway',
-            value_font_size=20,
-            value_label_font_size=10,
-            value_colors=('white',),
-            no_data_font_size=11,
-        )
-        config.tooltip_border_radius = 10
-
-        # create chart
-        pie_chart = pygal.Pie(config)
-        pie_chart.title = _('Results of the poll').format()
-
-        # add data for chart
-        result_poll = Poll.objects.get(pk=object_id).get_result_poll()
-        for choice, count_votes in result_poll:
-            pie_chart.add(choice.text_choice, count_votes)
-
-        # return chart as SVG
-        return pie_chart.render()
-
-    def _build_chart_polls_statistics(self):
-        """Return chart in SVG format on based statistics of count votes by year."""
-
-        # get a statistics data by votes
-        statistics_count_votes_by_year = get_statistics_count_objects_for_the_past_year(Vote, 'date_voting')
-
-        # create a line chart
-        chart_statistics_count_votes_by_year = pygal.Line()
-
-        # customization the chart
-        chart_statistics_count_votes_by_year.x_label_rotation = 20
-        chart_statistics_count_votes_by_year.show_legend = False
-        chart_statistics_count_votes_by_year.explicit_size = (1000, 800)
-        chart_statistics_count_votes_by_year.title = str(_('Count votes for past year'))
-        chart_statistics_count_votes_by_year.x_labels = list(i[0]for i in statistics_count_votes_by_year)
-
-        # add a data to the chart
-        chart_statistics_count_votes_by_year.add(
-            str(_("Count votes")),
-            list(i[1]for i in statistics_count_votes_by_year)
-        )
-
-        # return chart in SVG format
-        return chart_statistics_count_votes_by_year.render()
-
-
+@admin.register(Choice, site=AdminSite)
 class ChoiceAdmin(admin.ModelAdmin):
     '''
     Admin View for Choice
@@ -482,32 +343,23 @@ class ChoiceAdmin(admin.ModelAdmin):
         qs = qs.choices_with_count_votes()
         return qs
 
-    def get_urls(self):
-        urls = super(ChoiceAdmin, self).get_urls()
+    def suit_cell_attributes(self, obj, column):
 
-        # replace a url`s regex from /change/ to /preview/
-        url_polls_choice_change = tuple(url for url in urls if url.name == 'polls_choice_change')[0]
-        index_url_polls_choice_change = urls.index(url_polls_choice_change)
-        url_polls_choice_view = url(r'^(.+)/preview/$', self.change_view, {}, 'polls_choice_change')
-        urls.remove(url_polls_choice_change)
-        urls.insert(index_url_polls_choice_change, url_polls_choice_view)
+        if column == 'get_count_votes':
+            return {'class': 'text-center'}
 
-        remove_url_from_admin_urls(urls, 'add')
-        remove_url_from_admin_urls(urls, 'history')
-        remove_url_from_admin_urls(urls, 'delete')
+    def suit_row_attributes(self, obj, request):
 
-        return urls
+        if obj in obj.poll.get_most_popular_choice_or_choices():
+            return {'class': 'success'}
 
     def get_voters_with_get_admin_links_as_html(self, obj):
         """Display voters with link to admin url for each user."""
 
-        voters = obj.get_voters()
-        if not voters:
-            return mark_safe('<i>{0}</i>'.format(_('Nothing voted for this choice.')))
         return format_html_join(
             ', ',
             '<span><a href="{0}">{1}</a></span>',
-            ((voter.get_admin_url(), voter.get_full_name()) for voter in voters)
+            ((voter.get_admin_url(), voter.get_full_name()) for voter in obj.get_voters())
         )
     get_voters_with_get_admin_links_as_html.short_description = _('Voters')
 
@@ -516,6 +368,7 @@ class ChoiceAdmin(admin.ModelAdmin):
     get_poll_admin_link_as_html.short_description = _('Poll')
 
 
+@admin.register(Vote, site=AdminSite)
 class VoteAdmin(admin.ModelAdmin):
     '''
     Admin View for Vote
@@ -523,7 +376,7 @@ class VoteAdmin(admin.ModelAdmin):
 
     # objects list
     list_select_related = ('poll', 'user', 'choice')
-    list_display = ('poll', 'user', 'choice', 'date_voting')
+    list_display = ('truncated_poll', 'user', 'get_truncated_choice', 'date_voting')
     list_filter = (
         ('poll', admin.RelatedOnlyFieldListFilter),
         ('user', admin.RelatedOnlyFieldListFilter),
@@ -533,7 +386,7 @@ class VoteAdmin(admin.ModelAdmin):
 
     def get_urls(self):
 
-        urls = super(VoteAdmin, self).get_urls()
+        urls = super().get_urls()
 
         # remove urls for add and change vote
         remove_url_from_admin_urls(urls, 'add')
@@ -542,3 +395,22 @@ class VoteAdmin(admin.ModelAdmin):
         remove_url_from_admin_urls(urls, 'delete')
 
         return urls
+
+    def truncated_poll(self, obj):
+
+        return truncatechars(obj.poll, 100)
+    truncated_poll.short_description = Vote._meta.get_field('poll').verbose_name
+    truncated_poll.admin_order_field = 'poll'
+
+    def get_truncated_choice(self, obj):
+
+        return truncatechars(obj.choice, 100)
+    get_truncated_choice.short_description = Vote._meta.get_field('choice').verbose_name
+    get_truncated_choice.admin_order_field = 'choice'
+
+    def suit_cell_attributes(self, obj, column):
+
+        if column == 'date_voting':
+            return {'class': 'text-right'}
+        elif column == 'user':
+            return {'class': 'text-center'}

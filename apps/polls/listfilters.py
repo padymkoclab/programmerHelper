@@ -2,6 +2,8 @@
 from django.contrib import admin
 from django.utils.translation import ugettext_lazy as _
 
+from utils.django.listfilters import DatetimeWithNullSimpleListFilter
+
 
 class IsActiveVoterListFilter(admin.SimpleListFilter):
     """ """
@@ -26,3 +28,10 @@ class IsActiveVoterListFilter(admin.SimpleListFilter):
             return qs.filter(is_active_voter=False)
         else:
             return qs
+
+
+class LatestVotingSimpleListFilter(DatetimeWithNullSimpleListFilter):
+
+    title = 'Date latest voting'
+    parameter_name = 'date_latest_voting'
+    field_for_lookup = 'date_latest_voting'

@@ -2,6 +2,8 @@
 import itertools
 import uuid
 
+from django.template import Context, Template
+from django.utils.html import mark_safe, escape, format_html
 from django.template.defaultfilters import truncatechars
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
@@ -11,11 +13,14 @@ from django.utils.translation import ugettext_lazy as _
 from django.db import models
 from django.conf import settings
 
+import pygal
+
+from utils.django.models_utils import get_admin_url
 from utils.django.datetime_utils import convert_date_to_django_date_format
 from utils.django.models_fields import ConfiguredAutoSlugField
 from utils.django.models import TimeStampedModel
 
-from .managers import PollManager, VoteManager
+from .managers import PollManager, ChoiceManager, VoteManager
 from .querysets import PollQuerySet, ChoiceQuerySet
 
 
@@ -37,12 +42,10 @@ class Poll(TimeStampedModel):
     title = models.CharField(
         _('Title'), max_length=200, unique=True,
         validators=[MinLengthValidator(settings.MIN_LENGTH_FOR_NAME_OR_TITLE_OBJECT)],
-        help_text=_('Allowed from {0} to 200 characters.').format(settings.MIN_LENGTH_FOR_NAME_OR_TITLE_OBJECT)
     )
     description = models.CharField(
         _('Short description'),
         validators=[MinLengthValidator(10)],
-        help_text=_('Enter at least 10 characters.'),
         max_length=100,
     )
     slug = ConfiguredAutoSlugField(populate_from='title', unique=True)
@@ -51,7 +54,7 @@ class Poll(TimeStampedModel):
         settings.AUTH_USER_MODEL,
         through='Vote',
         through_fields=['poll', 'user'],
-        verbose_name=_('Voted users'),
+        verbose_name=_('Voters'),
     )
 
     objects = models.Manager()
@@ -71,10 +74,7 @@ class Poll(TimeStampedModel):
         return reverse('polls:poll', kwargs={'pk': self.pk, 'slug': self.slug})
 
     def get_admin_url(self):
-        return reverse(
-            'admin:{0}_{1}_change'.format(self._meta.app_label, self._meta.model_name),
-            args=(self.pk, )
-        )
+        return get_admin_url(self)
 
     def natural_key(self):
         return self.title
@@ -90,12 +90,15 @@ class Poll(TimeStampedModel):
         max_count_votes = choices_with_count_votes.aggregate(max_count_votes=models.Max('count_votes'))
         max_count_votes = max_count_votes['max_count_votes']
 
+        if max_count_votes == 0:
+            return []
+
         # filter choice or choices with max count votes
         choices_with_max_count_votes = choices_with_count_votes.filter(count_votes=max_count_votes)
 
         return choices_with_max_count_votes
 
-    def get_result_poll(self):
+    def get_result(self):
         """Return as a sequnce details about result poll: (Choice, count votes)."""
 
         # determinate count votes in each choices
@@ -117,12 +120,18 @@ class Poll(TimeStampedModel):
     def get_count_votes(self):
         """Return count total votes in poll."""
 
+        if hasattr(self, 'count_votes'):
+            return self.count_votes
+
         return self.votes.count()
     get_count_votes.admin_order_field = 'count_votes'
     get_count_votes.short_description = _('Count votes')
 
     def get_count_choices(self):
         """Return count choices in poll."""
+
+        if hasattr(self, 'count_choices'):
+            return self.count_choices
 
         return self.choices.count()
     get_count_choices.admin_order_field = 'count_choices'
@@ -133,20 +142,39 @@ class Poll(TimeStampedModel):
 
         return self.voters.all()
 
-    def get_date_lastest_voting(self):
+    def get_date_latest_voting(self):
         """Return a datetime latest voting, in the project datetime format, of the poll or none."""
 
-        try:
-            # get date voting of a latest vote, if exists
-            date_voting = self.votes.latest().date_voting
+        if hasattr(self, 'date_latest_voting'):
+            return self.date_latest_voting
 
+        if self.votes.exists():
+            return self.votes.latest().date_voting
+        return
             # convert and to return the datetime object to the project datetime format
-            date_voting = convert_date_to_django_date_format(date_voting)
-            return date_voting
-        except Vote.DoesNotExist:
-            return
-    get_date_lastest_voting.admin_order_field = 'date_latest_voting'
-    get_date_lastest_voting.short_description = _('Date latest voting')
+            # date_voting = convert_date_to_django_date_format(date_voting)
+    get_date_latest_voting.admin_order_field = 'date_latest_voting'
+    get_date_latest_voting.short_description = _('Date latest voting')
+
+    def get_chart_results(self):
+        """ """
+
+        config = pygal.Config()
+        config.half_pie = True
+
+        chart = pygal.Pie(config)
+
+        chart.add('IE', 19.5)
+        chart.add('Firefox', 36.6)
+        chart.add('Chrome', 36.3)
+        chart.add('Safari', 4.5)
+        chart.add('Opera', 2.3)
+
+        svg = chart.render()
+
+        svg = mark_safe(svg)
+        # svg = mark_safe(Template('{{ svg|safe }}').render(Context({'svg': svg})))
+        return format_html('{}', svg)
 
 
 class Choice(models.Model):
@@ -158,16 +186,13 @@ class Choice(models.Model):
 
     id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
     poll = models.ForeignKey(
-        'Poll',
-        models.CASCADE,
-        verbose_name=_('Poll'),
-        related_name='choices',
-        limit_choices_to={'status': Poll.OPENED},
+        'Poll', verbose_name=_('Poll'),
+        on_delete=models.CASCADE, related_name='choices',
     )
     text_choice = models.TextField(_('Text choice'))
 
     objects = models.Manager()
-    objects = ChoiceQuerySet.as_manager()
+    objects = ChoiceManager.from_queryset(ChoiceQuerySet)()
 
     class Meta:
         db_table = 'choices'
@@ -223,7 +248,6 @@ class Vote(models.Model):
         models.CASCADE,
         verbose_name=_('User'),
         related_name='votes',
-        limit_choices_to={'is_active': True},
     )
     choice = models.ForeignKey(
         'Choice',
@@ -240,7 +264,7 @@ class Vote(models.Model):
         db_table = 'votes'
         verbose_name = "Vote"
         verbose_name_plural = "Votes"
-        ordering = ['poll', '-date_voting']
+        ordering = ['-date_voting']
         get_latest_by = 'date_voting'
         unique_together = ('poll', 'user')
 

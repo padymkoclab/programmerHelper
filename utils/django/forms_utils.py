@@ -14,6 +14,7 @@ class HorizontalRadioRenderer(forms.RadioSelect.renderer):
 
 
 class HorizontalRadioSelect(forms.RadioSelect):
+
     renderer = HorizontalRadioRenderer
 
 

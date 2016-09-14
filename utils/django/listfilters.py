@@ -203,3 +203,64 @@ class DateRangeFieldListFilter(admin.FieldListFilter):
 
 
 admin.FieldListFilter.register(lambda f: isinstance(f, models.DateField), DateRangeFieldListFilter)
+
+
+class DatetimeSimpleListFilter(admin.SimpleListFilter):
+
+    def lookups(self, request, model_admin):
+
+        return [
+            ('today', _('Today')),
+            ('week', _('Past 7 days')),
+            ('month', _('This month')),
+            ('year', _('This year')),
+        ]
+
+    def queryset(self, request, queryset):
+
+        condititons = self._get_conditions()
+
+        if condititons is not None:
+            return queryset.filter(**condititons)
+
+    def _get_conditions(self):
+        """ """
+
+        now = timezone.now()
+
+        date_ago = None
+        condititons = None
+
+        if self.value() == 'today':
+            date_ago = now.replace(hour=0, minute=0, second=0, microsecond=0)
+        if self.value() == 'week':
+            date_ago = now - timezone.timedelta(days=7)
+        if self.value() == 'month':
+            date_ago = now.replace(day=1)
+        if self.value() == 'year':
+            date_ago = now.replace(month=1, day=1)
+
+        if date_ago is not None:
+            condititons = {self.field_for_lookup + '__gte': date_ago}
+
+        return condititons
+
+
+class DatetimeWithNullSimpleListFilter(DatetimeSimpleListFilter):
+
+    def lookups(self, request, model_admin):
+
+        lookups = super().lookups(request, model_admin)
+        lookups.append(
+            ('never', _('Never')),
+        )
+        return lookups
+
+    def _get_conditions(self):
+
+        conditions = super()._get_conditions()
+
+        if self.value() == 'never':
+            conditions = {self.field_for_lookup + '__isnull': True}
+
+        return conditions

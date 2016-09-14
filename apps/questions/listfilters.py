@@ -1,7 +1,8 @@
 
-from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from django.contrib import admin
+
+from utils.django.listfilters import DatetimeSimpleListFilter
 
 
 class HasAcceptedAnswerSimpleListFilter(admin.SimpleListFilter):
@@ -24,34 +25,8 @@ class HasAcceptedAnswerSimpleListFilter(admin.SimpleListFilter):
             return queryset.filter(_has_accepted_answer=False)
 
 
-class LatestActivitySimpleListFilter(admin.SimpleListFilter):
+class LatestActivitySimpleListFilter(DatetimeSimpleListFilter):
 
-    title = _('Latest activity')
-    parameter_name = 'has_accepted_answer'
-
-    def lookups(self, request, model_admin):
-
-        return (
-            ('today', _('Today')),
-            ('week', _('Past 7 days')),
-            ('month', _('This month')),
-            ('year', _('This year')),
-        )
-
-    def queryset(self, request, queryset):
-
-        now = timezone.now()
-
-        date_ago = None
-
-        if self.value() == 'today':
-            date_ago = now.replace(hour=0, minute=0, second=0, microsecond=0)
-        if self.value() == 'week':
-            date_ago = now - timezone.timedelta(days=7)
-        if self.value() == 'month':
-            date_ago = now.replace(day=1)
-        if self.value() == 'year':
-            date_ago = now.replace(month=1, day=1)
-
-        if date_ago is not None:
-            return queryset.filter(date_latest_activity__gte=date_ago)
+    title = _('Date latest activity')
+    parameter_name = 'latest_activity'
+    field_for_lookup = 'date_latest_activity'

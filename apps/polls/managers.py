@@ -10,6 +10,11 @@ from dateutil.relativedelta import relativedelta
 
 from utils.django.functions_db import Round
 
+from apps.core.utils import (
+    get_statistics_count_objects_for_the_past_year,
+    get_chart_count_objects_for_the_past_year,
+)
+
 
 class PollsManager(models.Manager):
     """
@@ -93,6 +98,47 @@ class PollManager(models.Manager):
     Manager for polls
     """
 
+    def get_avg_count_choices(self):
+        """ """
+
+        self = self.polls_with_count_choices()
+        return self.aggregate(
+            avg=Round(
+                models.functions.Coalesce(
+                    models.Avg('count_choices'),
+                    0
+                )
+            )
+        )['avg']
+
+    def get_avg_count_votes(self):
+        """ """
+
+        self = self.polls_with_count_votes()
+        return self.aggregate(
+            avg=Round(
+                models.functions.Coalesce(
+                    models.Avg('count_votes'),
+                    0
+                )
+            )
+        )['avg']
+
+    def get_count_opened_polls(self):
+        """ """
+
+        return self.filter(status=self.model.OPENED).count()
+
+    def get_count_closed_polls(self):
+        """ """
+
+        return self.filter(status=self.model.CLOSED).count()
+
+    def get_count_draft_polls(self):
+        """ """
+
+        return self.filter(status=self.model.DRAFT).count()
+
     def get_by_natural_key(self, title):
         return self.get(title=title)
 
@@ -135,10 +181,26 @@ class PollManager(models.Manager):
         return avg_count_choices['avg_count_choices']
 
 
+class ChoiceManager(models.Manager):
+
+    def get_avg_count_votes(self):
+        """ """
+
+        self = self.choices_with_count_votes()
+        return self.aggregate(
+            avg=Round(
+                models.functions.Coalesce(
+                    models.Avg('count_votes'),
+                    0
+                )
+            )
+        )['avg']
+
+
 class VoteManager(models.Manager):
     """ """
 
-    def get_count_voters(self):
+    def get_count_distinct_voters(self):
         """ """
 
         return self.values('user').distinct().count()
@@ -204,3 +266,15 @@ class VoteManager(models.Manager):
             return self.latest()
         except self.model.DoesNotExist:
             return
+
+    def get_statistics_count_votes_for_the_past_year(self):
+        """ """
+
+        return get_statistics_count_objects_for_the_past_year(self, 'date_voting')
+
+    def get_chart_count_votes_for_the_past_year(self):
+        """ """
+
+        return get_chart_count_objects_for_the_past_year(
+            self.get_statistics_count_votes_for_the_past_year()
+        )

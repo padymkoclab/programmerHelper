@@ -2,25 +2,25 @@
 import factory
 from factory import fuzzy
 
-from utils.django.factories_utils import generate_text_by_min_length
+from utils.django.factories_utils import generate_text_random_length_for_field_of_model, AbstractTimeStampedFactory
 
 from .models import Poll, Choice
 
 
-class PollFactory(factory.django.DjangoModelFactory):
+class PollFactory(AbstractTimeStampedFactory):
 
     class Meta:
         model = Poll
 
-    status = fuzzy.FuzzyChoice(Poll.CHOICES_STATUS._db_values)
+    status = fuzzy.FuzzyChoice([value for value, label in Poll.CHOICES_STATUS])
 
     @factory.lazy_attribute
     def title(self):
-        return factory.Faker('text', locale='ru').generate([])[:50]
+        return generate_text_random_length_for_field_of_model(self, 'title')
 
     @factory.lazy_attribute
     def description(self):
-        return generate_text_by_min_length(10)[:100]
+        return generate_text_random_length_for_field_of_model(self, 'description')
 
 
 class ChoiceFactory(factory.django.DjangoModelFactory):
@@ -28,5 +28,6 @@ class ChoiceFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Choice
 
-    poll = fuzzy.FuzzyChoice(Poll.objects.opened_polls())
-    text_choice = factory.Faker('text', locale='ru')
+    @factory.lazy_attribute
+    def text_choice(self):
+        return generate_text_random_length_for_field_of_model(self, 'text_choice')
