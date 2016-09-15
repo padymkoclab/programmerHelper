@@ -3,18 +3,19 @@ from django.template.defaultfilters import truncatechars
 from django.utils.translation import ugettext_lazy as _
 from django.contrib import admin
 
-from utils.django.admin_utils import listing_objects_with_admin_url
 from utils.django.listfilters import IsNewSimpleListFilter
 
-from apps.core.admin import AppAdmin
+from apps.core.admin import AppAdmin, AdminSite
 from apps.comments.admin import CommentGenericInline
 from apps.opinions.admin import OpinionGenericInline
+from apps.opinions.admin_mixins import OpinionsAdminMixin
 
 from .apps import SnippetsConfig
 from .models import Snippet
 from .forms import SnippetAdminModelForm
 
 
+@AdminSite.register_app_admin_class
 class SnippetAppAdmin(AppAdmin):
 
     label = SnippetsConfig.label
@@ -104,7 +105,8 @@ class SnippetAppAdmin(AppAdmin):
         return msg
 
 
-class SnippetAdmin(admin.ModelAdmin):
+@admin.register(Snippet, site=AdminSite)
+class SnippetAdmin(OpinionsAdminMixin, admin.ModelAdmin):
     '''
     Admin View for Snippet.
     '''
@@ -230,25 +232,3 @@ class SnippetAdmin(admin.ModelAdmin):
         """ """
 
         raise NotImplementedError
-
-    def get_listing_critics_with_admin_urls(self, obj):
-        """ """
-
-        return listing_objects_with_admin_url(
-            obj.get_critics(),
-            'get_admin_url',
-            'get_full_name',
-            _('No body')
-        )
-    get_listing_critics_with_admin_urls.short_description = _('Critics')
-
-    def get_listing_supporters_with_admin_urls(self, obj):
-        """ """
-
-        return listing_objects_with_admin_url(
-            obj.get_supporters(),
-            'get_admin_url',
-            'get_full_name',
-            _('No body')
-        )
-    get_listing_supporters_with_admin_urls.short_description = _('Supporters')

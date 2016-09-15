@@ -1,7 +1,7 @@
 
 from django import forms
 
-from suit.widgets import AutosizedTextarea
+from suit_ckeditor.widgets import CKEditorWidget
 
 from apps.tags.forms import clean_tags
 
@@ -27,7 +27,7 @@ class SolutionAdminModelForm(forms.ModelForm):
 
         self.fields['user'].widget.widget.attrs['class'] = 'span11'
 
-        self.fields['body'].widget = AutosizedTextarea(attrs={'class': 'span12'})
+        self.fields['body'].widget = CKEditorWidget()
 
     def clean_tags(self):
         super(SolutionAdminModelForm, self).clean()

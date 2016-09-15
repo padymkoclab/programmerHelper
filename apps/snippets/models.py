@@ -1,8 +1,6 @@
 
-import random
 import collections
 
-from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.fields import GenericRelation
 from django.core.urlresolvers import reverse
 from django.core.validators import MinLengthValidator
@@ -17,20 +15,24 @@ from utils.python.constants import CHOICES_LEXERS
 
 from apps.comments.models import Comment
 from apps.comments.managers import CommentManager
+from apps.comments.models_mixins import CommentsModelMixin
 from apps.opinions.models import Opinion
 from apps.opinions.managers import OpinionManager
+from apps.opinions.models_mixins import OpinionsModelMixin
+# from apps.flavours.models import Flavour
+# from apps.flavours.managers import FlavourManager
+# from apps.flavours.models_mixins import FlavourModelMixin
 from apps.tags.models import Tag
 from apps.tags.managers import TagManager
+from apps.tags.models_mixins import TagsModelMixin
 
 # from apps.visits.models import Visit
-# from apps.tags.model_mixins import RelatedObjectsByTags
 
 from .managers import SnippetManager
 from .querysets import SnippetQuerySet
 
 
-# class Snippet(RelatedObjectsByTags, TimeStampedModel):
-class Snippet(TimeStampedModel):
+class Snippet(CommentsModelMixin, OpinionsModelMixin, TagsModelMixin, TimeStampedModel):
     """
     Model for snippet.
     """
@@ -83,78 +85,6 @@ class Snippet(TimeStampedModel):
     def get_admin_url(self):
 
         return get_admin_url(self)
-
-    def get_count_comments(self):
-
-        if hasattr(self, 'count_comments'):
-            return self.count_comments
-
-        return self.comments.count()
-    get_count_comments.admin_order_field = 'count_comments'
-    get_count_comments.short_description = _('Count comments')
-
-    def get_count_opinions(self):
-
-        if hasattr(self, 'count_opinions'):
-            return self.count_opinions
-
-        return self.opinions.count()
-    get_count_opinions.admin_order_field = 'count_opinions'
-    get_count_opinions.short_description = _('Count opinions')
-
-    def get_count_tags(self):
-
-        if hasattr(self, 'count_tags'):
-            return self.count_tags
-
-        return self.tags.count()
-    get_count_tags.admin_order_field = 'count_tags'
-    get_count_tags.short_description = _('Count tags')
-
-    def get_rating(self):
-        """Get mark of snippet, on based opinions of users about it."""
-
-        if hasattr(self, 'rating'):
-            return self.rating
-
-        # convert boolean to integer
-        self = self.opinions.annotate(
-            is_useful_int=models.Case(
-                models.When(is_useful=True, then=1),
-                models.When(is_useful=False, then=-1),
-                output_field=models.IntegerField()
-            )
-        )
-
-        return self.aggregate(rating=models.functions.Coalesce(models.Sum('is_useful_int'), 0))['rating']
-    get_rating.short_description = _('Rating')
-    get_rating.admin_order_field = 'rating'
-
-    def get_count_critics(self):
-        """Get count good opinions about this snippet."""
-
-        return self.get_critics().count()
-    get_count_critics.short_description = _('Count critics')
-
-    def get_count_supporters(self):
-        """Get count bad opinions about this snippet."""
-
-        return self.get_supporters().count()
-    get_count_supporters.short_description = _('Count supporters')
-
-    def get_critics(self):
-        """Return the users determined this snippet as not useful."""
-
-        user = self.opinions.filter(is_useful=False).values('user__pk')
-        return get_user_model()._default_manager.filter(pk__in=user)
-    get_critics.short_description = _('Critics')
-
-    def get_supporters(self):
-        """Return the users determined this snippet as useful."""
-
-        user = self.opinions.filter(is_useful=True).values('user__pk')
-        return get_user_model()._default_manager.filter(pk__in=user)
-    get_supporters.short_description = _('Supporters')
 
     def related_snippets(self):
         """Deterniming a snippets, related with this snippet by tags and lexer."""

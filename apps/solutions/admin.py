@@ -3,10 +3,10 @@ from django.utils.translation import ugettext_lazy as _
 from django.contrib import admin
 
 from utils.django.listfilters import IsNewSimpleListFilter
-from utils.django.admin_utils import listing_objects_with_admin_url
 
-from apps.core.admin import AppAdmin
+from apps.core.admin import AppAdmin, AdminSite
 from apps.opinions.admin import OpinionGenericInline
+from apps.opinions.admin_mixins import OpinionsAdminMixin
 from apps.comments.admin import CommentGenericInline
 
 from .apps import SolutionsConfig
@@ -14,6 +14,7 @@ from .forms import SolutionAdminModelForm
 from .models import Solution
 
 
+@AdminSite.register_app_admin_class
 class SolutionAppAdmin(AppAdmin):
 
     label = SolutionsConfig.label
@@ -95,7 +96,8 @@ class SolutionAppAdmin(AppAdmin):
         return msg
 
 
-class SolutionAdmin(admin.ModelAdmin):
+@admin.register(Solution, site=AdminSite)
+class SolutionAdmin(OpinionsAdminMixin, admin.ModelAdmin):
     """
     Admin View for Solution
     """
@@ -131,8 +133,8 @@ class SolutionAdmin(admin.ModelAdmin):
         'date_added',
         'get_count_critics',
         'get_count_supporters',
-        'get_listing_critics',
-        'get_listing_supporters',
+        'get_listing_critics_with_admin_urls',
+        'get_listing_supporters_with_admin_urls',
     ]
 
     def get_queryset(self, request):
@@ -142,22 +144,27 @@ class SolutionAdmin(admin.ModelAdmin):
 
     def get_fieldsets(self, request, obj=None):
 
-        fieldsets = [
-            [
+        fieldsets = (
+            (
                 Solution._meta.verbose_name, {
                     'fields': [
                         'problem',
                         'slug',
                         'user',
-                        'body',
                         'tags',
                     ],
                 }
-            ],
-        ]
+            ),
+            (
+                Solution._meta.get_field('body').verbose_name, {
+                    'classes': ('full-width', ),
+                    'fields': ('body', ),
+                }
+            )
+        )
 
         if obj is not None:
-            fieldsets.append([
+            fieldsets.append((
                 _('Additional information'), {
                     'classes': ('collapse', ),
                     'fields': [
@@ -165,15 +172,15 @@ class SolutionAdmin(admin.ModelAdmin):
                         'get_count_opinions',
                         'get_count_critics',
                         'get_count_supporters',
-                        'get_listing_critics',
-                        'get_listing_supporters',
+                        'get_listing_critics_with_admin_urls',
+                        'get_listing_supporters_with_admin_urls',
                         'get_count_comments',
                         'get_count_tags',
                         'date_modified',
                         'date_added',
                     ]
                 }
-            ])
+            ))
 
         return fieldsets
 
@@ -213,16 +220,3 @@ class SolutionAdmin(admin.ModelAdmin):
             'date_added',
         ]:
             return {'class': 'text-right'}
-
-    def get_listing_critics(self, obj):
-        return listing_objects_with_admin_url(
-            obj.get_critics(), 'get_admin_url', 'get_full_name', _('No body')
-        )
-    get_listing_critics.short_description = _('Critics')
-
-    def get_listing_supporters(self, obj):
-
-        return listing_objects_with_admin_url(
-            obj.get_supporters(), 'get_admin_url', 'get_full_name', _('No body')
-        )
-    get_listing_supporters.short_description = _('Supporters')

@@ -6,6 +6,7 @@ from django.contrib import admin
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
+from apps.core.admin import AdminSite
 from apps.polls.listfilters import IsActiveVoterListFilter
 
 from .actions import (
@@ -15,10 +16,11 @@ from .actions import (
     make_users_as_active,
 )
 from .forms import UserChangeForm, UserCreationForm
-from .models import UserLevel
+from .models import User, UserLevel
 from .listfilters import ListFilterLastLogin
 
 
+@admin.register(User, site=AdminSite)
 class UserAdmin(BaseUserAdmin):
     """
     Admin configuration for model User
@@ -288,6 +290,7 @@ class UserAdmin(BaseUserAdmin):
         return self.changelist_view(request)
 
 
+@admin.register(UserLevel, site=AdminSite)
 class UserLevelAdmin(admin.ModelAdmin):
     '''
     Admin View for UserLevel

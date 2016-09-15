@@ -6,14 +6,19 @@ from django.utils.translation import ugettext_lazy as _
 from django.db import models
 from django.conf import settings
 
-from utils.django.models_fields import ConfiguredAutoSlugField
 from utils.django.models import TimeStampedModel
+from utils.django.models_fields import ConfiguredAutoSlugField
 from utils.django.models_utils import get_admin_url
 
 from apps.comments.models import Comment
 from apps.comments.managers import CommentManager
+from apps.comments.models_mixins import CommentsModelMixin
 from apps.opinions.models import Opinion
 from apps.opinions.managers import OpinionManager
+from apps.opinions.models_mixins import OpinionsModelMixin
+# from apps.flavours.models import Flavour
+# from apps.flavours.managers import FlavourManager
+# from apps.flavours.models_mixins import FlavourModelMixin
 
 from .querysets import UtilityQuerySet, CategoryQuerySet
 from .managers import CategoryManager, UtilityManager
@@ -106,7 +111,7 @@ class Category(TimeStampedModel):
     get_count_utilities.admin_order_field = 'count_utilities'
 
 
-class Utility(TimeStampedModel):
+class Utility(CommentsModelMixin, OpinionsModelMixin, TimeStampedModel):
     """
     Model of a utility
     """
@@ -141,46 +146,3 @@ class Utility(TimeStampedModel):
 
     def __str__(self):
         return '{0.name}'.format(self)
-
-    def get_mark(self):
-        """ """
-
-        # if queryset is already has need field - return it
-        # otherwise determinate value
-        if hasattr(self, 'mark'):
-            return self.mark
-
-        opinions = self.opinions.prefetch_related('opinions')
-
-        # change Bool to Int
-        opinions = opinions.annotate(is_useful_int=models.Case(
-            models.When(is_useful=True, then=1),
-            models.When(is_useful=False, then=-1),
-            output_field=models.IntegerField()
-        ))
-
-        # make sum by 'is_useful_int'
-        return opinions.aggregate(mark=models.Sum('is_useful_int'))['mark']
-
-    get_mark.short_description = _('Mark')
-    get_mark.admin_order_field = 'mark'
-
-    def get_count_comments(self):
-
-        # if queryset is already annotated with field 'count_comments' - return it
-        if hasattr(self, 'count_comments'):
-            return self.count_comments
-
-        return self.comments.prefetch_related('comments').count()
-    get_count_comments.short_description = _('Count comments')
-    get_count_comments.admin_order_field = 'count_comments'
-
-    def get_count_opinions(self):
-
-        # if queryset is already annotated with field 'count_opinions' - return it
-        if hasattr(self, 'count_opinions'):
-            return self.count_opinions
-
-        return self.opinions.prefetch_related('opinions').count()
-    get_count_opinions.short_description = _('Count opinions')
-    get_count_opinions.admin_order_field = 'count_opinions'

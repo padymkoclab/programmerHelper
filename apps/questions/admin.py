@@ -9,6 +9,7 @@ from utils.django.listfilters import IsNewSimpleListFilter
 from apps.core.admin import AppAdmin, AdminSite
 from apps.comments.admin import CommentGenericInline
 from apps.opinions.admin import OpinionGenericInline
+from apps.opinions.admin_mixins import OpinionsAdminMixin
 from apps.flavours.admin import FlavourGenericInline
 
 from .forms import QuestionAdminModelForm, AnswerAdminModelForm, AnswerInlineAdminModelForm
@@ -163,7 +164,7 @@ class AnswerInline(admin.StackedInline):
 
 
 @admin.register(Question, site=AdminSite)
-class QuestionAdmin(admin.ModelAdmin):
+class QuestionAdmin(OpinionsAdminMixin, admin.ModelAdmin):
     '''
     Admin View for Question
     '''
@@ -198,6 +199,10 @@ class QuestionAdmin(admin.ModelAdmin):
         'has_accepted_answer',
         'get_rating',
         'get_count_opinions',
+        'get_count_critics',
+        'get_listing_critics_with_admin_urls',
+        'get_count_supporters',
+        'get_listing_supporters_with_admin_urls',
         'get_count_tags',
         'get_count_flavours',
         'get_count_like_flavours',
@@ -245,6 +250,10 @@ class QuestionAdmin(admin.ModelAdmin):
                             'has_accepted_answer',
                             'get_rating',
                             'get_count_opinions',
+                            'get_count_critics',
+                            'get_listing_critics_with_admin_urls',
+                            'get_count_supporters',
+                            'get_listing_supporters_with_admin_urls',
                             'get_count_tags',
                             'get_count_flavours',
                             'get_count_like_flavours',
@@ -299,7 +308,7 @@ class QuestionAdmin(admin.ModelAdmin):
 
 
 @admin.register(Answer, site=AdminSite)
-class AnswerAdmin(admin.ModelAdmin):
+class AnswerAdmin(OpinionsAdminMixin, admin.ModelAdmin):
     '''
     Admin View for Answer
     '''
@@ -328,6 +337,10 @@ class AnswerAdmin(admin.ModelAdmin):
     readonly_fields = (
         'get_rating',
         'get_count_opinions',
+        'get_count_critics',
+        'get_listing_critics_with_admin_urls',
+        'get_count_supporters',
+        'get_listing_supporters_with_admin_urls',
         'get_count_comments',
         'date_modified',
         'date_added',
@@ -367,6 +380,10 @@ class AnswerAdmin(admin.ModelAdmin):
                         'fields': (
                             'get_rating',
                             'get_count_opinions',
+                            'get_count_critics',
+                            'get_listing_critics_with_admin_urls',
+                            'get_count_supporters',
+                            'get_listing_supporters_with_admin_urls',
                             'get_count_comments',
                             'date_modified',
                             'date_added',

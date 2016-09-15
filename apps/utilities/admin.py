@@ -1,19 +1,16 @@
 
-from unittest import mock
+import logging
 
-from django.http import HttpResponse
-from django.template.response import TemplateResponse
-from django.apps import apps
 from django.utils.text import force_text
 from django.template.defaultfilters import truncatechars
 from django.utils.translation import ugettext_lazy as _
 from django.contrib import admin
 
-from utils.python.logging_utils import create_logger_by_filename
 from utils.django.listfilters import IsNewSimpleListFilter
 
-from apps.core.admin import AppAdmin
+from apps.core.admin import AppAdmin, AdminSite
 from apps.opinions.admin import OpinionGenericInline
+from apps.opinions.admin_mixins import OpinionsAdminMixin
 from apps.comments.admin import CommentGenericInline
 
 from .apps import UtilitiesConfig
@@ -21,9 +18,10 @@ from .models import Category, Utility
 from .forms import CategoryAdminModelForm, UtilityAdminModelForm
 
 
-logger = create_logger_by_filename(__name__)
+logger = logging.getLogger(__name__)
 
 
+@AdminSite.register_app_admin_class
 class UtilitiesAppAdmin(AppAdmin):
 
     label = UtilitiesConfig.label
@@ -111,13 +109,13 @@ class UtilityInline(admin.StackedInline):
     model = Utility
     extra = 0
     fk_name = 'category'
-    readonly_fields = ['get_mark', 'get_count_comments', 'get_count_opinions', 'date_modified', 'date_added']
+    readonly_fields = ['get_rating', 'get_count_comments', 'get_count_opinions', 'date_modified', 'date_added']
     fields = [
         'name',
         'description',
         'category',
         'web_link',
-        'get_mark',
+        'get_rating',
         'get_count_comments',
         'get_count_opinions',
         'date_modified',
@@ -125,6 +123,7 @@ class UtilityInline(admin.StackedInline):
     ]
 
 
+@admin.register(Category, site=AdminSite)
 class CategoryAdmin(admin.ModelAdmin):
     '''
     Admin View for Category
@@ -201,7 +200,8 @@ class CategoryAdmin(admin.ModelAdmin):
         return []
 
 
-class UtilityAdmin(admin.ModelAdmin):
+@admin.register(Utility, site=AdminSite)
+class UtilityAdmin(OpinionsAdminMixin, admin.ModelAdmin):
     '''
     Admin View for Utility
     '''
@@ -210,7 +210,7 @@ class UtilityAdmin(admin.ModelAdmin):
     list_display = (
         'truncated_name',
         'category',
-        'get_mark',
+        'get_rating',
         'get_count_opinions',
         'get_count_comments',
         'is_new',
@@ -225,7 +225,17 @@ class UtilityAdmin(admin.ModelAdmin):
         'date_added',
     )
     search_fields = ('name', )
-    readonly_fields = ['get_mark', 'get_count_comments', 'get_count_opinions', 'date_modified', 'date_added']
+    readonly_fields = [
+        'get_rating',
+        'get_count_comments',
+        'get_count_opinions',
+        'get_count_critics',
+        'get_count_supporters',
+        'get_listing_critics_with_admin_urls',
+        'get_listing_supporters_with_admin_urls',
+        'date_modified',
+        'date_added',
+    ]
 
     def get_queryset(self, request):
         qs = super(UtilityAdmin, self).get_queryset(request)
@@ -252,9 +262,13 @@ class UtilityAdmin(admin.ModelAdmin):
                 _('Additional information'), {
                     'classes': ('collapse', ),
                     'fields': [
-                        'get_mark',
+                        'get_rating',
                         'get_count_comments',
                         'get_count_opinions',
+                        'get_count_critics',
+                        'get_count_supporters',
+                        'get_listing_critics_with_admin_urls',
+                        'get_listing_supporters_with_admin_urls',
                         'date_modified',
                         'date_added',
                     ]
@@ -272,6 +286,25 @@ class UtilityAdmin(admin.ModelAdmin):
             ]
             return [inline(self.model, self.admin_site) for inline in inlines]
         return []
+
+    def suit_cell_attributes(self, obj, column):
+
+        if column in ['truncated_name', 'category']:
+            css_class = 'text-left'
+        elif column in ['date_added', 'date_modified']:
+            css_class = 'text-right'
+        else:
+            css_class = 'text-center'
+
+        return {'class': css_class}
+
+    def suit_row_attributes(self, obj, request):
+
+        if obj.rating is not None:
+            if obj.rating > 0:
+                return {'class': 'success'}
+            elif obj.rating < 0:
+                return {'class': 'error'}
 
     def truncated_name(self, obj):
         return truncatechars(force_text(obj), 50)

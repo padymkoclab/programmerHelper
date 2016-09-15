@@ -1,5 +1,4 @@
 
-from django.utils.html import format_html
 from django.template.defaultfilters import truncatechars
 from django.utils.translation import ugettext_lazy as _
 from django.contrib import admin
@@ -7,7 +6,7 @@ from django.contrib import admin
 from utils.django.admin_utils import remove_url_from_admin_urls
 from utils.django.listfilters import IsNewSimpleListFilter
 
-from apps.core.admin import AppAdmin
+from apps.core.admin import AppAdmin, AdminSite
 
 from .apps import TestingConfig
 from .models import Suit, Question, Variant, Passage
@@ -21,6 +20,7 @@ from .forms import (
 from .listfilters import IsCompletedSimpleListFilter
 
 
+@AdminSite.register_app_admin_class
 class TestingAppAdmin(AppAdmin):
 
     label = TestingConfig.label
@@ -140,6 +140,7 @@ class PassageInline(admin.TabularInline):
     classes = ['collapse']
 
 
+@admin.register(Suit, site=AdminSite)
 class SuitAdmin(admin.ModelAdmin):
     """
     Admin View for Suit
@@ -239,6 +240,7 @@ class SuitAdmin(admin.ModelAdmin):
     truncated_name.admin_order_field = 'name'
 
 
+@admin.register(Question, site=AdminSite)
 class QuestionAdmin(admin.ModelAdmin):
     """
     Admin View for Question
@@ -314,6 +316,7 @@ class QuestionAdmin(admin.ModelAdmin):
     truncated_text_question.admin_order_field = 'text_question'
 
 
+@admin.register(Variant, site=AdminSite)
 class VariantAdmin(admin.ModelAdmin):
     '''
         Admin View for Variant
@@ -338,9 +341,6 @@ class VariantAdmin(admin.ModelAdmin):
 
         urls = super().get_urls()
 
-        urls += [
-        ]
-
         remove_url_from_admin_urls(urls, 'add'),
         remove_url_from_admin_urls(urls, 'change'),
         remove_url_from_admin_urls(urls, 'history'),
@@ -359,12 +359,13 @@ class VariantAdmin(admin.ModelAdmin):
     truncated_question.admin_order_field = 'question'
 
 
+@admin.register(Passage, site=AdminSite)
 class PassageAdmin(admin.ModelAdmin):
     """
 
     """
 
-    list_display = ['truncated_suit', 'user', 'colored_status', 'mark', 'date']
+    list_display = ['truncated_suit', 'user', 'status', 'mark', 'date']
     date_hierarchy = 'date'
     list_filter = [
         ('suit', admin.RelatedOnlyFieldListFilter),
@@ -385,9 +386,6 @@ class PassageAdmin(admin.ModelAdmin):
 
         urls = super().get_urls()
 
-        urls += [
-        ]
-
         remove_url_from_admin_urls(urls, 'add'),
         remove_url_from_admin_urls(urls, 'change'),
         remove_url_from_admin_urls(urls, 'history'),
@@ -395,16 +393,23 @@ class PassageAdmin(admin.ModelAdmin):
 
         return urls
 
+    def suit_cell_attributes(self, obj, column):
+
+        if column in ['date']:
+            return {'class': 'text-right'}
+        elif column in ['truncated_suit']:
+            return {'class': 'text-left'}
+        else:
+            return {'class': 'text-center'}
+
+    def suit_row_attributes(self, obj, request):
+
+        if 8 <= obj.mark <= 10:
+            return {'class': 'success'}
+        elif obj.mark <= 2:
+            return {'class': 'warning'}
+
     def truncated_suit(self, obj):
         return truncatechars(obj.suit, 60)
     truncated_suit.short_description = Passage._meta.get_field('suit').verbose_name
     truncated_suit.admin_order_field = 'suit'
-
-    def colored_status(self, obj):
-        if obj.status == Passage.PASSED:
-            color = 'rgb(0, 255, 0)'
-        elif obj.status == Passage.ATTEMPT:
-            color = 'rgb(255, 0, 0)'
-        return format_html('<span style="color: {}">{}</span>', color, obj.get_status_display())
-    colored_status.short_description = Passage._meta.get_field('status').verbose_name
-    colored_status.admin_order_field = 'status'

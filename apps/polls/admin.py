@@ -1,6 +1,5 @@
 
 from django.template.defaultfilters import truncatechars
-from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
 from django.utils.safestring import mark_safe
 from django.utils.html import format_html_join, format_html, conditional_escape
@@ -83,8 +82,9 @@ class ChoiceInline(admin.StackedInline):
     extra = 0
     can_delete = True
     list_select_related = ('poll',)
-    fields = ('text_choice', 'poll')
+    fields = ('text_choice', 'poll', 'get_count_votes')
     fk_name = 'poll'
+    readonly_fields = ('get_count_votes', )
 
 
 class VoteInline(admin.TabularInline):
@@ -133,10 +133,9 @@ class PollAdmin(admin.ModelAdmin):
     # object
     form = PollAdminModelForm
     readonly_fields = (
-        'get_most_popular_choice_or_choices_as_html',
-        'get_date_latest_voting',
-        'get_count_votes',
         'get_count_choices',
+        'get_count_votes',
+        'get_date_latest_voting',
         'get_chart_results',
     )
     prepopulated_fields = {'slug': ('title', )}
@@ -178,8 +177,8 @@ class PollAdmin(admin.ModelAdmin):
                     _('Additional information'), {
                         'classes': ('collapse', ),
                         'fields': (
-                            'get_count_votes',
                             'get_count_choices',
+                            'get_count_votes',
                             'get_date_latest_voting',
                         )
                     }
@@ -250,46 +249,6 @@ class PollAdmin(admin.ModelAdmin):
         # make join all voters in a safe html
         html_listing_voters = mark_safe(conditional_escape(', ').join(html_voters))
         return html_listing_voters
-
-    def get_most_popular_choice_or_choices_as_html(self, obj):
-        """Method-wrapper for method get_most_popular_choice_or_choices() of model Poll.
-        Return result of the method get_most_popular_choice_or_choices() as humen-readable view HTML."""
-
-        most_popular_choice_or_choices = obj.get_most_popular_choice_or_choices()
-
-        if len(most_popular_choice_or_choices) > 1:
-
-            lines = list()
-            for choice in most_popular_choice_or_choices:
-                format_string = ungettext(
-                    '%(truncated_text_choice)s (%(count_votes)d vote)',
-                    '%(truncated_text_choice)s (%(count_votes)d votes)',
-                    choice.count_votes,
-                ) % {
-                    'count_votes': choice.count_votes,
-                    'truncated_text_choice': choice.get_truncated_text_choice()
-                }
-
-                line = format_html('<li style="list-style: none;">{0}</li>', format_string)
-                lines.append(line)
-            return mark_safe(conditional_escape('').join(lines))
-        elif len(most_popular_choice_or_choices) == 1:
-
-            popular_choice = most_popular_choice_or_choices[0]
-
-            string = ungettext(
-                '%(truncated_text_choice)s (%(count_votes)d vote)',
-                '%(truncated_text_choice)s (%(count_votes)d votes)',
-                popular_choice.count_votes,
-            ) % {
-                'truncated_text_choice': popular_choice.get_truncated_text_choice(),
-                'count_votes': popular_choice.count_votes,
-            }
-
-            return format_html('<li style="list-style: none;">{0}</li>', string)
-        else:
-            return format_html('<i>{0}</i>', _('Poll does not have a choices at all.'))
-    get_most_popular_choice_or_choices_as_html.short_description = _('Most popular choice or choices')
 
     def view_preview(self, request):
         """ """

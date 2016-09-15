@@ -2,7 +2,7 @@
 from utils.python.logging_utils import create_logger_by_filename
 from utils.django.basecommands import ExtendedBaseCommand
 
-from apps.utilities.factories import UtilityFactory
+from apps.utilities.factories import CategoryFactory, UtilityFactory
 
 
 logger = create_logger_by_filename(__name__)
@@ -10,7 +10,7 @@ logger = create_logger_by_filename(__name__)
 
 class Command(ExtendedBaseCommand):
 
-    help = 'Factory testing utilities.'
+    help = 'Factory testing categories with utilities.'
 
     def add_arguments(self, parser):
 
@@ -20,11 +20,18 @@ class Command(ExtendedBaseCommand):
 
         count = kwargs['count'][0]
 
-        model = UtilityFactory._meta.model
+        CategoryModel = CategoryFactory._meta.model
+        UtilityModel = UtilityFactory._meta.model
 
-        model._default_manager.filter().delete()
+        CategoryModel.objects.filter().delete()
+
+        for i in range(20):
+            CategoryFactory()
 
         for i in range(count):
             UtilityFactory()
 
-        logger.debug('Made factory {0} testing utilities'.format(model._default_manager.count()))
+        logger.debug('Made factory testing {0} categories and {1} utilities'.format(
+            CategoryModel.objects.count(),
+            UtilityModel.objects.count(),
+        ))

@@ -1,10 +1,10 @@
 
-from django.core.exceptions import ValidationError
+import logging
+
 from django.contrib.contenttypes.fields import GenericRelation
 from django.core.validators import MinLengthValidator
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext_lazy as _
-from django.utils.translation import ugettext
 from django.db import models
 from django.conf import settings
 
@@ -14,20 +14,27 @@ from utils.django.models_utils import get_admin_url
 
 from apps.comments.models import Comment
 from apps.comments.managers import CommentManager
+from apps.comments.models_mixins import CommentsModelMixin
 from apps.opinions.models import Opinion
 from apps.opinions.managers import OpinionManager
+from apps.opinions.models_mixins import OpinionsModelMixin
 from apps.flavours.models import Flavour
 from apps.flavours.managers import FlavourManager
+from apps.flavours.models_mixins import FlavourModelMixin
 from apps.tags.models import Tag
 from apps.tags.managers import TagManager
+from apps.tags.models_mixins import TagsModelMixin
 
 from .managers import QuestionManager, AnswerManager
 from .querysets import QuestionQuerySet, AnswerQuerySet
 
 
-# scrapy data question from StackOverFlow or MailList Google Groups by tags Django, JS as latest
+logger = logging.getLogger(__name__)
 
-class Question(TimeStampedModel):
+logger.warning('scrapy data question from StackOverFlow or MailList Google Groups by tags Django, JS as latest')
+
+
+class Question(TagsModelMixin, OpinionsModelMixin, FlavourModelMixin, TimeStampedModel):
     """
 
     """
@@ -93,36 +100,6 @@ class Question(TimeStampedModel):
     get_count_answers.admin_order_field = 'count_answers'
     get_count_answers.short_description = _('Count answers')
 
-    def get_count_tags(self):
-        """ """
-
-        if hasattr(self, 'count_tags'):
-            return self.count_tags
-
-        return self.tags.count()
-    get_count_tags.admin_order_field = 'count_tags'
-    get_count_tags.short_description = _('Count tags')
-
-    def get_count_opinions(self):
-        """ """
-
-        if hasattr(self, 'count_opinions'):
-            return self.count_opinions
-
-        return self.opinions.count()
-    get_count_opinions.admin_order_field = 'count_opinions'
-    get_count_opinions.short_description = _('Count opinions')
-
-    def get_count_flavours(self):
-        """ """
-
-        if hasattr(self, 'count_flavours'):
-            return self.count_flavours
-
-        return self.flavours.count()
-    get_count_flavours.admin_order_field = 'count_flavours'
-    get_count_flavours.short_description = _('Count flavours')
-
     def has_accepted_answer(self):
         """ """
 
@@ -136,22 +113,6 @@ class Question(TimeStampedModel):
     has_accepted_answer.admin_order_field = '_has_accepted_answer'
     has_accepted_answer.boolean = True
 
-    def get_rating(self):
-        """ """
-
-        if hasattr(self, 'rating'):
-            return self.rating
-
-        opinions = self.opinions.annotate(is_useful_int=models.Case(
-            models.When(is_useful=True, then=1),
-            models.When(is_useful=False, then=-1),
-            output_field=models.IntegerField(),
-        ))
-
-        return opinions.aggregate(rating=models.Sum('is_useful_int'))['rating']
-    get_rating.short_description = _('Rating')
-    get_rating.admin_order_field = 'rating'
-
     def get_date_latest_activity(self):
         """ """
 
@@ -164,27 +125,17 @@ class Question(TimeStampedModel):
     get_date_latest_activity.short_description = _('Date latest activity')
     get_date_latest_activity.admin_order_field = 'date_latest_activity'
 
-    def get_count_like_flavours(self):
-        """ """
-
-        return self.flavours.filter(status=True).count()
-    get_count_like_flavours.short_description = _('Count likes flavorites')
-
-    def get_count_dislike_flavours(self):
-        """ """
-
-        return self.flavours.filter(status=False).count()
-    get_count_dislike_flavours.short_description = _('Count dislike flavorites')
-
     def related_questions(self):
         raise NotImplementedError
         # analysis tags
 
 
-class Answer(TimeStampedModel):
+class Answer(OpinionsModelMixin, CommentsModelMixin, TimeStampedModel):
     """
 
     """
+
+    ERROR_MSG_UNIQUE_TOGETHER_USER_AND_QUESTION = _('This user already gave an answer on this question')
 
     text_answer = models.TextField(_('Text of answer'), validators=[MinLengthValidator(20)])
     question = models.ForeignKey(
@@ -218,48 +169,8 @@ class Answer(TimeStampedModel):
     def unique_error_message(self, model_class, unique_check):
 
         if model_class == type(self) and unique_check == ('user', 'question'):
-            return _('This user already gave an answer on this question')
+            return self.ERROR_MSG_UNIQUE_TOGETHER_USER_AND_QUESTION
         return super().unique_error_message(model_class, unique_check)
-
-    def clean(self):
-        pass
-
-    def get_count_comments(self):
-        """ """
-
-        if hasattr(self, 'count_comments'):
-            return self.count_comments
-
-        return self.comments.count()
-    get_count_comments.admin_order_field = 'count_comments'
-    get_count_comments.short_description = _('Count comments')
-
-    def get_count_opinions(self):
-        """ """
-
-        if hasattr(self, 'count_opinions'):
-            return self.count_opinions
-
-        return self.opinions.count()
-    get_count_opinions.admin_order_field = 'count_opinions'
-    get_count_opinions.short_description = _('Count opinions')
-
-    def get_rating(self):
-        """ """
-
-        if hasattr(self, 'rating'):
-            return self.rating
-
-        opinions = self.opinions.annotate(is_useful_int=models.Case(
-            models.When(is_useful=True, then=1),
-            models.When(is_useful=False, then=-1),
-            output_field=models.IntegerField()
-        ))
-
-        rating = opinions.aggregate(rating=models.Sum('is_useful_int'))['rating']
-        return rating or 0
-    get_rating.short_description = _('Rating')
-    get_rating.admin_order_field = 'rating'
 
     def time_after_published_question(self):
         return self.date_added - self.question.date_added
