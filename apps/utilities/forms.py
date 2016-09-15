@@ -1,5 +1,6 @@
 
 from django import forms
+from django.utils.translation import ugettext_lazy as _
 
 from suit.widgets import AutosizedTextarea
 
@@ -16,11 +17,15 @@ class CategoryAdminModelForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
 
         self.fields['name'].widget.attrs['class'] = 'span12'
+        self.fields['name'].widget.attrs['placeholder'] = _('Enter name')
 
         self.fields['slug'].widget.attrs['class'] = 'span12'
         self.fields['slug'].disabled = True
 
-        self.fields['description'].widget = AutosizedTextarea(attrs={'class': 'span12'})
+        self.fields['description'].widget = AutosizedTextarea(attrs={
+            'class': 'span12',
+            'placeholder': _('Enter description'),
+        })
 
 
 class UtilityAdminModelForm(forms.ModelForm):
@@ -33,10 +38,14 @@ class UtilityAdminModelForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
 
         self.fields['name'].widget.attrs['class'] = 'span12'
+        self.fields['name'].widget.attrs['placeholder'] = _('Enter name')
 
-        # field with FK
         self.fields['category'].widget.widget.attrs['class'] = 'span11'
 
-        self.fields['description'].widget = AutosizedTextarea(attrs={'class': 'span12'})
+        self.fields['description'].widget = AutosizedTextarea(attrs={
+            'class': 'span12',
+            'placeholder': _('Enter description'),
+        })
 
         self.fields['web_link'].widget.attrs['class'] = 'span12'
+        self.fields['web_link'].widget.attrs['placeholder'] = _('Enter link in web')

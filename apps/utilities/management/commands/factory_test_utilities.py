@@ -1,20 +1,18 @@
 
-from utils.python.logging_utils import create_logger_by_filename
-from utils.django.basecommands import ExtendedBaseCommand
+
+import logging
+
+from utils.django.basecommands import FactoryCountBaseCommand
 
 from apps.utilities.factories import CategoryFactory, UtilityFactory
 
 
-logger = create_logger_by_filename(__name__)
+logger = logging.getLogger('django.development')
 
 
-class Command(ExtendedBaseCommand):
+class Command(FactoryCountBaseCommand):
 
     help = 'Factory testing categories with utilities.'
-
-    def add_arguments(self, parser):
-
-        parser.add_argument('count', nargs='+', type=self._positive_integer_from_1_to_999)
 
     def handle(self, **kwargs):
 

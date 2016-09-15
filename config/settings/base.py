@@ -158,6 +158,66 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'filters': {
+        'require_debug_false': {
+            '()': 'django.utils.log.RequireDebugFalse'
+        },
+        'require_debug_true': {
+            '()': 'django.utils.log.RequireDebugTrue'
+        }
+    },
+    'formatters': {
+        'django.server': {
+            '()': 'django.utils.log.ServerFormatter',
+            'format': '[%(server_time)s] %(message)s'
+        },
+        'django.development': {
+            'format': '%(name)s - %(module)s - %(message)s',
+        }
+    },
+    'handlers': {
+        'django.development': {
+            'class': 'logging.StreamHandler',
+            'level': 'DEBUG',
+            'formatter': 'django.development',
+        },
+        'console': {
+            'class': 'logging.StreamHandler',
+            'filters': ['require_debug_true'],
+            'level': 'INFO'
+        },
+        'django.server': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'django.server',
+            'level': 'INFO'
+        },
+        'mail_admins': {
+            'class': 'django.utils.log.AdminEmailHandler',
+            'filters': ['require_debug_false'],
+            'level': 'ERROR'
+        }
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console', 'mail_admins'],
+            'level': 'INFO'
+        },
+        'django.server': {
+            'handlers': ['django.server'],
+            'level': 'INFO',
+            'propagate': False
+        },
+        'django.development': {
+            'handlers': ['django.development'],
+            'level': 'DEBUG',
+            'propagate': False
+        },
+    },
+}
+
 
 # -----------------------------
 # MESSAGES

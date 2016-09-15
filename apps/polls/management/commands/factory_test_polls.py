@@ -6,7 +6,7 @@ from django.contrib.auth import get_user_model
 
 from factory import fuzzy
 
-from utils.django.basecommands import ExtendedBaseCommand
+from utils.django.basecommands import FactoryCountBaseCommand
 
 from apps.polls.factories import PollFactory, ChoiceFactory
 from apps.polls.models import Poll, Choice, Vote
@@ -14,10 +14,10 @@ from apps.polls.constants import MIN_COUNT_CHOICES_IN_POLL, MAX_COUNT_CHOICES_IN
 
 
 User = get_user_model()
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('django.development')
 
 
-class Command(ExtendedBaseCommand):
+class Command(FactoryCountBaseCommand):
 
     help = 'Factory a given amount of polls, include choices and votes.'
 
@@ -54,7 +54,7 @@ class Command(ExtendedBaseCommand):
                 random_date_voting = fuzzy.FuzzyDateTime(min_date_voting).fuzz()
                 Vote.objects.filter(pk=vote.pk).update(date_voting=random_date_voting)
 
-        logger.info('Made factory polls ({0}), choices ({1}) and votes ({2}).'.format(
+        logger.debug('Made factory polls ({0}), choices ({1}) and votes ({2}).'.format(
             Poll.objects.count(),
             Choice.objects.count(),
             Vote.objects.count(),

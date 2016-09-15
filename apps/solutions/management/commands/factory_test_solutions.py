@@ -1,17 +1,16 @@
 
-from utils.django.basecommands import ExtendedBaseCommand
-from utils.python.logging_utils import create_logger_by_filename
+import logging
+
+from utils.django.basecommands import FactoryCountBaseCommand
 
 from ...factories import SolutionFactory
 
-logger = create_logger_by_filename(__name__)
+logger = logging.getLogger('django.development')
 
 
-class Command(ExtendedBaseCommand):
+class Command(FactoryCountBaseCommand):
 
-    def add_arguments(self, parser):
-
-        parser.add_argument('count', nargs='+', type=self._positive_integer_from_1_to_999)
+    help = None
 
     def handle(self, **kwargs):
 

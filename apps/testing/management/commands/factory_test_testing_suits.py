@@ -1,21 +1,18 @@
 
+import logging
 import random
 
-from utils.python.logging_utils import create_logger_by_filename
-from utils.django.basecommands import ExtendedBaseCommand
+from utils.django.basecommands import FactoryCountBaseCommand
 
 from ...factories import SuitFactory, QuestionFactory, VariantFactory, PassageFactory
 
 
-logger = create_logger_by_filename(__name__)
+logger = logging.getLogger('django.development')
 
 
-class Command(ExtendedBaseCommand):
+class Command(FactoryCountBaseCommand):
 
     help = 'Factory testing suits without testing questions'
-
-    def add_arguments(self, parser):
-        parser.add_argument('count', nargs='+', type=self._positive_integer_from_1_to_999)
 
     def handle(self, *args, **kwargs):
 

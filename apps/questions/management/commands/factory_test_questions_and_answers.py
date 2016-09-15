@@ -2,15 +2,15 @@
 import random
 import logging
 
-from utils.django.basecommands import ExtendedBaseCommand
+from utils.django.basecommands import FactoryCountBaseCommand
 
 from ...factories import QuestionFactory, AnswerFactory
 
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('django.development')
 
 
-class Command(ExtendedBaseCommand):
+class Command(FactoryCountBaseCommand):
 
     help = 'Factory test questions'
 

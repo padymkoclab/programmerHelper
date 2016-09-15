@@ -138,13 +138,13 @@ class SolutionAdmin(OpinionsAdminMixin, admin.ModelAdmin):
     ]
 
     def get_queryset(self, request):
-        qs = super(SolutionAdmin, self).get_queryset(request)
+        qs = super().get_queryset(request)
         qs = qs.solutions_with_all_additional_fields()
         return qs
 
     def get_fieldsets(self, request, obj=None):
 
-        fieldsets = (
+        fieldsets = [
             (
                 Solution._meta.verbose_name, {
                     'fields': [
@@ -161,7 +161,7 @@ class SolutionAdmin(OpinionsAdminMixin, admin.ModelAdmin):
                     'fields': ('body', ),
                 }
             )
-        )
+        ]
 
         if obj is not None:
             fieldsets.append((

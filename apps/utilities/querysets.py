@@ -1,4 +1,6 @@
 
+
+
 from django.db import models
 
 from utils.python.logging_utils import create_logger_by_filename
@@ -49,24 +51,24 @@ class CategoryQuerySet(models.QuerySet):
 
         self = self.categories_with_total_marks()
 
-        self = self.extra(select={
-            'total_mark': """
-            SELECT
-                SUM(
-                    CASE
-                        WHEN "opinions"."is_useful" = True THEN 1
-                        WHEN "opinions"."is_useful" = FALSE THEN -1
-                        ELSE NULL
-                    END
-                )
-            FROM "utilities"
-            LEFT OUTER JOIN "opinions"
-                ON ("utilities"."id" = "opinions"."object_id" AND ("opinions"."content_type_id" = 40))
-            WHERE
-                "utilities"."id" = "utilities_categories"."id"
-            GROUP BY "utilities"."id"
-            """
-        })
+        # self = self.extra(select={
+        #     'total_mark': """
+        #     SELECT
+        #         SUM(
+        #             CASE
+        #                 WHEN "opinions"."is_useful" = True THEN 1
+        #                 WHEN "opinions"."is_useful" = FALSE THEN -1
+        #                 ELSE NULL
+        #             END
+        #         )
+        #     FROM "utilities"
+        #     LEFT OUTER JOIN "opinions"
+        #         ON ("utilities"."id" = "opinions"."object_id" AND ("opinions"."content_type_id" = 40))
+        #     WHERE
+        #         "utilities"."id" = "utilities_categories"."id"
+        #     GROUP BY "utilities"."id"
+        #     """
+        # })
 
         return self
 

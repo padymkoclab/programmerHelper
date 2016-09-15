@@ -157,7 +157,7 @@ class CategoryAdmin(admin.ModelAdmin):
 
     def get_queryset(self, request):
 
-        qs = super(CategoryAdmin, self).get_queryset(request)
+        qs = super().get_queryset(request)
         qs = qs.categories_with_all_additional_fields()
         return qs
 

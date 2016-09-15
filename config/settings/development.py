@@ -1,5 +1,5 @@
 
-from django.utils.safestring import mark_safe
+# from django.utils.safestring import mark_safe
 
 from .base import *
 
@@ -24,9 +24,9 @@ DATABASES = {
     }
 }
 
-TEMPLATES[0]['OPTIONS']['string_if_invalid'] = mark_safe(
-    '<i style="color: red; font-weight: bold;">Variable does not exists!!!</i>'
-)
+# TEMPLATES[0]['OPTIONS']['string_if_invalid'] = mark_safe(
+#     '<i style="color: red; font-weight: bold;">Variable does not exists!!!</i>'
+# )
 
 INSTALLED_APPS += [
     'django_extensions',

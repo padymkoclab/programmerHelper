@@ -1,5 +1,6 @@
 
 from django import forms
+from django.utils.translation import ugettext_lazy as _
 
 from suit_ckeditor.widgets import CKEditorWidget
 
@@ -18,9 +19,10 @@ class SolutionAdminModelForm(forms.ModelForm):
         fields = ('tags', 'slug')
 
     def __init__(self, *args, **kwargs):
-        super(SolutionAdminModelForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
         self.fields['problem'].widget.attrs['class'] = 'span12'
+        self.fields['problem'].widget.attrs['placeholder'] = _('Enter problem')
 
         self.fields['slug'].disabled = True
         self.fields['slug'].widget.attrs['class'] = 'span12'
@@ -30,6 +32,6 @@ class SolutionAdminModelForm(forms.ModelForm):
         self.fields['body'].widget = CKEditorWidget()
 
     def clean_tags(self):
-        super(SolutionAdminModelForm, self).clean()
+        super().clean()
         cleaned_tags = clean_tags(self)
         return cleaned_tags
