@@ -17,7 +17,7 @@ class Newsletter(models.Model):
     )
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, related_name='newsletters',
-        verbose_name=_('User'), on_delete=models.DO_NOTHING,
+        verbose_name=_('User'), on_delete=models.CASCADE,
     )
     date_added = models.DateTimeField(auto_now_add=True)
 

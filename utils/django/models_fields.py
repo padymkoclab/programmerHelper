@@ -309,9 +309,15 @@ class ConfiguredAutoSlugField(AutoSlugField):
 
 
 class YearField(models.IntegerField):
+
     description = _("Year ")
 
     def __init__(self, *args, **kwargs):
         kwargs['choices'] = ''
         kwargs['max_length'] = 4
         super(YearField, self).__init__(*args, **kwargs)
+
+
+class YearsLifeField:
+
+    pass

@@ -1,26 +1,34 @@
 
-from django.utils.html import format_html_join, format_html
-from django.template.defaultfilters import truncatewords
 from django.utils.translation import ugettext_lazy as _
 from django.contrib import admin
 
-from apps.replies.admin import ReplyInline
+from utils.django.listfilters import AllValuesChoicesFieldListFilter
+
+from apps.core.admin import AdminSite, AppAdmin
+from apps.replies.admin import ReplyGenericInline
 
 from .models import Book, Writer, Publisher
-from .forms import BookForm, WriterForm, PublisherForm
+from .forms import BookAdminModelForm, WriterAdminModelForm, PublisherAdminModelForm
 from .listfilters import (
     BookSizeSimpleListFilter,
     StatusLifeWriterSimpleListFilter,
     WritersCentriesSimpleListFilter
 )
+from .apps import LibraryConfig
 
 
+@AdminSite.register_app_admin_class
+class AppAdmin(AppAdmin):
+
+    label = LibraryConfig.label
+
+
+@admin.register(Book, site=AdminSite)
 class BookAdmin(admin.ModelAdmin):
     '''
     Admin View for Book
     '''
 
-    # changelist
     list_display = (
         'name',
         'count_pages',
@@ -29,7 +37,7 @@ class BookAdmin(admin.ModelAdmin):
         'language',
         'get_count_tags',
         'get_count_replies',
-        'color_styled_rating',
+        'get_rating',
         'is_new',
         'year_published',
         'date_added',
@@ -45,25 +53,31 @@ class BookAdmin(admin.ModelAdmin):
     date_hierarchy = 'date_added'
 
     # book
-    form = BookForm
+    form = BookAdminModelForm
     filter_horizontal = ['tags']
     filter_vertical = ['authorship']
     radio_fields = {'language': admin.HORIZONTAL}
     prepopulated_fields = {'slug': ('name', )}
-    readonly_fields = ['date_added', 'get_size_display', 'get_rating', 'show_most_common_words_from_replies']
+    readonly_fields = [
+        'date_added',
+        'get_size_display',
+        'get_count_replies',
+        'get_rating',
+        'get_most_common_words_from_replies'
+    ]
 
     list_select_related = True
 
     def get_queryset(self, request):
 
-        qs = super(BookAdmin, self).get_queryset(request)
+        qs = super().get_queryset(request)
         qs = qs.books_with_additional_fields()
         return qs
 
     def get_inline_instances(self, request, obj=None):
 
         if obj:
-            inlines = (ReplyInline, )
+            inlines = (ReplyGenericInline, )
             return [inline(self.model, self.admin_site) for inline in inlines]
         return []
 
@@ -74,7 +88,7 @@ class BookAdmin(admin.ModelAdmin):
                     'name',
                     'slug',
                     'description',
-                    'picture',
+                    'image',
                     'count_pages',
                     'year_published',
                     'language',
@@ -86,40 +100,46 @@ class BookAdmin(admin.ModelAdmin):
             },
         ]]
 
-        # if book exists
-        if obj:
+        if obj is not None:
             fieldsets.append([
                 _('Additional information'), {
                     'classes': ('collapse', ),
                     'fields': [
                         'date_added',
                         'get_size_display',
+                        'get_count_replies',
                         'get_rating',
-                        'show_most_common_words_from_replies',
+                        'get_most_common_words_from_replies',
                     ]
                 }
             ])
 
         return fieldsets
 
-    def color_styled_rating(self, obj):
-        """Return colored value of rating for each book."""
+    def suit_cell_attributes(self, obj, column):
+
+        if column == 'name':
+            class_css = 'left'
+        elif column == 'date_added':
+            class_css = 'right'
+        else:
+            class_css = 'center'
+
+        return {'class': 'text-{}'.format(class_css)}
+
+    def suit_row_attributes(self, obj, request):
 
         rating = obj.get_rating()
-        color = None
+
+        class_css = 'default'
 
         if rating is not None:
-            if rating < 3:
-                color = 'red'
-            elif rating > 4:
-                color = 'green'
+            if 4 <= rating <= 5:
+                class_css = 'success'
+            elif rating < 2:
+                class_css = 'error'
 
-        if color is not None:
-            return format_html('<span style="color: {0};">{1}<span>', color, rating)
-
-        return rating
-    color_styled_rating.admin_order_field = 'rating'
-    color_styled_rating.short_description = _('Rating')
+        return {'class': '{}'.format(class_css)}
 
     def show_most_common_words_from_replies(self, obj):
         return ', '.join(obj.get_most_common_words_from_replies())
@@ -151,6 +171,24 @@ class BookInlineForWriter(admin.TabularInline):
         return obj.book.get_count_replies()
     get_count_replies.short_description = _('Count replies')
 
+    def suit_cell_attributes(self, obj, column):
+        """ """
+
+        raise Exception()
+        if column == 'countries':
+            return {'class': 'text-center'}
+        elif column == 'name' and obj.status == -1:
+            return {'class': 'text-error'}
+
+        if column == 'rating':
+            class_css = 'right'
+        elif column == 'count_replies':
+            class_css = 'center'
+        else:
+            class_css = 'left'
+
+        return {'class': 'text-{}'.format(class_css)}
+
 
 class BookInlineForPublisher(admin.TabularInline):
     """Readonly inline of books for each publisher."""
@@ -162,12 +200,13 @@ class BookInlineForPublisher(admin.TabularInline):
     max_num = 0
 
 
+@admin.register(Writer, site=AdminSite)
 class WriterAdmin(admin.ModelAdmin):
     '''
     Admin View for Writer
     '''
 
-    form = WriterForm
+    form = WriterAdminModelForm
     list_display = (
         'name',
         'get_years_life',
@@ -194,7 +233,7 @@ class WriterAdmin(admin.ModelAdmin):
     list_filter = [StatusLifeWriterSimpleListFilter, WritersCentriesSimpleListFilter]
 
     def get_queryset(self, request):
-        qs = super(WriterAdmin, self).get_queryset(request)
+        qs = super().get_queryset(request)
         qs = qs.writers_with_additional_fields()
         return qs
 
@@ -238,13 +277,35 @@ class WriterAdmin(admin.ModelAdmin):
             return [inline(self.model, self.admin_site) for inline in inlines]
         return []
 
+    def suit_cell_attributes(self, obj, column):
 
+        if column == 'get_avg_mark_for_books':
+            class_css = 'right'
+        elif column in ['name', 'get_years_life']:
+            class_css = 'left'
+        else:
+            class_css = 'center'
+
+        return {'class': 'text-{}'.format(class_css)}
+
+
+@admin.register(Publisher, site=AdminSite)
 class PublisherAdmin(admin.ModelAdmin):
 
-    form = PublisherForm
-    search_fields = ['name']
-    list_display = ['name', 'get_count_books', 'country_origin', 'headquarters', 'founded_year', 'website']
-    readonly_fields = ['get_count_books']
+    form = PublisherAdminModelForm
+    search_fields = ('name', )
+    list_display = (
+        'name',
+        'get_count_books',
+        'country_origin',
+        'headquarters',
+        'founded_year',
+        'website',
+    )
+    readonly_fields = ('get_count_books', )
+    list_filter = (
+        ('country_origin', AllValuesChoicesFieldListFilter),
+    )
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
@@ -253,8 +314,8 @@ class PublisherAdmin(admin.ModelAdmin):
 
     def get_fieldsets(self, request, obj=None):
 
-        fieldsets = [
-            [
+        fieldsets = (
+            (
                 Publisher._meta.verbose_name, {
                     'fields': [
                         'name',
@@ -265,19 +326,12 @@ class PublisherAdmin(admin.ModelAdmin):
                         'website',
                     ]
                 }
-            ]
-        ]
+            ),
+        )
 
         if obj is not None:
 
-            fieldsets.append([
-                _('Additional information'), {
-                    'classes': ('collapse', ),
-                    'fields': {
-                        'get_count_books',
-                    }
-                }
-            ])
+            fieldsets[0][1]['fields'].insert(3, 'get_count_books')
 
         return fieldsets
 
@@ -287,3 +341,12 @@ class PublisherAdmin(admin.ModelAdmin):
             inlines = [BookInlineForPublisher]
             return [inline(self.model, self.admin_site) for inline in inlines]
         return []
+
+    def suit_cell_attributes(self, obj, column):
+
+        if column in ['founded_year', 'get_count_books']:
+            css_class = 'center'
+        else:
+            css_class = 'left'
+
+        return {'class': 'text-{}'.format(css_class)}

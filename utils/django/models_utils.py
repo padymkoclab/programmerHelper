@@ -13,6 +13,15 @@ from ..python.logging_utils import create_logger_by_filename
 logger = create_logger_by_filename(__name__)
 
 
+def upload_image(instance, filename):
+    """ """
+
+    return '{}/{}/{}/{}'.format(
+        instance._meta.app_label, instance._meta.model_name,
+        instance.slug, filename
+    )
+
+
 def get_admin_url(obj):
     """ """
 

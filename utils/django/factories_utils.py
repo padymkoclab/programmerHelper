@@ -22,8 +22,12 @@ class AbstractTimeStampedFactory(factory.DjangoModelFactory):
     @classmethod
     def _after_postgeneration(cls, obj, create, results=None):
         super(AbstractTimeStampedFactory, cls)._after_postgeneration(obj, create, results)
-        qs = obj.__class__._default_manager.filter(pk=obj.pk)
-        qs.update(date_modified=fuzzy.FuzzyDateTime(obj.date_added, Now).fuzz())
+        qs = obj._meta.model._default_manager.filter(pk=obj.pk)
+        try:
+            qs.update(date_modified=fuzzy.FuzzyDateTime(obj.date_added, Now).fuzz())
+        except:
+            from IPython.core.debugger import Tracer
+            Tracer()()
 
     @factory.post_generation
     def date_added(self, create, extracted, **kwargs):

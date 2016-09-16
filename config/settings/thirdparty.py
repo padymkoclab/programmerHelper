@@ -58,7 +58,7 @@ SUIT_CONFIG = {
             'icon': 'icon-star',
         },
         {
-            'app': 'books',
+            'app': 'library',
             'icon': 'icon-book',
         },
         {

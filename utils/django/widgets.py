@@ -1,14 +1,14 @@
 
+import logging
+
 from django.db.models.fields.files import ImageFieldFile
 from django.utils.translation import ugettext_lazy as _
 from django.utils.html import mark_safe
 from django.contrib.admin.widgets import AdminFileWidget
 from django import forms
 
-from ..python.logging_utils import create_logger_by_filename
 
-
-logger = create_logger_by_filename(__name__)
+logger = logging.getLogger('django.development')
 
 
 class AdminImageThumbnail(AdminFileWidget):

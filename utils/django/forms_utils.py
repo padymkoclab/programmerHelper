@@ -15,7 +15,12 @@ class HorizontalRadioRenderer(forms.RadioSelect.renderer):
 
 class HorizontalRadioSelect(forms.RadioSelect):
 
-    renderer = HorizontalRadioRenderer
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        css_style = 'style="display: inline-block; margin-right: 10px;"'
+
+        self.renderer.inner_html = '<li ' + css_style + '>{choice_value}{sub_widgets}</li>'
 
 
 class BooleanRadioSelect(forms.RadioSelect):

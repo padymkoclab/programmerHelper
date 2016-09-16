@@ -16,7 +16,6 @@ SECRET_KEY = get_secret_value_for_setting_from_file(filename='secrets.json', set
 # Application definition
 
 DJANGO_APPS = [
-    # 'django.contrib.admin.apps.SimpleAdminConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -26,7 +25,6 @@ DJANGO_APPS = [
 ]
 
 THIRD_PARTY_APPS = [
-    # 'django_js_reverse',
     # 'django_gravatar',
     'suit_ckeditor',
 ]
@@ -42,7 +40,7 @@ CUSTOM_APPS = [
     'apps.activity.apps.ActivityConfig',
     'apps.articles.apps.ArticlesConfig',
     'apps.badges.apps.BadgesConfig',
-    'apps.books.apps.BooksConfig',
+    'apps.library.apps.LibraryConfig',
     'apps.comments.apps.CommentsConfig',
     # 'apps.courses.apps.CoursesConfig',  # temporary is disabled
     'apps.flavours.apps.FlavoursConfig',

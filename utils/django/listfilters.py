@@ -1,6 +1,7 @@
 
 import datetime
 
+from django.utils.encoding import smart_text
 from django.db import models
 from django.core.exceptions import ImproperlyConfigured
 from django.contrib import admin
@@ -10,6 +11,43 @@ from django.utils import timezone
 from django.conf import settings
 
 from dateutil.relativedelta import relativedelta
+
+
+class AllValuesChoicesFieldListFilter(admin.AllValuesFieldListFilter):
+
+    def choices(self, changelist):
+        yield {
+            'selected': self.lookup_val is None and self.lookup_val_isnull is None,
+            'query_string': changelist.get_query_string({}, [self.lookup_kwarg, self.lookup_kwarg_isnull]),
+            'display': _('All'),
+        }
+        include_none = False
+
+        # all choices for this field
+        choices = dict(self.field.choices)
+
+        for val in self.lookup_choices:
+            if val is None:
+                include_none = True
+                continue
+            val = smart_text(val)
+            yield {
+                'selected': self.lookup_val == val,
+                'query_string': changelist.get_query_string({
+                    self.lookup_kwarg: val,
+                }, [self.lookup_kwarg_isnull]),
+
+                # instead code, display title
+                'display': choices[val],
+            }
+        if include_none:
+            yield {
+                'selected': bool(self.lookup_val_isnull),
+                'query_string': changelist.get_query_string({
+                    self.lookup_kwarg_isnull: 'True',
+                }, [self.lookup_kwarg]),
+                'display': self.empty_value_display,
+            }
 
 
 class ListFilterLastLogin(admin.SimpleListFilter):

@@ -46,19 +46,17 @@ class StatusLifeWriterSimpleListFilter(admin.SimpleListFilter):
 
     def lookups(self, request, model_admin):
 
-        queryset = model_admin.get_queryset(request)
-
-        if queryset.filter(death_year=None).exists():
-            yield ('alive', _('Alive writers'))
-        if queryset.exclude(death_year=None).exists():
-            yield ('dead', _('Dead writers'))
+        return (
+            ('alive', _('Alive writers')),
+            ('dead', _('Dead writers')),
+        )
 
     def queryset(self, request, queryset):
 
         value = self.value()
         if value == 'alive':
             return queryset.filter(death_year=None)
-        elif value == 'alive':
+        elif value == 'dead':
             return queryset.exclude(death_year=None)
 
 

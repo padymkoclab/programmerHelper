@@ -1,7 +1,8 @@
 
-from utils.python.logging_utils import create_logger_by_filename
+import logging
 
-logger = create_logger_by_filename(__name__)
+
+logger = logging.getLogger('django.development')
 
 
 def annotate_queryset_for_determinate_rating(queryset):

@@ -8,7 +8,7 @@ from django.conf import settings
 
 from utils.django.models import TimeStampedModel
 from utils.django.models_fields import ConfiguredAutoSlugField
-from utils.django.models_utils import get_admin_url
+from utils.django.models_utils import get_admin_url, upload_image
 
 from apps.comments.models import Comment
 from apps.comments.managers import CommentManager
@@ -30,10 +30,7 @@ class Category(TimeStampedModel):
     """
 
     def upload_category_image(instance, filename):
-        return '{}/{}/{}/{}'.format(
-            instance._meta.app_label, instance._meta.model_name,
-            instance.slug, filename
-        )
+        return upload_image(instance, filename)
 
     name = models.CharField(
         _('Name'), max_length=100, unique=True,

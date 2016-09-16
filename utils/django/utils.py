@@ -1,4 +1,5 @@
 
+import logging
 import socket
 import urllib
 import pprint
@@ -9,14 +10,20 @@ import json
 
 from django.utils import timezone
 from django.core.exceptions import ImproperlyConfigured
+from django.db import connection
 
 import factory
 from pygments import lexers
 
-from ..python.logging_utils import create_logger_by_filename
-
 
 __all__ = []
+
+
+def display_last_sql_queries(count=1):
+    """ """
+
+    queries = connection.queries[-count:]
+    print('\n-------------------------\n'.join(query['sql'] for query in queries))
 
 
 def join_enumarate(sep, iterable) -> str:
@@ -148,7 +155,7 @@ def get_ip_by_host(host):
 def get_location(request):
     """ """
 
-    logger = create_logger_by_filename(__name__)
+    logger = logging('django.development')
 
     # check up if is connect to internet
     if not has_connect_to_internet:
