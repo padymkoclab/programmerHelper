@@ -1,4 +1,5 @@
 
+import abc
 import io
 from unittest import mock
 
@@ -15,16 +16,16 @@ from django.apps import AppConfig
 from utils.django.utils import get_filename_with_datetime
 
 
-class AppAdmin:
+class AppAdmin(abc.ABC):
     """ """
 
+    @abc.abstractmethod
     def get_context_for_tables_of_statistics(self):
+        pass
 
-        raise NotImplementedError
-
+    @abc.abstractmethod
     def get_context_for_charts_of_statistics(self):
-
-        raise NotImplementedError
+        pass
 
 
 class AdminSite(admin.AdminSite):
@@ -74,8 +75,7 @@ class AdminSite(admin.AdminSite):
 
         urls = super().get_urls()
 
-        # generate string with all custom app`s label for regex, as example: 'tags|books|polls' and etc
-        apps_choice = '|'.join(AppConfig.create(conf).label for conf in settings.CUSTOM_APPS)
+        apps_choice = '|'.join(self._regiter_app_admin.keys())
 
         urls += [
 
@@ -127,10 +127,11 @@ class AdminSite(admin.AdminSite):
         request.current_app = self.name
 
         # get a AppAdmin for the app
-        app_admin = self._regiter_app_admin[app_label]
+        app_admin = self._regiter_app_admin.get(app_label, None)
 
-        context['tables_data'] = app_admin.get_context_for_tables_of_statistics()
-        context['tables_charts_data'] = app_admin.get_context_for_charts_of_statistics()
+        if app_admin is not None:
+            context['tables_data'] = app_admin.get_context_for_tables_of_statistics()
+            context['tables_charts_data'] = app_admin.get_context_for_charts_of_statistics()
 
         return TemplateResponse(request, template, context)
 

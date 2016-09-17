@@ -1,4 +1,6 @@
 
+from django.utils.html import format_html_join
+from django.utils.encoding import force_str
 from django.utils.translation import ugettext_lazy as _
 from django.contrib import admin
 
@@ -22,6 +24,56 @@ class AppAdmin(AppAdmin):
 
     label = LibraryConfig.label
 
+    def get_context_for_tables_of_statistics(self):
+        """ """
+
+        return (
+            (_('Books'), (
+                (_('Count books'), Book.objects.count()),
+                (_('Count russian books'), Book.objects.get_count_russian_books()),
+                (_('Count english books'), Book.objects.get_count_english_books()),
+                (_('Count great books'), Book.objects.get_count_great_books()),
+                (_('Count big books'), Book.objects.get_count_big_books()),
+                (_('Count middle books'), Book.objects.get_count_middle_books()),
+                (_('Count tiny books'), Book.objects.get_count_tiny_books()),
+            )),
+            (_('Writers'), (
+                (_('Count writers'), Writer.objects.count()),
+                (_('Average count books on writer'), Writer.objects.get_avg_count_books()),
+            )),
+            (_('Publishers'), (
+                (_('Count publishers'), Publisher.objects.count()),
+                (_('Average count books on publishers'), Publisher.objects.get_avg_count_books()),
+            )),
+            (_('Replies'), (
+                (_('Count replies'), Book.replies_manager.get_count_replies()),
+                (_('Average count replies on book'), Book.replies_manager.get_avg_count_replies()),
+            )),
+            (_('Tags'), (
+                (_('Count used tags'), Book.tags_manager.get_count_used_tags()),
+                (_('Count distinct tags'), Book.tags_manager.get_count_distinct_used_tags()),
+                (_('Average count tags on book'), Book.tags_manager.get_avg_count_tags()),
+            )),
+        )
+
+    def get_context_for_charts_of_statistics(self):
+
+        return (
+            {
+                'title': _('Chart count books by size'),
+                'table': None,
+                'chart': Book.objects.get_chart_statistics_count_books_by_size(),
+            },
+            {
+                'title': _('Chart count replies for the past year'),
+                'table': {
+                    'fields': (_('Month, year'), _('Count replies')),
+                    'data': Book.replies_manager.get_statistics_count_replies_for_the_past_year(),
+                },
+                'chart': Book.replies_manager.get_chart_count_replies_for_the_past_year(),
+            },
+        )
+
 
 @admin.register(Book, site=AdminSite)
 class BookAdmin(admin.ModelAdmin):
@@ -31,10 +83,11 @@ class BookAdmin(admin.ModelAdmin):
 
     list_display = (
         'name',
-        'count_pages',
-        'get_size_display',
+        'show_authorship_inline',
         'publisher',
         'language',
+        'count_pages',
+        'get_size_display',
         'get_count_tags',
         'get_count_replies',
         'get_rating',
@@ -45,6 +98,7 @@ class BookAdmin(admin.ModelAdmin):
     list_filter = (
         BookSizeSimpleListFilter,
         ('publisher', admin.RelatedOnlyFieldListFilter),
+        ('authorship', admin.RelatedOnlyFieldListFilter),
         'language',
         'year_published',
         'date_added',
@@ -52,7 +106,6 @@ class BookAdmin(admin.ModelAdmin):
     search_fields = ('name', )
     date_hierarchy = 'date_added'
 
-    # book
     form = BookAdminModelForm
     filter_horizontal = ['tags']
     filter_vertical = ['authorship']
@@ -140,6 +193,12 @@ class BookAdmin(admin.ModelAdmin):
                 class_css = 'error'
 
         return {'class': '{}'.format(class_css)}
+
+    def show_authorship_inline(self, obj):
+
+        authorship = map(force_str, obj.authorship.iterator())
+        return format_html_join(', ', '{}<br />', ((writer, ) for writer in authorship))
+    show_authorship_inline.short_description = Book._meta.get_field('authorship').verbose_name
 
     def show_most_common_words_from_replies(self, obj):
         return ', '.join(obj.get_most_common_words_from_replies())
@@ -272,7 +331,6 @@ class WriterAdmin(admin.ModelAdmin):
     def get_inline_instances(self, request, obj=None):
 
         if obj and obj.books.exists():
-            # readonly inline if writer has books
             inlines = [BookInlineForWriter]
             return [inline(self.model, self.admin_site) for inline in inlines]
         return []
@@ -287,6 +345,19 @@ class WriterAdmin(admin.ModelAdmin):
             class_css = 'center'
 
         return {'class': 'text-{}'.format(class_css)}
+
+    def suit_row_attributes(self, obj, request):
+
+        avg_mark_for_books = obj.get_avg_mark_for_books()
+
+        css_class = 'default'
+        if avg_mark_for_books is not None:
+            if 4 <= obj.get_avg_mark_for_books() <= 5:
+                css_class = 'success'
+            elif obj.get_avg_mark_for_books() < 2:
+                css_class = 'error'
+
+        return {'class': '{}'.format(css_class)}
 
 
 @admin.register(Publisher, site=AdminSite)

@@ -3,8 +3,16 @@ import logging
 
 from django import template
 
-logger = logging.getLogger(__name__)
+from ..admin import AdminSite
+
+logger = logging.getLogger('django.development')
 register = template.Library()
+
+
+@register.simple_tag
+def has_registered_app_admin(app_label):
+
+    return app_label in AdminSite._regiter_app_admin.keys()
 
 
 class MakeMarkupTableTag(template.Node):
@@ -40,7 +48,6 @@ class StatisticsTableAndChartTag(template.Node):
         try:
             tables_charts_data = self.tables_charts_data.resolve(context)
             template_ = template.loader.get_template('core/admin/_statistics_charts.html')
-            logger.error('Templatetag does not working')
             return template_.render(
                 template.Context({
                     'tables_charts_data': tables_charts_data,

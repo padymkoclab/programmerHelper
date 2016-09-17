@@ -1,5 +1,6 @@
 
 import logging
+import statistics
 import uuid
 
 from django.contrib.postgres.fields import ArrayField
@@ -24,7 +25,7 @@ from apps.tags.models import Tag
 from apps.tags.managers import TagManager
 from apps.tags.models_mixins import TagsModelMixin
 
-from .managers import BookManager, WriterManager
+from .managers import BookManager, WriterManager, PublisherManager
 from .querysets import BookQuerySet, WriterQuerySet, PublisherQuerySet
 
 
@@ -174,7 +175,7 @@ class Writer(models.Model):
     trends = ArrayField(
         models.CharField(max_length=100),
         size=10,
-        help_text=_('Basic trends of books. Make listing words separated commas.')
+        help_text=_('Make listing words separated commas.')
     )
     about = models.TextField(
         _('About writer'),
@@ -271,11 +272,15 @@ class Writer(models.Model):
 
         if self.books.exists():
             books_with_rating = self.books.books_with_rating()
-            return books_with_rating.aggregate(
-                avg=Round(
-                    models.Avg('rating')
-                )
-            )['avg']
+            # return books_with_rating.aggregate(
+            #     avg=Round(
+            #         models.Avg('rating')
+            #     )
+            # )['avg']
+            values = books_with_rating.values_list('rating', flat=True)
+            values = (i or 0 for i in values)
+            avg_mark_for_books = statistics.mean(values)
+            return round(avg_mark_for_books, 3)
         return
     get_avg_mark_for_books.short_description = _('Average mark for books')
     get_avg_mark_for_books.admin_order_field = 'avg_mark_for_books'
@@ -305,7 +310,7 @@ class Publisher(models.Model):
     website = models.URLField(_('Official website'))
 
     objects = models.Manager()
-    objects = PublisherQuerySet.as_manager()
+    objects = PublisherManager.from_queryset(PublisherQuerySet)()
 
     class Meta:
         verbose_name = _('Publisher')

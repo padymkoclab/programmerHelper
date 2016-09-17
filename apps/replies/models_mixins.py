@@ -28,7 +28,7 @@ class RepliesModelMixin:
         replies_with_total_mark = self.replies.replies_with_total_mark()
         rating = replies_with_total_mark.aggregate(rating=models.Avg('total_mark'))['rating']
         if rating is not None:
-            return rating
+            return round(rating, 3)
         return
     get_rating.admin_order_field = 'rating'
     get_rating.short_description = _('Rating')

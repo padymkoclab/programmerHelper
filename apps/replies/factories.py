@@ -1,6 +1,4 @@
 
-import random
-
 from django.contrib.auth import get_user_model
 
 import factory
@@ -26,10 +24,6 @@ class ReplyFactory(factory.DjangoModelFactory):
         users_given_their_replies = self.content_object.replies.values('user')
         users_given_not_their_replies = get_user_model().objects.exclude(pk__in=users_given_their_replies)
         return users_given_not_their_replies.random_users(1)
-
-    @factory.lazy_attribute
-    def impress(self):
-        return factory.Faker('text', locale='ru').generate([])[:random.randint(10, 50)]
 
     @factory.lazy_attribute
     def advantages(self):

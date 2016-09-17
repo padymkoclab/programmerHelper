@@ -1,6 +1,7 @@
  {% for table_chart in tables_charts_data %}
 <div class="chart_and_objects">
     <p class="lead">{{ table_chart.title }}</p>
+    {% if table_chart.table is not None %}
     <div class="div_chart_objects pull-left">
         <table class="table">
             <thead>
@@ -19,7 +20,8 @@
             </tbody>
         </table>
     </div>
-    <div class="div_chart pull-right">{{ table_chart.chart|safe }}</div>
+    {% endif %}
+    <div class="div_chart {% if table_chart.table is not None %}pull-right{% endif %}">{{ table_chart.chart|safe }}</div>
     <div class="clearfix"></div>
 </div>
 {% endfor %}

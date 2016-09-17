@@ -9,6 +9,14 @@ class ReplyQuerySet(models.QuerySet):
     QuerySet for replies.
     """
 
+    def objects_with_count_replies(self):
+        """ """
+
+        return self.annotate(count_replies=models.Count('replies', distinct=True))
+
+
+class A:
+
     def replies_with_total_mark(self):
         """Determining average mark for each reply by their marks: for content, for style, for language."""
 

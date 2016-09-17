@@ -57,12 +57,14 @@ def get_statistics_count_objects_for_the_past_year(queryset, date_field_name):
 def get_chart_count_objects_for_the_past_year(statistics_data):
     """ """
 
-    config = pygal.Config()
-    config.width = 800
-    config.height = 500
-    config.explicit_size = True
-    config.fill = True
-    config.show_legend = False
+    config = pygal.Config(
+        width=800,
+        height=500,
+        explicit_size=True,
+        fill=True,
+        show_legend=False,
+        x_label_rotation=-45,
+    )
 
     chart = pygal.StackedLine(config)
 

@@ -28,7 +28,6 @@ class FlavourManager(models.Manager):
 
         return statistics.mean()
 
-
     def get_statistics_count_flavours_for_the_past_year(self):
         """ """
 

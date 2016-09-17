@@ -1,11 +1,7 @@
 
 import logging
 
-from django.utils import timezone
 from django.db import models
-
-from utils.django.functions_db import Round
-
 
 logger = logging.getLogger('django.development')
 
@@ -15,20 +11,32 @@ class BookQuerySet(models.QuerySet):
     Queryset for books.
     """
 
+    def books_with_count_tags(self):
+        """ """
+
+        return self.prefetch_related('tags').annotate(
+            count_tags=models.Count('tags', distinct=True)
+        )
+
     def books_with_additional_fields(self):
         """Complex queryset with count tags, replies and rating of each the book."""
 
-        self = self.prefetch_related('tags').annotate(
-            count_tags=models.Count('tags', distinct=True)
-        )
+        self = self.books_with_count_tags()
 
         self = self.prefetch_related('replies').annotate(
             count_replies=models.Count('replies', distinct=True)
         )
 
+        self = self.books_with_rating()
+
+        return self
+
+    def books_with_rating(self):
+        """ """
+
         replies_table = self.model._meta.get_field('replies').rel.model._meta.db_table
         current_table = self.model._meta.db_table
-        self = self.extra(select={
+        return self.extra(select={
             'rating': """
             SELECT
                 ROUND(
@@ -50,30 +58,22 @@ class BookQuerySet(models.QuerySet):
             )
         })
 
-        return self
-
-    def new_books(self):
-        """Books published in this or past year."""
-
-        now_year = timezone.now().year
-        return self.filter(year_published__gte=now_year - 1).filter(year_published__lte=now_year)
-
-    def great_books(self):
+    def get_great_books(self):
         """Books with count pages 500 and more."""
 
         return self.filter(count_pages__gte=1000)
 
-    def big_books(self):
+    def get_big_books(self):
         """Books with count pages from 200 to 500."""
 
         return self.filter(count_pages__range=[300, 999])
 
-    def middle_books(self):
+    def get_middle_books(self):
         """Books with count pages from 50 to 200."""
 
         return self.filter(count_pages__range=[50, 299])
 
-    def tiny_books(self):
+    def get_tiny_books(self):
         """Books with count pages until 50."""
 
         return self.filter(count_pages__lt=50)
@@ -113,6 +113,11 @@ class WriterQuerySet(models.QuerySet):
     A queryset for the model Writer
     """
 
+    def writers_with_count_books(self):
+        """ """
+
+        return self.prefetch_related('books').annotate(count_books=models.Count('books', distinct=True))
+
     def writers_with_additional_fields(self):
         """Return queryset with annotated fields for each writer:
             - age
@@ -120,7 +125,7 @@ class WriterQuerySet(models.QuerySet):
             - count books
             - status of life"""
 
-        self = self.prefetch_related('books').annotate(count_books=models.Count('books', distinct=True))
+        self = self.writers_with_count_books()
         self = self.annotate(is_alive=models.Case(
             models.When(death_year=None, then=True),
             default=False,
@@ -132,18 +137,19 @@ class WriterQuerySet(models.QuerySet):
             output_field=models.IntegerField()
         ))
 
-        logger.critical('No annotation for field "rating"')
+        logging.critical('A nested subquery does not working')
 
-        # self = self.extra(select={
-        #     'avg_mark_for_books':
-        #         """
-        #         SELECT
-        #             SUM()
-        #         FROM {current_table}
-        #         """.format(
-        #             current_table=self.model._meta.db_table,
-        #         )
-        # })
+        # Writer.objects.extra(select={
+        #     'avg_mark_for_books': """
+        #     SELECT
+        #         COUNT(DISTINCT "library_book"."id")
+        #     FROM
+        #         "library_book"
+        #     GROUP BY
+        #         "library_book"."id"
+        #     """
+        # }).values_list('avg_mark_for_books', flat=True)
+
         return self
 
 

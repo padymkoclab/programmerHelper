@@ -87,7 +87,7 @@ class WriterFactory(factory.django.DjangoModelFactory):
 
     @factory.lazy_attribute
     def death_year(self):
-        return random.choice((random.randint(Writer.MIN_DEATH_YEAR, NOW_YEAR), None))
+        return random.choice((random.randint(self.birth_year, NOW_YEAR), None))
 
     @factory.lazy_attribute
     def trends(self):

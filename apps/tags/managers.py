@@ -3,6 +3,8 @@ import collections
 
 from django.db import models
 
+from utils.django.functions_db import Round
+
 from .querysets import TagQuerySet
 
 
@@ -12,12 +14,12 @@ class TagManager(models.Manager):
     Important towards other model have field 'tags'.
     """
 
-    def get_count_usaged_tags(self):
+    def get_count_used_tags(self):
         """ """
 
         return self.values('tags').count()
 
-    def get_count_unique_usaged_tags(self):
+    def get_count_distinct_used_tags(self):
         """ """
 
         return self.values('tags').distinct().count()
@@ -25,11 +27,10 @@ class TagManager(models.Manager):
     def get_avg_count_tags(self):
         """ """
 
-        return self.objects_with_count_tags().aggregate(
-            result=models.functions.Coalesce(
-                models.Avg('count_tags'), 0
-            )
-        )['result']
+        self = self.objects_with_count_tags()
+        return self.aggregate(avg=Round(
+            models.functions.Coalesce(models.Avg('count_tags'), 0)
+        ))['avg']
 
     def get_related_objects_by_tags(self, obj):
         """Return objects the same type, with common tags in a decsent order by a level similarity, as next:
