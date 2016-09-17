@@ -139,7 +139,7 @@ class IsNewSimpleListFilter(admin.SimpleListFilter):
 
     def queryset(self, request, queryset):
 
-        date_ago = timezone.now() - timezone.timedelta(days=settings.COUNT_DAYS_DISTINGUISH_ELEMENTS_AS_NEW)
+        date_ago = timezone.now() - timezone.timedelta(days=settings.COUNT_DAYS_FOR_NEW_ELEMENTS)
 
         if self.value() == 'new':
             return queryset.filter(date_added__gte=date_ago)

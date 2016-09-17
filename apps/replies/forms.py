@@ -4,7 +4,7 @@ from django import forms
 
 from suit.widgets import AutosizedTextarea
 
-from utils.django.forms_utils import HorizontalRadioSelect
+from utils.django.widgets import HorizontalRadioSelect
 
 from .models import Reply
 

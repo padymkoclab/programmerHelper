@@ -17,7 +17,7 @@ class Mark(BaseGenericModel):
     MIN_MARK = 1
     MAX_MARK = 5
 
-    account = models.ForeignKey(
+    user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name='marks',
@@ -34,21 +34,21 @@ class Mark(BaseGenericModel):
         verbose_name = _('Mark')
         verbose_name_plural = _('Marks')
         permissions = (('can_view_marks', _('Can view marks')),)
-        unique_together = ['account', 'object_id']
+        unique_together = ['user', 'object_id']
         get_latest_by = 'date_modified'
         ordering = ['date_modified']
 
     def __str__(self):
         type_instance = self.content_type._meta.verbose_name.lower()
-        return _('Mark on {0} "{1.content_object}" from {1.account}').format(type_instance, self)
+        return _('Mark on {0} "{1.content_object}" from {1.user}').format(type_instance, self)
 
     def clean(self):
-        if hasattr(self.content_object, 'account'):
-            if self.content_object.account == self.account:
+        if hasattr(self.content_object, 'user'):
+            if self.content_object.user == self.user:
                 raise ValidationError(_('User not allowed give mark about hisself labour.'))
 
     def is_new(self):
-        return self.date_modified > timezone.now() - timezone.timedelta(days=settings.COUNT_DAYS_DISTINGUISH_ELEMENTS_AS_NEW)
+        return self.date_modified > timezone.now() - timezone.timedelta(days=settings.COUNT_DAYS_FOR_NEW_ELEMENTS)
     is_new.admin_order_field = 'date_modified'
     is_new.short_description = _('Is new?')
     is_new.boolean = True

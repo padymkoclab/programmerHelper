@@ -4,7 +4,7 @@ import numbers
 from django.utils import timezone
 from django.db import models
 
-from utils.django.functions_db import Round
+from utils.django.functions_db import Round, ArrayLength
 
 
 class ArticleQuerySet(models.QuerySet):
@@ -16,7 +16,6 @@ class ArticleQuerySet(models.QuerySet):
         """Adding for each the article field with determined rating of an itself."""
 
         self = self.defer('subsections').annotate(rating=models.Avg('marks__mark'))
-        self = self.annotate(rating=models.functions.Coalesce('rating', .0))
         self = self.annotate(rating=Round('rating'))
         return self
 
@@ -42,29 +41,39 @@ class ArticleQuerySet(models.QuerySet):
     def articles_with_count_comments(self):
         """Adding for each the article field with determined count comments of an itself."""
 
-        return self.defer('subsections').annotate(count_comments=models.Count('comments', distinct=True))
+        return self.defer('subsections').annotate(
+            count_comments=models.Count('comments', distinct=True)
+        )
 
     def articles_with_count_marks(self):
         """Adding for each the article field with determined count marks of an itself."""
 
-        return self.defer('marks').annotate(count_marks=models.Count('marks', distinct=True))
+        return self.defer('subsections').annotate(
+            count_marks=models.Count('marks', distinct=True)
+        )
 
     def articles_with_count_tags(self):
         """Adding for each the article field with determined count tags of an itself."""
 
-        return self.defer('subsections').annotate(count_tags=models.Count('tags', distinct=True))
+        return self.defer('subsections').annotate(
+            count_tags=models.Count('tags', distinct=True)
+        )
 
     def articles_with_count_links(self):
         """Adding for each the article field with determined count useful links, used in each article."""
 
-        return self.defer('subsections').annotate(count_links=models.Count('links', distinct=True))
+        return self.defer('subsections').annotate(
+            count_links=ArrayLength('links', *(1, ))
+        )
 
     def articles_with_count_subsections(self):
         """Adding for each the article field with determined count subsections of an itself."""
 
-        return self.defer('subsections').annotate(count_subsections=models.Count('subsections', distinct=True))
+        return self.defer('subsections').annotate(
+            count_subsections=models.Count('subsections', distinct=True)
+        )
 
-    def articles_with_rating_and_count_comments_subsections_tags_links_marks(self):
+    def articles_with_all_additional_fields(self):
         """Determining for each article: count tags, comments, links, marks, subsections and rating."""
 
         self = self.articles_with_rating()
@@ -88,7 +97,9 @@ class ArticleQuerySet(models.QuerySet):
     def weekly_articles(self):
         """Articles published for last week."""
 
-        return self.only('date_added').filter(date_added__range=[timezone.now() - timezone.timedelta(weeks=1), timezone.now()])
+        return self.only('date_added').filter(
+            date_added__range=[timezone.now() - timezone.timedelta(weeks=1), timezone.now()]
+        )
 
     def articles_from_external_resourse(self):
         """Articles from external resourse pinted in field 'source'."""
@@ -131,3 +142,11 @@ class ArticleQuerySet(models.QuerySet):
         """Articles with count characters 10000 and more."""
 
         return self.articles_with_volume().filter(volume__gte=10000)
+
+
+class SubsectionQuerySet(models.QuerySet):
+
+    def subsections_with_length_of_content(self):
+        """ """
+
+        return self.annotate(content_length=models.functions.Length('content'))

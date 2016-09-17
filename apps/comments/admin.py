@@ -19,6 +19,8 @@ class CommentGenericInline(admin_generic.GenericStackedInline):
 
     readonly_fields = ['rating', 'date_modified', 'date_added']
 
+    suit_classes = 'suit-tab suit-tab-comments'
+
     def get_fields(self, request, obj=None):
 
         fields = ['user', 'text_comment', 'rating', 'date_modified', 'date_added']

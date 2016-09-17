@@ -3,6 +3,17 @@ from django.db import models
 from django.db.models.expressions import Func
 
 
+class ArrayLength(models.Func):
+    """Postgres specific function for annotation
+
+    Usage for 1-dimension array:
+        Stuff.objects.annotate(count_things=ArrayLength('things', *(1, )))
+
+    """
+
+    function = 'array_length'
+
+
 class Round(Func):
     """
 

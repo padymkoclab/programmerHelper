@@ -3,7 +3,7 @@ from django import forms
 
 from suit_ckeditor.widgets import CKEditorWidget
 
-from utils.django.forms_utils import BooleanRadioSelect
+from utils.django.widgets import BooleanRadioSelect
 
 from apps.tags.forms import clean_tags
 

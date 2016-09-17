@@ -23,11 +23,11 @@ class ReplyManager(models.Manager):
         # not possible make access to content models in __init__() or contribute_to_class()
         # but here it is worked
 
-        # access to a ContentTypeModel of an attached manager
-        self.ContentTypeModel = ContentType.objects.get_for_model(self.model)
+        # # access to a ContentTypeModel of an attached manager
+        # self.ContentTypeModel = ContentType.objects.get_for_model(self.model)
 
-        # a queryset of replies for that objects
-        self.queryset = Reply.objects.filter(content_type=self.ContentTypeModel)
+        # # a queryset of replies for that objects
+        # self.queryset = Reply.objects.filter(content_type=self.ContentTypeModel)
 
         return response
 
@@ -39,6 +39,12 @@ class ReplyManager(models.Manager):
     def get_avg_count_replies(self):
         """ """
 
+        # access to a ContentTypeModel of an attached manager
+        self.ContentTypeModel = ContentType.objects.get_for_model(self.model)
+
+        # a queryset of replies for that objects
+        self.queryset = Reply.objects.filter(content_type=self.ContentTypeModel)
+
         if self.exists():
             avg = self.queryset.count() / self.count()
             return round(avg, 3)
@@ -48,10 +54,22 @@ class ReplyManager(models.Manager):
     def get_statistics_count_replies_for_the_past_year(self):
         """ """
 
+        # access to a ContentTypeModel of an attached manager
+        self.ContentTypeModel = ContentType.objects.get_for_model(self.model)
+
+        # a queryset of replies for that objects
+        self.queryset = Reply.objects.filter(content_type=self.ContentTypeModel)
+
         return get_statistics_count_objects_for_the_past_year(self.queryset, 'date_added')
 
     def get_chart_count_replies_for_the_past_year(self):
         """ """
+
+        # access to a ContentTypeModel of an attached manager
+        self.ContentTypeModel = ContentType.objects.get_for_model(self.model)
+
+        # a queryset of replies for that objects
+        self.queryset = Reply.objects.filter(content_type=self.ContentTypeModel)
 
         return get_chart_count_objects_for_the_past_year(
             self.get_statistics_count_replies_for_the_past_year()

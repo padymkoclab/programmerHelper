@@ -1,50 +1,70 @@
 
 import random
 
+from django.conf import settings
 from django.utils.text import slugify
 from django.contrib.auth import get_user_model
 
 import factory
 from factory import fuzzy
 
+from apps.tags.models import Tag
 from apps.comments.factories import CommentFactory
 from apps.marks.factories import MarkFactory
 
-from utils.django.utils import generate_text_by_min_length
+from utils.django.factories_utils import (
+    generate_text_random_length_for_field_of_model,
+    AbstractTimeStampedFactory,
+    generate_image,
+)
 
-from .models import *
+from .models import Article, Subsection
 
 
-class ArticleFactory(factory.DjangoModelFactory):
+class SubsectionFactory(factory.DjangoModelFactory):
+
+    class Meta:
+        model = Subsection
+
+    @factory.lazy_attribute
+    def title(self):
+        return generate_text_random_length_for_field_of_model(self, 'title')
+
+    @factory.lazy_attribute
+    def content(self):
+        return generate_text_random_length_for_field_of_model(self, 'content')
+
+
+class ArticleFactory(AbstractTimeStampedFactory):
 
     class Meta:
         model = Article
 
-    quotation = factory.Faker('text', locale='ru')
-    status = fuzzy.FuzzyChoice(tuple(item[0] for item in Article.STATUS_ARTICLE))
+    status = fuzzy.FuzzyChoice([val for val, label in Article.STATUS_ARTICLE])
 
     @factory.lazy_attribute
-    def account(self):
-        return fuzzy.FuzzyChoice(get_user_model().objects.active_accounts()).fuzz()
+    def user(self):
+        return fuzzy.FuzzyChoice(get_user_model()._default_manager.all()).fuzz()
 
     @factory.lazy_attribute
     def title(self):
-        length_article_title = random.randint(10, 200)
-        return factory.Faker('text', locale='ru').generate([])[:length_article_title]
+        return generate_text_random_length_for_field_of_model(self, 'title')
+
+    @factory.lazy_attribute
+    def quotation(self):
+        return generate_text_random_length_for_field_of_model(self, 'quotation')
 
     @factory.lazy_attribute
     def header(self):
-        return generate_text_by_min_length(200)
+        return generate_text_random_length_for_field_of_model(self, 'header')
 
     @factory.lazy_attribute
     def conclusion(self):
-        return generate_text_by_min_length(200)
+        return generate_text_random_length_for_field_of_model(self, 'conclusion')
 
     @factory.lazy_attribute
-    def picture(self):
-        site_name = factory.Faker('url', locale='ru').generate([])
-        picture = factory.Faker('slug', locale='ru').generate([])
-        return '{0}{1}.gif'.format(site_name, picture)
+    def image(self):
+        return generate_image(filename='article.png')
 
     @factory.lazy_attribute
     def source(self):
@@ -53,6 +73,17 @@ class ArticleFactory(factory.DjangoModelFactory):
             article_slug = slugify(self.title, allow_unicode=True)
             return '{0}{1}/'.format(site_name, article_slug)
         return
+
+    @factory.lazy_attribute
+    def links(self):
+
+        links = list()
+        for i in range(random.randint(1, 10)):
+            site_host = factory.Faker('url').generate([])
+            url_name = factory.Faker('slug').generate([])
+            full_path = site_host + url_name
+            links.append(full_path)
+        return links
 
     @factory.post_generation
     def comments(self, created, extracted, **kwargs):
@@ -66,47 +97,17 @@ class ArticleFactory(factory.DjangoModelFactory):
         self.tags.set(tags)
 
     @factory.post_generation
-    def links(self, created, extracted, **kwargs):
-        count_links = random.randrange(1, settings.MAX_COUNT_WEBLINKS_ON_OBJECT)
-        weblinks = random.sample(tuple(WebLink.objects.all()), count_links)
-        self.links.set(weblinks)
-
-    @factory.post_generation
     def marks(self, created, extracted, **kwargs):
         for i in range(random.randint(0, 10)):
             MarkFactory(content_object=self)
 
     @factory.post_generation
     def date_added(self, created, extracted, **kwargs):
-        self.date_added = fuzzy.FuzzyDateTime(self.account.date_joined).fuzz()
+        self.date_added = fuzzy.FuzzyDateTime(self.user.date_joined).fuzz()
         self.save()
-        assert self.date_added >= self.account.date_joined
 
     @factory.post_generation
-    def date_modified(self, created, extracted, **kwargs):
-        self.date_modified = fuzzy.FuzzyDateTime(self.date_added).fuzz()
-        self.save()
-        assert self.date_modified >= self.date_added
+    def subsections(self, created, extracted, **kwargs):
 
-
-class ArticleSubsectionFactory(factory.DjangoModelFactory):
-
-    class Meta:
-        model = ArticleSubsection
-
-    @factory.lazy_attribute
-    def title(self):
-        length_of_title_subsection_of_article = random.randint(10, 200)
-        return factory.Faker('text', locale='ru').generate([])[:length_of_title_subsection_of_article]
-
-    @factory.lazy_attribute
-    def content(self):
-        return generate_text_by_min_length(100, as_p=True)
-
-
-def articles_factory(count):
-    Article.objects.filter().delete()
-    for i in range(count):
-        article = ArticleFactory()
-        for j in range(random.randrange(Article.MIN_COUNT_SUBSECTIONS, Article.MAX_COUNT_SUBSECTIONS)):
-            ArticleSubsectionFactory(article=article)
+        for i in range(random.randint(1, Article.MAX_COUNT_SUBSECTIONS)):
+            SubsectionFactory(article=self)

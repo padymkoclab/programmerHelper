@@ -24,7 +24,7 @@ class TimeStampedModel(models.Model):
     def is_new(self):
         return self.date_added > \
             timezone.now() - timezone.timedelta(
-                days=settings.COUNT_DAYS_DISTINGUISH_ELEMENTS_AS_NEW
+                days=settings.COUNT_DAYS_FOR_NEW_ELEMENTS
             )
     is_new.admin_order_field = 'date_added'
     is_new.short_description = _('Is new?')

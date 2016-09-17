@@ -17,6 +17,8 @@ class MarkGenericInline(admin_generic.GenericTabularInline):
     ct_field = 'content_type'
     ct_fk_field = 'object_id'
 
+    suit_classes = 'suit-tab suit-tab-marks'
+
 
 class MarkAdmin(admin.ModelAdmin):
     '''

@@ -1,39 +1,68 @@
 
+from django.template.defaultfilters import truncatechars
 from django.utils.translation import ugettext_lazy as _
 from django.contrib import admin
 
+from apps.core.admin import AdminSite, AppAdmin
 from apps.marks.admin import MarkGenericInline
 from apps.comments.admin import CommentGenericInline
 
-from .forms import ArticleForm, ArticleSubsectionFormset
-from .models import Article, ArticleSubsection
+from .forms import ArticleAdminModelForm, SubsectionAdminModelForm
+from .formsets import SubsectionFormset
+from .models import Article, Subsection
 
 
-class ArticleSubsectionInline(admin.StackedInline):
+class SubsectionInline(admin.StackedInline):
     '''
     Tabular Inline View for Tag
     '''
 
-    formset = ArticleSubsectionFormset
-    model = ArticleSubsection
-    min_num = Article.MIN_COUNT_SUBSECTIONS
+    form = SubsectionAdminModelForm
+    formset = SubsectionFormset
+    model = Subsection
+    min_num = 1
     max_num = Article.MAX_COUNT_SUBSECTIONS
     fk_name = 'article'
     prepopulated_fields = {'slug': ['title']}
-    fields = ['title', 'slug', 'content']
     extra = 0
-    template = 'articles/stacked.html'
+    fieldsets = (
+        (
+            None, {
+                'fields': ('title', 'slug',)
+            }
+        ),
+        (
+            None, {
+                'classes': ('full-width', ),
+                'fields': ('content', ),
+            }
+        ),
+    )
+
+    suit_classes = 'suit-tab suit-tab-subsections'
 
 
+@admin.register(Article, site=AdminSite)
 class ArticleAdmin(admin.ModelAdmin):
     '''
     Admin View for Article
     '''
 
-    form = ArticleForm
+    # formfield_overrides =
+    suit_form_tabs = (
+        ('general', _('General')),
+        ('header', _('Header')),
+        ('subsections', _('Subsections')),
+        ('footer', _('Footer')),
+        ('marks', _('Marks')),
+        ('comments', _('Comments')),
+        ('statistics', _('Statistics')),
+    )
+
+    form = ArticleAdminModelForm
     list_display = (
-        'title',
-        'account',
+        'truncated_title',
+        'user',
         'get_rating',
         'get_count_subsections',
         'get_count_links',
@@ -45,86 +74,120 @@ class ArticleAdmin(admin.ModelAdmin):
         'date_added',
     )
     list_filter = (
-        ('account', admin.RelatedOnlyFieldListFilter),
+        ('user', admin.RelatedOnlyFieldListFilter),
         'date_modified',
         'date_added',
     )
     search_fields = ('title',)
-    inlines = [
-        ArticleSubsectionInline,
-        MarkGenericInline,
-        CommentGenericInline,
-    ]
-    fieldsets = [
-        (_('Basic info'), {
-            'fields': [
-                'title', 'slug', 'picture', 'account'
-            ]
-        }),
-        (_('Status'), {
-            'fields': ['status']
-        }),
-        (_('Header'), {
-            'fields': ['quotation', 'header']
-        }),
-        (_('Footer'), {
-            'fields': ['conclusion', 'links', 'tags']
-        }),
-    ]
     filter_horizontal = ['tags']
-    # filter_vertical = ['links']
     date_hierarchy = 'date_added'
     prepopulated_fields = {'slug': ['title']}
+    readonly_fields = (
+        'get_rating',
+        'get_volume',
+        'get_count_marks',
+        'get_count_subsections',
+        'get_count_links',
+        'get_count_tags',
+        'get_related_objects',
+        'get_count_comments',
+    )
 
     def get_queryset(self, request):
         qs = super(ArticleAdmin, self).get_queryset(request)
-        qs = qs.articles_with_rating_and_count_comments_subsections_tags_links_marks()
+        qs = qs.articles_with_all_additional_fields()
         return qs
 
-    def get_count_links(self, obj):
-        return obj.count_links
-    get_count_links.admin_order_field = 'count_links'
-    get_count_links.short_description = _('Count useful links')
+    def get_fieldsets(self, request, obj=None):
 
-    def get_count_tags(self, obj):
-        return obj.count_tags
-    get_count_tags.admin_order_field = 'count_tags'
-    get_count_tags.short_description = _('Count tags')
-
-    def get_count_marks(self, obj):
-        return obj.count_marks
-    get_count_marks.admin_order_field = 'count_marks'
-    get_count_marks.short_description = _('Count marks')
-
-    def get_count_subsections(self, obj):
-        return obj.count_subsections
-    get_count_subsections.admin_order_field = 'count_subsections'
-    get_count_subsections.short_description = _('Count subsections')
-
-    def get_count_comments(self, obj):
-        return obj.count_comments
-    get_count_comments.admin_order_field = 'count_comments'
-    get_count_comments.short_description = _('Count comments')
-
-
-class ArticleSubsectionAdmin(admin.ModelAdmin):
-    '''
-        Admin View for ArticleSubsection
-    '''
-
-    list_display = ('article', 'title', 'date_modified', 'date_added')
-    list_filter = (
-        ('article', admin.RelatedOnlyFieldListFilter),
-        'date_modified',
-        'date_added',
-    )
-    search_fields = ('title', )
-    date_hierarchy = 'date_modified'
-    readonly_fields = ['slug']
-    fieldsets = [
-        [
-            ArticleSubsection._meta.verbose_name, {
-                'fields': ['article', 'title', 'slug', 'content'],
-            }
+        fieldsets = [
+            (
+                None, {
+                    'classes': ('suit-tab', 'suit-tab-general',),
+                    'fields': [
+                        'title',
+                        'slug',
+                        'user',
+                        'status',
+                        'image',
+                        'links',
+                        'tags',
+                    ],
+                }
+            ),
+            (
+                Article._meta.get_field('quotation').verbose_name, {
+                    'classes': ('suit-tab', 'suit-tab-header'),
+                    'fields': ('quotation', ),
+                }
+            ),
+            (
+                Article._meta.get_field('heading').verbose_name, {
+                    'classes': ('full-width', 'suit-tab', 'suit-tab-header'),
+                    'fields': ('heading', ),
+                }
+            ),
+            (
+                Article._meta.get_field('conclusion').verbose_name, {
+                    'classes': ('full-width', 'suit-tab', 'suit-tab-footer'),
+                    'fields': ('conclusion', ),
+                }
+            ),
         ]
-    ]
+
+        if obj is not None:
+            fieldsets.append(
+                (
+                    _('Statistics'), {
+                        'classes': ('suit-tab', 'suit-tab-statistics'),
+                        'fields': {
+                            'get_rating',
+                            'get_volume',
+                            'get_count_marks',
+                            'get_count_subsections',
+                            'get_count_links',
+                            'get_count_tags',
+                            'get_related_objects',
+                            'get_count_comments',
+                        }
+                    }
+                ),
+            )
+
+        return fieldsets
+
+    def get_inline_instances(self, reuest, obj=None):
+
+        if obj is not None:
+            inlines = [SubsectionInline, MarkGenericInline, CommentGenericInline]
+            return [inline(self.model, self.admin_site) for inline in inlines]
+
+        return []
+
+    def suit_row_attributes(self, obj, request):
+
+        css_class = 'default'
+        if obj.rating is not None:
+            if 4 <= obj.rating <= 5:
+                css_class = 'success'
+            if obj.rating < 2:
+                css_class = 'error'
+
+        return {'class': css_class}
+
+    def suit_cell_attributes(self, obj, column):
+
+        if column in ['date_added', 'date_modified']:
+            css_class = 'right'
+        elif column == 'title':
+            css_class = 'left'
+        else:
+            css_class = 'center'
+
+        return {'class': 'text-{}'.format(css_class)}
+
+    def truncated_title(self, obj):
+
+        return truncatechars(obj.title, 75)
+    truncated_title.short_description = Article._meta.get_field('title').verbose_name
+    truncated_title.admin_order_field = 'title'
