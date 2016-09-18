@@ -50,6 +50,9 @@ class Poll(TimeStampedModel):
     )
     slug = ConfiguredAutoSlugField(populate_from='title', unique=True)
     status = models.CharField(_('Status'), max_length=10, choices=CHOICES_STATUS, default=DRAFT)
+    # deactivate_date = models.DateTimeField(null=True, blank=True,
+    #     help_text=_("Point of time after this poll would be automatic deactivated"),
+    # )
     voters = models.ManyToManyField(
         settings.AUTH_USER_MODEL,
         through='Vote',

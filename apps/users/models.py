@@ -10,18 +10,18 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.db import models
 from django.conf import settings
+from utils.django import utils
 
 from utils.django.models_fields import ConfiguredAutoSlugField
 from utils.django.models_utils import get_admin_url
 
-from apps.polls.managers import PollsManager
-from apps.polls.querysets import UserPollQuerySet
-from apps.articles.models import Article
-from apps.activity.models import Activity
-from apps.forum.models import ForumTopic
-from apps.badges.managers import BadgeManager
-from apps.sessions.models import ExpandedSession
-from utils.django import utils
+# from apps.polls.managers import PollsManager
+# from apps.polls.querysets import UserPollQuerySet
+# from apps.articles.models import Article
+# from apps.activity.models import Activity
+# from apps.forum.models import Topic
+# from apps.badges.managers import BadgeManager
+# from apps.sessions.models import ExpandedSession
 # from utils.django.models_fields import PhoneField
 
 from .managers import UserManager
@@ -142,6 +142,11 @@ class User(AbstractBaseUser, PermissionsMixin):
     real_name = models.CharField(_('Real name'), max_length=200, default='')
 
     # phone = PhoneField(_('Phone'), default='')
+    # show_avatar Boolean
+    # show_avatar Boolean
+    # show_signature Boolean
+    # theme of site
+    # location
     # ваши направления развития верстка, программирование
     # What are you technologies using?
     # What you will read?
@@ -155,8 +160,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     # managers
     objects = models.Manager()
     objects = UserManager.from_queryset(UserQuerySet)()
-    polls = PollsManager.from_queryset(UserPollQuerySet)()
-    badges = BadgeManager()
+    # polls = PollsManager.from_queryset(UserPollQuerySet)()
+    # badges = BadgeManager()
 
     class Meta:
         db_table = 'user'
@@ -211,14 +216,14 @@ class User(AbstractBaseUser, PermissionsMixin):
     def has_module_perms(self, label):
         return True
 
-    def last_seen(self):
-        last_session_of_user = ExpandedSession.objects.filter(user_pk=self.pk).order_by('expire_date').last()
-        if last_session_of_user:
-            SessionStore = import_module(settings.SESSION_ENGINE).SessionStore
-            session = SessionStore(session_key=last_session_of_user.session_key)
-            last_seen = session['last_seen']
-            return last_seen
-        return None
+    # def last_seen(self):
+    #     last_session_of_user = ExpandedSession.objects.filter(user_pk=self.pk).order_by('expire_date').last()
+    #     if last_session_of_user:
+    #         SessionStore = import_module(settings.SESSION_ENGINE).SessionStore
+    #         session = SessionStore(session_key=last_session_of_user.session_key)
+    #         last_seen = session['last_seen']
+    #         return last_seen
+    #     return None
 
     def have_certain_count_consecutive_days(self, count_consecutive_days):
         if count_consecutive_days > 0:
@@ -239,8 +244,8 @@ class User(AbstractBaseUser, PermissionsMixin):
             return False
         raise ValueError('Count consecutive days must be 1 or more,')
 
-    def activity_with_users(self):
-        return self.activity.filter(flag=Activity.CHOICES_FLAGS.profiling).all()
+    # def activity_with_users(self):
+    #     return self.activity.filter(flag=Activity.CHOICES_FLAGS.profiling).all()
 
     def check_badge(self, badge_name):
         instance = self._as_queryset()
@@ -321,7 +326,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def get_count_popular_topics(self):
         """Getting count popular topics of user."""
-        popular_topics_of_user = ForumTopic.objects.popular_topics().filter(author=self)
+        # popular_topics_of_user = Topic.objects.popular_topics().filter(author=self)
         return popular_topics_of_user.count()
 
     def get_count_testing_suits_in_which_user_involed(self):

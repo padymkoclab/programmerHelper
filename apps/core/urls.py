@@ -34,7 +34,7 @@ urlpatterns = [
     url(r'^articles/', include('apps.articles.urls')),
     url(r'^library/', include('apps.library.urls')),
     # url(r'^courses/', include('apps.courses.urls')), # temporary is disabled
-    url(r'^forum/', include('apps.forum.urls')),
+    url(r'^forum/', include('apps.forums.urls')),
     url(r'^notifications/', include('apps.notifications.urls')),
     url(r'^news/', include('apps.newsletters.urls')),
     url(r'^polls/', include('apps.polls.urls')),

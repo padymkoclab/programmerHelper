@@ -44,7 +44,7 @@ CUSTOM_APPS = [
     'apps.comments.apps.CommentsConfig',
     # 'apps.courses.apps.CoursesConfig',  # temporary is disabled
     'apps.flavours.apps.FlavoursConfig',
-    'apps.forum.apps.ForumConfig',
+    'apps.forums.apps.ForumsConfig',
     'apps.marks.apps.MarksConfig',
     'apps.newsletters.apps.NewslettersConfig',
     'apps.notifications.apps.NotificationsConfig',

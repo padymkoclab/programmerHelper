@@ -3,6 +3,9 @@
 [description]
 """
 
+import io
+import base64
+
 
 def check_method_of_object(obj, method):
     """ """
@@ -46,3 +49,21 @@ def flatten(sequence):
             yield from flatten(i)
         else:
             yield i
+
+
+def run_video_in_jupyter(path):
+    """
+    path = "/media/wlysenko/66ABF2AC3D03BAAA/Light/Video/Сборка/Пришло время! Пора просыпаться!.mp4"
+
+    """
+
+    from jupyter.core import display
+
+    video = io.open(path, 'r+b').read()
+    encoded = base64.b64encode(video)
+    display.HTML(data="""
+        <video alt="test" controls>
+            <source src="data:video/mp4;base64,{0}" type="video/mp4" />
+        </video>
+        """.format(encoded.decode('ascii'))
+    )

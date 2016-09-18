@@ -2,6 +2,7 @@
 import itertools
 import random
 
+from django.utils.text import slugify
 from django.core.urlresolvers import reverse
 from django.shortcuts import _get_queryset
 from django.db import models
@@ -16,9 +17,11 @@ logger = create_logger_by_filename(__name__)
 def upload_image(instance, filename):
     """ """
 
+    slug = instance.slug if hasattr(instance, 'slug') else slugify(instance)
+
     return '{}/{}/{}/{}'.format(
         instance._meta.app_label, instance._meta.model_name,
-        instance.slug, filename
+        slug, filename
     )
 
 

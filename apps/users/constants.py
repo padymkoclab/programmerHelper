@@ -59,3 +59,9 @@ USER_LEVEL_DATAS = [
         name=UserLevel.REGULAR, color='#F0F8FF', description='Regular level of user'
     ),
 ]
+
+
+GROUPS_NAMES = (
+    'Moderators',
+    'Banned',
+)
