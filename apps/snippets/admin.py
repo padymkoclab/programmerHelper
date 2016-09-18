@@ -47,9 +47,9 @@ class SnippetAppAdmin(AppAdmin):
             ),
             (
                 _('Tags'), (
-                    (_('Count usaged tags'), Snippet.tags_manager.get_count_usaged_tags()),
+                    (_('Count used tags'), Snippet.tags_manager.get_count_used_tags()),
                     (_('Average count tags'), Snippet.tags_manager.get_avg_count_tags()),
-                    (_('Count unique usaged tags'), Snippet.tags_manager.get_count_unique_usaged_tags()),
+                    (_('Count distinct used tags'), Snippet.tags_manager.get_count_distinct_used_tags()),
                 )
             ),
         )

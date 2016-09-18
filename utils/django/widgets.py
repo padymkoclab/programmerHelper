@@ -1,6 +1,7 @@
 
 import logging
 
+from django.contrib import postgres
 from django.db.models.fields.files import ImageFieldFile
 from django.utils.translation import ugettext_lazy as _
 from django.utils.html import mark_safe
@@ -186,3 +187,27 @@ class BooleanRadioSelect(forms.RadioSelect):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.choices = [(True, _('Yes')), (False, _('No'))]
+
+
+class SplitInputsArrayWidget(postgres.forms.SplitArrayWidget):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def value_from_datadict(self, data, files, name):
+
+        value_from_datadict = super().value_from_datadict(data, files, name)
+
+        # convert a list to a string, with commas-separated values
+        value_from_datadict = ','.join(value_from_datadict)
+
+        return value_from_datadict
+
+    def render(self, name, value, attrs=None):
+
+        # if object has value, then
+        # convert a sting to a list by commas between values
+        if value is not None:
+            value = value.split(',')
+
+        return super().render(name, value, attrs=None)

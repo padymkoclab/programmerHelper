@@ -5,7 +5,7 @@ from django import forms
 from suit.widgets import AutosizedTextarea
 from apps.core.widgets import CKEditorAdminWidget
 
-from utils.django.widgets import AdminImageThumbnail
+from utils.django.widgets import AdminImageThumbnail, SplitInputsArrayWidget
 
 from apps.tags.forms import clean_tags
 
@@ -28,6 +28,15 @@ class ArticleAdminModelForm(forms.ModelForm):
         self.fields['slug'].widget.attrs['class'] = 'span12'
 
         self.fields['user'].widget.widget.attrs['class'] = 'span11'
+
+        # field 'links'
+        widget_base_field = self.fields['links'].base_field.widget
+        count_inputs = self.fields['links'].max_length
+        self.fields['links'].widget = SplitInputsArrayWidget(
+            widget_base_field,
+            count_inputs,
+            attrs={'class': 'span12'}
+        )
 
         self.fields['quotation'].widget = AutosizedTextarea(attrs={
             'class': 'span12',

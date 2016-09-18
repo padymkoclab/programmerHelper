@@ -21,10 +21,42 @@ class AppAdmin(abc.ABC):
 
     @abc.abstractmethod
     def get_context_for_tables_of_statistics(self):
+        """
+        return (
+            (_('Books'), (
+                (_('Count books'), Book.objects.count()),
+                (_('Count russian books'), Book.objects.get_count_russian_books()),
+                (_('Count english books'), Book.objects.get_count_english_books()),
+                (_('Count great books'), Book.objects.get_count_great_books()),
+                (_('Count big books'), Book.objects.get_count_big_books()),
+                (_('Count middle books'), Book.objects.get_count_middle_books()),
+                (_('Count tiny books'), Book.objects.get_count_tiny_books()),
+            )),
+        )
+        """
+
         pass
 
     @abc.abstractmethod
     def get_context_for_charts_of_statistics(self):
+        """
+        return (
+            {
+                'title': _('Chart count books by size'),
+                'table': None,
+                'chart': Book.objects.get_chart_statistics_count_books_by_size(),
+            },
+            {
+                'title': _('Chart count replies for the past year'),
+                'table': {
+                    'fields': (_('Month, year'), _('Count replies')),
+                    'data': Book.replies_manager.get_statistics_count_replies_for_the_past_year(),
+                },
+                'chart': Book.replies_manager.get_chart_count_replies_for_the_past_year(),
+            },
+        )
+        """
+
         pass
 
 

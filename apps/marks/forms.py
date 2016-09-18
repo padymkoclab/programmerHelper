@@ -1,23 +1,22 @@
 
-from collections import Counter
-
-from django.contrib.contenttypes.forms import BaseGenericInlineFormSet
-from django.utils.translation import ugettext_lazy as _
 from django import forms
 
+from .models import Mark
 
-class MarkFormSet(BaseGenericInlineFormSet):
-    """
-    Special inline form for relationship between TestQuestion and Varian models.
-    """
 
-    def clean(self):
-        """Custom validation"""
+class MarkAdminModelForm(forms.ModelForm):
 
-        super(MarkFormSet, self).clean()
-        all_given_scope_users = (form.cleaned_data.get('account') for form in self.forms)
-        counter_all_given_scope_users = Counter(all_given_scope_users)
-        for form in self.forms:
-            account = form.cleaned_data.get('account')
-            if account and counter_all_given_scope_users[account] > 1:
-                form.add_error('account', _('User is repeated.'))
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields['user'].widget.widget.attrs['class'] = 'span10'
+
+        mark_field = self.fields['mark']
+        mark_choices = [(i, i) for i in range(Mark.MIN_MARK, Mark.MAX_MARK + 1)]
+        mark_field.widget = forms.Select(
+            choices=mark_choices, attrs={'class': 'span9'}
+        )
+
+    class Meta:
+        model = Mark
+        fields = ('user', 'mark')

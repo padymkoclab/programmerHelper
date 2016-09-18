@@ -1,4 +1,5 @@
 
+from django.utils.text import slugify
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext_lazy as _
 from django.db import models
@@ -40,6 +41,12 @@ class Tag(TimeStampedModel):
 
     def __str__(self):
         return '{0.name}'.format(self)
+
+    def __init__(self, *args, **kwargs):
+
+        # self.name = slugify(self.name, allow_unicode=True)
+
+        super().__init__(*args, **kwargs)
 
     def get_absolute_url(self):
         return reverse('tags:tag', kwargs={'name': self.name})

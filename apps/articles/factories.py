@@ -78,7 +78,7 @@ class ArticleFactory(AbstractTimeStampedFactory):
     def links(self):
 
         links = list()
-        for i in range(random.randint(1, 10)):
+        for i in range(random.randint(1, Article.MAX_COUNT_LINKS)):
             site_host = factory.Faker('url').generate([])
             url_name = factory.Faker('slug').generate([])
             full_path = site_host + url_name

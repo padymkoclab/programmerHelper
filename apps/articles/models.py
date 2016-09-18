@@ -15,10 +15,13 @@ from utils.django.validators import MinCountWordsValidator
 
 from apps.comments.models import Comment
 from apps.comments.models_mixins import CommentsModelMixin
+from apps.comments.managers import CommentManager
 from apps.marks.models import Mark
 from apps.marks.models_mixins import MarksModelMixin
+from apps.marks.managers import MarkManager
 from apps.tags.models import Tag
 from apps.tags.models_mixins import TagsModelMixin
+from apps.tags.managers import TagManager
 
 from .managers import ArticleManager
 from .querysets import ArticleQuerySet, SubsectionQuerySet
@@ -30,6 +33,7 @@ class Article(CommentsModelMixin, TagsModelMixin, MarksModelMixin, TimeStampedMo
     """
 
     MAX_COUNT_SUBSECTIONS = 10
+    MAX_COUNT_LINKS = 10
 
     DRAFT = 'DRAFT'
     PUBLISHED = 'PUBLISHED'
@@ -68,7 +72,7 @@ class Article(CommentsModelMixin, TagsModelMixin, MarksModelMixin, TimeStampedMo
     )
     links = ArrayField(
         models.URLField(max_length=1000),
-        size=10,
+        size=MAX_COUNT_LINKS,
         verbose_name=_('Links'),
         help_text=_('Useful links'),
     )
@@ -78,6 +82,10 @@ class Article(CommentsModelMixin, TagsModelMixin, MarksModelMixin, TimeStampedMo
     # managers
     objects = models.Manager()
     objects = ArticleManager.from_queryset(ArticleQuerySet)()
+
+    comments_manager = CommentManager()
+    marks_manager = MarkManager()
+    tags_manager = TagManager()
 
     class Meta:
         verbose_name = _("Article")

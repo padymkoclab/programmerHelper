@@ -25,7 +25,6 @@ class AppAdmin(AppAdmin):
     label = LibraryConfig.label
 
     def get_context_for_tables_of_statistics(self):
-        """ """
 
         return (
             (_('Books'), (

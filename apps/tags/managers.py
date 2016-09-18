@@ -1,7 +1,10 @@
 
 import collections
 
+from django.utils.text import force_text
 from django.db import models
+
+import pygal
 
 from utils.django.functions_db import Round
 
@@ -57,7 +60,7 @@ class TagManager(models.Manager):
 
         return related_objects
 
-    def get_statistics_by_count_used_tags(self):
+    def get_statistics_used_tags(self):
         """Return count a used tags on deternimed type objects."""
 
         used_tags = list()
@@ -67,6 +70,25 @@ class TagManager(models.Manager):
         counter_used_tags = collections.Counter(used_tags).most_common()
 
         return counter_used_tags
+
+    def get_chart_most_used_tags(self):
+        """ """
+
+        config = pygal.Config(
+            width=1070,
+            explicit_size=True,
+            margin_left=200,
+            truncate_legend=30,
+        )
+
+        chart = pygal.Pie(config)
+
+        stat = self.get_statistics_used_tags()[:50]
+
+        for tag, count in stat:
+            chart.add(force_text(tag), count)
+
+        return chart.render()
 
 
 TagManager = TagManager.from_queryset(TagQuerySet)
