@@ -2,6 +2,9 @@
 import datetime
 
 from autoslug import AutoSlugField
+import markdown
+import textile
+from docutils.core import publish_parts
 
 from django import forms
 from django.utils.text import capfirst
@@ -321,3 +324,64 @@ class YearField(models.IntegerField):
 class YearsLifeField:
 
     pass
+
+
+class MarkupField(models.CharField):
+
+    description = _('Pretty markup field')
+
+    MARKDOWN = 'markdown'
+    TEXTILE = 'texttile'
+    ReST = 'restructuredtext'
+
+    MARKUP_CHOICES = (
+        (MARKDOWN, _('Markdown')),
+        (TEXTILE, _('Textile')),
+        (ReST, _('reStructuredText')),
+    )
+
+    def __init__(self, *args, **kwargs):
+
+        kwargs['verbose_name'] = _('Markup')
+        kwargs['max_length'] = 20
+        kwargs['choices'] = self.MARKUP_CHOICES
+        kwargs['default'] = self.MARKDOWN
+
+        self.fill_from = kwargs.pop('fill_from', None)
+        self.fill_to = kwargs.pop('fill_to', None)
+
+        super().__init__(*args, **kwargs)
+
+    def deconstruct(self):
+
+        name, path, args, kwargs = super().deconstruct()
+
+        del kwargs['verbose_name']
+        del kwargs['max_length']
+        del kwargs['choices']
+        del kwargs['default']
+
+        return name, path, args, kwargs
+
+    def pre_save(self, model_instance, add):
+
+        content = getattr(model_instance, self.fill_from)
+
+        selected_markup = getattr(model_instance, self.attname)
+
+        if selected_markup == self.MARKDOWN:
+            content_html = markdown.markdown(content)
+        elif selected_markup == self.TEXTILE:
+            content_html = textile.textile(content)
+        elif selected_markup == self.ReST:
+            content_html = self.convert_to_ReST(content)
+
+        setattr(model_instance, self.fill_to, content_html)
+
+        return super().pre_save(model_instance, add)
+
+    @staticmethod
+    def convert_to_ReST(content):
+        """ """
+
+        return publish_parts(source=content, writer_name='html')['fragment']

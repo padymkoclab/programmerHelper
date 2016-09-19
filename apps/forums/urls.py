@@ -1,12 +1,12 @@
 
 from django.conf.urls import url
 
-# from .views import SectionDetailView, TopicDetailView
+from .views import ForumDetailView, TopicDetailView
 
 
-app_name = 'forum'
+app_name = 'forums'
 
 urlpatterns = [
-    # url(r'theme/(?P<slug>[-_\w]+)/$', SectionDetailView.as_view(), {}, 'theme'),
-    # url(r'topic/(?P<slug>[-_\w]+)/$', TopicDetailView.as_view(), {}, 'topic'),
+    url(r'forum/(?P<slug>[-_\w]+)/$', ForumDetailView.as_view(), {}, 'forum'),
+    url(r'topic/(?P<slug>[-_\w]+)/$', TopicDetailView.as_view(), {}, 'topic'),
 ]

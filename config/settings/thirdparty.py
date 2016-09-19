@@ -70,7 +70,7 @@ SUIT_CONFIG = {
             'icon': 'icon-certificate',
         },
         {
-            'app': 'forum',
+            'app': 'forums',
             'icon': 'icon-th',
         },
         {

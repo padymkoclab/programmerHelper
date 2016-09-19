@@ -20,7 +20,7 @@ from .apps import LibraryConfig
 
 
 @AdminSite.register_app_admin_class
-class AppAdmin(AppAdmin):
+class ThisAppAdmin(AppAdmin):
 
     label = LibraryConfig.label
 

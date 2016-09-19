@@ -7,12 +7,13 @@ from django.contrib.auth import get_user_model
 import factory
 from factory import fuzzy
 
-from utils.django.factories_utils import generate_text_random_length_for_field_of_model, generate_image
+from utils.django.factories_utils import (
+    generate_text_random_length_for_field_of_model,
+    generate_image,
+    AbstractTimeStampedFactory,
+)
 
 from .models import Section, Forum, Topic, Post
-
-
-User = get_user_model().objects.all()
 
 
 class SectionFactory(factory.DjangoModelFactory):
@@ -42,7 +43,7 @@ class SectionFactory(factory.DjangoModelFactory):
         )
 
 
-class ForumFactory(factory.DjangoModelFactory):
+class ForumFactory(AbstractTimeStampedFactory):
 
     class Meta:
         model = Forum
@@ -71,15 +72,14 @@ class ForumFactory(factory.DjangoModelFactory):
         )
 
 
-class TopicFactory(factory.DjangoModelFactory):
+class TopicFactory(AbstractTimeStampedFactory):
 
     class Meta:
         model = Topic
 
-    status = fuzzy.FuzzyChoice([val for val, label in Topic.CHOICES_STATUS])
     views = fuzzy.FuzzyInteger(0, 1000)
     is_sticky = fuzzy.FuzzyChoice((True, False))
-    is_closed = fuzzy.FuzzyChoice((True, False))
+    is_opened = fuzzy.FuzzyChoice((True, False))
 
     @factory.lazy_attribute
     def subject(self):
@@ -89,14 +89,40 @@ class TopicFactory(factory.DjangoModelFactory):
     def user(self):
         return fuzzy.FuzzyChoice(get_user_model()._default_manager.all()).fuzz()
 
+    @factory.post_generation
+    def date_added(self, created, extracted, **kwargs):
+        self.date_added = fuzzy.FuzzyDateTime(self.user.date_joined).fuzz()
+        self.save()
 
-class PostFactory(factory.DjangoModelFactory):
+
+class PostFactory(AbstractTimeStampedFactory):
 
     class Meta:
         model = Post
 
-    content = factory.Faker('text', locale='ru')
+    markup = fuzzy.FuzzyChoice([val for val, label in Post._meta.get_field('markup').choices])
 
     @factory.lazy_attribute
     def user(self):
         return fuzzy.FuzzyChoice(get_user_model()._default_manager.all()).fuzz()
+
+    @factory.lazy_attribute
+    def content(self):
+        return generate_text_random_length_for_field_of_model(self, 'content')
+
+    @factory.lazy_attribute
+    def user_ip(self):
+        if random.random() > .5:
+            return factory.Faker('ipv6').generate([])
+        return factory.Faker('ipv4').generate([])
+
+    @factory.post_generation
+    def date_added(self, created, extracted, **kwargs):
+
+        count_posts = self.topic.posts.count()
+
+        # if is not a head of the topic
+        if count_posts != 1:
+            self.date_added = fuzzy.FuzzyDateTime(self.topic.date_added).fuzz()
+
+        self.save()

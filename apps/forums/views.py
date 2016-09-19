@@ -1,14 +1,16 @@
 
-# from django.views.generic import DetailView
+from django.views.generic import DetailView
 
-# from .models import ForumSection, ForumTopic
-
-
-# class TopicDetailView(DetailView):
-#     model = ForumTopic
-#     template_name = "programming_tester/test_suit_detail.html"
+from .models import Forum, Topic
 
 
-# class SectionDetailView(DetailView):
-#     model = ForumSection
-#     template_name = "TEMPLATE_NAME"
+class ForumDetailView(DetailView):
+
+    model = Forum
+    template_name = "forums/forum_detail.html"
+
+
+class TopicDetailView(DetailView):
+
+    model = Topic
+    template_name = "forums/topic_detail.html"

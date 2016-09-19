@@ -21,24 +21,22 @@ class Command(FactoryCountBaseCommand):
         TopicModel = TopicFactory._meta.model
         PostModel = PostFactory._meta.model
 
-        random.randint(1, 50)
-
         SectionModel._default_manager.filter().delete()
 
         for i in range(count):
             section = SectionFactory()
 
-            count_forums = random.randint(0, 50)
+            count_forums = random.randint(0, 30)
 
             for j in range(count_forums):
                 forum = ForumFactory(section=section)
 
-                count_topics = random.randint(0, 50)
+                count_topics = random.randint(0, 30)
 
                 for k in range(count_topics):
                     topic = TopicFactory(forum=forum)
 
-                    count_posts = random.randint(0, 50)
+                    count_posts = random.randint(0, 30)
 
                     for l in range(count_posts):
                         PostFactory(topic=topic)

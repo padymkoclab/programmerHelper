@@ -14,9 +14,6 @@ from factory import fuzzy
 from ..python.text_utils import findall_words
 
 
-Now = timezone.now()
-
-
 class AbstractTimeStampedFactory(factory.DjangoModelFactory):
 
     @classmethod
@@ -24,14 +21,14 @@ class AbstractTimeStampedFactory(factory.DjangoModelFactory):
         super(AbstractTimeStampedFactory, cls)._after_postgeneration(obj, create, results)
         qs = obj._meta.model._default_manager.filter(pk=obj.pk)
         try:
-            qs.update(date_modified=fuzzy.FuzzyDateTime(obj.date_added, Now).fuzz())
+            qs.update(date_modified=fuzzy.FuzzyDateTime(obj.date_added, timezone.now()).fuzz())
         except:
             from IPython.core.debugger import Tracer
             Tracer()()
 
     @factory.post_generation
     def date_added(self, create, extracted, **kwargs):
-        self.date_added = fuzzy.FuzzyDateTime(Now - timezone.timedelta(days=500)).fuzz()
+        self.date_added = fuzzy.FuzzyDateTime(timezone.now() - timezone.timedelta(days=500)).fuzz()
         self.save()
 
 
