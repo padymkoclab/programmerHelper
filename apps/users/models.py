@@ -2,6 +2,7 @@
 import random
 import uuid
 
+from django.core.validators import MinLengthValidator
 from django.utils import timezone
 from importlib import import_module
 from django.utils.translation import ugettext_lazy as _
@@ -67,13 +68,17 @@ class UserLevel(models.Model):
     )
 
     id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
-    name = models.CharField(_('Name'), max_length=50, choices=CHOICES_LEVEL, unique=True)
+    name = models.CharField(
+        _('Name'), max_length=50,
+        choices=CHOICES_LEVEL, unique=True,
+    )
     slug = ConfiguredAutoSlugField(populate_from='name', unique=True)
-    description = models.TextField(_('Description'))
+    description = models.TextField(
+        _('Description'), validators=[MinLengthValidator(10)]
+    )
     color = models.CharField(_('Color'), max_length=50)
 
     class Meta:
-        db_table = 'user_levels'
         verbose_name = _('Level')
         verbose_name_plural = _('Levels')
         ordering = ['name']

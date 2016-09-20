@@ -55,8 +55,8 @@ class ArticleFactory(AbstractTimeStampedFactory):
         return generate_text_random_length_for_field_of_model(self, 'quotation')
 
     @factory.lazy_attribute
-    def header(self):
-        return generate_text_random_length_for_field_of_model(self, 'header')
+    def heading(self):
+        return generate_text_random_length_for_field_of_model(self, 'heading')
 
     @factory.lazy_attribute
     def conclusion(self):

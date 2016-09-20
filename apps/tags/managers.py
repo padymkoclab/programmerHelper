@@ -1,4 +1,5 @@
 
+import random
 import collections
 
 from django.utils.text import force_text
@@ -6,6 +7,7 @@ from django.db import models
 
 import pygal
 
+from utils.python.constants import PRETTY_COLORS
 from utils.django.functions_db import Round
 
 from .querysets import TagQuerySet
@@ -35,7 +37,7 @@ class TagManager(models.Manager):
             models.functions.Coalesce(models.Avg('count_tags'), 0)
         ))['avg']
 
-    def get_related_objects_by_tags(self, obj):
+    def get_related_objects(self, obj):
         """Return objects the same type, with common tags in a decsent order by a level similarity, as next:
         object: count_common_tags."""
 
@@ -90,6 +92,16 @@ class TagManager(models.Manager):
 
         return chart.render()
 
+    def get_most_common_tags(self, min_count=None):
+        """ """
+
+        raise NotImplementedError
+
+    def display_cloud_tags(self, min_count=None):
+        """ """
+
+        raise NotImplementedError
+
 
 TagManager = TagManager.from_queryset(TagQuerySet)
 
@@ -99,10 +111,60 @@ class PurelyTagManager(models.Manager):
     Manager of a tags destined purely for tags.
     """
 
-    def remove_less_used_tags(self):
-        """Remove a less-used tags."""
+    def get_statistics_total_used_tags_by_type_objects(self):
+        """ """
 
-        raise NotImplementedError
+        related_fields_names = self.model._get_related_fields_names()
 
-    def get_statistics_total_used_tags(self):
-        raise NotImplementedError
+        stat = dict.fromkeys(related_fields_names, 0)
+
+        for obj in self.prefetch_related():
+            for related_field_name in related_fields_names:
+                stat[related_field_name] += getattr(obj, related_field_name).count()
+
+        stat2 = list()
+        for related_field_name, count in stat.items():
+            related_model = self.model._meta.get_field(related_field_name).related_model
+            verbose_name_plural = related_model._meta.verbose_name_plural
+
+            stat2.append((verbose_name_plural, count))
+
+        return stat2
+
+    def get_chart_total_used_tags_by_type_objects(self):
+        """ """
+
+        config = pygal.Config(
+            width=800,
+            height=500,
+            explicit_size=True,
+            legend_at_bottom=True,
+            show_legend=True,
+            half_pie=True,
+        )
+
+        chart = pygal.Pie(config)
+
+        for label, count in self.get_statistics_total_used_tags_by_type_objects():
+            chart.add(force_text(label), count)
+
+        return chart.render()
+
+    def display_cloud_tags(self, min_count=None, ordered=False, colored=True):
+        """ """
+
+        self = self.tags_with_total_count_usage().values('name', 'total_count_usage')
+
+        def wrap_(obj):
+            total_count_usage = obj['total_count_usage']
+            if total_count_usage == 1:
+                size = 1
+            elif total_count_usage == 0:
+                return ''
+            else:
+                size = total_count_usage / 100 + 1
+            color = random.choice(PRETTY_COLORS)
+            css_styles = 'font-size: {}em;color: {};'.format(size, color)
+            return '<span style="{}">{}</span>&nbsp;'.format(css_styles, obj['name'])
+
+        return ''.join(map(wrap_, self))
