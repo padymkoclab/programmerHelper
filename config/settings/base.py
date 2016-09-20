@@ -46,6 +46,7 @@ CUSTOM_APPS = [
     'apps.flavours.apps.FlavoursConfig',
     'apps.forums.apps.ForumsConfig',
     'apps.marks.apps.MarksConfig',
+    'apps.diaries.apps.DiaryConfig',
     'apps.newsletters.apps.NewslettersConfig',
     'apps.notifications.apps.NotificationsConfig',
     'apps.opinions.apps.OpinionsConfig',

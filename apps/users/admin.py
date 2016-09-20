@@ -16,7 +16,7 @@ from .actions import (
     make_users_as_active,
 )
 from .forms import UserChangeForm, UserCreationForm
-from .models import User, UserLevel
+from .models import User, Level
 from .listfilters import ListFilterLastLogin
 
 
@@ -33,7 +33,7 @@ class UserAdmin(BaseUserAdmin):
     # set it value in empty, since it should be change in following views
     list_display = [
         'email',
-        'username',
+        'display_name',
         'level',
         'is_active',
         'is_superuser',
@@ -49,10 +49,10 @@ class UserAdmin(BaseUserAdmin):
     ]
     ordering = ['date_joined']
 
-    search_fields = ['email', 'username']
+    search_fields = ['email', 'display_name']
     date_hierarchy = 'date_joined'
 
-    radio_fields = {'gender': admin.VERTICAL}
+    # radio_fields = {'gender': admin.VERTICAL}
     filter_horizontal = ['groups']
     filter_vertical = ['user_permissions']
     readonly_fields = ['last_login', 'level']
@@ -63,7 +63,7 @@ class UserAdmin(BaseUserAdmin):
                 'fields':
                     [
                         'email',
-                        'username',
+                        'display_name',
                         'password',
                         'level',
                 ]
@@ -73,7 +73,7 @@ class UserAdmin(BaseUserAdmin):
             _('Personal information'), {
                 'fields':
                     [
-                        'gender',
+                        # 'gender',
                         'real_name',
                         'date_birthday',
                     ]
@@ -106,7 +106,7 @@ class UserAdmin(BaseUserAdmin):
             None, {
                 'fields': [
                     'email',
-                    'username',
+                    'display_name',
                     'password1',
                     'password2',
                     'date_birthday',
@@ -252,7 +252,7 @@ class UserAdmin(BaseUserAdmin):
     #     if request.path == reverse('admin:users_user_changelist'):
     #         self.list_display = [
     #             'email',
-    #             'username',
+    #             'display_name',
     #             'level',
     #             'is_active',
     #             'is_superuser',
@@ -260,7 +260,7 @@ class UserAdmin(BaseUserAdmin):
     #             'date_joined',
     #         ]
     #         self.list_filter = [
-    #             ('level', UserLevelRelatedOnlyFieldListFilter),
+    #             ('level', LevelRelatedOnlyFieldListFilter),
     #             ('is_active', admin.BooleanFieldListFilter),
     #             ('is_superuser', admin.BooleanFieldListFilter),
     #             ListFilterLastLogin,
@@ -290,24 +290,24 @@ class UserAdmin(BaseUserAdmin):
         return self.changelist_view(request)
 
 
-@admin.register(UserLevel, site=AdminSite)
-class UserLevelAdmin(admin.ModelAdmin):
+@admin.register(Level, site=AdminSite)
+class LevelAdmin(admin.ModelAdmin):
     '''
-    Admin View for UserLevel
+    Admin View for Level
     '''
 
     list_display = ('name', 'get_count_users', 'color', 'description')
     search_fields = ('name',)
     fieldsets = [
         [
-            UserLevel._meta.verbose_name, {
+            Level._meta.verbose_name, {
                 'fields': ['name', 'color', 'description']
             }
         ]
     ]
 
     def get_queryset(self, request):
-        qs = super(UserLevelAdmin, self).get_queryset(request)
+        qs = super(LevelAdmin, self).get_queryset(request)
         qs = qs.annotate(
             count_users=models.Count('users'),
         )

@@ -65,5 +65,25 @@ def run_video_in_jupyter(path):
         <video alt="test" controls>
             <source src="data:video/mp4;base64,{0}" type="video/mp4" />
         </video>
-        """.format(encoded.decode('ascii'))
-    )
+        """.format(encoded.decode('ascii')))
+
+
+def rgb_to_hex(*args):
+
+    if len(args) != 3:
+        raise ValueError()
+
+    return '#{0:X}{1:X}{2:X}'.format(*args)
+
+
+def hex_to_rgb(val):
+
+    val = val.lstrip('#')
+
+    lv = len(val)
+
+    if lv == 3:
+        val = ''.join(i * 2 for i in val)
+        lv = 6
+
+    return tuple(int(val[i: i + lv // 3], 16) for i in range(0, lv, lv // 3))

@@ -30,7 +30,7 @@ class Createuserform(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ('email', 'password', 'username', 'date_birthday')
+        fields = ('email', 'password', 'display_name')
         widgets = {
             'email': forms.EmailInput(attrs={'placeholder': _('Enter your email')}),
         }
@@ -52,7 +52,7 @@ class UserCreationForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ('email', 'username', 'date_birthday')
+        fields = ('email', 'display_name')
 
     def clean_password2(self):
         password1 = self.cleaned_data.get("password1")
@@ -84,3 +84,8 @@ class UserChangeForm(forms.ModelForm):
 
     def clean_password(self):
         return self.initial["password"]
+
+
+class Level(forms.ModelForm):
+
+    pass

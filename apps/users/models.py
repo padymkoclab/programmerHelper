@@ -13,7 +13,7 @@ from django.db import models
 from django.conf import settings
 from utils.django import utils
 
-from utils.django.models_fields import ConfiguredAutoSlugField
+from utils.django.models_fields import ConfiguredAutoSlugField, PhoneField
 from utils.django.models_utils import get_admin_url
 
 # from apps.polls.managers import PollsManager
@@ -30,7 +30,7 @@ from .querysets import UserQuerySet
 from .exceptions import ProtectDeleteUser
 
 
-class UserLevel(models.Model):
+class Level(models.Model):
     """
 
     """
@@ -89,7 +89,7 @@ class UserLevel(models.Model):
         return '{0.name}'.format(self)
 
     def save(self, *args, **kwargs):
-        super(UserLevel, self).save(*args, **kwargs)
+        super(Level, self).save(*args, **kwargs)
 
     def get_absolute_url(self):
         return reverse('users:level', kwargs={'slug': self.slug})
@@ -97,70 +97,28 @@ class UserLevel(models.Model):
 
 class User(AbstractBaseUser, PermissionsMixin):
     """
-    Custom auth user model with additional fields and username fields as email
+    Custom auth user model with additional fields and display_name fields as email
     """
 
-    MAN = 'MAN'
-    WOMAN = 'WOMAN'
+    USERNAME_FIELD = 'email'
 
-    CHOICES_GENDER = (
-        (MAN, _('Man')),
-        (WOMAN, _('Woman')),
-    )
-
-    # user detail
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     email = models.EmailField(
-        _('Email'),
-        unique=True,
+        _('Email'), unique=True,
         error_messages={
             'unique': _('User with this email already exists.')
         }
     )
-    username = models.CharField(_('Username'), max_length=200, help_text=_('Displayed name'))
-    is_active = models.BooleanField(
-        _('Is active'),
-        default=True,
-        help_text=_('Designated that this user is not disabled.'),
-    )
-    profile_views = models.IntegerField(_('Profile views'), default=0, editable=False)
-    date_joined = models.DateTimeField(_('Date joined'), auto_now_add=True)
+    display_name = models.CharField(_('Display name'), max_length=200)
+    is_active = models.BooleanField(_('Is active'), default=True)
     level = models.ForeignKey(
-        'UserLevel',
+        'Level',
         verbose_name='Level',
         related_name='users',
-        default=UserLevel.REGULAR,
+        default=Level.REGULAR,
         to_field='name',
-        on_delete=models.PROTECT,
     )
-    signature = models.CharField(_('Signature'), max_length=50, default='')
-
-    # presents in web
-    presents_on_gmail = models.URLField(_('Presents on google services'), default='')
-    presents_on_github = models.URLField(_('Presents on github'), default='')
-    presents_on_stackoverflow = models.URLField(_('Presents on stackoverflow'), default='')
-    personal_website = models.URLField(_('Personal website'), default='')
-
-    # private fields
-    gender = models.CharField(_('Gender'), max_length=50, choices=CHOICES_GENDER, default=MAN)
-    date_birthday = models.DateField(_('Date birthday'))
-    real_name = models.CharField(_('Real name'), max_length=200, default='')
-
-    # phone = PhoneField(_('Phone'), default='')
-    # show_avatar Boolean
-    # show_avatar Boolean
-    # show_signature Boolean
-    # theme of site
-    # location
-    # ваши направления развития верстка, программирование
-    # What are you technologies using?
-    # What you will read?
-    # What you read already?
-    # create own diarly
-    # biography (date birth not mention)
-
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['username', 'date_birthday']
+    date_joined = models.DateTimeField(_('Date joined'), auto_now_add=True)
 
     # managers
     objects = models.Manager()
@@ -169,7 +127,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     # badges = BadgeManager()
 
     class Meta:
-        db_table = 'user'
         verbose_name = _("User")
         verbose_name_plural = _("Users")
         ordering = ['-date_joined']
@@ -204,12 +161,14 @@ class User(AbstractBaseUser, PermissionsMixin):
         return get_admin_url(self)
 
     def get_full_name(self):
-        return '{0.username} ({0.email})'.format(self)
-    get_full_name.admin_order_field = 'username'
+        return '{0.display_name} ({0.email})'.format(self)
+    get_full_name.admin_order_field = 'display_name'
     get_full_name.short_description = _('Full name')
 
     def get_short_name(self):
-        return '{0.email}'.format(self)
+        return '{0.display_name}'.format(self)
+    get_short_name.admin_order_field = 'display_name'
+    get_short_name.short_description = _('Name')
 
     @property
     def is_staff(self):
@@ -402,6 +361,48 @@ class User(AbstractBaseUser, PermissionsMixin):
     # answer, queations, hearts, opinons and more
 
 
-# class Profile(models.Model):
+class Profile(models.Model):
+    """
 
-#     user = models.OneToOneField('User')
+    """
+
+    MAN = 'MAN'
+    WOMAN = 'WOMAN'
+
+    CHOICES_GENDER = (
+        (MAN, _('Man')),
+        (WOMAN, _('Woman')),
+        (None, _('Unknown'))
+    )
+
+    user = models.OneToOneField(settings.AUTH_USER_MODEL)
+
+    # public info
+    profile_views = models.IntegerField(_('Profile views'), default=0, editable=False)
+    # crafts = models.CharField()
+    # ваши направления развития верстка, программирование
+    display_name = models.CharField(_('Display name'), max_length=50)
+    about = models.TextField(_('About self'), default='')
+    signature = models.CharField(_('Signature'), max_length=50, default='')
+    presents_on_gmail = models.URLField(_('Presents on google services'), default='')
+    presents_on_github = models.URLField(_('Presents on GitHub'), default='')
+    presents_on_stackoverflow = models.URLField(_('Presents on stackoverflow'), default='')
+    personal_website = models.URLField(_('Personal website'), default='')
+    gender = models.CharField(
+        _('Gender'), max_length=10, choices=CHOICES_GENDER,
+        default=MAN, null=True, blank=True,
+    )
+
+    location = models.CharField(_('Location'), max_length=50)
+
+    latitude = models.FloatField(_('Latitude'))
+    longitude = models.FloatField(_('Longitude'))
+
+    # private info
+    date_birthday = models.DateField(
+        _('Date birthday'), null=True, blank=True,
+        help_text=_('Only used for displaying age'))
+    real_name = models.CharField(_('Real name'), max_length=200, default='')
+    phone = PhoneField(_('Phone'), default='')
+
+    # theme of site

@@ -1,10 +1,13 @@
 
+import logging
+
 from django.core.management.base import BaseCommand
 from django.conf import settings
 
 from unipath import Path
 
-from mylabour.utils import configured_logging
+
+logger = logging.getLogger('django.development')
 
 
 class Command(BaseCommand):
@@ -14,8 +17,9 @@ class Command(BaseCommand):
         parser.add_argument('app_names_plural', nargs='+', type=str)
 
     def handle(self, *args, **options):
-        logger = configured_logging()
+
         app_names_plural = options['app_names_plural']
+
         #
         apps_dir = settings.BASE_DIR.child('apps')
         if not apps_dir.exists():
@@ -27,12 +31,18 @@ class Command(BaseCommand):
             if app_dir.exists():
                 logger.warning('App with name "%s" already exists.' % app_name)
                 raise ValueError('Conflict name of app: "%s"' % app_name)
+
             logger.info('Start creating new app "%s" ...' % app_name)
             # create tree of directories
             Path(app_dir, 'migrations').mkdir(parents=True)
-            Path(app_dir, 'locale').mkdir(parents=True)
             Path(app_dir, 'migrations', '__init__.py').write_file('')
+            Path(app_dir, 'management', app_name, 'commands').mkdir(parents=True)
+            Path(app_dir, 'management', '__init__.py').write_file('')
+            Path(app_dir, 'management', app_name, 'commands', '__init__.py').write_file('')
+            Path(app_dir, 'tests').mkdir(parents=True)
+            Path(app_dir, 'locale').mkdir(parents=True)
             Path(app_dir, 'static', app_name, 'img').mkdir(parents=True)
+
             dir_for_css = Path(app_dir, 'static', app_name, 'css')
             dir_for_css.mkdir(parents=True)
             dir_for_js = Path(app_dir, 'static', app_name, 'js')
