@@ -30,3 +30,22 @@ def signal_post_migrate_model_levels_of_users(sender, **kwargs):
     call_command('create_test_superuser')
     call_command('create_test_superuser')
     logger.debug('A signal post_migration for app Users was called')
+
+
+def auto_create_user_profile(sender, instance, created, **kwargs):
+
+    if created is True:
+
+        from .models import Profile
+        Profile.objects.create(user=instance)
+        logger.debug('Autocreated profile for user "{}"'.format(instance))
+
+
+def auto_delete_user_profile(sender, instance, created, **kwargs):
+
+    pass
+    # if created is True:
+
+    #     from .models import Profile
+    #     Profile.objects.create(user=instance)
+    #     logger.debug('Autocreated profile for user "{}"'.format(instance))

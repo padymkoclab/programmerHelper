@@ -1,8 +1,11 @@
 
+import logging
+
 from django.core.urlresolvers import reverse
 from django.conf.urls import url
 from django.db import models
 from django.contrib import admin
+from django.utils.html import format_html
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
@@ -15,9 +18,12 @@ from .actions import (
     make_users_as_non_active,
     make_users_as_active,
 )
-from .forms import UserChangeForm, UserCreationForm
-from .models import User, Level
+from .forms import UserChangeForm, UserCreationForm, LevelAdminModelForm
+from .models import User, Level, Profile
 from .listfilters import ListFilterLastLogin
+
+
+logger = logging.getLogger('django.development')
 
 
 @admin.register(User, site=AdminSite)
@@ -33,7 +39,7 @@ class UserAdmin(BaseUserAdmin):
     # set it value in empty, since it should be change in following views
     list_display = [
         'email',
-        'display_name',
+        'username',
         'level',
         'is_active',
         'is_superuser',
@@ -49,10 +55,9 @@ class UserAdmin(BaseUserAdmin):
     ]
     ordering = ['date_joined']
 
-    search_fields = ['email', 'display_name']
+    search_fields = ['email', 'username']
     date_hierarchy = 'date_joined'
 
-    # radio_fields = {'gender': admin.VERTICAL}
     filter_horizontal = ['groups']
     filter_vertical = ['user_permissions']
     readonly_fields = ['last_login', 'level']
@@ -63,32 +68,11 @@ class UserAdmin(BaseUserAdmin):
                 'fields':
                     [
                         'email',
-                        'display_name',
+                        'username',
                         'password',
                         'level',
                 ]
             },
-        ),
-        (
-            _('Personal information'), {
-                'fields':
-                    [
-                        # 'gender',
-                        'real_name',
-                        'date_birthday',
-                    ]
-            }
-        ),
-        (
-            _('Presents in web'), {
-                'fields':
-                    [
-                        'presents_on_gmail',
-                        'presents_on_github',
-                        'presents_on_stackoverflow',
-                        'personal_website',
-                    ]
-            }
         ),
         (
             _('Permissions'), {
@@ -106,10 +90,9 @@ class UserAdmin(BaseUserAdmin):
             None, {
                 'fields': [
                     'email',
-                    'display_name',
+                    'username',
                     'password1',
                     'password2',
-                    'date_birthday',
                 ]
             }
         )
@@ -252,7 +235,7 @@ class UserAdmin(BaseUserAdmin):
     #     if request.path == reverse('admin:users_user_changelist'):
     #         self.list_display = [
     #             'email',
-    #             'display_name',
+    #             'username',
     #             'level',
     #             'is_active',
     #             'is_superuser',
@@ -290,30 +273,63 @@ class UserAdmin(BaseUserAdmin):
         return self.changelist_view(request)
 
 
+@admin.register(Profile, site=AdminSite)
+class ProfileAdmin(admin.ModelAdmin):
+
+    pass
+
+
 @admin.register(Level, site=AdminSite)
 class LevelAdmin(admin.ModelAdmin):
     '''
     Admin View for Level
     '''
 
-    list_display = ('name', 'get_count_users', 'color', 'description')
+    form = LevelAdminModelForm
+    list_display = (
+        'name',
+        'get_count_users',
+        'display_color',
+        'description',
+    )
     search_fields = ('name',)
-    fieldsets = [
-        [
+    fieldsets = (
+        (
             Level._meta.verbose_name, {
-                'fields': ['name', 'color', 'description']
-            }
-        ]
-    ]
+                'fields': (
+                    'name',
+                    'color',
+                    'description',
+                )
+            },
+        ),
+    )
 
     def get_queryset(self, request):
-        qs = super(LevelAdmin, self).get_queryset(request)
-        qs = qs.annotate(
-            count_users=models.Count('users'),
-        )
+
+        qs = super().get_queryset(request)
+        qs = qs.levels_with_count_users()
         return qs
 
-    def get_count_users(self, obj):
-        return obj.count_users
-    get_count_users.admin_order_field = 'count_users'
-    get_count_users.short_description = _('Count users')
+    def formfield_for_choice_field(self, db_field, request, **kwargs):
+
+        if db_field.name == "name":
+            logger.warning('Do exclude used choices')
+        return super().formfield_for_choice_field(db_field, request, **kwargs)
+
+    def suit_cell_attributes(self, request, column):
+
+        css_class_align = 'left'
+        if column == 'get_count_users':
+            css_class_align = 'center'
+        return {'class': 'text-{}'.format(css_class_align)}
+
+    def display_color(self, obj):
+        """ """
+
+        return format_html(
+            '<span style="background-color: {};">&nbsp;&nbsp;&nbsp;&nbsp;</span>&nbsp;{}',
+            obj.color, obj.color,
+        )
+    display_color.short_description = Level._meta.get_field('color').verbose_name
+    display_color.admin_order_field = 'color'

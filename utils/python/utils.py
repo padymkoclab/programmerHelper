@@ -1,10 +1,12 @@
-"""[summary]
+"""
+[summary]
 
 [description]
 """
 
 import io
 import base64
+from IPython.core import display as JupyterDisplay
 
 
 def check_method_of_object(obj, method):
@@ -57,11 +59,9 @@ def run_video_in_jupyter(path):
 
     """
 
-    from jupyter.core import display
-
     video = io.open(path, 'r+b').read()
     encoded = base64.b64encode(video)
-    display.HTML(data="""
+    JupyterDisplay.Video(data="""
         <video alt="test" controls>
             <source src="data:video/mp4;base64,{0}" type="video/mp4" />
         </video>

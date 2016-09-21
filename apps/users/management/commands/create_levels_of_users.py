@@ -1,14 +1,13 @@
 
+import logging
+
 from django.core.management.base import BaseCommand
 
-from utils.python.logging_utils import create_logger_by_filename
-
-from apps.users.factories import UserLevelFactory
-from apps.users.models import UserLevel
+from apps.users.factories import LevelFactory
 from apps.users.constants import USER_LEVEL_DATAS
 
 
-logger = create_logger_by_filename(__name__)
+logger = logging.getLogger('django.development')
 
 
 class Command(BaseCommand):
@@ -17,9 +16,10 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
-        # create levels of users if don`t yet
-        if not UserLevel.objects.count():
+        LevelModel = LevelFactory._meta.model
+
+        if not LevelModel.objects.count():
             for obj in USER_LEVEL_DATAS:
-                UserLevelFactory(name=obj.name, color=obj.color, description=obj.description)
+                LevelFactory(name=obj.name, color=obj.color, description=obj.description)
             logger.info('Created levels for users.')
         logger.debug('Levels of users already exists.')

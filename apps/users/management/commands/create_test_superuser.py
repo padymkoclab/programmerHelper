@@ -1,13 +1,13 @@
 
+import logging
+
 from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
-
-from utils.python.logging_utils import create_logger_by_filename
 
 from apps.users.constants import TEST_SUPERUSER_DATA
 
 
-logger = create_logger_by_filename(__name__)
+logger = logging.getLogger('django.development')
 
 
 class Command(BaseCommand):

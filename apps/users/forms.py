@@ -3,11 +3,13 @@ from django.utils.translation import ugettext_lazy as _
 from django import forms
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
 
+from suit.widgets import AutosizedTextarea
+
 # from passwords.fields import PasswordField
 # from passwords.validators import (
 #     DictionaryValidator, LengthValidator, ComplexityValidator)
 
-from .models import User
+from .models import User, Level
 
 
 class Createuserform(forms.ModelForm):
@@ -30,7 +32,7 @@ class Createuserform(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ('email', 'password', 'display_name')
+        fields = ('email', 'password', 'username')
         widgets = {
             'email': forms.EmailInput(attrs={'placeholder': _('Enter your email')}),
         }
@@ -52,7 +54,7 @@ class UserCreationForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ('email', 'display_name')
+        fields = ('email', 'username')
 
     def clean_password2(self):
         password1 = self.cleaned_data.get("password1")
@@ -86,6 +88,18 @@ class UserChangeForm(forms.ModelForm):
         return self.initial["password"]
 
 
-class Level(forms.ModelForm):
+class LevelAdminModelForm(forms.ModelForm):
 
-    pass
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields['name'].widget.attrs['class'] = 'span3'
+        self.fields['name'].widget.attrs['placeholder'] = _('Enter name')
+
+    class Meta:
+        widgets = {
+            'description': AutosizedTextarea(attrs={
+                'class': 'span12',
+                'placeholder': _('Enter description'),
+            })
+        }

@@ -2,18 +2,19 @@
 import random
 
 from django.utils import timezone
-from django.utils.text import slugify
 
 import factory
 from factory import fuzzy
 
-from .models import User, UserLevel
+from utils.django.factories_utils import generate_text_random_length_for_field_of_model
+
+from .models import User, Level, Profile
 
 
-class UserLevelFactory(factory.DjangoModelFactory):
+class LevelFactory(factory.DjangoModelFactory):
 
     class Meta:
-        model = UserLevel
+        model = Level
 
 
 class UserFactory(factory.DjangoModelFactory):
@@ -21,13 +22,13 @@ class UserFactory(factory.DjangoModelFactory):
     class Meta:
         model = User
 
-    email = factory.Faker('email', locale='en')
-    username = factory.Faker('name', locale='en')
-    date_birthday = factory.Faker('date', locale='ru')
-    real_name = factory.Faker('first_name', locale='ru')
-    gender = fuzzy.FuzzyChoice([value for value, label in User.CHOICES_GENDER])
+    email = factory.Faker('email', 'en')
+    username = factory.Faker('user_name', 'ru')
+    display_name = factory.Faker('name', 'ru')
 
     password = factory.PostGenerationMethodCall('set_password', 'defaultpassword')
+
+    profile = factory.RelatedFactory('apps.users.factories.ProfileFactory', 'user')
 
     @factory.lazy_attribute
     def is_active(self):
@@ -45,31 +46,102 @@ class UserFactory(factory.DjangoModelFactory):
         else:
             return False
 
-    @factory.lazy_attribute
-    def presents_on_gmail(self):
-        slug_name = self.username.lower().replace(' ', '_')
-        return 'http://google.com/users/{0}'.format(slug_name)
-
-    @factory.lazy_attribute
-    def presents_on_github(self):
-        slug_name = self.username.lower().replace(' ', '_')
-        return 'http://github.com/{0}'.format(slug_name)
-
-    @factory.lazy_attribute
-    def presents_on_stackoverflow(self):
-        slug_name = self.username.lower().replace(' ', '_')
-        return 'http://stackoverflow.com/users/{0}'.format(slug_name)
-
-    @factory.lazy_attribute
-    def personal_website(self):
-        slug_name = slugify(self.username, allow_unicode=True)
-        return 'http://{0}.com'.format(slug_name)
-
-    @factory.lazy_attribute
-    def signature(self):
-        return 'Sincerely {0.username}'.format(self)
-
     @factory.post_generation
     def date_joined(self, created, extracted, **kwargs):
         self.date_joined = fuzzy.FuzzyDateTime(timezone.now() - timezone.timedelta(weeks=60)).fuzz()
         self.save()
+
+
+class ProfileFactory(factory.DjangoModelFactory):
+
+    class Meta:
+        model = Profile
+
+    user = factory.SubFactory(UserFactory, profile=None)
+    views = fuzzy.FuzzyInteger(0, 1000)
+    gender = fuzzy.FuzzyChoice([val for val, label in Profile.CHOICES_GENDER])
+
+    @factory.lazy_attribute
+    def about(self):
+        if random.random() > .5:
+            return generate_text_random_length_for_field_of_model(self, 'about')
+        return ''
+
+    @factory.lazy_attribute
+    def presents_on_gmail(self):
+        if random.random() > .5:
+            return'https://google.com/' + factory.Faker('user_name').generate([]).lower()
+        return ''
+
+    @factory.lazy_attribute
+    def presents_on_github(self):
+        if random.random() > .5:
+            return'https://github.com/' + factory.Faker('user_name').generate([]).lower()
+        return ''
+
+    @factory.lazy_attribute
+    def presents_on_stackoverflow(self):
+        if random.random() > .5:
+            return'https://stackoverflow.com/' + factory.Faker('user_name').generate([]).lower()
+        return ''
+
+    @factory.lazy_attribute
+    def signature(self):
+        if random.random() > .5:
+            return generate_text_random_length_for_field_of_model(self, 'signature')
+        return ''
+
+    @factory.lazy_attribute
+    def personal_website(self):
+        if random.random() > .5:
+            return factory.Faker('url').generate([])
+        return ''
+
+    @factory.lazy_attribute
+    def date_birthday(self):
+        if random.random() > .5:
+            return fuzzy.FuzzyDate(
+                timezone.now() - timezone.timedelta(days=20000),
+                timezone.now()
+            ).fuzz()
+        return
+
+    @factory.lazy_attribute
+    def longitude(self):
+        if random.random() > .5:
+            return factory.Faker('longitude').generate([])
+        return
+
+    @factory.lazy_attribute
+    def latitude(self):
+        if random.random() > .5:
+            return factory.Faker('latitude').generate([])
+        return
+
+    @factory.lazy_attribute
+    def real_name(self):
+        if random.random() > .5:
+            return factory.Faker('name', 'ru').generate([])
+        return ''
+
+    @factory.lazy_attribute
+    def location(self):
+        if random.random() > .5:
+            city = factory.Faker('city').generate([])
+            country = factory.Faker('country').generate([])
+            return '{}, {}'.format(city, country)
+        return ''
+
+    @factory.lazy_attribute
+    def phone(self):
+        if random.random() > .5:
+            return factory.Faker('phone_number').generate([])
+        return ''
+
+    @factory.lazy_attribute
+    def job(self):
+        if random.random() > .5:
+            if random.random() > .5:
+                return factory.Faker('company').generate([])
+            return 'Freelance'
+        return ''

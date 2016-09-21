@@ -6,31 +6,39 @@ from django.db import models
 # from django.utils.translation import ugettext as _
 from django.contrib.auth.models import BaseUserManager
 
+from .querysets import LevelQuerySet, UserQuerySet
+
+
+class LevelManager(models.Manager):
+
+    pass
+
+
+LevelManager = LevelManager.from_queryset(LevelQuerySet)
+
 
 class UserManager(BaseUserManager):
     """
     Custom manager for custom user model
     """
 
-    def create_user(self, email, username, date_birthday, password):
+    def create_user(self, email, username, password):
         """Create staff user with certain attributes."""
 
         user = self.model(
             email=self.normalize_email(email),
             username=username,
-            date_birthday=date_birthday,
         )
         user.set_password(password)
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, email, username, date_birthday, password):
+    def create_superuser(self, email, username, password):
         """Creating superuser with certain attributes."""
 
         user = self.create_user(
             email=email,
             username=username,
-            date_birthday=date_birthday,
             password=password,
         )
         user.is_superuser = True
@@ -63,6 +71,9 @@ class UserManager(BaseUserManager):
             result[pk] = 100 / len(list_restictions) * value
         # return as dictioinary {instance.pk: percent}
         return result
+
+
+UserManager = UserManager.from_queryset(UserQuerySet)
 
 
 class ActiveUserManager(models.Manager):

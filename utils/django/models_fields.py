@@ -1,11 +1,6 @@
 
 import datetime
 
-from autoslug import AutoSlugField
-import markdown
-import textile
-from docutils.core import publish_parts
-
 from django import forms
 from django.utils.text import capfirst
 from django.core.exceptions import ValidationError
@@ -13,6 +8,14 @@ from django.core.validators import validate_unicode_slug
 from django.db.models import NullBooleanField
 from django.utils.translation import ugettext as _
 from django.db import models
+
+from autoslug import AutoSlugField
+import markdown
+import textile
+from docutils.core import publish_parts
+
+from .descriptors import ReverseOneToOneDescriptorWithAutoCreate
+
 
 __all__ = ['CountryField', 'ConfiguredAutoSlugField']
 
@@ -385,3 +388,9 @@ class MarkupField(models.CharField):
         """ """
 
         return publish_parts(source=content, writer_name='html')['fragment']
+
+
+class AutoOneToOneField(models.OneToOneField):
+    """ """
+
+    related_accessor_class = ReverseOneToOneDescriptorWithAutoCreate

@@ -13,7 +13,7 @@ from django.db import models
 from django.conf import settings
 from utils.django import utils
 
-from utils.django.models_fields import ConfiguredAutoSlugField, PhoneField
+from utils.django.models_fields import ConfiguredAutoSlugField, PhoneField, AutoOneToOneField
 from utils.django.models_utils import get_admin_url
 
 # from apps.polls.managers import PollsManager
@@ -25,9 +25,47 @@ from utils.django.models_utils import get_admin_url
 # from apps.sessions.models import ExpandedSession
 # from utils.django.models_fields import PhoneField
 
-from .managers import UserManager
-from .querysets import UserQuerySet
+from .managers import UserManager, LevelManager
 from .exceptions import ProtectDeleteUser
+
+
+class ColorField(models.CharField):
+    """
+
+    Three widgets:
+        HTML5 input color
+        jQuery Color Picker
+        http://jscolor.com/
+    Types=['rgb', 'hex', 'name']
+    """
+
+    description = _('ColorField for the Django')
+
+    def __init__(self, *args, **kwargs):
+
+        kwargs['max_length'] = 30
+
+        super(ColorField, self).__init__(*args, **kwargs)
+
+    def deconstruct(self):
+
+        name, path, args, kwargs = super(ColorField, self).deconstruct()
+
+        del kwargs['max_length']
+
+        return name, path, args, kwargs
+
+    def formfield(self, **kwargs):
+
+        from django import forms
+        defaults = {
+            'max_length': self.max_length,
+            'required': False,
+            'widget': forms.NumberInput,
+            'form_class': forms.CharField,
+        }
+        defaults.update(kwargs)
+        return super(ColorField, self).formfield(**defaults)
 
 
 class Level(models.Model):
@@ -35,20 +73,20 @@ class Level(models.Model):
 
     """
 
-    PLATINUM = 'PLATINUM'
-    GOLDEN = 'GOLDEN'
-    SILVER = 'SILVER'
-    DIAMOND = 'DIAMOND'
-    RUBY = 'RUBY'
-    SAPPHIRE = 'SAPPHIRE'
-    MALACHITE = 'MALACHITE'
-    AMETHYST = 'AMETHYST'
-    EMERALD = 'EMERALD'
-    AGATE = 'AGATE'
-    TURQUOISE = 'TURQUOISE'
-    AMBER = 'AMBER'
-    OPAL = 'OPAL'
-    REGULAR = 'REGULAR'
+    PLATINUM = 'platinum'
+    GOLDEN = 'golden'
+    SILVER = 'silver'
+    DIAMOND = 'diamond'
+    RUBY = 'ruby'
+    SAPPHIRE = 'sapphire'
+    MALACHITE = 'malachite'
+    AMETHYST = 'amethyst'
+    EMERALD = 'emerald'
+    AGATE = 'agate'
+    TURQUOISE = 'turquoise'
+    AMBER = 'amber'
+    OPAL = 'opal'
+    REGULAR = 'regular'
 
     CHOICES_LEVEL = (
         (PLATINUM, _('Platinum')),
@@ -71,22 +109,27 @@ class Level(models.Model):
     name = models.CharField(
         _('Name'), max_length=50,
         choices=CHOICES_LEVEL, unique=True,
+        error_messages={'unique': _('Level with name already exists.')}
     )
     slug = ConfiguredAutoSlugField(populate_from='name', unique=True)
     description = models.TextField(
         _('Description'), validators=[MinLengthValidator(10)]
     )
-    color = models.CharField(_('Color'), max_length=50)
+    color = ColorField(
+        _('Color'), max_length=50,
+        help_text=_('Enter color name or hex code or rgba'),
+    )
+
+    objects = models.Manager()
+    objects = LevelManager()
 
     class Meta:
         verbose_name = _('Level')
         verbose_name_plural = _('Levels')
         ordering = ['name']
 
-    objects = models.Manager()
-
     def __str__(self):
-        return '{0.name}'.format(self)
+        return self.get_name_display()
 
     def save(self, *args, **kwargs):
         super(Level, self).save(*args, **kwargs)
@@ -94,13 +137,24 @@ class Level(models.Model):
     def get_absolute_url(self):
         return reverse('users:level', kwargs={'slug': self.slug})
 
+    def get_count_users(self):
+        """ """
+
+        if hasattr(self, 'count_users'):
+            return self.count_users
+
+        return self.users.count()
+    get_count_users.admin_order_field = 'count_users'
+    get_count_users.short_description = _('Count users')
+
 
 class User(AbstractBaseUser, PermissionsMixin):
     """
-    Custom auth user model with additional fields and display_name fields as email
+    Custom auth user model with additional fields and username fields as email
     """
 
-    USERNAME_FIELD = 'email'
+    USERNAME_FIELD = 'username'
+    REQUIRED_FIELDS = ('email', 'display_name')
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     email = models.EmailField(
@@ -109,7 +163,16 @@ class User(AbstractBaseUser, PermissionsMixin):
             'unique': _('User with this email already exists.')
         }
     )
-    display_name = models.CharField(_('Display name'), max_length=200)
+    username = models.CharField(
+        _('Username'), max_length=200, unique=True,
+        error_messages={
+            'unique': _('User with this username already exists.')
+        }
+    )
+    display_name = models.CharField(
+        _('Display name'), max_length=200,
+        help_text=_('Name for public display'),
+    )
     is_active = models.BooleanField(_('Is active'), default=True)
     level = models.ForeignKey(
         'Level',
@@ -122,7 +185,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     # managers
     objects = models.Manager()
-    objects = UserManager.from_queryset(UserQuerySet)()
+    objects = UserManager()
     # polls = PollsManager.from_queryset(UserPollQuerySet)()
     # badges = BadgeManager()
 
@@ -136,20 +199,23 @@ class User(AbstractBaseUser, PermissionsMixin):
         return '{0.email}'.format(self)
 
     def save(self, *args, **kwargs):
+
         super(User, self).save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):
 
         # Protect a user from removal, if web application has this restriction
-        if not settings.CAN_DELETE_USER:
-            raise ProtectDeleteUser(
-                _(
-                    """
-                    Sorry, but features our the site not allow removal profile of user.
-                    If you want, you can made user as non-active.
-                    """
+        #
+        if settings.DEBUG is False:
+            if not settings.CAN_DELETE_USER:
+                raise ProtectDeleteUser(
+                    _(
+                        """
+                        Sorry, but features our the site not allow removal profile of user.
+                        If you want, you can made user as non-active.
+                        """
+                    )
                 )
-            )
 
         super(User, self).delete(*args, **kwargs)
 
@@ -161,14 +227,14 @@ class User(AbstractBaseUser, PermissionsMixin):
         return get_admin_url(self)
 
     def get_full_name(self):
-        return '{0.display_name} ({0.email})'.format(self)
-    get_full_name.admin_order_field = 'display_name'
-    get_full_name.short_description = _('Full name')
+        return '{0.username} ({0.email})'.format(self)
+    # get_full_name.admin_order_field = 'username'
+    # get_full_name.short_description = _('Full name')
 
     def get_short_name(self):
         return '{0.display_name}'.format(self)
-    get_short_name.admin_order_field = 'display_name'
-    get_short_name.short_description = _('Name')
+    # get_short_name.admin_order_field = 'display_name'
+    # get_short_name.short_description = _('Name')
 
     @property
     def is_staff(self):
@@ -188,6 +254,10 @@ class User(AbstractBaseUser, PermissionsMixin):
     #         last_seen = session['last_seen']
     #         return last_seen
     #     return None
+
+    def has_diary(self):
+
+        return self.diary
 
     def have_certain_count_consecutive_days(self, count_consecutive_days):
         if count_consecutive_days > 0:
@@ -359,6 +429,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     # https://www.digitalocean.com/community/users/jellingwood?primary_filter=upvotes_given
     # answer, queations, hearts, opinons and more
+    #
 
 
 class Profile(models.Model):
@@ -375,34 +446,42 @@ class Profile(models.Model):
         (None, _('Unknown'))
     )
 
-    user = models.OneToOneField(settings.AUTH_USER_MODEL)
-
-    # public info
-    profile_views = models.IntegerField(_('Profile views'), default=0, editable=False)
-    # crafts = models.CharField()
-    # ваши направления развития верстка, программирование
-    display_name = models.CharField(_('Display name'), max_length=50)
-    about = models.TextField(_('About self'), default='')
-    signature = models.CharField(_('Signature'), max_length=50, default='')
-    presents_on_gmail = models.URLField(_('Presents on google services'), default='')
-    presents_on_github = models.URLField(_('Presents on GitHub'), default='')
-    presents_on_stackoverflow = models.URLField(_('Presents on stackoverflow'), default='')
-    personal_website = models.URLField(_('Personal website'), default='')
-    gender = models.CharField(
-        _('Gender'), max_length=10, choices=CHOICES_GENDER,
-        default=MAN, null=True, blank=True,
+    user = AutoOneToOneField(
+        'User', related_name='profile',
+        verbose_name=_('User'), on_delete=models.CASCADE
     )
 
-    location = models.CharField(_('Location'), max_length=50)
+    # public info
+    views = models.IntegerField(_('Profile views'), default=0, editable=False)
 
-    latitude = models.FloatField(_('Latitude'))
-    longitude = models.FloatField(_('Longitude'))
+    # crafts = models.CharField() ваши направления развития верстка, программирование
+    # theme of site
+
+    about = models.TextField(_('About self'), default='', blank=True)
+    signature = models.CharField(_('Signature'), max_length=50, default='', blank=True)
+    presents_on_gmail = models.URLField(_('Presents on google services'), default='', blank=True)
+    presents_on_github = models.URLField(_('Presents on GitHub'), default='', blank=True)
+    presents_on_stackoverflow = models.URLField(_('Presents on stackoverflow.com'), default='', blank=True)
+    personal_website = models.URLField(_('Personal website'), default='', blank=True)
+    gender = models.CharField(
+        _('Gender'), max_length=10, choices=CHOICES_GENDER,
+        default=None, null=True, blank=True,
+    )
+    job = models.CharField(
+        _('Job'), max_length=100, default='', blank=True,
+        help_text=_('or write Freelance')
+    )
+
+    location = models.CharField(_('Location'), max_length=50, default='', blank=True)
+    latitude = models.FloatField(_('Latitude'), blank=True, null=True)
+    longitude = models.FloatField(_('Longitude'), blank=True, null=True)
 
     # private info
     date_birthday = models.DateField(
         _('Date birthday'), null=True, blank=True,
         help_text=_('Only used for displaying age'))
-    real_name = models.CharField(_('Real name'), max_length=200, default='')
-    phone = PhoneField(_('Phone'), default='')
+    real_name = models.CharField(_('Real name'), max_length=200, default='', blank=True)
+    phone = PhoneField(_('Phone'), default='', blank=True)
 
-    # theme of site
+    def __str__(self):
+        return _('Profile of user "{}"').format(self.user.get_short_name())

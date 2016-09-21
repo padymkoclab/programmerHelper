@@ -43,7 +43,7 @@ SUIT_CONFIG = {
         {
             'app': 'users',
             'icon': 'icon-user',
-            'models': ('user', 'userlevel', 'auth.group'),
+            'models': ('user', 'level', 'profile', 'auth.group'),
         },
         {
             'app': 'actions',

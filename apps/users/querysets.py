@@ -1,10 +1,20 @@
 
+import logging
+
 from django.db import models
 
-from utils.python.logging_utils import create_logger_by_filename
 from utils.django.models_utils import get_random_objects
 
-logger = create_logger_by_filename(__name__)
+
+logger = logging.getLogger('django.development')
+
+
+class LevelQuerySet(models.QuerySet):
+
+    def levels_with_count_users(self):
+        """ """
+
+        return self.annotate(count_users=models.Count('users', distinct=True))
 
 
 class UserQuerySet(models.QuerySet):
