@@ -24,16 +24,15 @@ class Opinion(BaseGenericModel):
     objects = OpinionManager.from_queryset(OpinionQuerySet)()
 
     class Meta:
-        db_table = 'opinions'
         verbose_name = _('Opinion')
         verbose_name_plural = _('Opinions')
         get_latest_by = 'date_modified'
         ordering = ['date_modified']
-        permissions = (('can_view_opinions', _('Can view opinions')),)
+        # permissions = (('can_view_opinions', _('Can view opinions')),)
         unique_together = ['user', 'object_id']
 
     def __str__(self):
-        return _('Opinion about {0} "{1}"').format(
+        return _('About {0} "{1}"').format(
             self.content_type.model_class()._meta.verbose_name.lower(),
             self.content_object.__str__(),
         )

@@ -27,8 +27,8 @@ class SubsectionFactory(factory.DjangoModelFactory):
         model = Subsection
 
     @factory.lazy_attribute
-    def title(self):
-        return generate_text_random_length_for_field_of_model(self, 'title')
+    def name(self):
+        return generate_text_random_length_for_field_of_model(self, 'name')
 
     @factory.lazy_attribute
     def content(self):
@@ -47,8 +47,8 @@ class ArticleFactory(AbstractTimeStampedFactory):
         return fuzzy.FuzzyChoice(get_user_model()._default_manager.all()).fuzz()
 
     @factory.lazy_attribute
-    def title(self):
-        return generate_text_random_length_for_field_of_model(self, 'title')
+    def name(self):
+        return generate_text_random_length_for_field_of_model(self, 'name')
 
     @factory.lazy_attribute
     def quotation(self):
@@ -70,7 +70,7 @@ class ArticleFactory(AbstractTimeStampedFactory):
     def source(self):
         if random.random() > .5:
             site_name = factory.Faker('url', locale='ru').generate([])
-            article_slug = slugify(self.title, allow_unicode=True)
+            article_slug = slugify(self.name, allow_unicode=True)
             return '{0}{1}/'.format(site_name, article_slug)
         return
 

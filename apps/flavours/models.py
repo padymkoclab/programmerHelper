@@ -23,7 +23,7 @@ class Flavour(BaseGenericModel):
         ordering = ['date_modified']
 
     def __str__(self):
-        return _('Flavour on {0} "{1}"').format(
+        return _('On {0} "{1}"').format(
             self.content_type.model_class()._meta.verbose_name.lower(),
             self.content_object.__str__()
         )

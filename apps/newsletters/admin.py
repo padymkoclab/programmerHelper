@@ -45,9 +45,8 @@ class NewsletterAdmin(admin.ModelAdmin):
     '''
 
     form = NewsletterAdminModelForm
-    list_display = ('truncated_content', 'user', 'date_added')
+    list_display = ('truncated_content', 'date_added')
     list_filter = (
-        ('user', admin.RelatedOnlyFieldListFilter),
         'date_added',
     )
     search_fields = ('content', )
@@ -57,11 +56,6 @@ class NewsletterAdmin(admin.ModelAdmin):
     def get_fieldsets(self, request, obj=None):
 
         fieldsets = [
-            (
-                Newsletter._meta.verbose_name, {
-                    'fields': ('user', ),
-                }
-            ),
             (
                 Newsletter._meta.get_field('content').verbose_name, {
                     'classes': ('full-width', ),
@@ -83,11 +77,9 @@ class NewsletterAdmin(admin.ModelAdmin):
 
     def suit_cell_attributes(self, obj, column):
 
-        if column == 'user':
-            css_class = 'text-center'
-        elif column == 'date_added':
-            css_class = 'text-right'
+        if column == 'date_added':
+            css_align = 'right'
         else:
-            css_class = 'text-left'
+            css_align = 'left'
 
-        return {'class': css_class}
+        return {'class': 'text-{}'.format(css_align)}

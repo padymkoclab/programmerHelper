@@ -43,16 +43,16 @@ class Article(CommentsModelMixin, TagsModelMixin, MarksModelMixin, TimeStampedMo
         (PUBLISHED, _('Published')),
     )
 
-    ERROR_MSG_UNIQUE_TOGETHER_USER_AND_TITLE = _('This author already have article with this title.')
+    ERROR_MSG_UNIQUE_TOGETHER_USER_AND_TITLE = _('This author already have article with this name.')
 
     def upload_image(instance, filename):
         return upload_image(instance, filename)
 
-    title = models.CharField(
-        _('Title'), max_length=200,
+    name = models.CharField(
+        _('Name'), max_length=200,
         validators=[MinLengthValidator(settings.MIN_LENGTH_FOR_NAME_OR_TITLE_OBJECT)],
     )
-    slug = ConfiguredAutoSlugField(populate_from='title', unique_with=['user'])
+    slug = ConfiguredAutoSlugField(populate_from='name', unique_with=['user'])
     quotation = models.CharField(_('Quotation'), max_length=200, validators=[MinLengthValidator(10)])
     image = models.ImageField(_('Picture'), upload_to=upload_image, max_length=1000)
     heading = models.TextField(_('Heading'), validators=[MinCountWordsValidator(10)])
@@ -92,10 +92,10 @@ class Article(CommentsModelMixin, TagsModelMixin, MarksModelMixin, TimeStampedMo
         verbose_name_plural = _("Articles")
         get_latest_by = 'date_added'
         ordering = ['date_added']
-        unique_together = ['user', 'title']
+        unique_together = ['user', 'name']
 
     def __str__(self):
-        return '{0.title}'.format(self)
+        return '{0.name}'.format(self)
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
@@ -107,7 +107,7 @@ class Article(CommentsModelMixin, TagsModelMixin, MarksModelMixin, TimeStampedMo
         return get_admin_url(self)
 
     def unique_error_message(self, model_class, unique_check):
-        if isinstance(self, model_class) and unique_check == ('user', 'title'):
+        if isinstance(self, model_class) and unique_check == ('user', 'name'):
             return self.ERROR_MSG_UNIQUE_TOGETHER_USER_AND_TITLE
         return super().unique_error_message(model_class, unique_check)
 
@@ -148,7 +148,7 @@ class Article(CommentsModelMixin, TagsModelMixin, MarksModelMixin, TimeStampedMo
 
 class Subsection(TimeStampedModel):
 
-    ERROR_MSG_UNIQUE_TOGETHER_ARTICLE_AND_TITLE = _('Subsection with this title already exists in this article.')
+    ERROR_MSG_UNIQUE_TOGETHER_ARTICLE_AND_TITLE = _('Subsection with this name already exists in this article.')
 
     article = models.ForeignKey(
         'Article',
@@ -156,27 +156,27 @@ class Subsection(TimeStampedModel):
         on_delete=models.CASCADE,
         verbose_name=_('Article'),
     )
-    title = models.CharField(
-        _('Title'),
+    name = models.CharField(
+        _('Name'),
         max_length=200,
         validators=[MinLengthValidator(settings.MIN_LENGTH_FOR_NAME_OR_TITLE_OBJECT)],
     )
-    slug = ConfiguredAutoSlugField(populate_from='title', unique_with=['article'])
+    slug = ConfiguredAutoSlugField(populate_from='name', unique_with=['article'])
     content = models.TextField(_('Content'), validators=[MinLengthValidator(100)])
 
     class Meta:
         verbose_name = _("Subsection")
         verbose_name_plural = _("Subsections")
         ordering = ['article']
-        unique_together = ['article', 'title']
+        unique_together = ['article', 'name']
 
     objects = models.Manager()
     objects = SubsectionQuerySet.as_manager()
 
     def __str__(self):
-        return '{0.title}'.format(self)
+        return '{0.name}'.format(self)
 
     def unique_error_message(self, model_class, unique_check):
-        if isinstance(self, model_class) and unique_check == ('article', 'title'):
+        if isinstance(self, model_class) and unique_check == ('article', 'name'):
             return self.ERROR_MSG_UNIQUE_TOGETHER_ARTICLE_AND_TITLE
         return super().unique_error_message(model_class, unique_check)

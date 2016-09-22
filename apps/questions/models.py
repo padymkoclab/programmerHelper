@@ -164,7 +164,7 @@ class Answer(OpinionsModelMixin, CommentsModelMixin, TimeStampedModel):
         unique_together = [('user', 'question')]
 
     def __str__(self):
-        return _('Answer on question "{0.question}" from user "{0.user}"').format(self)
+        return _('{0.question}').format(self)
 
     def unique_error_message(self, model_class, unique_check):
 

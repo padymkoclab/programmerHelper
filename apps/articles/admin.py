@@ -88,12 +88,12 @@ class SubsectionInline(admin.StackedInline):
     min_num = 1
     max_num = Article.MAX_COUNT_SUBSECTIONS
     fk_name = 'article'
-    prepopulated_fields = {'slug': ['title']}
+    prepopulated_fields = {'slug': ['name']}
     extra = 0
     fieldsets = (
         (
             None, {
-                'fields': ('title', 'slug',)
+                'fields': ('name', 'slug',)
             }
         ),
         (
@@ -126,7 +126,7 @@ class ArticleAdmin(admin.ModelAdmin):
 
     form = ArticleAdminModelForm
     list_display = (
-        'truncated_title',
+        'truncated_name',
         'user',
         'status',
         'get_rating',
@@ -145,10 +145,10 @@ class ArticleAdmin(admin.ModelAdmin):
         'date_modified',
         'date_added',
     )
-    search_fields = ('title',)
+    search_fields = ('name',)
     filter_horizontal = ['tags']
     date_hierarchy = 'date_added'
-    prepopulated_fields = {'slug': ['title']}
+    prepopulated_fields = {'slug': ['name']}
     readonly_fields = (
         'get_rating',
         'get_volume',
@@ -173,7 +173,7 @@ class ArticleAdmin(admin.ModelAdmin):
                 None, {
                     'classes': ('suit-tab', 'suit-tab-general',),
                     'fields': [
-                        'title',
+                        'name',
                         'slug',
                         'user',
                         'status',
@@ -247,15 +247,15 @@ class ArticleAdmin(admin.ModelAdmin):
 
         if column in ['date_added', 'date_modified']:
             css_class = 'right'
-        elif column == 'title':
+        elif column == 'name':
             css_class = 'left'
         else:
             css_class = 'center'
 
         return {'class': 'text-{}'.format(css_class)}
 
-    def truncated_title(self, obj):
+    def truncated_name(self, obj):
 
-        return truncatechars(obj.title, 75)
-    truncated_title.short_description = Article._meta.get_field('title').verbose_name
-    truncated_title.admin_order_field = 'title'
+        return truncatechars(obj.name, 75)
+    truncated_name.short_description = Article._meta.get_field('name').verbose_name
+    truncated_name.admin_order_field = 'name'

@@ -22,24 +22,26 @@ class UserManager(BaseUserManager):
     Custom manager for custom user model
     """
 
-    def create_user(self, email, username, password):
+    def create_user(self, email, username, password, display_name):
         """Create staff user with certain attributes."""
 
         user = self.model(
             email=self.normalize_email(email),
             username=username,
+            display_name=display_name,
         )
         user.set_password(password)
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, email, username, password):
+    def create_superuser(self, email, username, password, display_name):
         """Creating superuser with certain attributes."""
 
         user = self.create_user(
             email=email,
             username=username,
             password=password,
+            display_name=display_name,
         )
         user.is_superuser = True
         user.save(using=self._db)

@@ -1,4 +1,6 @@
 
+import collections
+import itertools
 import urllib
 import hashlib
 import random
@@ -19,6 +21,7 @@ from utils.django import utils
 from utils.django.models_fields import ConfiguredAutoSlugField, PhoneField, AutoOneToOneField, ColorField
 from utils.django.models_utils import get_admin_url
 
+from apps.tags.models import Tag
 # from apps.polls.managers import PollsManager
 # from apps.polls.querysets import UserPollQuerySet
 # from apps.articles.models import Article
@@ -405,6 +408,21 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_active_voter.admin_order_field = 'is_active_voter'
     is_active_voter.short_description = _('Is active\nvoter?')
     is_active_voter.boolean = True
+
+    def get_statistics_usage_tags(self):
+        """ """
+
+        tags = itertools.chain.from_iterable((
+            self.solutions.values_list('tags', flat=True),
+            self.snippets.values_list('tags', flat=True),
+            self.questions.values_list('tags', flat=True),
+            self.articles.values_list('tags', flat=True),
+            self.answers.values_list('question__tags', flat=True),
+        ))
+        tags = collections.Counter(tags).most_common()
+        tags = ((Tag.objects.get(pk=pk), count) for pk, count in tags)
+
+        return tuple(tags)
 
     def have_certain_count_consecutive_days(self, count_consecutive_days):
         if count_consecutive_days > 0:

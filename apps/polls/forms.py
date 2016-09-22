@@ -4,14 +4,12 @@ from django.utils.translation import ugettext_lazy as _
 
 from suit.widgets import AutosizedTextarea
 
-from .models import Poll, Choice
+# from .models import Poll, Choice
 
 
 class PollAdminModelForm(forms.ModelForm):
 
     class Meta:
-        model = Poll
-        fields = ('title', 'slug', 'status')
         widgets = {
             'status': forms.RadioSelect(),
         }
@@ -28,9 +26,6 @@ class PollAdminModelForm(forms.ModelForm):
 
 
 class ChoiceAdminInlineModelForm(forms.ModelForm):
-    class Meta:
-        model = Choice
-        fields = ('poll', 'text_choice')
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

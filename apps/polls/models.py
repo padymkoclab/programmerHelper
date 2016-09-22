@@ -152,10 +152,10 @@ class Poll(TimeStampedModel):
             return self.date_latest_voting
 
         if self.votes.exists():
-            return self.votes.latest().date_voting
+            return self.votes.latest().date_added
         return
             # convert and to return the datetime object to the project datetime format
-            # date_voting = convert_date_to_django_date_format(date_voting)
+            # date_added = convert_date_to_django_date_format(date_added)
     get_date_latest_voting.admin_order_field = 'date_latest_voting'
     get_date_latest_voting.short_description = _('Date latest voting')
 
@@ -241,16 +241,12 @@ class Vote(models.Model):
 
     id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
     poll = models.ForeignKey(
-        'Poll',
-        models.CASCADE,
-        verbose_name=_('Poll'),
-        related_name='votes',
+        'Poll', models.CASCADE,
+        verbose_name=_('Poll'), related_name='votes',
     )
     user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        models.CASCADE,
-        verbose_name=_('User'),
-        related_name='votes',
+        settings.AUTH_USER_MODEL, models.CASCADE,
+        verbose_name=_('User'), related_name='votes',
     )
     choice = models.ForeignKey(
         'Choice',
@@ -258,7 +254,7 @@ class Vote(models.Model):
         verbose_name=_('Choice'),
         related_name='votes',
     )
-    date_voting = models.DateTimeField(_('Date voting'), auto_now=True)
+    date_added = models.DateTimeField(_('Date added'), auto_now_add=True)
 
     objects = models.Manager()
     objects = VoteManager()
@@ -267,8 +263,8 @@ class Vote(models.Model):
         db_table = 'votes'
         verbose_name = "Vote"
         verbose_name_plural = "Votes"
-        ordering = ['-date_voting']
-        get_latest_by = 'date_voting'
+        ordering = ['-date_added']
+        get_latest_by = 'date_added'
         unique_together = ('poll', 'user')
 
     def __str__(self):

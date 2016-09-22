@@ -4,13 +4,28 @@ import logging
 from django.core.urlresolvers import reverse
 from django.conf.urls import url
 from django.db import models
+from django.template.defaultfilters import truncatechars
+from django import forms
+from django.utils.text import force_text
 from django.contrib import admin
 from django.utils.html import format_html
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
 from apps.core.admin import AdminSite
-from apps.snippets.admin import SnippetInline
+
+from apps.snippets.models import Snippet
+from apps.articles.models import Article
+from apps.solutions.models import Solution
+from apps.questions.models import Question, Answer
+from apps.comments.models import Comment
+from apps.replies.models import Reply
+from apps.flavours.models import Flavour
+from apps.opinions.models import Opinion
+from apps.marks.models import Mark
+from apps.polls.models import Vote
+from apps.forums.models import Topic, Post
+
 from apps.polls.listfilters import IsActiveVoterListFilter
 from apps.diaries.admin import DiaryInline
 
@@ -70,6 +85,43 @@ class ProfileInline(admin.StackedInline):
     verbose_name_plural = ''
 
     suit_classes = 'suit-tab suit-tab-profile'
+
+
+inlines = [
+    ProfileInline, DiaryInline
+]
+for model in [
+    Snippet, Article, Solution, Question, Answer,
+    Comment, Reply, Opinion, Mark, Flavour, Topic, Post,
+    # Vote,
+]:
+
+    class ObjectInlineFormSet(forms.BaseInlineFormSet):
+
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+
+            # make slice form in formsets
+            self.queryset = self.queryset.order_by('-date_added')[:3]
+
+    def truncated_str(self, obj):
+        return truncatechars(force_text(obj), 120)
+    truncated_str.short_description = model._meta.verbose_name
+
+    ObjectInline = type('ObjectInline', (admin.TabularInline, ), dict(
+        model=model,
+        fields=('truncated_str', 'date_added'),
+        readonly_fields=('truncated_str', 'date_added'),
+        can_delete=False,
+        max_num=0,
+        extra=0,
+        show_change_link=True,
+        suit_classes='suit-tab suit-tab-objects',
+        formset=ObjectInlineFormSet,
+        truncated_str=truncated_str,
+    ))
+
+    inlines.append(ObjectInline)
 
 
 @admin.register(User, site=AdminSite)
@@ -151,6 +203,8 @@ class UserAdmin(BaseUserAdmin):
         ('profile', _('Profile')),
         ('diary', _('Diary')),
         ('objects', _('Objects')),
+        ('tags', _('Tags')),
+        ('badges', _('Badges')),
         ('activity', _('Activity')),
         ('notifications', _('Notifications')),
         ('summary', _('Summary')),
@@ -239,8 +293,6 @@ class UserAdmin(BaseUserAdmin):
     def get_inline_instances(self, request, obj=None):
 
         if obj is not None:
-
-            inlines = (ProfileInline, DiaryInline, SnippetInline)
             return [inline(self.model, self.admin_site) for inline in inlines]
         return ()
 

@@ -9,7 +9,7 @@ from utils.django.widgets import AdminImageThumbnail, SplitInputsArrayWidget
 
 from apps.tags.forms import clean_tags
 
-from .models import Article, Subsection
+# from .models import Article, Subsection
 
 
 class ArticleAdminModelForm(forms.ModelForm):
@@ -21,8 +21,8 @@ class ArticleAdminModelForm(forms.ModelForm):
 
         super().__init__(*args, **kwargs)
 
-        self.fields['title'].widget.attrs['class'] = 'span12'
-        self.fields['title'].widget.attrs['placeholder'] = _('Enter title')
+        self.fields['name'].widget.attrs['class'] = 'span12'
+        self.fields['name'].widget.attrs['placeholder'] = _('Enter name')
 
         self.fields['slug'].disabled = True
         self.fields['slug'].widget.attrs['class'] = 'span12'
@@ -44,8 +44,6 @@ class ArticleAdminModelForm(forms.ModelForm):
         })
 
     class Meta:
-        model = Article
-        fields = ('tags', 'links', 'slug')
         widgets = {
             'status': forms.RadioSelect(),
             'image': AdminImageThumbnail(),
@@ -66,15 +64,13 @@ class SubsectionAdminModelForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.fields['title'].widget.attrs['class'] = 'span12'
-        self.fields['title'].widget.attrs['placeholder'] = _('Enter title')
+        self.fields['name'].widget.attrs['class'] = 'span12'
+        self.fields['name'].widget.attrs['placeholder'] = _('Enter name')
 
         self.fields['slug'].disabled = True
         self.fields['slug'].widget.attrs['class'] = 'span12'
 
     class Meta:
-        model = Subsection
-        fields = ('title', )
         widgets = {
             'content': CKEditorAdminWidget(),
         }

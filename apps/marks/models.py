@@ -39,8 +39,10 @@ class Mark(BaseGenericModel):
         ordering = ['date_modified']
 
     def __str__(self):
-        type_instance = self.content_type._meta.verbose_name.lower()
-        return _('Mark on {0} "{1.content_object}" from {1.user}').format(type_instance, self)
+        return _('On {0} "{1.content_object}"').format(
+            self.content_object._meta.verbose_name.lower(),
+            self
+        )
 
     def clean(self):
         if hasattr(self.content_object, 'user'):

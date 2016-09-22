@@ -97,9 +97,9 @@ class VoteInline(admin.TabularInline):
     max_num = 0
     can_delete = False
     list_select_related = ('poll', 'choice', 'user')
-    fields = ('user', 'get_truncated_text_choice', 'date_voting')
+    fields = ('user', 'get_truncated_text_choice', 'date_added')
     fk_name = 'poll'
-    readonly_fields = ['get_truncated_text_choice', 'user', 'date_voting']
+    readonly_fields = ['get_truncated_text_choice', 'user', 'date_added']
 
 
 @admin.register(Poll, site=AdminSite)
@@ -335,12 +335,12 @@ class VoteAdmin(admin.ModelAdmin):
 
     # objects list
     list_select_related = ('poll', 'user', 'choice')
-    list_display = ('truncated_poll', 'user', 'get_truncated_choice', 'date_voting')
+    list_display = ('truncated_poll', 'user', 'get_truncated_choice', 'date_added')
     list_filter = (
         ('poll', admin.RelatedOnlyFieldListFilter),
         ('user', admin.RelatedOnlyFieldListFilter),
         ('choice', admin.RelatedOnlyFieldListFilter),
-        'date_voting',
+        'date_added',
     )
 
     def get_urls(self):
@@ -369,7 +369,7 @@ class VoteAdmin(admin.ModelAdmin):
 
     def suit_cell_attributes(self, obj, column):
 
-        if column == 'date_voting':
+        if column == 'date_added':
             return {'class': 'text-right'}
         elif column == 'user':
             return {'class': 'text-center'}

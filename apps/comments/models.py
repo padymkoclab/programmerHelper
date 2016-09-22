@@ -40,14 +40,15 @@ class Comment(BaseGenericModel):
         ordering = ['date_added']
 
     def __str__(self):
-        return '{0.text_comment}'.format(self)
+        return _('On {0} "{1.content_object}"').format(
+            self.content_object._meta.verbose_name.lower(),
+            self
+        )
 
     def is_new(self):
         """ """
 
-        return self.date_added > timezone.now() - timezone.timedelta(
-            days=settings.COUNT_DAYS_DISTINGUISH_ELEMENTS_AS_NEW
-        )
+        return self.date_added > timezone.now() - timezone.timedelta(days=settings.COUNT_DAYS_FOR_NEW_ELEMENTS)
     is_new.admin_order_field = 'date_added'
     is_new.short_description = _('Is new?')
     is_new.boolean = True

@@ -255,4 +255,4 @@ class Passage(models.Model):
         ordering = ['date']
 
     def __str__(self):
-        return 'Passage of user {0.user} on suit {0.suit} on {0.date}'.format(self)
+        return '{0.suit}'.format(self)

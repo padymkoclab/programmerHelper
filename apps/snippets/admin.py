@@ -235,19 +235,3 @@ class SnippetAdmin(OpinionsAdminMixin, admin.ModelAdmin):
         """ """
 
         raise NotImplementedError
-
-
-class SnippetInline(admin.TabularInline):
-    """
-    Inline for the user model in the admin
-    """
-
-    model = Snippet
-    fields = ('__str__', )
-    readonly_fields = ('__str__', )
-    can_delete = False
-    max_num = 0
-    extra = 0
-    show_change_link = True
-
-    suit_classes = 'suit-tab suit-tab-objects'
