@@ -1,10 +1,12 @@
 
 import logging
 
+from django.forms.utils import flatatt
+from django.utils.text import force_text
 from django.contrib import postgres
 from django.db.models.fields.files import ImageFieldFile
 from django.utils.translation import ugettext_lazy as _
-from django.utils.html import mark_safe
+from django.utils.html import mark_safe, format_html
 from django.contrib.admin.widgets import AdminFileWidget
 from django import forms
 
@@ -211,3 +213,37 @@ class SplitInputsArrayWidget(postgres.forms.SplitArrayWidget):
             value = value.split(',')
 
         return super().render(name, value, attrs=None)
+
+
+class ColorInput(forms.Widget):
+    """
+    Base class for all <input> widgets (except type='checkbox' and
+    type='radio', which are special).
+    """
+
+    class Media:
+        css = {
+            'all': ('mylabour/css/colorwidget.css', ),
+        }
+        js = ('mylabour/js/colorwidget.js', )
+
+    def format_value(self, value):
+        # if self.is_localized:
+            # return formats.localize_input(value)
+        return value
+
+    def render(self, name, value, attrs=None):
+
+        if value is None:
+            value = ''
+
+        final_attrs = self.build_attrs(attrs, type='color', name=name)
+
+        if value != '':
+            # Only add the 'value' attribute if a value is non-empty.
+            final_attrs['value'] = force_text(self.format_value(value))
+
+        return format_html(
+            '<div class="colorfield"><input type="text" disabled="disabled" /><input{} /></div>',
+            flatatt(final_attrs),
+        )

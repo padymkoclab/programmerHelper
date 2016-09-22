@@ -14,6 +14,7 @@ import markdown
 import textile
 from docutils.core import publish_parts
 
+from .widgets import ColorInput
 from .descriptors import ReverseOneToOneDescriptorWithAutoCreate
 
 
@@ -394,3 +395,36 @@ class AutoOneToOneField(models.OneToOneField):
     """ """
 
     related_accessor_class = ReverseOneToOneDescriptorWithAutoCreate
+
+
+class ColorField(models.CharField):
+    """
+
+    Three widgets:
+        HTML5 input color - OK
+        jQuery Color Picker
+        http://jscolor.com/
+    Types=['rgb', 'hex', 'name']
+    """
+
+    description = _('ColorField for the Django')
+
+    def __init__(self, *args, **kwargs):
+
+        kwargs['max_length'] = 30
+
+        super(ColorField, self).__init__(*args, **kwargs)
+
+    def deconstruct(self):
+
+        name, path, args, kwargs = super(ColorField, self).deconstruct()
+
+        del kwargs['max_length']
+
+        return name, path, args, kwargs
+
+    def formfield(self, form_class=None, choices_form_class=None, **kwargs):
+
+        kwargs['widget'] = ColorInput()
+
+        return super().formfield(form_class=None, choices_form_class=None, **kwargs)

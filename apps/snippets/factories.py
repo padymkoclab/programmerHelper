@@ -32,8 +32,8 @@ class SnippetFactory(AbstractTimeStampedFactory):
         return fuzzy.FuzzyChoice(get_user_model()._default_manager.all()).fuzz()
 
     @factory.lazy_attribute
-    def title(self):
-        return generate_text_random_length_for_field_of_model(self, 'title')
+    def name(self):
+        return generate_text_random_length_for_field_of_model(self, 'name')
 
     @factory.lazy_attribute
     def description(self):

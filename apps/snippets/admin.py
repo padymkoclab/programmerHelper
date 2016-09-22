@@ -113,7 +113,7 @@ class SnippetAdmin(OpinionsAdminMixin, admin.ModelAdmin):
 
     form = SnippetAdminModelForm
     list_display = (
-        'truncated_title',
+        'truncated_name',
         'user',
         'lexer',
         'get_rating',
@@ -132,7 +132,7 @@ class SnippetAdmin(OpinionsAdminMixin, admin.ModelAdmin):
         'date_added',
     )
 
-    search_fields = ('title', )
+    search_fields = ('name', )
     filter_horizontal = ['tags']
     date_hierarchy = 'date_added'
 
@@ -167,7 +167,7 @@ class SnippetAdmin(OpinionsAdminMixin, admin.ModelAdmin):
             [
                 Snippet._meta.verbose_name, {
                     'fields': [
-                        'title',
+                        'name',
                         'slug',
                         'user',
                         'lexer',
@@ -206,10 +206,10 @@ class SnippetAdmin(OpinionsAdminMixin, admin.ModelAdmin):
 
         return fieldsets
 
-    def truncated_title(self, obj):
-        return truncatechars(obj.title, 50)
-    truncated_title.short_description = Snippet._meta.get_field('title').verbose_name
-    truncated_title.admin_order_field = 'title'
+    def truncated_name(self, obj):
+        return truncatechars(obj.name, 50)
+    truncated_name.short_description = Snippet._meta.get_field('name').verbose_name
+    truncated_name.admin_order_field = 'name'
 
     def suit_row_attributes(self, obj, request):
 
@@ -221,14 +221,33 @@ class SnippetAdmin(OpinionsAdminMixin, admin.ModelAdmin):
 
     def suit_cell_attributes(self, obj, column):
 
-        if column in ['truncated_title']:
-            return {'class': 'text-left'}
+        css_text_align = 'center'
+        if column in ['truncated_name']:
+            css_text_align = 'left'
         elif column in ['date_modified', 'date_added']:
-            return {'class': 'text-right'}
+            css_text_align = 'right'
         else:
-            return {'class': 'text-center'}
+            css_text_align = 'center'
+
+        return {'class': 'text-{}'.format(css_text_align)}
 
     def preview_snippet(self):
         """ """
 
         raise NotImplementedError
+
+
+class SnippetInline(admin.TabularInline):
+    """
+    Inline for the user model in the admin
+    """
+
+    model = Snippet
+    fields = ('__str__', )
+    readonly_fields = ('__str__', )
+    can_delete = False
+    max_num = 0
+    extra = 0
+    show_change_link = True
+
+    suit_classes = 'suit-tab suit-tab-objects'

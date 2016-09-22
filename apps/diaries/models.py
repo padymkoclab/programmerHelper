@@ -8,15 +8,13 @@ from django.db import models
 from django.conf import settings
 
 from utils.django.models import TimeStampedModel
-
-
-#
-# What are you technologies using?
-# What you will read?
-# What you read already?
+from utils.django.models_utils import get_admin_url
 
 
 class Diary(TimeStampedModel):
+    """ """
+
+    MAX_COUNT_PARTITION = 50
 
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
@@ -29,11 +27,39 @@ class Diary(TimeStampedModel):
         ordering = ('user', )
 
     def __str__(self):
-        return ('Diary of user {0.user}').format(self)
+        return '{0.user}'.format(self)
 
     def get_absolute_url(self):
+        return 'ERROR'
         return reverse('')
 
-    @property
-    def date_created(self):
-        return self.user.date_joined
+    def get_admin_url(self):
+        return get_admin_url(self)
+
+    def get_count_partitions(self):
+        """ """
+
+        if hasattr(self, 'count_partitions'):
+            return self.count_partitions
+
+        return self.partitions.count()
+
+
+class Partition(TimeStampedModel):
+    """ """
+
+    diary = models.ForeignKey(
+        'Diary', on_delete=models.CASCADE,
+        verbose_name=_('Diary'), related_name='partitions',
+    )
+    name = models.CharField(_('Name'), max_length=50, unique=True)
+    content = models.TextField(_('Content'))
+
+    class Meta:
+        verbose_name = _('Partition')
+        verbose_name_plural = _('Partitions')
+        ordering = ('diary', )
+        unique_together = (('diary', 'name'), )
+
+    def __str__(self):
+        return '0.name'.format()

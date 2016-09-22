@@ -10,7 +10,9 @@ from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
 from apps.core.admin import AdminSite
+from apps.snippets.admin import SnippetInline
 from apps.polls.listfilters import IsActiveVoterListFilter
+from apps.diaries.admin import DiaryInline
 
 from .actions import (
     make_users_as_non_superuser,
@@ -26,6 +28,50 @@ from .listfilters import ListFilterLastLogin
 logger = logging.getLogger('django.development')
 
 
+class ProfileInline(admin.StackedInline):
+
+    template = 'users/admin/edit_inline/stacked_OneToOne.html'
+    model = Profile
+    fields = (
+        'views',
+        'about',
+        'signature',
+        'presents_on_gmail',
+        'presents_on_github',
+        'presents_on_stackoverflow',
+        'personal_website',
+        'gender',
+        'job',
+        'location',
+        'latitude',
+        'longitude',
+        'phone',
+        'date_birthday',
+        'real_name',
+    )
+    readonly_fields = (
+        'views',
+        'about',
+        'signature',
+        'presents_on_gmail',
+        'presents_on_github',
+        'presents_on_stackoverflow',
+        'personal_website',
+        'gender',
+        'job',
+        'location',
+        'latitude',
+        'longitude',
+        'phone',
+        'date_birthday',
+        'real_name',
+    )
+    show_change_link = True
+    verbose_name_plural = ''
+
+    suit_classes = 'suit-tab suit-tab-profile'
+
+
 @admin.register(User, site=AdminSite)
 class UserAdmin(BaseUserAdmin):
     """
@@ -37,15 +83,17 @@ class UserAdmin(BaseUserAdmin):
     actions = [make_users_as_non_superuser, make_users_as_superuser, make_users_as_non_active, make_users_as_active]
 
     # set it value in empty, since it should be change in following views
-    list_display = [
-        'email',
+    list_display = (
+        'display_name',
         'username',
+        'email',
         'level',
         'is_active',
         'is_superuser',
         'last_login',
         'date_joined',
-    ]
+    )
+
     list_filter = [
         ('level', admin.RelatedOnlyFieldListFilter),
         ('is_active', admin.BooleanFieldListFilter),
@@ -53,38 +101,13 @@ class UserAdmin(BaseUserAdmin):
         ListFilterLastLogin,
         ('date_joined', admin.DateFieldListFilter),
     ]
-    ordering = ['date_joined']
+    ordering = ('date_joined', )
 
-    search_fields = ['email', 'username']
+    search_fields = ('display_name', 'email', 'username')
     date_hierarchy = 'date_joined'
 
     filter_horizontal = ['groups']
     filter_vertical = ['user_permissions']
-    readonly_fields = ['last_login', 'level']
-    fieldsets = [
-        (
-            _('User detail'), {
-                'classes': ['wide'],
-                'fields':
-                    [
-                        'email',
-                        'username',
-                        'password',
-                        'level',
-                ]
-            },
-        ),
-        (
-            _('Permissions'), {
-                'fields': [
-                    'is_active',
-                    'is_superuser',
-                    'user_permissions',
-                    'groups',
-                ]
-            }
-        ),
-    ]
     add_fieldsets = [
         (
             None, {
@@ -97,112 +120,129 @@ class UserAdmin(BaseUserAdmin):
             }
         )
     ]
+    readonly_fields = (
+        'display_avatar',
+        'last_login',
+        'reputation',
+        'level',
+        'last_seen',
+        'date_joined',
+        'get_count_comments',
+        'get_count_opinions',
+        'get_count_likes',
+        'get_count_marks',
+        'get_count_questions',
+        'get_count_snippets',
+        'get_count_articles',
+        'get_count_answers',
+        'get_count_solutions',
+        'get_count_posts',
+        'get_count_topics',
+        'get_count_test_suits',
+        'get_count_passages',
+        'get_count_votes',
+        'display_diary_details',
+    )
+
+    suit_form_tabs = [
+        ('general', _('General')),
+        ('permissions', _('Permissions')),
+        ('groups', _('Groups')),
+        ('profile', _('Profile')),
+        ('diary', _('Diary')),
+        ('objects', _('Objects')),
+        ('activity', _('Activity')),
+        ('notifications', _('Notifications')),
+        ('summary', _('Summary')),
+    ]
 
     def get_queryset(self, request):
+
         qs = super(UserAdmin, self).get_queryset(request)
 
-        if request.path == '/admin/users/user/voters/':
-            qs = qs.model.polls.users_as_voters()
-            return qs.filter(count_votes__gt=0)
+        # if request.path == '/admin/users/user/voters/':
+        #     qs = qs.model.polls.users_as_voters()
+        #     return qs.filter(count_votes__gt=0)
 
-        # qs = qs.annotate(
-        #     count_comments=models.Count('comments', distinct=True),
-        #     count_opinions=models.Count('opinions', distinct=True),
-        #     count_likes=models.Count('likes', distinct=True),
-        #     count_marks=models.Count('marks', distinct=True),
-        #     count_articles=models.Count('articles', distinct=True),
-        #     count_answers=models.Count('answers', distinct=True),
-        #     count_posts=models.Count('posts', distinct=True),
-        #     count_solutions=models.Count('solutions', distinct=True),
-        #     count_topics=models.Count('topics', distinct=True),
-        #     count_questions=models.Count('questions', distinct=True),
-        #     count_snippets=models.Count('snippets', distinct=True),
-        #     count_courses=models.Count('courses', distinct=True),
-        #     count_test_suits=models.Count('test_suits', distinct=True),
-        #     count_passages=models.Count('passages', distinct=True),
-        # )
+        qs = qs.annotate()
         return qs
 
-    # def get_count_comments(self, obj):
-    #     return obj.count_comments
-    # get_count_comments.admin_order_field = 'count_comments'
-    # get_count_comments.short_description = _('Count comments')
+    def get_fieldsets(self, request, obj=None):
 
-    # def get_count_opinions(self, obj):
-    #     return obj.count_opinions
-    # get_count_opinions.admin_order_field = 'count_opinions'
-    # get_count_opinions.short_description = _('Count opinions')
+        fieldsets = [
+            (
+                None, {
+                    'classes': ('suit-tab suit-tab-general', ),
+                    'fields': (
+                        'display_name',
+                        'email',
+                        'username',
+                        'password',
+                        'is_active',
+                        'is_superuser',
+                        'display_avatar',
+                    )
+                },
+            ),
+        ]
 
-    # def get_count_likes(self, obj):
-    #     return obj.count_likes
-    # get_count_likes.admin_order_field = 'count_likes'
-    # get_count_likes.short_description = _('Count likes')
+        if obj is not None:
+            fieldsets.extend((
 
-    # def get_count_marks(self, obj):
-    #     return obj.count_marks
-    # get_count_marks.admin_order_field = 'count_marks'
-    # get_count_marks.short_description = _('Count marks')
+                (
+                    None, {
+                        'classes': ('suit-tab suit-tab-permissions', ),
+                        'fields': (
+                            'user_permissions',
+                        )
+                    }
+                ),
+                (
+                    None, {
+                        'classes': ('suit-tab suit-tab-groups', ),
+                        'fields': (
+                            'groups',
+                        )
+                    }
+                ),
+                (
+                    None, {
+                        'classes': ('suit-tab suit-tab-summary', ),
+                        'fields': (
+                            'level',
+                            'reputation',
+                            'last_seen',
+                            'last_login',
+                            'date_joined',
+                            'display_diary_details',
+                            'get_count_comments',
+                            'get_count_opinions',
+                            'get_count_likes',
+                            'get_count_marks',
+                            'get_count_questions',
+                            'get_count_snippets',
+                            'get_count_articles',
+                            'get_count_answers',
+                            'get_count_solutions',
+                            'get_count_posts',
+                            'get_count_topics',
+                            'get_count_test_suits',
+                            'get_count_passages',
+                            'get_count_votes',
+                        )
+                    }
+                ),
+            ))
 
-    # def get_count_questions(self, obj):
-    #     return obj.count_questions
-    # get_count_questions.admin_order_field = 'count_questions'
-    # get_count_questions.short_description = _('Count questions')
+        return fieldsets
 
-    # def get_count_snippets(self, obj):
-    #     return obj.count_snippets
-    # get_count_snippets.admin_order_field = 'count_snippets'
-    # get_count_snippets.short_description = _('Count snippets')
+    def get_inline_instances(self, request, obj=None):
 
-    # def get_count_articles(self, obj):
-    #     return obj.count_articles
-    # get_count_articles.admin_order_field = 'count_articles'
-    # get_count_articles.short_description = _('Count article')
+        if obj is not None:
 
-    # def get_count_answers(self, obj):
-    #     return obj.count_answers
-    # get_count_answers.admin_order_field = 'count_answers'
-    # get_count_answers.short_description = _('Count answers')
-
-    # def get_count_solutions(self, obj):
-    #     return obj.count_solutions
-    # get_count_solutions.admin_order_field = 'count_solutions'
-    # get_count_solutions.short_description = _('Count solutions')
-
-    # def get_count_posts(self, obj):
-    #     return obj.count_posts
-    # get_count_posts.admin_order_field = 'count_posts'
-    # get_count_posts.short_description = _('Count posts')
-
-    # def get_count_topics(self, obj):
-    #     return obj.count_topics
-    # get_count_topics.admin_order_field = 'count_topics'
-    # get_count_topics.short_description = _('Count topics')
-
-    # def get_count_test_suits(self, obj):
-    #     return obj.count_test_suits
-    # get_count_test_suits.admin_order_field = 'count_test_suits'
-    # get_count_test_suits.short_description = _('Count test suits')
-
-    # def get_count_passages(self, obj):
-    #     return obj.count_passages
-    # get_count_passages.admin_order_field = 'count_passages'
-    # get_count_passages.short_description = _('Count passages')
-
-    def get_count_votes(self, obj):
-        return obj.count_votes
-    get_count_votes.admin_order_field = 'count_votes'
-    get_count_votes.short_description = _('Count votes')
-
-    def get_date_latest_voting(self, obj):
-        return obj.date_latest_voting
-    get_date_latest_voting.admin_order_field = 'date_latest_voting'
-    get_date_latest_voting.short_description = _('Date of latest voting')
-
-    def is_active_voter(self, obj):
-        return obj.is_active_voter
-    is_active_voter.admin_order_field = 'is_active_voter'
-    is_active_voter.short_description = _('Is active\nvoter?')
-    is_active_voter.boolean = True
+            inlines = (ProfileInline, DiaryInline, SnippetInline)
+            return [inline(self.model, self.admin_site) for inline in inlines]
+        return ()
 
     def get_urls(self):
 
@@ -216,6 +256,10 @@ class UserAdmin(BaseUserAdmin):
         urls = additional_urls + urls
 
         return urls
+
+    def change_view(self, request, object_id, form_url='', extra_context=None):
+
+        return super().change_view(request, object_id, form_url, extra_context)
 
     # def changelist_view(self, request, extra_context=None):
 
@@ -272,11 +316,41 @@ class UserAdmin(BaseUserAdmin):
 
         return self.changelist_view(request)
 
+    def display_diary_details(self, obj):
+
+        has_diary = obj.has_diary()
+
+        msg = _('User has not a diary')
+        link_url = reverse('admin:diaries_diary_add')
+        link_text = _('Create now')
+
+        return format_html(
+            '<span>{}</span><form action="{}"><button type="submit">{}</button></form>', msg, link_url, link_text)
+
+        if has_diary is True:
+            msg = _('User has a diary')
+            link_url = '2'
+            link_text = _('Change it')
+
+        return format_html('<span>{}</span><a href="{}">{}</a>', msg, link_url, link_text)
+
 
 @admin.register(Profile, site=AdminSite)
 class ProfileAdmin(admin.ModelAdmin):
 
     pass
+
+
+class UserInline(admin.TabularInline):
+
+    model = User
+    fields = ('display_admin_change_link', 'reputation', 'date_joined')
+    readonly_fields = ('display_admin_change_link', 'reputation', 'date_joined')
+    max_num = 0
+    extra = 0
+    can_delete = False
+
+    suit_classes = 'suit-tab suit-tab-users'
 
 
 @admin.register(Level, site=AdminSite)
@@ -300,9 +374,16 @@ class LevelAdmin(admin.ModelAdmin):
                     'name',
                     'color',
                     'description',
-                )
+                ),
+                'classes': ('suit-tab suit-tab-general', )
             },
         ),
+    )
+    inlines = [UserInline]
+
+    suit_form_tabs = (
+        ('general', _('General')),
+        ('users', _('Users')),
     )
 
     def get_queryset(self, request):

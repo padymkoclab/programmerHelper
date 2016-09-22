@@ -1,0 +1,9 @@
+
+.colorfield input[type='text'] {
+    width: 120px;
+}
+
+
+.colorfield input[type='color'] {
+    width: 15px;
+}

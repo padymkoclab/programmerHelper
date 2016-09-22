@@ -1,7 +1,10 @@
 
+import urllib
+import hashlib
 import random
 import uuid
 
+from django.utils.html import format_html
 from django.core.validators import MinLengthValidator
 from django.utils import timezone
 from importlib import import_module
@@ -13,7 +16,7 @@ from django.db import models
 from django.conf import settings
 from utils.django import utils
 
-from utils.django.models_fields import ConfiguredAutoSlugField, PhoneField, AutoOneToOneField
+from utils.django.models_fields import ConfiguredAutoSlugField, PhoneField, AutoOneToOneField, ColorField
 from utils.django.models_utils import get_admin_url
 
 # from apps.polls.managers import PollsManager
@@ -27,45 +30,6 @@ from utils.django.models_utils import get_admin_url
 
 from .managers import UserManager, LevelManager
 from .exceptions import ProtectDeleteUser
-
-
-class ColorField(models.CharField):
-    """
-
-    Three widgets:
-        HTML5 input color
-        jQuery Color Picker
-        http://jscolor.com/
-    Types=['rgb', 'hex', 'name']
-    """
-
-    description = _('ColorField for the Django')
-
-    def __init__(self, *args, **kwargs):
-
-        kwargs['max_length'] = 30
-
-        super(ColorField, self).__init__(*args, **kwargs)
-
-    def deconstruct(self):
-
-        name, path, args, kwargs = super(ColorField, self).deconstruct()
-
-        del kwargs['max_length']
-
-        return name, path, args, kwargs
-
-    def formfield(self, **kwargs):
-
-        from django import forms
-        defaults = {
-            'max_length': self.max_length,
-            'required': False,
-            'widget': forms.NumberInput,
-            'form_class': forms.CharField,
-        }
-        defaults.update(kwargs)
-        return super(ColorField, self).formfield(**defaults)
 
 
 class Level(models.Model):
@@ -196,7 +160,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         get_latest_by = 'date_joined'
 
     def __str__(self):
-        return '{0.email}'.format(self)
+        return self.get_short_name()
 
     def save(self, *args, **kwargs):
 
@@ -223,18 +187,27 @@ class User(AbstractBaseUser, PermissionsMixin):
         return reverse('users:detail', kwargs={'email': self.email})
 
     def get_admin_url(self):
+        """ """
 
         return get_admin_url(self)
 
+    def display_admin_change_link(self):
+        """ """
+
+        return format_html('<a href="{}">{}</a>', self.get_admin_url(), self.get_full_name())
+    display_admin_change_link.short_description = _('User')
+
     def get_full_name(self):
-        return '{0.username} ({0.email})'.format(self)
+        """ """
+
+        return '{0} ({0.email})'.format(self)
+    get_full_name.short_description = _('Full name')
     # get_full_name.admin_order_field = 'username'
-    # get_full_name.short_description = _('Full name')
 
     def get_short_name(self):
         return '{0.display_name}'.format(self)
+    get_short_name.short_description = _('Short name')
     # get_short_name.admin_order_field = 'display_name'
-    # get_short_name.short_description = _('Name')
 
     @property
     def is_staff(self):
@@ -257,7 +230,181 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def has_diary(self):
 
-        return self.diary
+        return hasattr(self, 'diary')
+    has_diary.short_description = _('Has diary?')
+    has_diary.boolean = True
+
+    def get_gavatar_url(self, size=100, default='identicon'):
+        """ """
+
+        gravatar_url = "https://www.gravatar.com/avatar/"
+        user_hash = hashlib.md5(self.email.lower().encode()).hexdigest()
+        gravatar_parameters = urllib.parse.urlencode({'size': size, 'default': default, 'rating': 'g'})
+
+        return '{}{}?{}'.format(gravatar_url, user_hash, gravatar_parameters)
+
+    def display_avatar(self, size=100):
+        """ """
+
+        return format_html('<img src="{}" />', self.get_gavatar_url(size))
+    display_avatar.short_description = _('Avatar')
+
+    @property
+    def last_seen(self):
+        """ """
+
+        return 'ERROR'
+
+    def get_count_comments(self):
+        """ """
+
+        if hasattr(self, 'count_comments'):
+            return self.count_comments
+
+        return self.comments.count()
+    get_count_comments.admin_order_field = 'count_comments'
+    get_count_comments.short_description = _('Count comments')
+
+    def get_count_opinions(self):
+        """ """
+
+        if hasattr(self, 'count_opinions'):
+            return self.count_opinions
+
+        return self.opinions.count()
+    get_count_opinions.admin_order_field = 'count_opinions'
+    get_count_opinions.short_description = _('Count opinions')
+
+    def get_count_likes(self):
+        """ """
+
+        if hasattr(self, 'count_likes'):
+            return self.count_likes
+
+        return self.likes.count()
+    get_count_likes.admin_order_field = 'count_likes'
+    get_count_likes.short_description = _('Count likes')
+
+    def get_count_marks(self):
+        """ """
+
+        if hasattr(self, 'count_marks'):
+            return self.count_marks
+
+        return self.marks.count()
+    get_count_marks.admin_order_field = 'count_marks'
+    get_count_marks.short_description = _('Count marks')
+
+    def get_count_questions(self):
+        """ """
+
+        if hasattr(self, 'count_questions'):
+            return self.count_questions
+
+        return self.questions.count()
+    get_count_questions.admin_order_field = 'count_questions'
+    get_count_questions.short_description = _('Count questions')
+
+    def get_count_snippets(self):
+        """ """
+
+        if hasattr(self, 'count_snippets'):
+            return self.count_snippets
+
+        return self.snippets.count()
+    get_count_snippets.admin_order_field = 'count_snippets'
+    get_count_snippets.short_description = _('Count snippets')
+
+    def get_count_articles(self):
+        """ """
+
+        if hasattr(self, 'count_articles'):
+            return self.count_articles
+
+        return self.articles.count()
+    get_count_articles.admin_order_field = 'count_articles'
+    get_count_articles.short_description = _('Count article')
+
+    def get_count_answers(self):
+        """ """
+
+        if hasattr(self, 'count_answers'):
+            return self.count_answers
+
+        return self.answers.count()
+    get_count_answers.admin_order_field = 'count_answers'
+    get_count_answers.short_description = _('Count answers')
+
+    def get_count_solutions(self):
+        """ """
+
+        if hasattr(self, 'count_solutions'):
+            return self.count_solutions
+
+        return self.solutions.count()
+    get_count_solutions.admin_order_field = 'count_solutions'
+    get_count_solutions.short_description = _('Count solutions')
+
+    def get_count_posts(self):
+        """ """
+
+        if hasattr(self, 'count_posts'):
+            return self.count_posts
+
+        return self.posts.count()
+    get_count_posts.admin_order_field = 'count_posts'
+    get_count_posts.short_description = _('Count posts')
+
+    def get_count_topics(self):
+        """ """
+
+        if hasattr(self, 'count_topics'):
+            return self.count_topics
+
+        return self.topics.count()
+    get_count_topics.admin_order_field = 'count_topics'
+    get_count_topics.short_description = _('Count topics')
+
+    def get_count_test_suits(self):
+        """ """
+
+        if hasattr(self, 'count_test_suits'):
+            return self.count_test_suits
+
+        return self.test_suits.count()
+    get_count_test_suits.admin_order_field = 'count_test_suits'
+    get_count_test_suits.short_description = _('Count test suits')
+
+    def get_count_passages(self):
+        """ """
+
+        if hasattr(self, 'count_passages'):
+            return self.count_passages
+
+        return self.passages.count()
+    get_count_passages.admin_order_field = 'count_passages'
+    get_count_passages.short_description = _('Count passages')
+
+    def get_count_votes(self):
+        """ """
+
+        if hasattr(self, 'count_votes'):
+            return self.count_votes
+
+        return self.votes.count()
+    get_count_votes.admin_order_field = 'count_votes'
+    get_count_votes.short_description = _('Count votes')
+
+    def get_date_latest_voting(self, obj):
+        return obj.date_latest_voting
+    get_date_latest_voting.admin_order_field = 'date_latest_voting'
+    get_date_latest_voting.short_description = _('Date of latest voting')
+
+    def is_active_voter(self, obj):
+        return obj.is_active_voter
+    is_active_voter.admin_order_field = 'is_active_voter'
+    is_active_voter.short_description = _('Is active\nvoter?')
+    is_active_voter.boolean = True
 
     def have_certain_count_consecutive_days(self, count_consecutive_days):
         if count_consecutive_days > 0:
@@ -288,12 +435,20 @@ class User(AbstractBaseUser, PermissionsMixin):
     def has_badge(self, badge_name):
         return self.__class__.badges_manager.has_badge(user=self, badge_name=badge_name)
 
+    @property
+    def reputation(self):
+        return self.get_reputation()
+
     def get_reputation(self):
         """Getting reputation 1of user based on his activity, activity, badges."""
+
+        return 'ERROR'
+
         return sum([
             self.get_reputation_for_badges(),
             self.get_reputation_for_activity(),
         ])
+    get_reputation.short_description = _('Reputation')
 
     def get_reputation_for_badges(self):
         """Getting reputation of user for badges."""
@@ -446,13 +601,14 @@ class Profile(models.Model):
         (None, _('Unknown'))
     )
 
+    id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
     user = AutoOneToOneField(
         'User', related_name='profile',
         verbose_name=_('User'), on_delete=models.CASCADE
     )
 
     # public info
-    views = models.IntegerField(_('Profile views'), default=0, editable=False)
+    views = models.IntegerField(_('Count views'), default=0, editable=False)
 
     # crafts = models.CharField() ваши направления развития верстка, программирование
     # theme of site
@@ -476,6 +632,8 @@ class Profile(models.Model):
     latitude = models.FloatField(_('Latitude'), blank=True, null=True)
     longitude = models.FloatField(_('Longitude'), blank=True, null=True)
 
+    # show_email = models.BooleanField(_('Show email'), default=True)
+
     # private info
     date_birthday = models.DateField(
         _('Date birthday'), null=True, blank=True,
@@ -484,4 +642,10 @@ class Profile(models.Model):
     phone = PhoneField(_('Phone'), default='', blank=True)
 
     def __str__(self):
-        return _('Profile of user "{}"').format(self.user.get_short_name())
+        return '{}'.format(self.user.get_short_name())
+
+    def get_absolute_url(self):
+        return self.user.get_absolute_url()
+
+    def get_admin_url(self):
+        return get_admin_url(self)

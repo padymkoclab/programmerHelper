@@ -29,6 +29,7 @@ class UserFactory(factory.DjangoModelFactory):
     password = factory.PostGenerationMethodCall('set_password', 'defaultpassword')
 
     profile = factory.RelatedFactory('apps.users.factories.ProfileFactory', 'user')
+    diary = factory.RelatedFactory('apps.diaries.factories.DiaryFactory', 'user')
 
     @factory.lazy_attribute
     def is_active(self):

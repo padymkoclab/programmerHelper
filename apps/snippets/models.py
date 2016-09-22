@@ -39,11 +39,11 @@ class Snippet(CommentsModelMixin, OpinionsModelMixin, TagsModelMixin, TimeStampe
 
     CHOICES_LEXERS = CHOICES_LEXERS
 
-    title = models.CharField(
-        _('Title'), max_length=200, unique=True,
-        validators=[MinLengthValidator(settings.MIN_LENGTH_FOR_NAME_OR_TITLE_OBJECT)]
+    name = models.CharField(
+        _('Name'), max_length=200, unique=True,
+        validators=[MinLengthValidator(10)]
     )
-    slug = ConfiguredAutoSlugField(populate_from='title', unique=True)
+    slug = ConfiguredAutoSlugField(populate_from='name', unique=True)
     lexer = models.CharField(_('Lexer'), max_length=50, choices=CHOICES_LEXERS)
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, verbose_name=_('User'),
@@ -76,7 +76,7 @@ class Snippet(CommentsModelMixin, OpinionsModelMixin, TagsModelMixin, TimeStampe
         ordering = ['date_added']
 
     def __str__(self):
-        return '{0.title}'.format(self)
+        return '{0.name}'.format(self)
 
     def get_absolute_url(self):
 
