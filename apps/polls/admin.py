@@ -97,9 +97,9 @@ class VoteInline(admin.TabularInline):
     max_num = 0
     can_delete = False
     list_select_related = ('poll', 'choice', 'user')
-    fields = ('user', 'get_truncated_text_choice', 'date_added')
+    fields = ('user', 'get_truncated_text_choice', 'created')
     fk_name = 'poll'
-    readonly_fields = ['get_truncated_text_choice', 'user', 'date_added']
+    readonly_fields = ['get_truncated_text_choice', 'user', 'created']
 
 
 @admin.register(Poll, site=AdminSite)
@@ -118,14 +118,14 @@ class PollAdmin(admin.ModelAdmin):
         'get_count_choices',
         'status',
         'get_date_latest_voting',
-        'date_modified',
-        'date_added',
+        'updated',
+        'created',
     )
     list_filter = (
         'status',
         LatestVotingSimpleListFilter,
-        'date_modified',
-        'date_added',
+        'updated',
+        'created',
     )
     search_fields = ('title',)
     actions = [make_closed, make_draft, make_opened]
@@ -197,7 +197,7 @@ class PollAdmin(admin.ModelAdmin):
 
         if column in ['get_count_votes', 'get_count_choices', 'status']:
             return {'class': 'text-center'}
-        elif column in ['get_date_latest_voting', 'date_modified', 'date_added']:
+        elif column in ['get_date_latest_voting', 'updated', 'created']:
             return {'class': 'text-right'}
 
     def suit_row_attributes(self, obj, request):
@@ -335,12 +335,12 @@ class VoteAdmin(admin.ModelAdmin):
 
     # objects list
     list_select_related = ('poll', 'user', 'choice')
-    list_display = ('truncated_poll', 'user', 'get_truncated_choice', 'date_added')
+    list_display = ('truncated_poll', 'user', 'get_truncated_choice', 'created')
     list_filter = (
         ('poll', admin.RelatedOnlyFieldListFilter),
         ('user', admin.RelatedOnlyFieldListFilter),
         ('choice', admin.RelatedOnlyFieldListFilter),
-        'date_added',
+        'created',
     )
 
     def get_urls(self):
@@ -349,7 +349,7 @@ class VoteAdmin(admin.ModelAdmin):
 
         # remove urls for add and change vote
         remove_url_from_admin_urls(urls, 'add')
-        remove_url_from_admin_urls(urls, 'change')
+        # remove_url_from_admin_urls(urls, 'change')
         remove_url_from_admin_urls(urls, 'history')
         remove_url_from_admin_urls(urls, 'delete')
 
@@ -369,7 +369,7 @@ class VoteAdmin(admin.ModelAdmin):
 
     def suit_cell_attributes(self, obj, column):
 
-        if column == 'date_added':
+        if column == 'created':
             return {'class': 'text-right'}
         elif column == 'user':
             return {'class': 'text-center'}

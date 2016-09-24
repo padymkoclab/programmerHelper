@@ -36,8 +36,8 @@ class Comment(BaseGenericModel):
         db_table = 'comments'
         verbose_name = _('Comment')
         verbose_name_plural = _('Comments')
-        get_latest_by = 'date_added'
-        ordering = ['date_added']
+        get_latest_by = 'created'
+        ordering = ['created']
 
     def __str__(self):
         return _('On {0} "{1.content_object}"').format(
@@ -48,7 +48,7 @@ class Comment(BaseGenericModel):
     def is_new(self):
         """ """
 
-        return self.date_added > timezone.now() - timezone.timedelta(days=settings.COUNT_DAYS_FOR_NEW_ELEMENTS)
-    is_new.admin_order_field = 'date_added'
+        return self.created > timezone.now() - timezone.timedelta(days=settings.COUNT_DAYS_FOR_NEW_ELEMENTS)
+    is_new.admin_order_field = 'created'
     is_new.short_description = _('Is new?')
     is_new.boolean = True

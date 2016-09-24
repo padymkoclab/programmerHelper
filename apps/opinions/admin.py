@@ -24,8 +24,8 @@ class OpinionGenericInline(admin_generic.GenericTabularInline):
     extra = 0
     ct_field = 'content_type'
     ct_fk_field = 'object_id'
-    fields = ['user', 'is_useful', 'date_modified', 'date_added']
-    readonly_fields = ['date_modified', 'date_added']
+    fields = ['user', 'is_useful', 'updated', 'created']
+    readonly_fields = ['updated', 'created']
 
     def get_max_num(self, request, obj=None, **kwargs):
 
@@ -52,8 +52,8 @@ class OpinionAdmin(admin.ModelAdmin):
         'content_type',
         'user',
         'is_useful',
-        'date_modified',
-        'date_added',
+        'updated',
+        'created',
     )
 
     def truncated_content_object(self, obj):

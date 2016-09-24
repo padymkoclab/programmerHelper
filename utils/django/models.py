@@ -11,22 +11,22 @@ from django.contrib.contenttypes.models import ContentType
 
 class TimeStampedModel(models.Model):
     """
-    Abstract base models with two fields: date_added and date_modified. And too supported localization.
+    Abstract base models with two fields: created and updated. And too supported localization.
     """
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    date_modified = models.DateTimeField(_('Date modified'), auto_now=True)
-    date_added = models.DateTimeField(_('Date added'), auto_now_add=True)
+    updated = models.DateTimeField(_('Date modified'), auto_now=True)
+    created = models.DateTimeField(_('Date added'), auto_now_add=True)
 
     class Meta:
         abstract = True
 
     def is_new(self):
-        return self.date_added > \
+        return self.created > \
             timezone.now() - timezone.timedelta(
                 days=settings.COUNT_DAYS_FOR_NEW_ELEMENTS
             )
-    is_new.admin_order_field = 'date_added'
+    is_new.admin_order_field = 'created'
     is_new.short_description = _('Is new?')
     is_new.boolean = True
 
@@ -38,8 +38,8 @@ class BaseGenericModel(models.Model):
     object_id = models.UUIDField()
     content_object = GenericForeignKey('content_type', 'object_id')
 
-    date_modified = models.DateTimeField(_('Date modified'), auto_now=True)
-    date_added = models.DateTimeField(_('Date added'), auto_now_add=True)
+    updated = models.DateTimeField(_('Date modified'), auto_now=True)
+    created = models.DateTimeField(_('Date added'), auto_now_add=True)
 
     class Meta:
         abstract = True

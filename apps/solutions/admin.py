@@ -110,17 +110,17 @@ class SolutionAdmin(OpinionsAdminMixin, admin.ModelAdmin):
         'get_count_comments',
         'get_count_tags',
         'is_new',
-        'date_modified',
-        'date_added',
+        'updated',
+        'created',
     )
     list_filter = (
         ('user', admin.RelatedOnlyFieldListFilter),
         IsNewSimpleListFilter,
-        'date_modified',
-        'date_added',
+        'updated',
+        'created',
     )
     search_fields = ('problem', )
-    date_hierarchy = 'date_added'
+    date_hierarchy = 'created'
     filter_horizontal = ['tags']
     prepopulated_fields = {'slug': ['problem']}
     form = SolutionAdminModelForm
@@ -129,8 +129,8 @@ class SolutionAdmin(OpinionsAdminMixin, admin.ModelAdmin):
         'get_count_opinions',
         'get_count_comments',
         'get_count_tags',
-        'date_modified',
-        'date_added',
+        'updated',
+        'created',
         'get_count_critics',
         'get_count_supporters',
         'get_listing_critics_with_admin_urls',
@@ -176,8 +176,8 @@ class SolutionAdmin(OpinionsAdminMixin, admin.ModelAdmin):
                         'get_listing_supporters_with_admin_urls',
                         'get_count_comments',
                         'get_count_tags',
-                        'date_modified',
-                        'date_added',
+                        'updated',
+                        'created',
                     ]
                 }
             ))
@@ -216,7 +216,7 @@ class SolutionAdmin(OpinionsAdminMixin, admin.ModelAdmin):
             return {'class': 'text-center'}
 
         if column in [
-            'date_modified',
-            'date_added',
+            'updated',
+            'created',
         ]:
             return {'class': 'text-right'}

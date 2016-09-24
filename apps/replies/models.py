@@ -89,8 +89,8 @@ class Reply(BaseGenericModel):
     class Meta:
         verbose_name = _('Reply')
         verbose_name_plural = _('Replies')
-        get_latest_by = 'date_added'
-        ordering = ['date_added']
+        get_latest_by = 'created'
+        ordering = ['created']
         unique_together = ['user', 'object_id']
 
     def __str__(self):
@@ -108,8 +108,8 @@ class Reply(BaseGenericModel):
         super(Reply, self).save(*args, **kwargs)
 
     def is_new(self):
-        return self.date_added > timezone.now() - timezone.timedelta(days=settings.COUNT_DAYS_FOR_NEW_ELEMENTS)
-    is_new.admin_order_field = 'date_added'
+        return self.created > timezone.now() - timezone.timedelta(days=settings.COUNT_DAYS_FOR_NEW_ELEMENTS)
+    is_new.admin_order_field = 'created'
     is_new.short_description = _('Is new?')
     is_new.boolean = True
 

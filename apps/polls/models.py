@@ -67,8 +67,8 @@ class Poll(TimeStampedModel):
         db_table = 'polls'
         verbose_name = _("Poll")
         verbose_name_plural = _("Polls")
-        ordering = ['date_added']
-        get_latest_by = 'date_added'
+        ordering = ['created']
+        get_latest_by = 'created'
 
     def __str__(self):
         return '{0.title}'.format(self)
@@ -152,10 +152,10 @@ class Poll(TimeStampedModel):
             return self.date_latest_voting
 
         if self.votes.exists():
-            return self.votes.latest().date_added
+            return self.votes.latest().created
         return
             # convert and to return the datetime object to the project datetime format
-            # date_added = convert_date_to_django_date_format(date_added)
+            # created = convert_date_to_django_date_format(created)
     get_date_latest_voting.admin_order_field = 'date_latest_voting'
     get_date_latest_voting.short_description = _('Date latest voting')
 
@@ -254,7 +254,7 @@ class Vote(models.Model):
         verbose_name=_('Choice'),
         related_name='votes',
     )
-    date_added = models.DateTimeField(_('Date added'), auto_now_add=True)
+    created = models.DateTimeField(_('Date added'), auto_now_add=True)
 
     objects = models.Manager()
     objects = VoteManager()
@@ -263,8 +263,8 @@ class Vote(models.Model):
         db_table = 'votes'
         verbose_name = "Vote"
         verbose_name_plural = "Votes"
-        ordering = ['-date_added']
-        get_latest_by = 'date_added'
+        ordering = ['-created']
+        get_latest_by = 'created'
         unique_together = ('poll', 'user')
 
     def __str__(self):

@@ -29,7 +29,7 @@ from .managers import QuestionManager, AnswerManager
 from .querysets import QuestionQuerySet, AnswerQuerySet
 
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('django.development')
 
 logger.warning('scrapy data question from StackOverFlow or MailList Google Groups by tags Django, JS as latest')
 
@@ -76,8 +76,8 @@ class Question(TagsModelMixin, OpinionsModelMixin, FlavourModelMixin, TimeStampe
     class Meta:
         verbose_name = _("Question")
         verbose_name_plural = _("Questions")
-        ordering = ['-date_added']
-        get_latest_by = 'date_added'
+        ordering = ['-created']
+        get_latest_by = 'created'
 
     def __str__(self):
         return _('{0.title}').format(self)
@@ -120,8 +120,8 @@ class Question(TagsModelMixin, OpinionsModelMixin, FlavourModelMixin, TimeStampe
             return self.date_latest_activity
 
         if self.answers.exists():
-            return self.answers.latest().date_modified
-        return self.date_modified
+            return self.answers.latest().updated
+        return self.updated
     get_date_latest_activity.short_description = _('Date latest activity')
     get_date_latest_activity.admin_order_field = 'date_latest_activity'
 
@@ -160,7 +160,7 @@ class Answer(OpinionsModelMixin, CommentsModelMixin, TimeStampedModel):
         verbose_name = _("Answer")
         verbose_name_plural = _("Answers")
         ordering = ['question', 'user']
-        get_latest_by = 'date_modified'
+        get_latest_by = 'updated'
         unique_together = [('user', 'question')]
 
     def __str__(self):
@@ -173,4 +173,4 @@ class Answer(OpinionsModelMixin, CommentsModelMixin, TimeStampedModel):
         return super().unique_error_message(model_class, unique_check)
 
     def time_after_published_question(self):
-        return self.date_added - self.question.date_added
+        return self.created - self.question.created

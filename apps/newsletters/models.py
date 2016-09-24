@@ -14,13 +14,13 @@ class Newsletter(models.Model):
         max_length=500,
         validators=[MinLengthValidator(25)]
     )
-    date_added = models.DateTimeField(auto_now_add=True)
+    created = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         verbose_name = _("Newsletter")
         verbose_name_plural = _("Newsletters")
-        get_latest_by = 'date_added'
-        ordering = ['date_added']
+        get_latest_by = 'created'
+        ordering = ['created']
 
     objects = models.Manager()
     objects = ManagerNewsletter()

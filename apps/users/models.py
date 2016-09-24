@@ -1,4 +1,5 @@
 
+import logging
 import collections
 import itertools
 import urllib
@@ -16,8 +17,9 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.db import models
 from django.conf import settings
-from utils.django import utils
+from django.core.cache import cache
 
+from utils.django import utils
 from utils.django.models_fields import ConfiguredAutoSlugField, PhoneField, AutoOneToOneField, ColorField
 from utils.django.models_utils import get_admin_url
 
@@ -33,6 +35,9 @@ from apps.tags.models import Tag
 
 from .managers import UserManager, LevelManager
 from .exceptions import ProtectDeleteUser
+
+
+logger = logging.getLogger('django.development')
 
 
 class Level(models.Model):
@@ -516,10 +521,6 @@ class User(AbstractBaseUser, PermissionsMixin):
         # return total_mark_for_snippets of instance
         return user_with_total_mark_for_snippets.total_mark_for_snippets
 
-    def get_percent_filled_user_profile(self):
-        """Getting percent filled profile of user."""
-        return self.__class__.objects.get_filled_users_profiles()[self.pk]
-
     def get_total_rating_for_articles(self):
         """Getting total ratings of all articles of user."""
         evaluation_total_rating_for_articles_of_user = Article.objects.articles_with_rating().filter(author=self).aggregate(
@@ -612,11 +613,12 @@ class Profile(models.Model):
 
     MAN = 'MAN'
     WOMAN = 'WOMAN'
+    UNKNOWN = 'UNKNOWN'
 
     CHOICES_GENDER = (
         (MAN, _('Man')),
         (WOMAN, _('Woman')),
-        (None, _('Unknown'))
+        (UNKNOWN, _('Unknown'))
     )
 
     id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
@@ -639,11 +641,10 @@ class Profile(models.Model):
     personal_website = models.URLField(_('Personal website'), default='', blank=True)
     gender = models.CharField(
         _('Gender'), max_length=10, choices=CHOICES_GENDER,
-        default=None, null=True, blank=True,
+        default=UNKNOWN,
     )
     job = models.CharField(
         _('Job'), max_length=100, default='', blank=True,
-        help_text=_('or write Freelance')
     )
 
     location = models.CharField(_('Location'), max_length=50, default='', blank=True)
@@ -659,6 +660,8 @@ class Profile(models.Model):
     real_name = models.CharField(_('Real name'), max_length=200, default='', blank=True)
     phone = PhoneField(_('Phone'), default='', blank=True)
 
+    updated = models.DateTimeField(_('Updated'), auto_now=True)
+
     def __str__(self):
         return '{}'.format(self.user.get_short_name())
 
@@ -667,3 +670,72 @@ class Profile(models.Model):
 
     def get_admin_url(self):
         return get_admin_url(self)
+
+    @property
+    def last_seen(self):
+
+        key = 'LastSeenUser{}'.format(self.user.pk)
+        date_last_seen = cache.get(key)
+
+        if date_last_seen is not None:
+            return date_last_seen
+        return
+
+    def get_percentage_filling(self):
+        """Getting percent filled profile of user."""
+
+        logger.error('Not correct and untested results')
+        logger.error('Does not work "admin_order_field"')
+
+        considering_fields = (
+            'about',
+            'signature',
+            'presents_on_gmail',
+            'presents_on_github',
+            'presents_on_stackoverflow',
+            'personal_website',
+            'job',
+            'location',
+            'latitude',
+            'longitude',
+            'date_birthday',
+            'real_name',
+            'phone',
+        )
+
+        result = sum(int(bool(getattr(self, field))) for field in considering_fields)
+
+        if self.gender is not self.UNKNOWN:
+            result += 1
+
+        result = result * 100 / len(considering_fields) + 1
+        result = round(result, 2)
+
+        return '{0}%'.format(result)
+    get_percentage_filling.short_description = _('Percentage filling')
+    get_percentage_filling.admin_order_field = 'percentage_filling'
+
+
+# get_top_tag
+# chart reputation
+# get_badges_by_sort (silver, bronze, gold)
+
+
+# class Notification(models.Model):
+#     """ """
+
+#     CHOICES_NOTIFICATIONS = (
+#         (_('Message')),
+#         (_('Comment')),
+#         (_('Badge')),
+#         (_('Reputation')),
+#     )
+
+#     id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
+#     type = models.CharField(_('Type'), max_length=50, choices=CHOICES_NOTIFICATIONS)
+#     user = models.ForeignKey(
+#         'User', related_name='notifications',
+#         verbose_name=_('User'), on_delete=models.CASCADE
+#     )
+#     content = models.CharField(_('Content'), max_length=300)
+#     created = models.DateTimeField(_('Created'), auto_now_add=True)

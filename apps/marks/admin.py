@@ -18,8 +18,8 @@ class MarkGenericInline(admin_generic.GenericTabularInline):
     extra = 0
     ct_field = 'content_type'
     ct_fk_field = 'object_id'
-    fiedls = ('user', 'mark', 'date_modified', 'date_added')
-    readonly_fields = ('date_modified', 'date_added')
+    fiedls = ('user', 'mark', 'updated', 'created')
+    readonly_fields = ('updated', 'created')
 
     suit_classes = 'suit-tab suit-tab-marks'
 

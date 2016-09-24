@@ -90,9 +90,9 @@ class Article(CommentsModelMixin, TagsModelMixin, MarksModelMixin, TimeStampedMo
     class Meta:
         verbose_name = _("Article")
         verbose_name_plural = _("Articles")
-        get_latest_by = 'date_added'
-        ordering = ['date_added']
-        unique_together = ['user', 'name']
+        get_latest_by = 'created'
+        ordering = ('created', )
+        unique_together = (('user', 'name'), )
 
     def __str__(self):
         return '{0.name}'.format(self)
@@ -101,7 +101,7 @@ class Article(CommentsModelMixin, TagsModelMixin, MarksModelMixin, TimeStampedMo
         super().save(*args, **kwargs)
 
     def get_absolute_url(self):
-        return reverse('articles:article', kwargs={'slug': self.slug})
+        return reverse('articles:article', kwargs={'slug': self.slug, 'pk': self.pk})
 
     def get_admin_page_url(self):
         return get_admin_url(self)

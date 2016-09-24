@@ -158,8 +158,8 @@ class AnswerInline(admin.StackedInline):
         'get_rating',
         'get_count_opinions',
         'get_count_comments',
-        'date_modified',
-        'date_added',
+        'updated',
+        'created',
     )
 
 
@@ -181,7 +181,7 @@ class QuestionAdmin(OpinionsAdminMixin, admin.ModelAdmin):
         'get_count_flavours',
         'is_new',
         'get_date_latest_activity',
-        'date_added',
+        'created',
     )
     list_filter = (
         ('user', admin.RelatedOnlyFieldListFilter),
@@ -189,7 +189,7 @@ class QuestionAdmin(OpinionsAdminMixin, admin.ModelAdmin):
         HasAcceptedAnswerSimpleListFilter,
         IsNewSimpleListFilter,
         LatestActivitySimpleListFilter,
-        'date_added',
+        'created',
     )
     filter_horizontal = ('tags', )
     form = QuestionAdminModelForm
@@ -208,8 +208,8 @@ class QuestionAdmin(OpinionsAdminMixin, admin.ModelAdmin):
         'get_count_like_flavours',
         'get_count_dislike_flavours',
         'get_date_latest_activity_for_admin_readonly',
-        'date_added',
-        'date_modified',
+        'created',
+        'updated',
     )
 
     def get_queryset(self, request):
@@ -259,8 +259,8 @@ class QuestionAdmin(OpinionsAdminMixin, admin.ModelAdmin):
                             'get_count_like_flavours',
                             'get_count_dislike_flavours',
                             'get_date_latest_activity_for_admin_readonly',
-                            'date_added',
-                            'date_modified',
+                            'created',
+                            'updated',
                         )
                     }
                 )
@@ -279,7 +279,7 @@ class QuestionAdmin(OpinionsAdminMixin, admin.ModelAdmin):
 
         if column in ['truncated_title']:
             return {'class': 'text-left'}
-        elif column in ['date_added', 'date_modified']:
+        elif column in ['created', 'updated']:
             return {'class': 'text-right'}
         return {'class': 'text-center'}
 
@@ -321,19 +321,19 @@ class AnswerAdmin(OpinionsAdminMixin, admin.ModelAdmin):
         'get_count_opinions',
         'get_count_comments',
         'is_new',
-        'date_modified',
-        'date_added',
+        'updated',
+        'created',
     )
     list_filter = (
         ('user', admin.RelatedOnlyFieldListFilter),
         ('question', admin.RelatedOnlyFieldListFilter),
         'is_accepted',
         IsNewSimpleListFilter,
-        'date_modified',
-        'date_added',
+        'updated',
+        'created',
     )
     form = AnswerAdminModelForm
-    date_hierarchy = 'date_added'
+    date_hierarchy = 'created'
     readonly_fields = (
         'get_rating',
         'get_count_opinions',
@@ -342,8 +342,8 @@ class AnswerAdmin(OpinionsAdminMixin, admin.ModelAdmin):
         'get_count_supporters',
         'get_listing_supporters_with_admin_urls',
         'get_count_comments',
-        'date_modified',
-        'date_added',
+        'updated',
+        'created',
     )
 
     def get_queryset(self, request):
@@ -385,8 +385,8 @@ class AnswerAdmin(OpinionsAdminMixin, admin.ModelAdmin):
                             'get_count_supporters',
                             'get_listing_supporters_with_admin_urls',
                             'get_count_comments',
-                            'date_modified',
-                            'date_added',
+                            'updated',
+                            'created',
                         )
                     }
                 )
@@ -405,7 +405,7 @@ class AnswerAdmin(OpinionsAdminMixin, admin.ModelAdmin):
 
         if column in ['truncated_question']:
             return {'class': 'text-left'}
-        elif column in ['date_added', 'date_modified']:
+        elif column in ['created', 'updated']:
             return {'class': 'text-right'}
         return {'class': 'text-center'}
 

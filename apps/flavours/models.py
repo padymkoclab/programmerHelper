@@ -19,8 +19,8 @@ class Flavour(BaseGenericModel):
         verbose_name = _('Flavour')
         verbose_name_plural = _('Flavours')
         unique_together = ['user', 'object_id']
-        get_latest_by = 'date_modified'
-        ordering = ['date_modified']
+        get_latest_by = 'updated'
+        ordering = ['updated']
 
     def __str__(self):
         return _('On {0} "{1}"').format(

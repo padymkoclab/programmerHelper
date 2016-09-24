@@ -74,8 +74,8 @@ class Suit(TimeStampedModel):
     class Meta:
         verbose_name = _("Suit")
         verbose_name_plural = _("Suits")
-        ordering = ['date_added']
-        get_latest_by = 'date_modified'
+        ordering = ['created']
+        get_latest_by = 'updated'
 
     def __str__(self):
         return '{0.name}'.format(self)
@@ -150,7 +150,7 @@ class Question(TimeStampedModel):
         verbose_name = _("Question")
         verbose_name_plural = _("Questions")
         unique_together = ('title', 'suit')
-        get_latest_by = 'date_modified'
+        get_latest_by = 'updated'
         ordering = ['suit', 'title']
 
     objects = models.Manager()
@@ -243,7 +243,7 @@ class Passage(models.Model):
             MaxValueValidator(MAX_MARK),
         ]
     )
-    date = models.DateTimeField(_('Date'), auto_now_add=True)
+    created = models.DateTimeField(_('Created'), auto_now_add=True)
 
     objects = models.Manager()
     objects = PassageManager()
@@ -251,8 +251,8 @@ class Passage(models.Model):
     class Meta:
         verbose_name = _("Passage")
         verbose_name_plural = _("Passages")
-        get_latest_by = 'date'
-        ordering = ['date']
+        get_latest_by = 'created'
+        ordering = ['created']
 
     def __str__(self):
         return '{0.suit}'.format(self)

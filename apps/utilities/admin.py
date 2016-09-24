@@ -109,7 +109,7 @@ class UtilityInline(admin.StackedInline):
     model = Utility
     extra = 0
     fk_name = 'category'
-    readonly_fields = ['get_rating', 'get_count_comments', 'get_count_opinions', 'date_modified', 'date_added']
+    readonly_fields = ['get_rating', 'get_count_comments', 'get_count_opinions', 'updated', 'created']
     fields = [
         'name',
         'description',
@@ -118,8 +118,8 @@ class UtilityInline(admin.StackedInline):
         'get_rating',
         'get_count_comments',
         'get_count_opinions',
-        'date_modified',
-        'date_added',
+        'updated',
+        'created',
     ]
 
 
@@ -137,12 +137,12 @@ class CategoryAdmin(admin.ModelAdmin):
         'get_total_count_opinions',
         'get_total_count_comments',
         'is_new',
-        'date_modified',
-        'date_added')
+        'updated',
+        'created')
     list_filter = (
         IsNewSimpleListFilter,
-        'date_modified',
-        'date_added',
+        'updated',
+        'created',
     )
     search_fields = ('name', )
     prepopulated_fields = {'slug': ('name', )}
@@ -151,8 +151,8 @@ class CategoryAdmin(admin.ModelAdmin):
         'get_total_count_opinions',
         'get_total_count_comments',
         'get_count_utilities',
-        'date_modified',
-        'date_added',
+        'updated',
+        'created',
     ]
 
     def get_queryset(self, request):
@@ -185,8 +185,8 @@ class CategoryAdmin(admin.ModelAdmin):
                         'get_total_count_opinions',
                         'get_total_count_comments',
                         'get_count_utilities',
-                        'date_modified',
-                        'date_added',
+                        'updated',
+                        'created',
                     ]
                 }
             ])
@@ -214,15 +214,15 @@ class UtilityAdmin(OpinionsAdminMixin, admin.ModelAdmin):
         'get_count_opinions',
         'get_count_comments',
         'is_new',
-        'date_modified',
-        'date_added',
+        'updated',
+        'created',
     )
 
     list_filter = (
         ('category', admin.RelatedOnlyFieldListFilter),
         IsNewSimpleListFilter,
-        'date_modified',
-        'date_added',
+        'updated',
+        'created',
     )
     search_fields = ('name', )
     readonly_fields = [
@@ -233,8 +233,8 @@ class UtilityAdmin(OpinionsAdminMixin, admin.ModelAdmin):
         'get_count_supporters',
         'get_listing_critics_with_admin_urls',
         'get_listing_supporters_with_admin_urls',
-        'date_modified',
-        'date_added',
+        'updated',
+        'created',
     ]
 
     def get_queryset(self, request):
@@ -269,8 +269,8 @@ class UtilityAdmin(OpinionsAdminMixin, admin.ModelAdmin):
                         'get_count_supporters',
                         'get_listing_critics_with_admin_urls',
                         'get_listing_supporters_with_admin_urls',
-                        'date_modified',
-                        'date_added',
+                        'updated',
+                        'created',
                     ]
                 }
             ])
@@ -291,7 +291,7 @@ class UtilityAdmin(OpinionsAdminMixin, admin.ModelAdmin):
 
         if column in ['truncated_name', 'category']:
             css_class = 'text-left'
-        elif column in ['date_added', 'date_modified']:
+        elif column in ['created', 'updated']:
             css_class = 'text-right'
         else:
             css_class = 'text-center'

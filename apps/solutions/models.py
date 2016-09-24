@@ -67,7 +67,7 @@ class Solution(CommentsModelMixin, OpinionsModelMixin, TagsModelMixin, TimeStamp
         verbose_name = _("Solution")
         verbose_name_plural = _("Solutions")
         ordering = ['problem']
-        get_latest_by = 'date_modified'
+        get_latest_by = 'updated'
         permissions = (("can_view_opinions_about_solutions", "Can view opinions about solutions"),)
 
     def __str__(self):

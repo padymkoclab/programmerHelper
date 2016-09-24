@@ -17,5 +17,5 @@ class FlavourGenericInline(admin.GenericTabularInline):
     extra = 0
     ct_field = 'content_type'
     ct_fk_field = 'object_id'
-    fields = ['user', 'status', 'date_modified', 'date_added']
-    readonly_fields = ['date_modified', 'date_added']
+    fields = ['user', 'status', 'updated', 'created']
+    readonly_fields = ['updated', 'created']

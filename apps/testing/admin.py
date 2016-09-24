@@ -135,8 +135,8 @@ class PassageInline(admin.TabularInline):
     model = Suit.testers.through
     extra = 0
     can_delete = False
-    fields = ['user', 'status', 'mark', 'date']
-    readonly_fields = ['user', 'status', 'mark', 'date']
+    fields = ['user', 'status', 'mark', 'created']
+    readonly_fields = ['user', 'status', 'mark', 'created']
     classes = ['collapse']
 
 
@@ -156,18 +156,18 @@ class SuitAdmin(admin.ModelAdmin):
         'duration',
         'complexity',
         'is_new',
-        'date_modified',
-        'date_added',
+        'updated',
+        'created',
     )
     list_filter = (
         'status',
         'complexity',
         IsNewSimpleListFilter,
-        'date_modified',
-        'date_added',
+        'updated',
+        'created',
     )
 
-    date_hierarchy = 'date_added'
+    date_hierarchy = 'created'
     readonly_fields = [
         'get_count_questions',
         'get_count_passages',
@@ -175,8 +175,8 @@ class SuitAdmin(admin.ModelAdmin):
         'get_count_passed_passages',
         'get_count_distinct_testers',
         'get_avg_mark',
-        'date_modified',
-        'date_added'
+        'updated',
+        'created'
     ]
     prepopulated_fields = {'slug': ('name', )}
 
@@ -226,8 +226,8 @@ class SuitAdmin(admin.ModelAdmin):
                         'get_count_passed_passages',
                         'get_count_distinct_testers',
                         'get_avg_mark',
-                        'date_modified',
-                        'date_added',
+                        'updated',
+                        'created',
                     ]
                 }
             ])
@@ -254,19 +254,19 @@ class QuestionAdmin(admin.ModelAdmin):
         'get_count_variants',
         'is_completed',
         'is_new',
-        'date_modified',
-        'date_added'
+        'updated',
+        'created'
     )
     list_filter = (
         ('suit', admin.RelatedOnlyFieldListFilter),
         IsCompletedSimpleListFilter,
         IsNewSimpleListFilter,
-        'date_modified',
-        'date_added',
+        'updated',
+        'created',
     )
-    date_hierarchy = 'date_added'
+    date_hierarchy = 'created'
     prepopulated_fields = {'slug': ('title', )}
-    readonly_fields = ['get_count_variants', 'is_completed', 'date_modified', 'date_added']
+    readonly_fields = ['get_count_variants', 'is_completed', 'updated', 'created']
 
     def get_queryset(self, request):
         qs = super(QuestionAdmin, self).get_queryset(request)
@@ -297,8 +297,8 @@ class QuestionAdmin(admin.ModelAdmin):
                     'fields': [
                         'get_count_variants',
                         'is_completed',
-                        'date_modified',
-                        'date_added'
+                        'updated',
+                        'created'
                     ]
                 }
             ])
@@ -342,7 +342,7 @@ class VariantAdmin(admin.ModelAdmin):
         urls = super().get_urls()
 
         remove_url_from_admin_urls(urls, 'add'),
-        remove_url_from_admin_urls(urls, 'change'),
+        # remove_url_from_admin_urls(urls, 'change'),
         remove_url_from_admin_urls(urls, 'history'),
         remove_url_from_admin_urls(urls, 'delete'),
 
@@ -365,13 +365,13 @@ class PassageAdmin(admin.ModelAdmin):
 
     """
 
-    list_display = ['truncated_suit', 'user', 'status', 'mark', 'date']
-    date_hierarchy = 'date'
+    list_display = ['truncated_suit', 'user', 'status', 'mark', 'created']
+    date_hierarchy = 'created'
     list_filter = [
         ('suit', admin.RelatedOnlyFieldListFilter),
         ('user', admin.RelatedOnlyFieldListFilter),
         'status',
-        'date',
+        'created',
     ]
     fieldsets = [
         [
@@ -387,7 +387,7 @@ class PassageAdmin(admin.ModelAdmin):
         urls = super().get_urls()
 
         remove_url_from_admin_urls(urls, 'add'),
-        remove_url_from_admin_urls(urls, 'change'),
+        # remove_url_from_admin_urls(urls, 'change'),
         remove_url_from_admin_urls(urls, 'history'),
         remove_url_from_admin_urls(urls, 'delete'),
 

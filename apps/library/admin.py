@@ -92,7 +92,7 @@ class BookAdmin(admin.ModelAdmin):
         'get_rating',
         'is_new',
         'year_published',
-        'date_added',
+        'created',
     )
     list_filter = (
         BookSizeSimpleListFilter,
@@ -100,10 +100,10 @@ class BookAdmin(admin.ModelAdmin):
         ('authorship', admin.RelatedOnlyFieldListFilter),
         'language',
         'year_published',
-        'date_added',
+        'created',
     )
     search_fields = ('name', )
-    date_hierarchy = 'date_added'
+    date_hierarchy = 'created'
 
     form = BookAdminModelForm
     filter_horizontal = ['tags']
@@ -111,7 +111,7 @@ class BookAdmin(admin.ModelAdmin):
     radio_fields = {'language': admin.HORIZONTAL}
     prepopulated_fields = {'slug': ('name', )}
     readonly_fields = [
-        'date_added',
+        'created',
         'get_size_display',
         'get_count_replies',
         'get_rating',
@@ -157,7 +157,7 @@ class BookAdmin(admin.ModelAdmin):
                 _('Additional information'), {
                     'classes': ('collapse', ),
                     'fields': [
-                        'date_added',
+                        'created',
                         'get_size_display',
                         'get_count_replies',
                         'get_rating',
@@ -172,7 +172,7 @@ class BookAdmin(admin.ModelAdmin):
 
         if column == 'name':
             class_css = 'left'
-        elif column == 'date_added':
+        elif column == 'created':
             class_css = 'right'
         else:
             class_css = 'center'

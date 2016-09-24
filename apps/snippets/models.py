@@ -72,8 +72,8 @@ class Snippet(CommentsModelMixin, OpinionsModelMixin, TagsModelMixin, TimeStampe
         db_table = 'snippets'
         verbose_name = _("Snippet")
         verbose_name_plural = _("Snippets")
-        get_latest_by = 'date_added'
-        ordering = ['date_added']
+        get_latest_by = 'created'
+        ordering = ['created']
 
     def __str__(self):
         return '{0.name}'.format(self)

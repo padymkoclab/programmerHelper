@@ -121,28 +121,28 @@ class SnippetAdmin(OpinionsAdminMixin, admin.ModelAdmin):
         'get_count_opinions',
         'get_count_comments',
         'is_new',
-        'date_modified',
-        'date_added',
+        'updated',
+        'created',
     )
     list_filter = (
         ('user', admin.RelatedOnlyFieldListFilter),
         ('lexer', admin.AllValuesFieldListFilter),
         IsNewSimpleListFilter,
-        'date_modified',
-        'date_added',
+        'updated',
+        'created',
     )
 
     search_fields = ('name', )
     filter_horizontal = ['tags']
-    date_hierarchy = 'date_added'
+    date_hierarchy = 'created'
 
     readonly_fields = [
         'get_rating',
         'get_count_tags',
         'get_count_opinions',
         'get_count_comments',
-        'date_modified',
-        'date_added',
+        'updated',
+        'created',
         'get_count_critics',
         'get_count_supporters',
         'get_listing_critics_with_admin_urls',
@@ -198,8 +198,8 @@ class SnippetAdmin(OpinionsAdminMixin, admin.ModelAdmin):
                         'get_count_supporters',
                         'get_listing_critics_with_admin_urls',
                         'get_listing_supporters_with_admin_urls',
-                        'date_modified',
-                        'date_added',
+                        'updated',
+                        'created',
                     ],
                 }
             ])
@@ -224,7 +224,7 @@ class SnippetAdmin(OpinionsAdminMixin, admin.ModelAdmin):
         css_text_align = 'center'
         if column in ['truncated_name']:
             css_text_align = 'left'
-        elif column in ['date_modified', 'date_added']:
+        elif column in ['updated', 'created']:
             css_text_align = 'right'
         else:
             css_text_align = 'center'

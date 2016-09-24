@@ -25,7 +25,6 @@ DJANGO_APPS = [
 ]
 
 THIRD_PARTY_APPS = [
-    # 'django_gravatar',
     'suit_ckeditor',
 ]
 
@@ -37,7 +36,6 @@ COMMON_APPS = [
 ]
 
 CUSTOM_APPS = [
-    'apps.activity.apps.ActivityConfig',
     'apps.articles.apps.ArticlesConfig',
     'apps.badges.apps.BadgesConfig',
     'apps.library.apps.LibraryConfig',
@@ -83,7 +81,7 @@ MY_MIDDLEWARE_CLASSES = [
     # 'utils.middleware.TimeLoadPageMiddleware',
     # 'utils.middleware.CountQueriesMiddleware',
     # 'apps.visits.middleware.CountVisitsPageMiddleware',
-    # 'apps.visits.middleware.RegistratorVisitAccountMiddleware',
+    'apps.visits.middleware.LastSeenUserMiddleware',
 ]
 
 MIDDLEWARE = DJANGO_MIDDLEWARE_CLASSES + MY_MIDDLEWARE_CLASSES
@@ -115,7 +113,7 @@ TEMPLATES = [
 
 MY_CONTEXT_PROCCESSORS = [
     # 'utils.context_processors.date_creating_website',
-    # 'apps.visits.context_processors.count_visits',
+    'apps.visits.context_processors.users_online',
     # 'apps.sessions.context_processors.users_online',
 ]
 
@@ -300,8 +298,8 @@ SESSION_SERIALIZER = 'apps.sessions.serializers.ComprehensiveSessionJSONSerializ
 
 CACHES = {
     'default': {
-        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
-        'LOCATION': 'chachetable',
+        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+        'LOCATION': '127.0.0.1:11211',
     }
 }
 

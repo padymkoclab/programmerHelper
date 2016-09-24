@@ -45,13 +45,13 @@ class NewsletterAdmin(admin.ModelAdmin):
     '''
 
     form = NewsletterAdminModelForm
-    list_display = ('truncated_content', 'date_added')
+    list_display = ('truncated_content', 'created')
     list_filter = (
-        'date_added',
+        'created',
     )
     search_fields = ('content', )
-    date_hierarchy = 'date_added'
-    readonly_fields = ('date_added', )
+    date_hierarchy = 'created'
+    readonly_fields = ('created', )
 
     def get_fieldsets(self, request, obj=None):
 
@@ -69,7 +69,7 @@ class NewsletterAdmin(admin.ModelAdmin):
             fieldsets.append((
                 _('Additional information'), {
                     'classes': ('collapse', ),
-                    'fields': ('date_added', ),
+                    'fields': ('created', ),
                 }
             ))
 
@@ -77,7 +77,7 @@ class NewsletterAdmin(admin.ModelAdmin):
 
     def suit_cell_attributes(self, obj, column):
 
-        if column == 'date_added':
+        if column == 'created':
             css_align = 'right'
         else:
             css_align = 'left'

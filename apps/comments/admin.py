@@ -17,13 +17,13 @@ class CommentGenericInline(admin_generic.GenericStackedInline):
     ct_field = 'content_type'
     ct_fk_field = 'object_id'
 
-    readonly_fields = ['rating', 'date_modified', 'date_added']
+    readonly_fields = ['rating', 'updated', 'created']
 
     suit_classes = 'suit-tab suit-tab-comments'
 
     def get_fields(self, request, obj=None):
 
-        fields = ['user', 'text_comment', 'rating', 'date_modified', 'date_added']
+        fields = ['user', 'text_comment', 'rating', 'updated', 'created']
 
         return fields
 
@@ -33,7 +33,7 @@ class CommentAdmin(admin.ModelAdmin):
         Admin View for Comment
     '''
 
-    list_display = ('content_object', 'user', 'content_type', 'rating', 'is_new', 'date_modified', 'date_added')
+    list_display = ('content_object', 'user', 'content_type', 'rating', 'is_new', 'updated', 'created')
     # list_filter = ('',)
     # search_fields = ('',)
 

@@ -2,7 +2,9 @@
 from django.utils.translation import ugettext_lazy as _
 from django import forms
 
-from apps.core.widgets import CKEditorAdminWidget
+# from suit_ckeditor.widgets import CKEditorWidget
+
+# from apps.core.widgets import CKEditorAdminWidget
 
 
 class PartitionInlineAdminModelForm(forms.ModelForm):
@@ -13,8 +15,5 @@ class PartitionInlineAdminModelForm(forms.ModelForm):
         self.fields['name'].widget.attrs['placeholder'] = _('Enter name')
         self.fields['name'].widget.attrs['class'] = 'span12'
 
-    class Meta:
-        widgets = {
-            'content': CKEditorAdminWidget(attrs={
-            })
-        }
+        self.fields['content'].widget.attrs['placeholder'] = _('Enter content')
+        self.fields['content'].widget.attrs['class'] = 'span12'

@@ -25,3 +25,6 @@ IGNORABLE_URLS_FOR_COUNT_VISITS = (
     r'/favicon.ico$',
     r'/(robots.txt)|(humans.txt)$',
 )
+
+
+USER_LASTSEEN_TIMEOUT = 60

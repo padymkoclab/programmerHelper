@@ -26,8 +26,8 @@ class Opinion(BaseGenericModel):
     class Meta:
         verbose_name = _('Opinion')
         verbose_name_plural = _('Opinions')
-        get_latest_by = 'date_modified'
-        ordering = ['date_modified']
+        get_latest_by = 'updated'
+        ordering = ['updated']
         # permissions = (('can_view_opinions', _('Can view opinions')),)
         unique_together = ['user', 'object_id']
 

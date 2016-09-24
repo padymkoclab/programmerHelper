@@ -15,12 +15,10 @@ class DiaryInline(admin.StackedInline):
 
     model = Diary
     template = 'users/admin/edit_inline/stacked_OneToOne.html'
-    fields = ('date_added', 'date_modified')
-    readonly_fields = ('date_added', 'date_modified')
+    fields = ('created', 'updated')
+    readonly_fields = ('created', 'updated')
     verbose_name_plural = ''
     show_change_link = True
-
-    suit_classes = 'suit-tab suit-tab-diary'
 
     def get_queryset(self, request):
 
@@ -43,16 +41,8 @@ class PartitionInline(admin.StackedInline):
     fieldsets = (
         (
             None, {
-                # 'classes': ('collapse', ),
                 'fields': (
                     'name',
-                )
-            }
-        ),
-        (
-            None, {
-                'classes': ('full-width', ),
-                'fields': (
                     'content',
                 )
             }
@@ -72,4 +62,11 @@ class DiaryAdmin(admin.ModelAdmin):
             }
         )
     ]
+    list_display = ('user', 'get_count_partitions', 'get_date_latest_changes')
     inlines = (PartitionInline, )
+
+    def get_queryset(self, request):
+
+        qs = super().get_queryset(request)
+        qs = qs.diaries_with_count_partitions()
+        return qs

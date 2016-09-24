@@ -35,8 +35,8 @@ class Mark(BaseGenericModel):
         verbose_name_plural = _('Marks')
         permissions = (('can_view_marks', _('Can view marks')),)
         unique_together = ['user', 'object_id']
-        get_latest_by = 'date_modified'
-        ordering = ['date_modified']
+        get_latest_by = 'updated'
+        ordering = ['updated']
 
     def __str__(self):
         return _('On {0} "{1.content_object}"').format(
@@ -50,7 +50,7 @@ class Mark(BaseGenericModel):
                 raise ValidationError(_('User not allowed give mark about hisself labour.'))
 
     def is_new(self):
-        return self.date_modified > timezone.now() - timezone.timedelta(days=settings.COUNT_DAYS_FOR_NEW_ELEMENTS)
-    is_new.admin_order_field = 'date_modified'
+        return self.updated > timezone.now() - timezone.timedelta(days=settings.COUNT_DAYS_FOR_NEW_ELEMENTS)
+    is_new.admin_order_field = 'updated'
     is_new.short_description = _('Is new?')
     is_new.boolean = True

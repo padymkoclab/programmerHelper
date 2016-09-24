@@ -136,18 +136,18 @@ class ArticleAdmin(admin.ModelAdmin):
         'get_count_marks',
         'get_count_comments',
         'is_new',
-        'date_modified',
-        'date_added',
+        'updated',
+        'created',
     )
     list_filter = (
         ('user', admin.RelatedOnlyFieldListFilter),
         'status',
-        'date_modified',
-        'date_added',
+        'updated',
+        'created',
     )
     search_fields = ('name',)
     filter_horizontal = ['tags']
-    date_hierarchy = 'date_added'
+    date_hierarchy = 'created'
     prepopulated_fields = {'slug': ['name']}
     readonly_fields = (
         'get_rating',
@@ -245,7 +245,7 @@ class ArticleAdmin(admin.ModelAdmin):
 
     def suit_cell_attributes(self, obj, column):
 
-        if column in ['date_added', 'date_modified']:
+        if column in ['created', 'updated']:
             css_class = 'right'
         elif column == 'name':
             css_class = 'left'

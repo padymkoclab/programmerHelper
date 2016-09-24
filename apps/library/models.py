@@ -97,7 +97,7 @@ class Book(TagsModelMixin, RepliesModelMixin, models.Model):
             ),
         ]
     )
-    date_added = models.DateTimeField(_('Date added'), auto_now_add=True)
+    created = models.DateTimeField(_('Date added'), auto_now_add=True)
     tags = models.ManyToManyField(
         Tag, verbose_name=_('Tags'), related_name='books',
     )

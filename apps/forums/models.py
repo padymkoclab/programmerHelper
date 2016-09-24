@@ -14,7 +14,7 @@ from django.conf import settings
 from utils.django.datetime_utils import convert_date_to_django_date_format
 from utils.django.models import TimeStampedModel
 from utils.django.models_fields import ConfiguredAutoSlugField, MarkupField
-from utils.django.models_utils import upload_image, get_admin_url
+from utils.django.models_utils import get_admin_url
 
 from .managers import SectionManager, ForumManager, TopicManager, PostManager
 
@@ -23,9 +23,6 @@ class Section(models.Model):
     """
 
     """
-
-    def upload_image(instance, filename):
-        return upload_image(instance, filename)
 
     id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
     name = models.CharField(_('Name'), max_length=80, unique=True, validators=[MinLengthValidator(5)])
@@ -38,7 +35,6 @@ class Section(models.Model):
         _('Position'), unique=True,
         validators=[MinValueValidator(1)]
     )
-    image = models.ImageField(_('Image'), upload_to=upload_image)
 
     objects = models.Manager()
     objects = SectionManager()
@@ -134,7 +130,7 @@ class Forum(TimeStampedModel):
         verbose_name = ("Forum")
         verbose_name_plural = _("Forums")
         ordering = ['name']
-        get_latest_by = 'date_modified'
+        get_latest_by = 'updated'
         unique_together = (('section', 'name'))
 
     def __str__(self):
@@ -222,9 +218,9 @@ class Forum(TimeStampedModel):
         if latest_post is None:
             return
 
-        latest_post_date_modified = convert_date_to_django_date_format(latest_post.date_modified)
+        latest_post_updated = convert_date_to_django_date_format(latest_post.updated)
 
-        return format_html(_('by {}<br />{}'), latest_post.user, latest_post_date_modified)
+        return format_html(_('by {}<br />{}'), latest_post.user, latest_post_updated)
     display_details_latest_post.short_description = _('Latest post')
 
 
@@ -254,9 +250,9 @@ class Topic(TimeStampedModel):
     class Meta:
         verbose_name = _('Topic')
         verbose_name_plural = _('Topics')
-        ordering = ['-is_sticky', 'forum', '-date_added']
+        ordering = ['-is_sticky', 'forum', '-created']
         unique_together = ['subject', 'forum']
-        get_latest_by = 'date_modified'
+        get_latest_by = 'updated'
 
     def __str__(self):
         return '{0.subject}'.format(self)
@@ -271,7 +267,7 @@ class Topic(TimeStampedModel):
     def head(self):
         """ """
 
-        return self.posts.select_related().order_by('date_added').first()
+        return self.posts.select_related().order_by('created').first()
 
     def get_count_posts(self):
         """ """
@@ -311,9 +307,9 @@ class Topic(TimeStampedModel):
         if latest_post is None:
             return
 
-        latest_post_date_modified = convert_date_to_django_date_format(latest_post.date_modified)
+        latest_post_updated = convert_date_to_django_date_format(latest_post.updated)
 
-        return format_html(_('by {}<br />{}'), latest_post.user, latest_post_date_modified)
+        return format_html(_('by {}<br />{}'), latest_post.user, latest_post_updated)
     display_details_latest_post.short_description = _('Latest post')
 
 
@@ -341,8 +337,8 @@ class Post(TimeStampedModel):
     class Meta:
         verbose_name = _("Post")
         verbose_name_plural = _("Posts")
-        ordering = ['topic', 'date_added']
-        get_latest_by = 'date_added'
+        ordering = ['topic', 'created']
+        get_latest_by = 'created'
 
     def __str__(self):
         return truncatechars(self.content, 100)

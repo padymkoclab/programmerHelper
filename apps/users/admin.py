@@ -25,9 +25,9 @@ from apps.opinions.models import Opinion
 from apps.marks.models import Mark
 from apps.polls.models import Vote
 from apps.forums.models import Topic, Post
+from apps.testing.models import Passage
 
 from apps.polls.listfilters import IsActiveVoterListFilter
-from apps.diaries.admin import DiaryInline
 
 from .actions import (
     make_users_as_non_superuser,
@@ -35,7 +35,7 @@ from .actions import (
     make_users_as_non_active,
     make_users_as_active,
 )
-from .forms import UserChangeForm, UserCreationForm, LevelAdminModelForm
+from .forms import UserChangeForm, UserCreationForm, LevelAdminModelForm, ProfileAdminModelForm
 from .models import User, Level, Profile
 from .listfilters import ListFilterLastLogin
 
@@ -87,13 +87,11 @@ class ProfileInline(admin.StackedInline):
     suit_classes = 'suit-tab suit-tab-profile'
 
 
-inlines = [
-    ProfileInline, DiaryInline
-]
+inlines = []
 for model in [
     Snippet, Article, Solution, Question, Answer,
     Comment, Reply, Opinion, Mark, Flavour, Topic, Post,
-    # Vote,
+    Vote, Passage
 ]:
 
     class ObjectInlineFormSet(forms.BaseInlineFormSet):
@@ -102,23 +100,27 @@ for model in [
             super().__init__(*args, **kwargs)
 
             # make slice form in formsets
-            self.queryset = self.queryset.order_by('-date_added')[:3]
+            self.queryset = self.queryset.order_by('-created')[:3]
 
     def truncated_str(self, obj):
         return truncatechars(force_text(obj), 120)
     truncated_str.short_description = model._meta.verbose_name
 
+    def get_fields(self, request, obj=None):
+        return ('truncated_str', 'created'),
+
     ObjectInline = type('ObjectInline', (admin.TabularInline, ), dict(
         model=model,
-        fields=('truncated_str', 'date_added'),
-        readonly_fields=('truncated_str', 'date_added'),
+        readonly_fields=('truncated_str', 'created'),
         can_delete=False,
+        template='users/admin/edit_inline/tabular_tab_activity.html',
         max_num=0,
         extra=0,
         show_change_link=True,
-        suit_classes='suit-tab suit-tab-objects',
+        suit_classes='suit-tab suit-tab-activity',
         formset=ObjectInlineFormSet,
         truncated_str=truncated_str,
+        get_fields=get_fields,
     ))
 
     inlines.append(ObjectInline)
@@ -145,7 +147,6 @@ class UserAdmin(BaseUserAdmin):
         'last_login',
         'date_joined',
     )
-
     list_filter = [
         ('level', admin.RelatedOnlyFieldListFilter),
         ('is_active', admin.BooleanFieldListFilter),
@@ -193,22 +194,23 @@ class UserAdmin(BaseUserAdmin):
         'get_count_test_suits',
         'get_count_passages',
         'get_count_votes',
-        'display_diary_details',
+        # 'display_diary_details',
     )
 
     suit_form_tabs = [
         ('general', _('General')),
         ('permissions', _('Permissions')),
         ('groups', _('Groups')),
-        ('profile', _('Profile')),
-        ('diary', _('Diary')),
-        ('objects', _('Objects')),
         ('tags', _('Tags')),
         ('badges', _('Badges')),
         ('activity', _('Activity')),
         ('notifications', _('Notifications')),
         ('summary', _('Summary')),
     ]
+
+    suit_form_includes = (
+        ('users/admin/user_admin_tab_tags.html', 'top', 'tags'),
+    )
 
     def get_queryset(self, request):
 
@@ -259,42 +261,36 @@ class UserAdmin(BaseUserAdmin):
                         )
                     }
                 ),
-                (
-                    None, {
-                        'classes': ('suit-tab suit-tab-summary', ),
-                        'fields': (
-                            'level',
-                            'reputation',
-                            'last_seen',
-                            'last_login',
-                            'date_joined',
-                            'display_diary_details',
-                            'get_count_comments',
-                            'get_count_opinions',
-                            'get_count_likes',
-                            'get_count_marks',
-                            'get_count_questions',
-                            'get_count_snippets',
-                            'get_count_articles',
-                            'get_count_answers',
-                            'get_count_solutions',
-                            'get_count_posts',
-                            'get_count_topics',
-                            'get_count_test_suits',
-                            'get_count_passages',
-                            'get_count_votes',
-                        )
-                    }
-                ),
+                # (
+                #     None, {
+                #         'classes': ('suit-tab suit-tab-summary', ),
+                #         'fields': (
+                #             'level',
+                #             'reputation',
+                #             'last_seen',
+                #             'last_login',
+                #             'date_joined',
+                #             'display_diary_details',
+                #             'get_count_comments',
+                #             'get_count_opinions',
+                #             'get_count_likes',
+                #             'get_count_marks',
+                #             'get_count_questions',
+                #             'get_count_snippets',
+                #             'get_count_articles',
+                #             'get_count_answers',
+                #             'get_count_solutions',
+                #             'get_count_posts',
+                #             'get_count_topics',
+                #             'get_count_test_suits',
+                #             'get_count_passages',
+                #             'get_count_votes',
+                #         )
+                #     }
+                # ),
             ))
 
         return fieldsets
-
-    def get_inline_instances(self, request, obj=None):
-
-        if obj is not None:
-            return [inline(self.model, self.admin_site) for inline in inlines]
-        return ()
 
     def get_urls(self):
 
@@ -310,6 +306,12 @@ class UserAdmin(BaseUserAdmin):
         return urls
 
     def change_view(self, request, object_id, form_url='', extra_context=None):
+
+        if extra_context is None:
+            extra_context = {}
+
+        extra_context['statistics_usage_tags'] = \
+            self.model.objects.get(pk=object_id).get_statistics_usage_tags()
 
         return super().change_view(request, object_id, form_url, extra_context)
 
@@ -349,6 +351,24 @@ class UserAdmin(BaseUserAdmin):
 
     #     response = super(UserAdmin, self).changelist_view(request, extra_context)
     #     return response
+
+    def get_inline_instances(self, request, obj=None):
+
+        if obj is not None:
+            # inlines = inlines
+            return [inline(self.model, self.admin_site) for inline in inlines]
+        return []
+
+    def suit_cell_attributes(self, request, column):
+
+        if column in ['date_joined', 'last_login']:
+            css_class_align = 'right'
+        elif column in ['display_name', 'username', 'email']:
+            css_class_align = 'left'
+        else:
+            css_class_align = 'center'
+
+        return {'class': 'text-{}'.format(css_class_align)}
 
     def voters_view(self, request):
         """ """
@@ -390,7 +410,76 @@ class UserAdmin(BaseUserAdmin):
 @admin.register(Profile, site=AdminSite)
 class ProfileAdmin(admin.ModelAdmin):
 
-    pass
+    list_display = (
+        'get_user__get_full_name',
+        'gender',
+        'views',
+        'last_seen',
+        'get_percentage_filling',
+        'updated',
+    )
+    readonly_fields = (
+        'get_user__display_avatar',
+        'get_user__get_full_name',
+    )
+    # search_fields = ('user', )
+    date_hierarchy = 'updated'
+    list_filter = (
+        'gender',
+        'updated',
+    )
+
+    form = ProfileAdminModelForm
+    fieldsets = (
+        (
+            None, {
+                'fields': (
+                    'get_user__display_avatar',
+                    # 'views',
+                    'signature',
+                    'presents_on_gmail',
+                    'presents_on_github',
+                    'presents_on_stackoverflow',
+                    'personal_website',
+                    'gender',
+                    'job',
+                    'location',
+                    ('longitude', 'latitude'),
+                    'date_birthday',
+                    'real_name',
+                    'phone',
+                    # 'updated',
+                ),
+            }
+        ),
+        (
+            None, {
+                'classes': ('full-width', ),
+                'fields': (
+                    'about',
+                )
+            }
+        )
+    )
+
+    def suit_cell_attributes(self, request, column):
+
+        if column in ['updated', 'last_seen']:
+            css_class_align = 'right'
+        elif column in ['get_user__get_full_name', ]:
+            css_class_align = 'left'
+        else:
+            css_class_align = 'center'
+
+        return {'class': 'text-{}'.format(css_class_align)}
+
+    def get_user__display_avatar(self, obj):
+        return obj.user.display_avatar()
+    get_user__display_avatar.short_description = _('Avatar')
+
+    def get_user__get_full_name(self, obj):
+        return obj.user.get_full_name()
+    get_user__get_full_name.short_description = _('User')
 
 
 class UserInline(admin.TabularInline):

@@ -30,7 +30,6 @@ urlpatterns = [
 
     # apps
     url(r'^users/', include('apps.users.urls')),
-    url(r'^activity/', include('apps.activity.urls')),
     url(r'^articles/', include('apps.articles.urls')),
     url(r'^library/', include('apps.library.urls')),
     # url(r'^courses/', include('apps.courses.urls')), # temporary is disabled

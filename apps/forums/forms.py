@@ -6,8 +6,6 @@ from django.utils.translation import ugettext_lazy as _
 
 from suit.widgets import AutosizedTextarea
 
-from utils.django.widgets import AdminImageThumbnail
-
 from .models import Section, Forum, Topic, Post
 
 
@@ -26,13 +24,6 @@ class SectionAdminModelForm(forms.ModelForm):
         self.fields['position'].widget.attrs['min'] = 1
 
         logger.error('Displayed TextInput istead of NumberInput for field "Section.position"')
-
-    class Meta:
-        model = Section
-        fields = ('name', 'groups', 'position', 'image')
-        widgets = {
-            'image': AdminImageThumbnail(),
-        }
 
 
 class ForumInlineAdminModelForm(forms.ModelForm):
@@ -56,8 +47,6 @@ class FormAdminModelForm(forms.ModelForm):
         self.fields['section'].widget.widget.attrs['class'] = 'span11'
 
     class Meta:
-        model = Forum
-        fields = ('name', )
         widgets = {
             'description': AutosizedTextarea(attrs={
                 'placeholder': _('Enter description'),

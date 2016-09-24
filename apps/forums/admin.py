@@ -120,7 +120,6 @@ class SectionAdmin(admin.ModelAdmin):
                 'classes': ('suit-tab', 'suit-tab-general', ),
                 'fields': (
                     'name',
-                    'image',
                     'position',
                     'groups',
                 ),
@@ -190,7 +189,7 @@ class TopicInline(admin.TabularInline):
             obj.get_admin_url(),
             truncatechars(obj.subject, 75),
             obj.user,
-            convert_date_to_django_date_format(obj.date_added),
+            convert_date_to_django_date_format(obj.created),
         )
     display_topic.short_description = _('Topic')
 
@@ -215,19 +214,19 @@ class ForumAdmin(admin.ModelAdmin):
         'get_total_count_posts',
         'get_count_active_users',
         'display_details_latest_post',
-        'date_modified',
-        'date_added',
+        'updated',
+        'created',
     )
     list_filter = (
-        'date_modified',
-        'date_added',
+        'updated',
+        'created',
     )
     search_fields = ('name',)
     readonly_fields = (
         'get_count_topics',
         'get_total_count_posts',
-        'date_modified',
-        'date_added',
+        'updated',
+        'created',
     )
     filter_horizontal = ('moderators', )
 
@@ -267,8 +266,8 @@ class ForumAdmin(admin.ModelAdmin):
                         'fields': (
                             'get_count_topics',
                             'get_total_count_posts',
-                            'date_modified',
-                            'date_added',
+                            'updated',
+                            'created',
                         )
                     }
                 ),
@@ -285,7 +284,7 @@ class ForumAdmin(admin.ModelAdmin):
 
     def suit_cell_attributes(self, request, column):
 
-        if column in ['date_added', 'date_modified']:
+        if column in ['created', 'updated']:
             css_align = 'right'
         elif column in ['truncated_name', 'display_details_latest_post']:
             css_align = 'left'
@@ -312,8 +311,8 @@ class PostInline(admin.StackedInline):
     extra = 0
     can_delete = True
     fk_name = 'topic'
-    fields = ('user', 'markup', 'user_ip', 'content', 'display_content_html', 'date_added')
-    readonly_fields = ('date_added', 'display_content_html')
+    fields = ('user', 'markup', 'user_ip', 'content', 'display_content_html', 'created')
+    readonly_fields = ('created', 'display_content_html')
 
     suit_classes = 'suit-tab suit-tab-posts'
 
@@ -338,23 +337,23 @@ class TopicAdmin(admin.ModelAdmin):
         'is_sticky',
         'is_opened',
         'is_new',
-        'date_modified',
-        'date_added',
+        'updated',
+        'created',
     )
     list_filter = (
         ('user', admin.RelatedOnlyFieldListFilter),
         'is_opened',
         'is_sticky',
-        'date_modified',
-        'date_added',
+        'updated',
+        'created',
     )
-    date_hierarchy = 'date_added'
+    date_hierarchy = 'created'
     search_fields = ('subject', )
     readonly_fields = (
         'get_count_posts',
         'views',
-        'date_modified',
-        'date_added',
+        'updated',
+        'created',
     )
 
     suit_form_tabs = (
@@ -394,8 +393,8 @@ class TopicAdmin(admin.ModelAdmin):
                         'fields': (
                             'get_count_posts',
                             'views',
-                            'date_modified',
-                            'date_added',
+                            'updated',
+                            'created',
                         )
                     }
                 ),
@@ -412,7 +411,7 @@ class TopicAdmin(admin.ModelAdmin):
 
     def suit_cell_attributes(self, request, column):
 
-        if column in ['date_added', 'date_modified']:
+        if column in ['created', 'updated']:
             css_align = 'right'
         elif column in ['truncated_subject', 'display_details_latest_post']:
             css_align = 'left'
@@ -435,19 +434,19 @@ class PostAdmin(admin.ModelAdmin):
     '''
 
     form = PostAdminModelForm
-    list_display = ('truncated_topic', 'user', 'markup', 'is_new', 'date_modified', 'date_added')
+    list_display = ('truncated_topic', 'user', 'markup', 'is_new', 'updated', 'created')
     list_filter = (
         ('user', admin.RelatedOnlyFieldListFilter),
         ('topic', admin.RelatedOnlyFieldListFilter),
         ('markup', admin.AllValuesFieldListFilter),
-        'date_modified',
-        'date_added',
+        'updated',
+        'created',
     )
-    date_hierarchy = 'date_added'
+    date_hierarchy = 'created'
     search_fields = ('content', )
     readonly_fields = (
-        'date_modified',
-        'date_added',
+        'updated',
+        'created',
         'display_content_html',
     )
 
@@ -478,8 +477,8 @@ class PostAdmin(admin.ModelAdmin):
                 (_('Statistics'), {
                     'classes': ('suit-tab', 'suit-tab-statistics', ),
                     'fields': (
-                        'date_modified',
-                        'date_added',
+                        'updated',
+                        'created',
                     )
                 }),
             )
@@ -490,7 +489,7 @@ class PostAdmin(admin.ModelAdmin):
 
         if column == 'truncated_topic':
             css_align = 'left'
-        elif column in ['date_added', 'date_modified']:
+        elif column in ['created', 'updated']:
             css_align = 'right'
         else:
             css_align = 'center'
