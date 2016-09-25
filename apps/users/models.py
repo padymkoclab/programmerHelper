@@ -18,6 +18,7 @@ from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.db import models
 from django.conf import settings
 from django.core.cache import cache
+# from django.contrib.auth import password_validation
 
 from utils.django import utils
 from utils.django.models_fields import ConfiguredAutoSlugField, PhoneField, AutoOneToOneField, ColorField
@@ -35,6 +36,7 @@ from apps.tags.models import Tag
 
 from .managers import UserManager, LevelManager
 from .exceptions import ProtectDeleteUser
+from .validators import UsernameValidator
 
 
 logger = logging.getLogger('django.development')
@@ -120,13 +122,21 @@ class Level(models.Model):
     get_count_users.short_description = _('Count users')
 
 
+# get_earned_badges
+# get_unearned_badges
+# get_gold_badges
+# get_silver_badges
+# get_bronze_badges
+# get_chart_visits
+# get_chart_activity
+
 class User(AbstractBaseUser, PermissionsMixin):
     """
     Custom auth user model with additional fields and username fields as email
     """
 
     USERNAME_FIELD = 'username'
-    REQUIRED_FIELDS = ('email', 'display_name')
+    REQUIRED_FIELDS = ('email', 'alias')
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     email = models.EmailField(
@@ -136,13 +146,18 @@ class User(AbstractBaseUser, PermissionsMixin):
         }
     )
     username = models.CharField(
-        _('Username'), max_length=200, unique=True,
+        _('Username'), max_length=40, unique=True,
         error_messages={
             'unique': _('User with this username already exists.')
-        }
+        },
+        validators=[
+            MinLengthValidator(3),
+            UsernameValidator(),
+        ],
+        help_text=UsernameValidator.help_text,
     )
-    display_name = models.CharField(
-        _('Display name'), max_length=200,
+    alias = models.CharField(
+        _('Alias'), max_length=200,
         help_text=_('Name for public display'),
     )
     is_active = models.BooleanField(_('Is active'), default=True)
@@ -172,6 +187,8 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def save(self, *args, **kwargs):
 
+        self.diary
+        self.profile
         super(User, self).save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):
@@ -199,6 +216,9 @@ class User(AbstractBaseUser, PermissionsMixin):
 
         return get_admin_url(self)
 
+    # def clean(self):
+    #     pass
+
     def display_admin_change_link(self):
         """ """
 
@@ -213,9 +233,9 @@ class User(AbstractBaseUser, PermissionsMixin):
     # get_full_name.admin_order_field = 'username'
 
     def get_short_name(self):
-        return '{0.display_name}'.format(self)
+        return '{0.alias}'.format(self)
     get_short_name.short_description = _('Short name')
-    # get_short_name.admin_order_field = 'display_name'
+    # get_short_name.admin_order_field = 'alias'
 
     @property
     def is_staff(self):
@@ -414,7 +434,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_active_voter.short_description = _('Is active\nvoter?')
     is_active_voter.boolean = True
 
-    def get_statistics_usage_tags(self):
+    def get_statistics_usage_tags(self, count=None):
         """ """
 
         tags = itertools.chain.from_iterable((
@@ -425,9 +445,18 @@ class User(AbstractBaseUser, PermissionsMixin):
             self.answers.values_list('question__tags', flat=True),
         ))
         tags = collections.Counter(tags).most_common()
-        tags = ((Tag.objects.get(pk=pk), count) for pk, count in tags)
+        tags = tuple((Tag.objects.get(pk=pk), count) for pk, count in tags)
 
-        return tuple(tags)
+        if count is not None:
+            tags = tuple(tags)[:count]
+
+        return tags
+
+    def get_top_tag(self):
+        """ """
+
+        first_element = self.get_statistics_usage_tags(1)[0]
+        return first_element[0]
 
     def have_certain_count_consecutive_days(self, count_consecutive_days):
         if count_consecutive_days > 0:
@@ -716,26 +745,5 @@ class Profile(models.Model):
     get_percentage_filling.admin_order_field = 'percentage_filling'
 
 
-# get_top_tag
 # chart reputation
 # get_badges_by_sort (silver, bronze, gold)
-
-
-# class Notification(models.Model):
-#     """ """
-
-#     CHOICES_NOTIFICATIONS = (
-#         (_('Message')),
-#         (_('Comment')),
-#         (_('Badge')),
-#         (_('Reputation')),
-#     )
-
-#     id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
-#     type = models.CharField(_('Type'), max_length=50, choices=CHOICES_NOTIFICATIONS)
-#     user = models.ForeignKey(
-#         'User', related_name='notifications',
-#         verbose_name=_('User'), on_delete=models.CASCADE
-#     )
-#     content = models.CharField(_('Content'), max_length=300)
-#     created = models.DateTimeField(_('Created'), auto_now_add=True)

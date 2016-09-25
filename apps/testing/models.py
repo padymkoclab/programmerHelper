@@ -255,4 +255,4 @@ class Passage(models.Model):
         ordering = ['created']
 
     def __str__(self):
-        return '{0.suit}'.format(self)
+        return _('In suit "{0.suit}"').format(self)

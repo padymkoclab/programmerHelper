@@ -1,20 +1,44 @@
 
+{% load i18n %}
+
 <style>
-  #tabs_tags_div{
+
+  #tabs_div_tags .div_tags{
     width: 100%;
     -moz-column-count: 4;
     -webkit-column-count: 4;
     column-count: 4;
+    background-color: rgb(246, 247, 248);
+    padding: 10px 0;
+  }
+
+  #tabs_div_tags .div_tag{
+    padding: 5px;
+  }
+
+  #tabs_div_tags .div_header{
+    background: rgb(255, 255, 255);
     padding: 10px;
   }
 
-  #tabs_tags_div div{
-    padding: 5px 0;
+  #tabs_div_tags .div_header span{
+    font-size: 16px;
   }
+
+  #tabs_div_tags .div_header a{
+    float: right;
+  }
+
 </style>
 
-<div id="tabs_tags_div">
-{% for tag, count in statistics_usage_tags %}
-    <div><a href="{{ tag.get_admin_url }}">{{ tag }}</a> x {{ count }}</div>
-{% endfor %}
+<div id="tabs_div_tags">
+  <div class="div_header">
+      <span>{% trans "Top tag" %}: {{ user_top_tag }}</span>
+      <a href="">{% trans "View all" %}</a>
+  </div>
+  <div class="div_tags">
+  {% for tag, count in statistics_usage_tags %}
+      <div class="div_tag"><a href="{{ tag.get_admin_url }}">{{ tag }}</a> x {{ count }}</div>
+  {% endfor %}
+  </div>
 </div>

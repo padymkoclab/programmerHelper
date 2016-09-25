@@ -1,4 +1,6 @@
 
+import uuid
+
 from django.utils import timezone
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
@@ -7,20 +9,22 @@ from django.utils.translation import ugettext_lazy as _
 from django.db import models
 from django.conf import settings
 
+from utils.django.models_fields import AutoOneToOneField
 from utils.django.models import TimeStampedModel
 from utils.django.models_utils import get_admin_url
 
 from .managers import DiaryManager
 
 
-class Diary(TimeStampedModel):
+class Diary(models.Model):
     """ """
 
     MAX_COUNT_PARTITION = 50
 
-    user = models.OneToOneField(
+    id = models.UUIDField(default=uuid.uuid4, primary_key=True, editable=False)
+    user = AutoOneToOneField(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
-        verbose_name=_('User'), related_name='diary'
+        verbose_name=_('Owner'), related_name='diary'
     )
 
     objects = models.Manager()
@@ -44,9 +48,15 @@ class Diary(TimeStampedModel):
     def get_date_latest_changes(self):
         """ """
 
+        if hasattr(self, 'date_latest_changes'):
+            return self.date_latest_changes
+
         if self.partitions.exists():
             return self.partitions.latest().updated
+
         return
+    get_date_latest_changes.short_description = _('Date latest changes')
+    get_date_latest_changes.admin_order_field = 'date_latest_changes'
 
     def get_count_partitions(self):
         """ """
@@ -55,7 +65,18 @@ class Diary(TimeStampedModel):
             return self.count_partitions
 
         return self.partitions.count()
+    get_count_partitions.short_description = _('Count partitions')
     get_count_partitions.admin_order_field = 'count_partitions'
+
+    def get_total_size(self):
+        """ """
+
+        if hasattr(self, 'total_size'):
+            return self.total_size
+
+        return self.partitions.count()
+    get_total_size.short_description = _('Total size')
+    get_total_size.admin_order_field = 'total_size'
 
 
 class Partition(TimeStampedModel):
@@ -65,7 +86,7 @@ class Partition(TimeStampedModel):
         'Diary', on_delete=models.CASCADE,
         verbose_name=_('Diary'), related_name='partitions',
     )
-    name = models.CharField(_('name'), max_length=50, unique=True)
+    name = models.CharField(_('name'), max_length=50)
     content = models.TextField(_('content'))
 
     class Meta:

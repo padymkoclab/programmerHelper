@@ -27,7 +27,4 @@ class UsersConfig(AppConfig):
 
         # User = get_user_model()
 
-        # post_save.connect(auto_create_user_profile, sender=User)
-        # post_delete.connect(auto_delete_user_profile, sender=User)
-
         post_migrate.connect(signal_post_migrate_model_levels_of_users, sender=self)

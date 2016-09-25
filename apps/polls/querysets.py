@@ -35,7 +35,7 @@ class PollQuerySet(models.QuerySet):
     def polls_with_date_lastest_voting(self):
         """Return a queryset with determined last voting`s date for an each polls."""
 
-        return self.annotate(date_latest_voting=models.Max('votes__date_voting'))
+        return self.annotate(date_latest_voting=models.Max('votes__created'))
 
     def polls_with_count_choices_and_votes_and_date_lastest_voting(self):
         """Return the queryset, where each a poll has deternimed a count choices and votes itself."""
@@ -69,7 +69,7 @@ class UserPollQuerySet(models.QuerySet):
     def users_with_date_latest_voting(self):
         """ """
 
-        return self.annotate(date_latest_voting=models.Max('votes__date_voting'))
+        return self.annotate(date_latest_voting=models.Max('votes__created'))
 
     def users_with_active_voters_status(self):
         """ """

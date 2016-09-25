@@ -348,10 +348,10 @@ class VoteAdmin(admin.ModelAdmin):
         urls = super().get_urls()
 
         # remove urls for add and change vote
-        remove_url_from_admin_urls(urls, 'add')
+        # remove_url_from_admin_urls(urls, 'add')
         # remove_url_from_admin_urls(urls, 'change')
-        remove_url_from_admin_urls(urls, 'history')
-        remove_url_from_admin_urls(urls, 'delete')
+        # remove_url_from_admin_urls(urls, 'history')
+        # remove_url_from_admin_urls(urls, 'delete')
 
         return urls
 

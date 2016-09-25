@@ -9,7 +9,7 @@ TEST_SUPERUSER_DATA = dict(
     email='admin@admin.com',
     username='admin',
     password='admin',
-    display_name='Admin',
+    alias='Admin',
 )
 
 

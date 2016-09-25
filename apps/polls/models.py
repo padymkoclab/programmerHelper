@@ -64,7 +64,6 @@ class Poll(TimeStampedModel):
     objects = PollManager.from_queryset(PollQuerySet)()
 
     class Meta:
-        db_table = 'polls'
         verbose_name = _("Poll")
         verbose_name_plural = _("Polls")
         ordering = ['created']
@@ -198,7 +197,6 @@ class Choice(models.Model):
     objects = ChoiceManager.from_queryset(ChoiceQuerySet)()
 
     class Meta:
-        db_table = 'choices'
         verbose_name = _("Choice")
         verbose_name_plural = _("Choices")
         ordering = ['poll']
@@ -260,7 +258,6 @@ class Vote(models.Model):
     objects = VoteManager()
 
     class Meta:
-        db_table = 'votes'
         verbose_name = "Vote"
         verbose_name_plural = "Votes"
         ordering = ['-created']
@@ -268,7 +265,7 @@ class Vote(models.Model):
         unique_together = ('poll', 'user')
 
     def __str__(self):
-        return _('Vote of a user "{0.user}" in a poll "{0.poll}"').format(self)
+        return _('In a poll "{0.poll}"').format(self)
 
     def unique_error_message(self, model_class, unique_check):
         """A custom text for fields in meta-attribute unique_together."""

@@ -50,9 +50,9 @@ class Command(FactoryCountBaseCommand):
                 vote = Vote.objects.create(user=user, poll=poll, choice=choice)
 
                 # change date voting on random
-                min_date_added = max(poll.date_added, vote.user.date_joined)
-                random_date_added = fuzzy.FuzzyDateTime(min_date_added).fuzz()
-                Vote.objects.filter(pk=vote.pk).update(date_added=random_date_added)
+                min_date_created = max(poll.created, vote.user.date_joined)
+                random_created = fuzzy.FuzzyDateTime(min_date_created).fuzz()
+                Vote.objects.filter(pk=vote.pk).update(created=random_created)
 
         logger.debug('Made factory polls ({0}), choices ({1}) and votes ({2}).'.format(
             Poll.objects.count(),

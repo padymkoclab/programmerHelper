@@ -18,17 +18,17 @@ class AbstractTimeStampedFactory(factory.DjangoModelFactory):
 
     @classmethod
     def _after_postgeneration(cls, obj, create, results=None):
-        super(AbstractTimeStampedFactory, cls)._after_postgeneration(obj, create, results)
+        super()._after_postgeneration(obj, create, results)
         qs = obj._meta.model._default_manager.filter(pk=obj.pk)
         try:
-            qs.update(date_modified=fuzzy.FuzzyDateTime(obj.date_added, timezone.now()).fuzz())
-        except:
-            from IPython.core.debugger import Tracer
-            Tracer()()
+            updated = fuzzy.FuzzyDateTime(obj.created, timezone.now()).fuzz()
+            qs.update(updated=updated)
+        except Exception as e:
+            import ipdb; ipdb.set_trace()
 
     @factory.post_generation
-    def date_added(self, create, extracted, **kwargs):
-        self.date_added = fuzzy.FuzzyDateTime(timezone.now() - timezone.timedelta(days=500)).fuzz()
+    def created(self, create, extracted, **kwargs):
+        self.created = fuzzy.FuzzyDateTime(timezone.now() - timezone.timedelta(days=500)).fuzz()
         self.save()
 
 

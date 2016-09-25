@@ -58,7 +58,7 @@ class Question(TagsModelMixin, OpinionsModelMixin, FlavourModelMixin, TimeStampe
         settings.AUTH_USER_MODEL, verbose_name=_('User'),
         related_name='questions', on_delete=models.CASCADE,
     )
-    views = models.PositiveIntegerField(_('Views'), default=0, editable=False)
+    views = models.PositiveIntegerField(_('Count views'), editable=False, default=0)
     tags = models.ManyToManyField(
         Tag, related_name='questions', verbose_name=_('Tags'),
     )

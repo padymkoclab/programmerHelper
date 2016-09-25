@@ -24,7 +24,7 @@ class UserFactory(factory.DjangoModelFactory):
 
     email = factory.Faker('email', 'en')
     username = factory.Faker('user_name', 'ru')
-    display_name = factory.Faker('name', 'ru')
+    alias = factory.Faker('name', 'ru')
 
     password = factory.PostGenerationMethodCall('set_password', 'defaultpassword')
 

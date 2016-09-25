@@ -1,7 +1,9 @@
 
 from django.utils.translation import ugettext_lazy as _
 from django import forms
+from django.conf import settings
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
+from django.contrib.auth import password_validation
 
 from suit.widgets import AutosizedTextarea, SuitDateWidget
 from suit_ckeditor.widgets import CKEditorWidget
@@ -15,59 +17,63 @@ from utils.django.widgets import HorizontalRadioSelect
 from .models import User, Level
 
 
-class Createuserform(forms.ModelForm):
-    """
-    Form for creating user
-    """
-
-    # password = PasswordField(label=_('Passowrd'))
-    field = forms.CharField(
-        # validators=[
-        # DictionaryValidator(words=['banned_word'], threshold=0.9),
-        # LengthValidator(min_length=8),
-        # ComplexityValidator(complexities=dict(
-        #     UPPER=1,
-        #     LOWER=1,
-        #     DIGITS=1
-        # ),
-        # )])
-    )
-
-    class Meta:
-        model = User
-        fields = ('email', 'password', 'username')
-        widgets = {
-            'email': forms.EmailInput(attrs={'placeholder': _('Enter your email')}),
-        }
-
-
-# Admin forms
-
-class UserCreationForm(forms.ModelForm):
+class UserCreateAdminModelForm(forms.ModelForm):
     """
     A form for creating new users. Includes all the required
     fields, plus a repeated password.
     """
 
-    password1 = forms.CharField(label=_('Password'), widget=forms.PasswordInput)
+    error_messages = {
+        'password_mismatch': _("The two password fields didn't match."),
+    }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields['alias'].widget.attrs['class'] = 'span9'
+        self.fields['alias'].widget.attrs['placeholder'] = _('Enter alias')
+
+        self.fields['username'].widget.attrs['class'] = 'span9'
+        self.fields['username'].widget.attrs['placeholder'] = _('Enter username')
+
+        self.fields['email'].widget.attrs['class'] = 'span9'
+        self.fields['email'].widget.attrs['placeholder'] = _('Enter email')
+
+    password1 = forms.CharField(
+        label=_('Password'),
+        strip=False,
+        widget=forms.PasswordInput(attrs={
+            'class': 'span9',
+            'placeholder': _('Enter password'),
+        }),
+        help_text=password_validation.password_validators_help_text_html(),
+    )
     password2 = forms.CharField(
         label=_('Password confirmation'),
-        widget=forms.PasswordInput,
-        help_text=_('Enter the same password as before, for verification.'))
+        widget=forms.PasswordInput(attrs={
+            'class': 'span9',
+            'placeholder': _('Enter password again'),
+        }),
+        strip=False,
+        help_text=_('Enter the same password as before'))
 
-    class Meta:
-        model = User
-        fields = ('email', 'username')
+    def clean_password1(self):
+        password1 = self.cleaned_data.get("password1")
+        auth_password_validators = password_validation.get_password_validators(settings.AUTH_PASSWORD_VALIDATORS)
+        password_validation.validate_password(password1, self.instance, auth_password_validators)
 
     def clean_password2(self):
         password1 = self.cleaned_data.get("password1")
         password2 = self.cleaned_data.get("password2")
         if password1 and password2 and password1 != password2:
-            raise forms.ValidationError(_("The two password fields didn't match."))
+            raise forms.ValidationError(
+                self.error_messages['password_mismatch'],
+                code='password_mismatch'
+            )
         return password2
 
     def save(self, commit=True):
-        user = super(UserCreationForm, self).save(commit=False)
+        user = super().save(commit=False)
         user.set_password(self.cleaned_data["password1"])
         if commit:
             user.save()
@@ -81,11 +87,19 @@ class UserChangeForm(forms.ModelForm):
     password hash display field.
     """
 
-    password = ReadOnlyPasswordHashField()
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
-    class Meta:
-        model = User
-        fields = ('email',)
+        self.fields['alias'].widget.attrs['class'] = 'span9'
+        self.fields['alias'].widget.attrs['placeholder'] = _('Enter desire name')
+
+        self.fields['username'].widget.attrs['class'] = 'span9'
+        self.fields['username'].widget.attrs['placeholder'] = _('Enter username')
+
+        self.fields['email'].widget.attrs['class'] = 'span9'
+        self.fields['email'].widget.attrs['placeholder'] = _('Enter email')
+
+    password = ReadOnlyPasswordHashField()
 
     def clean_password(self):
         return self.initial["password"]

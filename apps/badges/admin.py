@@ -3,7 +3,9 @@ from django.utils.translation import ugettext_lazy as _
 from django.db.models import Count
 from django.contrib import admin
 
-from .models import *
+from apps.core.admin import AdminSite
+
+from .models import Badge, GotBadge
 
 
 # class UserInline(admin.TabularInline):
@@ -14,18 +16,19 @@ from .models import *
 #     extra = 1
 
 
+@admin.register(Badge, site=AdminSite)
 class BadgeAdmin(admin.ModelAdmin):
     """
     Admin View for Badge
     """
 
-    list_display = ('name', 'short_description', 'get_count_users_with_this_badge', 'date_created')
-    list_filter = ['date_created']
-    search_fields = ('name', 'short_description')
+    list_display = ('name', 'description', 'get_count_users_with_this_badge')
+    list_filter = []
+    search_fields = ('name', 'description')
     fieldsets = (
         (
             Badge._meta.verbose_name, {
-                'fields': ['name', 'short_description', 'users'],
+                'fields': ['name', 'description', 'users'],
             }
         ),
     )
@@ -33,7 +36,6 @@ class BadgeAdmin(admin.ModelAdmin):
     #     UserInline,
     # ]
     readonly_fields = ['users']
-    date_hierarchy = 'date_created'
 
     def get_queryset(self, request):
         qs = super(BadgeAdmin, self).get_queryset(request)
@@ -46,23 +48,23 @@ class BadgeAdmin(admin.ModelAdmin):
     get_count_users_with_this_badge.short_description = _('Count users with this badge')
 
 
-class GettingBadgeAdmin(admin.ModelAdmin):
+class GotBadgeAdmin(admin.ModelAdmin):
     '''
     Admin View for GettingBadge
     '''
 
-    list_display = ('badge', 'user', 'date_getting')
+    list_display = ('badge', 'user', 'created')
     list_filter = (
         ('user', admin.RelatedOnlyFieldListFilter),
         ('badge', admin.RelatedOnlyFieldListFilter),
-        'date_getting',
+        'created',
     )
-    date_hierarchy = 'date_getting'
-    readonly_fields = ('badge', 'user', 'conditions')
+    date_hierarchy = 'created'
+    readonly_fields = ('badge', 'user')
     fieldsets = [
         [
-            GettingBadge._meta.verbose_name, {
-                'fields': ('badge', 'user', 'conditions'),
+            GotBadge._meta.verbose_name, {
+                'fields': ('badge', 'user',),
             }
         ]
     ]

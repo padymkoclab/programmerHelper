@@ -58,6 +58,7 @@ class Article(CommentsModelMixin, TagsModelMixin, MarksModelMixin, TimeStampedMo
     heading = models.TextField(_('Heading'), validators=[MinCountWordsValidator(10)])
     conclusion = models.TextField(_('Conclusion'), validators=[MinCountWordsValidator(10)])
     status = models.CharField(_('Status'), max_length=10, choices=STATUS_ARTICLE, default=DRAFT)
+    views = models.PositiveIntegerField(_('Count views'), editable=False, default=0)
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, verbose_name=_('User'),
         related_name='articles', on_delete=models.CASCADE,

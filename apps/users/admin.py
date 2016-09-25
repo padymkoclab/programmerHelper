@@ -35,7 +35,7 @@ from .actions import (
     make_users_as_non_active,
     make_users_as_active,
 )
-from .forms import UserChangeForm, UserCreationForm, LevelAdminModelForm, ProfileAdminModelForm
+from .forms import UserChangeForm, UserCreateAdminModelForm, LevelAdminModelForm, ProfileAdminModelForm
 from .models import User, Level, Profile
 from .listfilters import ListFilterLastLogin
 
@@ -133,12 +133,17 @@ class UserAdmin(BaseUserAdmin):
     """
 
     form = UserChangeForm
-    add_form = UserCreationForm
-    actions = [make_users_as_non_superuser, make_users_as_superuser, make_users_as_non_active, make_users_as_active]
+    add_form = UserCreateAdminModelForm
+    actions = (
+        make_users_as_non_superuser,
+        make_users_as_superuser,
+        make_users_as_non_active,
+        make_users_as_active,
+    )
 
     # set it value in empty, since it should be change in following views
     list_display = (
-        'display_name',
+        'alias',
         'username',
         'email',
         'level',
@@ -156,23 +161,24 @@ class UserAdmin(BaseUserAdmin):
     ]
     ordering = ('date_joined', )
 
-    search_fields = ('display_name', 'email', 'username')
+    search_fields = ('alias', 'email', 'username')
     date_hierarchy = 'date_joined'
 
     filter_horizontal = ['groups']
     filter_vertical = ['user_permissions']
-    add_fieldsets = [
+    add_fieldsets = (
         (
             None, {
-                'fields': [
+                'fields': (
                     'email',
                     'username',
+                    'alias',
                     'password1',
                     'password2',
-                ]
+                )
             }
-        )
-    ]
+        ),
+    )
     readonly_fields = (
         'display_avatar',
         'last_login',
@@ -197,24 +203,9 @@ class UserAdmin(BaseUserAdmin):
         # 'display_diary_details',
     )
 
-    suit_form_tabs = [
-        ('general', _('General')),
-        ('permissions', _('Permissions')),
-        ('groups', _('Groups')),
-        ('tags', _('Tags')),
-        ('badges', _('Badges')),
-        ('activity', _('Activity')),
-        ('notifications', _('Notifications')),
-        ('summary', _('Summary')),
-    ]
-
-    suit_form_includes = (
-        ('users/admin/user_admin_tab_tags.html', 'top', 'tags'),
-    )
-
     def get_queryset(self, request):
 
-        qs = super(UserAdmin, self).get_queryset(request)
+        qs = super().get_queryset(request)
 
         # if request.path == '/admin/users/user/voters/':
         #     qs = qs.model.polls.users_as_voters()
@@ -225,26 +216,43 @@ class UserAdmin(BaseUserAdmin):
 
     def get_fieldsets(self, request, obj=None):
 
-        fieldsets = [
-            (
-                None, {
-                    'classes': ('suit-tab suit-tab-general', ),
-                    'fields': (
-                        'display_name',
-                        'email',
-                        'username',
-                        'password',
-                        'is_active',
-                        'is_superuser',
-                        'display_avatar',
-                    )
-                },
-            ),
-        ]
+        if obj is None:
+            self.suit_form_tabs = ()
+            self.suit_form_includes = ()
+            return self.add_fieldsets
 
-        if obj is not None:
-            fieldsets.extend((
+        else:
 
+            self.suit_form_tabs = (
+                ('general', _('General')),
+                ('permissions', _('Permissions')),
+                ('groups', _('Groups')),
+                ('tags', _('Tags')),
+                ('badges', _('Badges')),
+                ('activity', _('Activity')),
+                ('notifications', _('Notifications')),
+                ('summary', _('Summary')),
+            )
+
+            self.suit_form_includes = (
+                ('users/admin/user_admin_tab_tags.html', 'top', 'tags'),
+            )
+
+            return (
+                (
+                    None, {
+                        'classes': ('suit-tab suit-tab-general', ),
+                        'fields': (
+                            'alias',
+                            'email',
+                            'username',
+                            'password',
+                            'is_active',
+                            'is_superuser',
+                            'display_avatar',
+                        )
+                    },
+                ),
                 (
                     None, {
                         'classes': ('suit-tab suit-tab-permissions', ),
@@ -261,36 +269,34 @@ class UserAdmin(BaseUserAdmin):
                         )
                     }
                 ),
-                # (
-                #     None, {
-                #         'classes': ('suit-tab suit-tab-summary', ),
-                #         'fields': (
-                #             'level',
-                #             'reputation',
-                #             'last_seen',
-                #             'last_login',
-                #             'date_joined',
-                #             'display_diary_details',
-                #             'get_count_comments',
-                #             'get_count_opinions',
-                #             'get_count_likes',
-                #             'get_count_marks',
-                #             'get_count_questions',
-                #             'get_count_snippets',
-                #             'get_count_articles',
-                #             'get_count_answers',
-                #             'get_count_solutions',
-                #             'get_count_posts',
-                #             'get_count_topics',
-                #             'get_count_test_suits',
-                #             'get_count_passages',
-                #             'get_count_votes',
-                #         )
-                #     }
-                # ),
-            ))
-
-        return fieldsets
+                (
+                    None, {
+                        'classes': ('suit-tab suit-tab-summary', ),
+                        'fields': (
+                            'level',
+                            'reputation',
+                            'last_seen',
+                            'last_login',
+                            'date_joined',
+                            # 'display_diary_details',
+                            'get_count_comments',
+                            'get_count_opinions',
+                            'get_count_likes',
+                            'get_count_marks',
+                            'get_count_questions',
+                            'get_count_snippets',
+                            'get_count_articles',
+                            'get_count_answers',
+                            'get_count_solutions',
+                            'get_count_posts',
+                            'get_count_topics',
+                            'get_count_test_suits',
+                            'get_count_passages',
+                            'get_count_votes',
+                        )
+                    }
+                ),
+            )
 
     def get_urls(self):
 
@@ -310,8 +316,12 @@ class UserAdmin(BaseUserAdmin):
         if extra_context is None:
             extra_context = {}
 
-        extra_context['statistics_usage_tags'] = \
-            self.model.objects.get(pk=object_id).get_statistics_usage_tags()
+        statistics_usage_tags = self.model.objects.get(pk=object_id).get_statistics_usage_tags(20)
+
+        extra_context['statistics_usage_tags'] = statistics_usage_tags
+
+        # for reject unneccessary calculation use straight access instead user.get_top_tag()
+        extra_context['user_top_tag'] = None if statistics_usage_tags is not None else statistics_usage_tags[0][0]
 
         return super().change_view(request, object_id, form_url, extra_context)
 
@@ -363,7 +373,7 @@ class UserAdmin(BaseUserAdmin):
 
         if column in ['date_joined', 'last_login']:
             css_class_align = 'right'
-        elif column in ['display_name', 'username', 'email']:
+        elif column in ['alias', 'username', 'email']:
             css_class_align = 'left'
         else:
             css_class_align = 'center'
