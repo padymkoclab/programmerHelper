@@ -20,17 +20,16 @@ from django.conf import settings
 from django.core.cache import cache
 # from django.contrib.auth import password_validation
 
-from utils.django import utils
 from utils.django.models_fields import ConfiguredAutoSlugField, PhoneField, AutoOneToOneField, ColorField
 from utils.django.models_utils import get_admin_url
 
 from apps.tags.models import Tag
+from apps.badges.models import BadgeManager
 # from apps.polls.managers import PollsManager
 # from apps.polls.querysets import UserPollQuerySet
 # from apps.articles.models import Article
 # from apps.activity.models import Activity
 # from apps.forum.models import Topic
-# from apps.badges.managers import BadgeManager
 # from apps.sessions.models import ExpandedSession
 # from utils.django.models_fields import PhoneField
 
@@ -40,6 +39,16 @@ from .validators import UsernameValidator
 
 
 logger = logging.getLogger('django.development')
+
+
+logger.info('Example user page https://www.digitalocean.com/community/users/jellingwood?primary_filter=upvotes_given')
+logger.info('get_earned_badges')
+logger.info('get_unearned_badges')
+logger.info('get_gold_badges')
+logger.info('get_silver_badges')
+logger.info('get_bronze_badges')
+logger.info('get_chart_visits')
+logger.info('get_chart_activity')
 
 
 class Level(models.Model):
@@ -122,14 +131,6 @@ class Level(models.Model):
     get_count_users.short_description = _('Count users')
 
 
-# get_earned_badges
-# get_unearned_badges
-# get_gold_badges
-# get_silver_badges
-# get_bronze_badges
-# get_chart_visits
-# get_chart_activity
-
 class User(AbstractBaseUser, PermissionsMixin):
     """
     Custom auth user model with additional fields and username fields as email
@@ -174,7 +175,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     objects = models.Manager()
     objects = UserManager()
     # polls = PollsManager.from_queryset(UserPollQuerySet)()
-    # badges = BadgeManager()
+    badges_manager = BadgeManager()
 
     class Meta:
         verbose_name = _("User")
@@ -187,9 +188,11 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def save(self, *args, **kwargs):
 
-        self.diary
-        self.profile
         super(User, self).save(*args, **kwargs)
+
+        # auto create
+        # self.diary
+        # self.profile
 
     def delete(self, *args, **kwargs):
 
@@ -255,12 +258,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     #         last_seen = session['last_seen']
     #         return last_seen
     #     return None
-
-    def has_diary(self):
-
-        return hasattr(self, 'diary')
-    has_diary.short_description = _('Has diary?')
-    has_diary.boolean = True
 
     def get_gavatar_url(self, size=100, default='identicon'):
         """ """
@@ -424,11 +421,15 @@ class User(AbstractBaseUser, PermissionsMixin):
     get_count_votes.short_description = _('Count votes')
 
     def get_date_latest_voting(self, obj):
+        """ """
+
         return obj.date_latest_voting
     get_date_latest_voting.admin_order_field = 'date_latest_voting'
     get_date_latest_voting.short_description = _('Date of latest voting')
 
     def is_active_voter(self, obj):
+        """ """
+
         return obj.is_active_voter
     is_active_voter.admin_order_field = 'is_active_voter'
     is_active_voter.short_description = _('Is active\nvoter?')
@@ -459,52 +460,11 @@ class User(AbstractBaseUser, PermissionsMixin):
         return first_element[0]
 
     def have_certain_count_consecutive_days(self, count_consecutive_days):
-        if count_consecutive_days > 0:
-            if count_consecutive_days <= self.days_attendances.count():
-                list_all_dates = self.days_attendances.only('day_attendance').values_list('day_attendance', flat=True)
-                # getting differents between dates as timedelta objects
-                differents_dates = utils.get_different_between_elements(sequence=list_all_dates, left_to_right=False)
-                # converting timedelta objects in numbers
-                differents_dates = tuple(timedelta.days for timedelta in differents_dates)
-                # find the groups consecutive elements
-                groups_concecutive_elements = utils.show_concecutive_certain_element(differents_dates, 1)
-                # determinate max count consecutive elements
-                max_count_concecutive_elements = max(len(group) for group in groups_concecutive_elements)
-                # add 1 for учитывания первого дня
-                max_count_concecutive_elements = max_count_concecutive_elements + 1 if max_count_concecutive_elements else 0
-                if 0 < count_consecutive_days <= max_count_concecutive_elements:
-                    return True
-            return False
-        raise ValueError('Count consecutive days must be 1 or more,')
-
-    # def activity_with_users(self):
-    #     return self.activity.filter(flag=Activity.CHOICES_FLAGS.profiling).all()
-
-    def check_badge(self, badge_name):
-        instance = self._as_queryset()
-        return self.__class__.badges_manager.validate_badges(users=instance, badges_names=[badge_name])
-
-    def has_badge(self, badge_name):
-        return self.__class__.badges_manager.has_badge(user=self, badge_name=badge_name)
+        pass
 
     @property
     def reputation(self):
         return self.get_reputation()
-
-    def get_reputation(self):
-        """Getting reputation 1of user based on his activity, activity, badges."""
-
-        return 'ERROR'
-
-        return sum([
-            self.get_reputation_for_badges(),
-            self.get_reputation_for_activity(),
-        ])
-    get_reputation.short_description = _('Reputation')
-
-    def get_reputation_for_badges(self):
-        """Getting reputation of user for badges."""
-        return self.badges.count() * 10
 
     def get_total_mark_for_answers(self):
         """Getting total mark for answers of user."""
@@ -564,17 +524,10 @@ class User(AbstractBaseUser, PermissionsMixin):
     def get_count_popular_topics(self):
         """Getting count popular topics of user."""
         # popular_topics_of_user = Topic.objects.popular_topics().filter(author=self)
-        return popular_topics_of_user.count()
 
-    def get_count_testing_suits_in_which_user_involed(self):
-        """In creating, how many testing suit involved user."""
-        return self.testing_suits.count()
+        return self.popular_topics_of_user.count()
 
-    def get_count_courses_in_which_user_involed(self):
-        """In creating, how many testSuit involved user."""
-        return self.courses.count()
-
-    def get_reputation_for_activity(self):
+    def get_reputation(self):
         """
         Getting reputation of user for activity on website:
         marks of published snippets, answers, questions and rating of articles,
@@ -590,49 +543,24 @@ class User(AbstractBaseUser, PermissionsMixin):
         Filled profile                  = *1
         Participate in poll             = *1
         Popular topic                   = *100
-        Participate in creating tests   = *100
-        Participate in creating courses = *200
+
+        Vote in poll +1
+
         ---------------------------------------
         """
-        reputation_for_snippets = (self.get_total_mark_for_snippets() or 0) * 2
-        reputation_for_solutions = (self.get_total_mark_for_solutions() or 0) * 3
-        reputation_for_questions = (self.get_total_mark_for_questions() or 0) * 1
-        reputation_for_answers = (self.get_total_mark_for_answers() or 0) * 2
-        # reputation_for_polls = self.get_count_participate_in_polls() or 0
-        reputation_for_filled_user_profile = self.get_percent_filled_user_profile() or 0
-        # reputation_for_polls = (self.get_total_rating_for_articles() or 0) * 4
-        # reputation_for_polls = (self.get_count_popular_topics() or 0) * 100
-        reputation_for_test_suits = (self.get_count_testing_suits_in_which_user_involed() or 0) * 100
-        reputation_for_courses = (self.get_count_courses_in_which_user_involed() or 0) * 200
-        return sum([
-            reputation_for_snippets,
-            reputation_for_solutions,
-            reputation_for_questions,
-            reputation_for_answers,
-            # reputation_for_polls,
-            reputation_for_filled_user_profile,
-            # reputation_for_polls,
-            # reputation_for_polls,
-            reputation_for_test_suits,
-            reputation_for_courses,
-        ])
 
-    def get_top_tags(self):
-        """Return dict as couple: 'tag': percent_usage % """
+        reputation = 0
 
-        return NotImplementedError
+        # Vote in poll +1
+        count_votes = self.get_count_votes()
 
-    def comments(self):
+        reputation += count_votes
 
-        return NotImplementedError
+    get_reputation.short_description = _('Reputation')
 
-    def count_comments(self):
+    def has_badge(self, badge):
 
-        return NotImplementedError
-
-    # https://www.digitalocean.com/community/users/jellingwood?primary_filter=upvotes_given
-    # answer, queations, hearts, opinons and more
-    #
+        return self.badges.filter(badge=badge).exists()
 
 
 class Profile(models.Model):

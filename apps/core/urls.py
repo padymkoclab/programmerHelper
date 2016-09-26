@@ -29,19 +29,20 @@ urlpatterns = [
     # url(r'^django_js_reverse/$', cache_page(3600)(urls_js), name='django_js_reverse'),
 
     # apps
-    url(r'^users/', include('apps.users.urls')),
-    url(r'^articles/', include('apps.articles.urls')),
-    url(r'^library/', include('apps.library.urls')),
     # url(r'^courses/', include('apps.courses.urls')), # temporary is disabled
+    url(r'^articles/', include('apps.articles.urls')),
+    url(r'^badges/', include('apps.badges.urls')),
     url(r'^forum/', include('apps.forums.urls')),
-    url(r'^notifications/', include('apps.notifications.urls')),
+    url(r'^library/', include('apps.library.urls')),
     url(r'^news/', include('apps.newsletters.urls')),
+    url(r'^notifications/', include('apps.notifications.urls')),
     url(r'^polls/', include('apps.polls.urls')),
     url(r'^questions/', include('apps.questions.urls')),
     url(r'^snippets/', include('apps.snippets.urls')),
     url(r'^solutions/', include('apps.solutions.urls')),
     url(r'^tags/', include('apps.tags.urls')),
     url(r'^testing/', include('apps.testing.urls')),
+    url(r'^users/', include('apps.users.urls')),
     url(r'^utilities/', include('apps.utilities.urls')),
 ]
 

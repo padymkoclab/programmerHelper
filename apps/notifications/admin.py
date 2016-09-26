@@ -17,17 +17,17 @@ class NotificationAdmin(admin.ModelAdmin):
         'user',
         'is_read',
         'content',
-        # 'message',
+        'action',
         'created',
     )
     list_filter = (
         ('user', admin.RelatedOnlyFieldListFilter),
         'is_read',
-        'content',
+        'action',
         'created',
     )
     readonly_fields = (
-        # 'message',
+        'action',
         'display_user_with_admin_url',
         'is_read',
         'content',
@@ -39,7 +39,7 @@ class NotificationAdmin(admin.ModelAdmin):
         'display_user_with_admin_url',
         'is_read',
         'content',
-        # 'message',
+        'action',
         'created',
     )
 

@@ -48,6 +48,7 @@ class BadgeAdmin(admin.ModelAdmin):
     get_count_users_with_this_badge.short_description = _('Count users with this badge')
 
 
+@admin.register(GotBadge, site=AdminSite)
 class GotBadgeAdmin(admin.ModelAdmin):
     '''
     Admin View for GettingBadge

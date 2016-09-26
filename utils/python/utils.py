@@ -9,6 +9,15 @@ import base64
 from IPython.core import display as JupyterDisplay
 
 
+class classproperty:
+
+    def __init__(self, f):
+        self.f = f
+
+    def __get__(self, obj, owner):
+        return self.f(owner)
+
+
 def check_method_of_object(obj, method):
     """ """
 

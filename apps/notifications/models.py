@@ -6,14 +6,17 @@ from django.utils.translation import ugettext_lazy as _
 from django.db import models
 from django.conf import settings
 
+from utils.python.utils import classproperty
+
+from .managers import NotificationManager
+from .utils import get_contents
+
 
 class Notification(models.Model):
     """ """
 
     NEW_MESSAGE = 'NEW_MESSAGE'
     NEW_COMMENT = 'NEW_COMMENT'
-    NEW_ATTAINMENT = 'NEW_ATTAINMENT'
-    LOSS_ATTAINMENT = 'LOSS_ATTAINMENT'
     CHANGING_REPUTATION = 'CHANGING_REPUTATION'
     CREATED_OBJECT = 'CREATED_OBJECT'
     UPDATED_OBJECT = 'UPDATED_OBJECT'
@@ -23,12 +26,12 @@ class Notification(models.Model):
     UPDATED_PROFILE = 'UPDATED_PROFILE'
     UPDATED_DIARY = 'UPDATED_DIARY'
     DELETED_USER = 'DELETED_USER'
+    EARNED_BADGE = 'EARNED_BADGE'
+    LOST_BADGE = 'LOST_BADGE'
 
     CHOICES_ACTIONS = (
         (NEW_MESSAGE, _('New message')),
         (NEW_COMMENT, _('New comment')),
-        (NEW_ATTAINMENT, _('New attainment')),
-        (LOSS_ATTAINMENT, _('Loss attainment')),
         (CHANGING_REPUTATION, _('Changing reputation')),
         (CREATED_OBJECT, _('Created object')),
         (UPDATED_OBJECT, _('Updated object')),
@@ -38,7 +41,13 @@ class Notification(models.Model):
         (UPDATED_PROFILE, _('Updated profile')),
         (UPDATED_DIARY, _('Updated diary')),
         (DELETED_USER, _('Deleted user')),
+        (EARNED_BADGE, _('Earned badge')),
+        (LOST_BADGE, _('Lost badge')),
     )
+
+    @classproperty
+    def CONTENTS(cls):
+        return get_contents(cls)
 
     id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
     user = models.ForeignKey(
@@ -50,6 +59,9 @@ class Notification(models.Model):
     action = models.CharField(_('Action'), max_length=50, choices=CHOICES_ACTIONS)
     created = models.DateTimeField(_('Created'), auto_now_add=True)
 
+    objects = models.Manager()
+    objects = NotificationManager()
+
     class Meta:
         verbose_name = _('Notification')
         verbose_name_plural = _('Notifications')
@@ -60,13 +72,10 @@ class Notification(models.Model):
         return self.get_action_display()
 
     @property
-    def message(self):
+    def full_message(self):
         return self.determination_message()
 
-    def send_message(self):
-        pass
-
-    def check_up_badges(self):
+    def send_full_message(self):
         pass
 
     def checkup_reputation(self):

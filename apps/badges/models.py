@@ -10,7 +10,9 @@ from utils.django.models_fields import ConfiguredAutoSlugField
 from utils.django.models import TimeStampedModel
 from utils.django.models_utils import get_admin_url
 
-# from .managers import BadgeManager
+from apps.notifications.models import Notification
+
+from .managers import BadgeManager
 
 
 class Badge(TimeStampedModel):
@@ -73,27 +75,26 @@ class Badge(TimeStampedModel):
     category = models.CharField(_('Category'), max_length=30, choices=CHOICES_CATEGORY)
     kind = models.CharField(_('Kind'), max_length=20, choices=CHOICES_KIND)
     users = models.ManyToManyField(
-        settings.AUTH_USER_MODEL,
-        verbose_name=_('Users'),
+        settings.AUTH_USER_MODEL, verbose_name=_('Users'),
         through='GotBadge',
         through_fields=('badge', 'user'),
-        # related_name='+',
+        related_name='+',
     )
 
     objects = models.Manager()
-    # objects = BadgeManager()
+    objects = BadgeManager()
 
     class Meta:
         verbose_name = _("Badge")
         verbose_name_plural = _("Badges")
-        ordering = ['name']
+        ordering = ('name', )
         get_latest_by = 'created'
 
     def __str__(self):
         return '{0.name}'.format(self)
 
     def get_absolute_url(self):
-        return reverse('')
+        return reverse('badges:detail', kwargs={'pk': self.pk, 'slug': self.slug})
 
     def get_admin_url(self):
         return get_admin_url(self)
@@ -109,6 +110,14 @@ class Badge(TimeStampedModel):
 
         pass
 
+    def check_badge_for_user(self, user):
+
+        Notification.objects.create(
+            user=user,
+            action=Notification.EARNED_BADGE,
+            content=_('You earned badge "{}"').format(self),
+        )
+
 
 class GotBadge(models.Model):
 
@@ -118,7 +127,7 @@ class GotBadge(models.Model):
     )
     badge = models.ForeignKey(
         'Badge', verbose_name=_('Badge'),
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE, related_name='+',
     )
     created = models.DateTimeField(_('Date getting'), auto_now_add=True)
 
@@ -128,3 +137,6 @@ class GotBadge(models.Model):
         ordering = ('-created', )
         get_latest_by = ('created', )
         unique_together = (('user', 'badge'), )
+
+    def __str__(self):
+        return 'Badge "{0.badge}" of user "{0.user}"'.format(self)
