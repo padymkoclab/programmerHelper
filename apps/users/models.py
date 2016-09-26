@@ -161,6 +161,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         _('Alias'), max_length=200,
         help_text=_('Name for public display'),
     )
+    reputation = models.IntegerField(_('Reputation'), default=0, editable=False)
     is_active = models.BooleanField(_('Is active'), default=True)
     level = models.ForeignKey(
         'Level',
@@ -461,10 +462,6 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def have_certain_count_consecutive_days(self, count_consecutive_days):
         pass
-
-    @property
-    def reputation(self):
-        return self.get_reputation()
 
     def get_total_mark_for_answers(self):
         """Getting total mark for answers of user."""

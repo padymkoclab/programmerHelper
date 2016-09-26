@@ -65,3 +65,8 @@ GROUPS_NAMES = (
     'Moderators',
     'Banned',
 )
+
+
+CALCULATION_REPUTATION = {
+    'VOTE': 1,
+}

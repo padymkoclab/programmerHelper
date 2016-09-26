@@ -204,8 +204,8 @@ BADGES = (
         'category': Badge.OTHER,
     },
     {
-        'name': 'Register',
-        'description': 'Has more 10000 characters in diary',
+        'name': 'Frequent recorder',
+        'description': 'Has at least 250000 characters in a diary',
         'kind': Badge.BRONZE,
         'category': Badge.OTHER,
     },

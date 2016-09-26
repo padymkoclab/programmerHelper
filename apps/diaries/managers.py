@@ -1,7 +1,7 @@
 
 from django.db import models
 
-from .querysets import DiaryQuerySet
+from .querysets import DiaryQuerySet, PartitionQuerySet
 
 
 class DiaryManager(models.Manager):
@@ -11,3 +11,11 @@ class DiaryManager(models.Manager):
 
 
 DiaryManager = DiaryManager.from_queryset(DiaryQuerySet)
+
+
+class PartitionManager(models.Manager):
+
+    pass
+
+
+PartitionManager = PartitionManager.from_queryset(PartitionQuerySet)

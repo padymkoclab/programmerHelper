@@ -37,6 +37,9 @@ def updated_profile(sender, instance, created, *args, **kwargs):
 def updated_diary(sender, instance, created, *args, **kwargs):
 
     if created is False:
+
+        User.badges_manager.check_badge_for_user('Frequent recorder', instance.user)
+
         Notification.objects.send_notification_about_updated_diary_of_user(instance.user)
 
 
@@ -57,6 +60,8 @@ def particitated_in_poll(sender, instance, created, *args, **kwargs):
             User.badges_manager.check_badge_for_user('Voter', user)
             User.badges_manager.check_badge_for_user('Electorate', user)
             User.badges_manager.check_badge_for_user('Vox Populi', user)
+
+            User._default_manager.change_reputation(user, '+', 'VOTE')
 
         elif sender == Poll:
 
@@ -79,6 +84,8 @@ def lost_vote_in_poll(sender, instance, *args, **kwargs):
         User.badges_manager.check_badge_for_user('Voter', user)
         User.badges_manager.check_badge_for_user('Electorate', user)
         User.badges_manager.check_badge_for_user('Vox Populi', user)
+
+        User._default_manager.change_reputation(user, '-', 'VOTE')
 
     elif sender == Poll:
 

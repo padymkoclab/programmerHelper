@@ -13,7 +13,7 @@ from utils.django.models_fields import AutoOneToOneField
 from utils.django.models import TimeStampedModel
 from utils.django.models_utils import get_admin_url
 
-from .managers import DiaryManager
+from .managers import DiaryManager, PartitionManager
 
 
 class Diary(models.Model):
@@ -74,7 +74,8 @@ class Diary(models.Model):
         if hasattr(self, 'total_size'):
             return self.total_size
 
-        return self.partitions.count()
+        partitions = self.partitions.partitions_with_sizes()
+        return partitions.aggregate(total_size=models.Sum('size'))['total_size']
     get_total_size.short_description = _('Total size')
     get_total_size.admin_order_field = 'total_size'
 
@@ -95,6 +96,9 @@ class Partition(TimeStampedModel):
         ordering = ('diary', )
         get_latest_by = 'updated'
         unique_together = (('diary', 'name'), )
+
+    objects = models.Manager()
+    objects = PartitionManager()
 
     def __str__(self):
         return '{0.name}'.format(self)

@@ -147,6 +147,7 @@ class UserAdmin(BaseUserAdmin):
         'username',
         'email',
         'level',
+        'reputation',
         'is_active',
         'is_superuser',
         'last_login',
@@ -182,7 +183,7 @@ class UserAdmin(BaseUserAdmin):
     readonly_fields = (
         'display_avatar',
         'last_login',
-        'reputation',
+        # 'reputation',
         'level',
         'last_seen',
         'date_joined',
@@ -274,7 +275,7 @@ class UserAdmin(BaseUserAdmin):
                         'classes': ('suit-tab suit-tab-summary', ),
                         'fields': (
                             'level',
-                            'reputation',
+                            # 'reputation',
                             'last_seen',
                             'last_login',
                             'date_joined',
@@ -495,8 +496,8 @@ class ProfileAdmin(admin.ModelAdmin):
 class UserInline(admin.TabularInline):
 
     model = User
-    fields = ('display_admin_change_link', 'reputation', 'date_joined')
-    readonly_fields = ('display_admin_change_link', 'reputation', 'date_joined')
+    # fields = ('display_admin_change_link', 'reputation', 'date_joined')
+    # readonly_fields = ('display_admin_change_link', 'reputation', 'date_joined')
     max_num = 0
     extra = 0
     can_delete = False

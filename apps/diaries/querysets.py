@@ -28,3 +28,11 @@ class DiaryQuerySet(models.QuerySet):
         self = self.diaries_with_date_latest_changes()
 
         return self
+
+
+class PartitionQuerySet(models.QuerySet):
+    """ """
+
+    def partitions_with_sizes(self):
+
+        return self.annotate(size=models.functions.Length('content'))

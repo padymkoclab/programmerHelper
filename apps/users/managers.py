@@ -7,6 +7,12 @@ from django.db import models
 from django.contrib.auth.models import BaseUserManager
 
 from .querysets import LevelQuerySet, UserQuerySet
+# from .constants import CALCULATION_REPUTATION
+
+
+CALCULATION_REPUTATION = {
+    'VOTE': 1,
+}
 
 
 class LevelManager(models.Manager):
@@ -73,6 +79,21 @@ class UserManager(BaseUserManager):
             result[pk] = 100 / len(list_restictions) * value
         # return as dictioinary {instance.pk: percent}
         return result
+
+    def change_reputation(self, user, sign, constant):
+
+        if sign not in ('+', '-'):
+            raise ValueError()
+
+        value = CALCULATION_REPUTATION[constant]
+
+        if sign == '+':
+            user.reputation += value
+        else:
+            user.reputation -= value
+
+        user.full_clean()
+        user.save()
 
 
 UserManager = UserManager.from_queryset(UserQuerySet)
