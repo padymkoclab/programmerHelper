@@ -18,18 +18,18 @@ js_info_dict = {
 urlpatterns = [
 
     # django
-    url(r'^admin/export_import/', include('apps.export_import_models.urls')),
-    url(r'^admin/', AdminSite.urls),
+    # url(r'^admin/export_import/', include('apps.export_import_models.urls')),
     url(r'^jsi18n/$', javascript_catalog, js_info_dict, 'javascript-catalog'),
     url(r'^i18n/', include('django.conf.urls.i18n')),
 
     # project
     url(r'^$', IndexView.as_view(), {}, 'index'),
     url(r'^image/(?P<height>\d+)x(?P<width>\d+)/$', PlaceholderView.as_view(), {}, 'placeholder'),
-    # url(r'^django_js_reverse/$', cache_page(3600)(urls_js), name='django_js_reverse'),
 
     # apps
     # url(r'^courses/', include('apps.courses.urls')), # temporary is disabled
+    #
+    url(r'^admin/', include('apps.admin.urls')),
     url(r'^articles/', include('apps.articles.urls')),
     url(r'^badges/', include('apps.badges.urls')),
     url(r'^forum/', include('apps.forums.urls')),

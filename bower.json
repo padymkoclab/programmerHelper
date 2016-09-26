@@ -1,14 +1,13 @@
 {
-  "name": "programmerhelper",
+  "name": "programmerHelper",
   "description": "",
   "main": "index.js",
   "authors": [
-    "I"
+    "setivolkylany"
   ],
-  "license": "ISC",
+  "license": "MIT",
   "keywords": [
-    "Python",
-    "Django"
+    "Development"
   ],
   "homepage": "https://github.com/setivolkylany/programmerHelper",
   "ignore": [
@@ -20,9 +19,12 @@
     "tests"
   ],
   "dependencies": {
-    "bootstrap": "3",
-    "jquery-ui": "^1.12.0",
-    "jquery": "2.1.4",
+    "bootstrap": "3.3.7",
+    "d3": "^4.2.6",
+    "font-awesome": "^4.6.3",
+    "jquery-ui": "^1.12.1",
+    "jquery": "3",
+    "select2": "^4.0.3",
     "underscore": "^1.8.3"
   }
 }

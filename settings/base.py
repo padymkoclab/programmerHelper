@@ -16,7 +16,6 @@ SECRET_KEY = get_secret_value_for_setting_from_file(filename='secrets.json', set
 # Application definition
 
 DJANGO_APPS = [
-    'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.messages',
@@ -26,7 +25,6 @@ DJANGO_APPS = [
 ]
 
 THIRD_PARTY_APPS = [
-    'suit_ckeditor',
 ]
 
 COMMON_APPS = [
@@ -37,6 +35,7 @@ COMMON_APPS = [
 ]
 
 CUSTOM_APPS = [
+    'apps.admin.apps.AdminConfig',
     'apps.articles.apps.ArticlesConfig',
     'apps.badges.apps.BadgesConfig',
     'apps.library.apps.LibraryConfig',
@@ -62,7 +61,6 @@ CUSTOM_APPS = [
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + COMMON_APPS + CUSTOM_APPS
-INSTALLED_APPS.insert(0, 'suit')
 
 # Project settings
 

@@ -1,0 +1,39 @@
+
+{% extends "admin/base.html" %}
+
+{% load i18n %}
+{% load static %}
+
+{% block header %}
+
+  <!-- Header -->
+  <div id="header">
+    <nav class="navbar navbar-default">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#navbar-header-collapse" aria-expanded="false">
+            <span class="sr-only">{% trans "Toogle navigation" %}</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a href="#" class="navbar-brand">{{ admin_site_title }}</a>
+          <div class="collapse navbar-collapse" id="navbar-header-collapse">
+            <ul class="nav navbar">
+              <li><a href="#">Link</a></li>
+              <li><a href="#">Link</a></li>
+              <li><a href="#">Link</a></li>
+              <li><a href="#">Link</a></li>
+              <li><a href="#">Link</a></li>
+              <li><a href="#">Link</a></li>
+              <li><a href="#">Link</a></li>
+              <li><a href="#">Link</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </nav>
+  </div>
+
+
+{% endblock header %}

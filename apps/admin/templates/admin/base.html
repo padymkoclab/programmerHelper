@@ -1,0 +1,22 @@
+
+{% extends "admin/core.html" %}
+
+{% load i18n %}
+{% load static %}
+
+{% block wrapper %}
+
+  {% block header %}{% endblock header %}
+  {% block sidebar %}{% endblock sidebar %}
+  {% block breadcrumbs %}{% endblock breadcrumbs %}
+  {% block messages %}{% endblock messages %}
+  {% block content %}
+
+    {% block tools %}{% endblock tools %}
+
+    {{ content }}
+
+  {% endblock content %}
+  {% block footer %}{% endblock footer %}
+
+{% endblock wrapper %}
