@@ -4,6 +4,7 @@
 
 *.ipynb
 
+static/vendor/
 assets/
 media/
 
