@@ -1,0 +1,86 @@
+
+{% extends "admin/admin/base.html" %}
+
+{% load i18n static %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'admin/admin/css/login.css' %}">
+{% endblock extra_css %}
+
+{% block wrapper %}
+
+  {% block content %}
+    <div id="wrapper_login_form">
+
+      <p id="header" class="lead text-center">{% trans "Login to the admin" %}</p>
+
+      {% if form.errors and not form.non_field_errors %}
+        <p>
+        {% if form.errors.items|length == 1 %}
+          {% trans "Please correct the error below." %}
+        {% else %}
+          {% trans "Please correct the errors below." %}
+        {% endif %}
+        </p>
+      {% endif %}
+
+      {% if form.non_field_errors %}
+        {% for error in form.non_field_errors %}
+          <p class="text-danger">{{ error }}</p>
+        {% endfor %}
+      {% endif %}
+
+      {% if user.is_authenticated %}
+      <p class="text-danger">
+        {% with user.get_full_name as user_full_name %}
+
+        {% blocktrans trimmed %}
+            You are authenticated as {{ user_full_name }}, but are not authorized to
+            access this page. Would you like to login to a different user?
+        {% endblocktrans %}
+        {% endwith %}
+      </p>
+      {% endif %}
+
+
+      <form action="" method="POST">{% csrf_token %}
+        <div class="form-group has-feedback">
+
+            {% if form.credential.errors %}
+              <ul>
+              {% for error in form.credential.errors %}
+                  <li class="text-danger">{{ error }}</li>
+              {% endfor %}
+              </ul>
+            {% endif %}
+
+            <label for="{{ form.credential.id_for_label }}" class="control-label">{{ form.credential.label }}</label>
+            <i class="glyphicon glyphicon-user form-control-feedback"></i>
+            {{ form.credential }}
+            <p class="help-block">{{ form.credential.help_text }}</p>
+        </div>
+
+        <div class="form-group has-feedback">
+
+            {% if form.password.errors %}
+              <ul>
+              {% for error in form.password.errors %}
+                  <li class="text-danger">{{ error }}</li>
+              {% endfor %}
+              </ul>
+            {% endif %}
+
+            <label for="{{ form.password.id_for_label }}" class="control-label">{{ form.password.label }}</label>
+            <i class="glyphicon glyphicon-lock form-control-feedback"></i>
+            {{ form.password }}
+            <p class="help-block">{{ form.password.help_text }}</p>
+        </div>
+
+        <div class="form-group">
+            <button type="submit" class="btn btn-info btn-block">{% trans "Login" %}</button>
+        </div>
+      </form>
+    </div>
+  {% endblock content %}
+
+{% endblock wrapper %}

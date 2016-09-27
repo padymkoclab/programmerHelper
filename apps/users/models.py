@@ -260,7 +260,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     #         return last_seen
     #     return None
 
-    def get_gavatar_url(self, size=100, default='identicon'):
+    # REQUIRED FOR ALL PROJECTS
+    def get_avatar_path(self, size=100, default='identicon'):
         """ """
 
         gravatar_url = "https://www.gravatar.com/avatar/"
@@ -269,10 +270,11 @@ class User(AbstractBaseUser, PermissionsMixin):
 
         return '{}{}?{}'.format(gravatar_url, user_hash, gravatar_parameters)
 
+    # REQUIRED FOR ALL PROJECTS
     def display_avatar(self, size=100):
         """ """
 
-        return format_html('<img src="{}" />', self.get_gavatar_url(size))
+        return format_html('<img src="{}" />', self.get_avatar_path(size))
     display_avatar.short_description = _('Avatar')
 
     @property

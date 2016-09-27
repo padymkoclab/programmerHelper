@@ -128,7 +128,7 @@ WSGI_APPLICATION = 'wsgi.application'
 AUTH_USER_MODEL = 'users.User'
 
 AUTHENTICATION_BACKENDS = (
-    'django.contrib.auth.backends.ModelBackend',
+    'utils.django.auth.backends.UsernameEmailBackend',
 )
 
 LOGIN_URL = '/users/login/'

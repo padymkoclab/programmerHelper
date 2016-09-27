@@ -1,0 +1,45 @@
+
+#header nav{
+    padding-right: 15px;
+    border-radius: 0;
+}
+
+#admin_site_header{
+    background: #2A3F54;
+    border-radius: 0;
+    height: 60px;
+}
+
+#admin_site_header a:hover{
+    text-decoration: none;
+    color:  #fff;
+}
+
+#admin_site_header i.fa{
+    border: 1px solid #EAEAEA;
+    padding: 5px 6px;
+    border-radius: 50%;
+    color: #fff;
+}
+
+#admin_site_header span{
+    font-size: 22px;
+    width: 100%;
+    color: #fff;
+    line-height: 59px;
+    height: 55px;
+    margin: 0;
+    padding-left: 10px;
+}
+
+
+.profile-full-name{
+    font-size: 15px;
+    margin: 15px 0;
+}
+
+.profile-avatar img{
+    background: #fff;
+    border: 2px solid rgba(52,73,94,0.44);
+    padding: 4px
+}

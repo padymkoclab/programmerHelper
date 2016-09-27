@@ -1,13 +1,21 @@
 
-{% extends "admin/core.html" %}
+{% extends "admin/admin/core.html" %}
 
 {% load i18n %}
 {% load static %}
 
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'admin/admin/css/base.css' %}">
+{% endblock extra_css %}
+
 {% block wrapper %}
 
-  {% block header %}{% endblock header %}
+<div id="sidebar">
   {% block sidebar %}{% endblock sidebar %}
+</div>
+
+<div id="content">
+  {% block header %}{% endblock header %}
   {% block breadcrumbs %}{% endblock breadcrumbs %}
   {% block messages %}{% endblock messages %}
   {% block content %}
@@ -17,6 +25,10 @@
     {{ content }}
 
   {% endblock content %}
+</div>
+
+<div id="footer">
   {% block footer %}{% endblock footer %}
+</div>
 
 {% endblock wrapper %}
