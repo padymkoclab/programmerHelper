@@ -245,11 +245,25 @@ class User(AbstractBaseUser, PermissionsMixin):
     def is_staff(self):
         return self.is_superuser
 
-    def has_perm(self, perm, obj=None):
-        return True
+    def has_permission(self, perm, obj=None):
 
-    def has_module_perms(self, label):
-        return True
+        if not self.is_active:
+            return False
+
+        if self.is_superuser:
+            return True
+
+        return False
+
+    def has_module_permissions(self, label):
+
+        if not self.is_active:
+            return False
+
+        if self.is_superuser:
+            return True
+
+        return False
 
     # def last_seen(self):
     #     last_session_of_user = ExpandedSession.objects.filter(user_pk=self.pk).order_by('expire_date').last()
@@ -619,7 +633,8 @@ class Profile(models.Model):
     updated = models.DateTimeField(_('Updated'), auto_now=True)
 
     def __str__(self):
-        return '{}'.format(self.user.get_short_name())
+        return '{}'.format('Error')
+        logger.error("return '{}'.format(self.user.get_short_name())")
 
     def get_absolute_url(self):
         return self.user.get_absolute_url()

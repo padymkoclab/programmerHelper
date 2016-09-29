@@ -1,0 +1,24 @@
+
+
+#div_model_searchbox, #div_actions, #div_date_hierarchy, #changelist{
+    margin-top: 10px;
+}
+
+
+#changelist table{
+    background-color: rgb(255, 255, 255);
+}
+
+#changelist table thead th{
+    color: rgb(255, 255, 255);
+    background-color: #222;
+}
+
+#changelist table thead th:nth-child(1), #changelist table tbody td:nth-child(1){
+    width: 5px;
+    text-align: center;
+}
+
+#div_actions form span{
+    font-size: 16px;
+}

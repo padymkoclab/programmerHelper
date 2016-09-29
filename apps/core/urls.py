@@ -8,12 +8,15 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 # from django_js_reverse.views import urls_js
 
-from apps.admin.site import admin_site
+# from apps.admin.site import DefaultSiteAdmin
+from apps.users.admin import DefaultSiteAdmin
+# from django.contrib import admin
 from .views import IndexView, PlaceholderView
 
 js_info_dict = {
     'packages': ('your.app.package',),
 }
+
 
 urlpatterns = [
 
@@ -29,7 +32,7 @@ urlpatterns = [
     # apps
     # url(r'^courses/', include('apps.courses.urls')), # temporary is disabled
     #
-    url(r'^admin/', admin_site.urls),
+    url(r'^admin/', DefaultSiteAdmin.urls),
     url(r'^articles/', include('apps.articles.urls')),
     url(r'^badges/', include('apps.badges.urls')),
     url(r'^forum/', include('apps.forums.urls')),

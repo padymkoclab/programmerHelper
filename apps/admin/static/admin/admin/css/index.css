@@ -1,31 +1,113 @@
 
-#header nav{
-    padding-right: 15px;
-    border-radius: 0;
+body{
+    color: #73879C;
+    background-color: rgb(247, 247, 247);
+    font-family: "Helvetica Neue", Roboto, Arial, "Droid Sans", sans-serif;
+    font-size: 13px;
+    font-weight: 400;
+    line-height: 1.471;
 }
 
-#admin_site_header{
+#sidebar
+{
+    position: fixed;
+    z-index: 999;
+
+    width: 250px;
+    height: 100%;
+
+    -webkit-transition: width .5s ease;
+       -moz-transition: width .5s ease;
+         -o-transition: width .5s ease;
+            transition: width .5s ease;
+
     background: #2A3F54;
+    overflow-y: hidden;
+    color: rgb(255, 255, 255);
+}
+
+#wrapper.toggle_sidebar #sidebar
+{
+    width: 0;
+}
+
+#content
+{
+    position: relative;
+    padding-left: 250px;
+    padding-right: 0;
+
+    width: 100%;
+    height: 100%;
+
+    -webkit-transition: padding-left .5s ease;
+       -moz-transition: padding-left .5s ease;
+         -o-transition: padding-left .5s ease;
+            transition: padding-left .5s ease;
+}
+
+#wrapper.toggle_sidebar #content
+{
+    padding-left: 0;
+}
+
+@media(max-width: 768px){
+    #sidebar
+    {
+        width: 0;
+    }
+    #content
+    {
+        padding-left: 0;
+    }
+}
+
+#header nav{
+  padding-right: 15px;
+}
+
+
+
+#search_box
+{
+    width: 100%;
+
+    -webkit-transition: width 1.5s .2s;
+            transition: width 1.5s .2s;
+    -webkit-transition-timing-function: ease;
+            transition-timing-function: ease;
+}
+
+#wrapper_search_box:hover #search_box
+{
+    display: hidden;
+
+    width: 200%;
+}
+
+
+#admin_site_header{
+    /* background: #2A3F54; */
     border-radius: 0;
     height: 60px;
 }
 
 #admin_site_header a:hover{
     text-decoration: none;
-    color:  #fff;
+    color:  rgb(255, 255, 255);
 }
 
 #admin_site_header i.fa{
     border: 1px solid #EAEAEA;
     padding: 5px 6px;
     border-radius: 50%;
-    color: #fff;
+    color: rgb(255, 255, 255);
 }
 
 #admin_site_header span{
     font-size: 22px;
     width: 100%;
-    color: #fff;
+    color: rgb(255, 255, 255);
     line-height: 59px;
     height: 55px;
     margin: 0;
@@ -39,7 +121,121 @@
 }
 
 .profile-avatar img{
-    background: #fff;
+    background: rgb(255, 255, 255);
     border: 2px solid rgba(52,73,94,0.44);
     padding: 4px
+}
+
+#sidebar_apps {
+  color: rgb(255, 255, 255);
+}
+
+#sidebar_apps ul li{
+  background: #2A3F54;
+  padding: 0;
+}
+
+#sidebar_apps ul li:first-child{
+  border-radius: 0;
+}
+
+#sidebar_apps ul li:last-child{
+  border-radius: 0;
+}
+
+#sidebar_apps ul li a {
+  position: relative;
+  padding: 0 10px;
+  display: block;
+  text-decoration: none;
+  cursor: pointer;
+  color: #E7E7E7;
+  font-weight: 500;
+  padding: 13px 15px 12px;
+}
+
+#sidebar_apps ul li.main_list > a i.fa {
+  margin-right: 5px;
+}
+
+#sidebar_apps ul li.main_list > a span.fa {
+  margin-left: 5px;
+  float: right;
+}
+
+#sidebar_apps ul li.main_list a:hover {
+  color: rgb(255, 255, 255);
+  text-decoration: none;
+}
+
+#sidebar_apps ul li.main_list.active > a {
+  text-shadow: rgba(0,0,0,0.25) 0 -1px 0;
+  background: linear-gradient(#334556, #2C4257),#2A3F54;
+  box-shadow: rgba(0,0,0,0.25) 0 1px 0,inset rgba(255,255,255,0.16) 0 1px 0;
+  border-right: 5px solid #1ABB9C;
+}
+
+#sidebar_apps .div_nested_list{
+  display: none;
+}
+
+
+#sidebar_apps .nested_list li::before{
+  background: #425668;
+  bottom: auto;
+  content: "";
+  height: 8px;
+  left: 23px;
+  margin-top: 15px;
+  position: absolute;
+  right: auto;
+  width: 8px;
+  z-index: 1;
+  border-radius: 50%;
+}
+
+
+#sidebar_apps .nested_list li{
+  padding-left: 36px;
+}
+
+#sidebar_apps .nested_list li > a{
+  color: rgba(255,255,255,0.75);
+  font-size: 12px;
+  padding: 9px;
+}
+
+#sidebar_apps .nested_list li > a:hover{
+  background-color: transparent;
+}
+
+li.nested_list_active_page{
+  background: rgba(255,255,255,0.05) !important;
+}
+
+li.nested_list_active_page a{
+  color: rgb(255, 255, 255) !important;
+}
+
+#sidebar_footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  background: #2A3F54;
+  clear: both;
+}
+
+#sidebar_footer > a{
+  padding: 7px 0 3px;
+  text-align: center;
+  width: 25%;
+  font-size: 17px;
+  display: block;
+  float: left;
+  background: #172D44;
+}
+
+#inner-content{
+  padding: 15px;
+  color: #222;
 }

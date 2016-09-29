@@ -34,3 +34,34 @@ def admin_staff_member_required(
         view_func = csrf_protect(view_func)
 
     return view_func
+
+
+def register_model(model, admin_site):
+    """
+    Registers the given model(s) classes and wrapped ModelAdmin class with
+    admin site:
+
+    @register(Author)
+    class AuthorAdmin(admin.ModelAdmin):
+        pass
+
+    A kwarg of `site` can be passed as the admin site, otherwise the default
+    admin site will be used.
+    """
+    from apps.admin.admin import ModelAdmin
+    from apps.admin.site import AdminSite
+
+    def _model_admin_wrapper(admin_class):
+        if not model:
+            raise ValueError('Model must be passed to register.')
+
+        if not isinstance(admin_site, AdminSite):
+            raise ValueError('site must subclass AdminSite')
+
+        if not issubclass(admin_class, ModelAdmin):
+            raise ValueError('Wrapped class must subclass ModelAdmin.')
+
+        admin_site.register(model, admin_class=admin_class)
+
+        return admin_class
+    return _model_admin_wrapper

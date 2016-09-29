@@ -10,25 +10,18 @@
 
 {% block wrapper %}
 
-<div id="sidebar">
   {% block sidebar %}{% endblock sidebar %}
-</div>
 
-<div id="content">
   {% block header %}{% endblock header %}
+
   {% block breadcrumbs %}{% endblock breadcrumbs %}
+
   {% block messages %}{% endblock messages %}
-  {% block content %}
 
-    {% block tools %}{% endblock tools %}
+  {% block tools %}{% endblock tools %}
 
-    {{ content }}
+  {% block content %} {% endblock content %}
 
-  {% endblock content %}
-</div>
-
-<div id="footer">
   {% block footer %}{% endblock footer %}
-</div>
 
 {% endblock wrapper %}

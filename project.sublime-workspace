@@ -4,6 +4,250 @@
 		"selected_items":
 		[
 			[
+				"verb",
+				"verbose_name"
+			],
+			[
+				"has",
+				"hasattr"
+			],
+			[
+				"fiel",
+				"fieldnames"
+			],
+			[
+				"admin",
+				"admin_model"
+			],
+			[
+				"get",
+				"get_queryset	function"
+			],
+			[
+				"templa",
+				"template_name"
+			],
+			[
+				"form",
+				"format	function"
+			],
+			[
+				"_registry_",
+				"_registry_models	statement"
+			],
+			[
+				"_regi",
+				"_registry_models	statement"
+			],
+			[
+				"Lee",
+				"LevelAdmin"
+			],
+			[
+				"Model",
+				"ModelAdmin	import"
+			],
+			[
+				"Admin",
+				"AdminSite"
+			],
+			[
+				"A",
+				"AdminSite	class"
+			],
+			[
+				"si",
+				"sites	module"
+			],
+			[
+				"Sni",
+				"Snippet"
+			],
+			[
+				"slide",
+				"slideUp	.slideUp()"
+			],
+			[
+				"css",
+				"css	.css() - single"
+			],
+			[
+				"togg",
+				"toggleClass	.toggleClass()"
+			],
+			[
+				"back",
+				"background-color"
+			],
+			[
+				"padd",
+				"padding-right"
+			],
+			[
+				"to",
+				"toggleClass	.toggleClass()"
+			],
+			[
+				"add",
+				"addClass	.addClass()"
+			],
+			[
+				"wid",
+				"width"
+			],
+			[
+				"pos",
+				"position"
+			],
+			[
+				"paddin",
+				"padding-left"
+			],
+			[
+				"java",
+				"javascript"
+			],
+			[
+				"tra",
+				"transition"
+			],
+			[
+				"re",
+				"required	Attr"
+			],
+			[
+				"in",
+				"include	function"
+			],
+			[
+				"con",
+				"conf	module"
+			],
+			[
+				"cs",
+				"csrf_protect	function"
+			],
+			[
+				"ne",
+				"never_cache	function"
+			],
+			[
+				"admi",
+				"admin	module"
+			],
+			[
+				"dec",
+				"decorators	module"
+			],
+			[
+				"st",
+				"staff_member_required	function"
+			],
+			[
+				"app",
+				"app_name	statement"
+			],
+			[
+				"upda",
+				"update	function"
+			],
+			[
+				"conte",
+				"context	param"
+			],
+			[
+				"csrf",
+				"csrf_protect	statement"
+			],
+			[
+				"req",
+				"request"
+			],
+			[
+				"REd",
+				"RedirectView	class"
+			],
+			[
+				"up",
+				"update	function"
+			],
+			[
+				"he",
+				"height	Attr"
+			],
+			[
+				"__",
+				"__init__	init"
+			],
+			[
+				"clea",
+				"cleaned_data"
+			],
+			[
+				"auth",
+				"authenticate	function"
+			],
+			[
+				"vie",
+				"views	module"
+			],
+			[
+				"co",
+				"core	module"
+			],
+			[
+				"border-top",
+				"border-top-right-radius"
+			],
+			[
+				"text",
+				"TextInput	class"
+			],
+			[
+				"uge",
+				"ugettext_lazy	statement"
+			],
+			[
+				"def",
+				"default	param"
+			],
+			[
+				"bad",
+				"badge	statement"
+			],
+			[
+				"Not",
+				"NotificationQuerySet	class"
+			],
+			[
+				"rela",
+				"related_name	param"
+			],
+			[
+				"dis",
+				"dispatch	module"
+			],
+			[
+				"De",
+				"DetailView	class"
+			],
+			[
+				"view",
+				"views	module"
+			],
+			[
+				"models",
+				"models_utils	module"
+			],
+			[
+				"Cha",
+				"CharField	class"
+			],
+			[
+				"Aut",
+				"AutoOneToOneField	class"
+			],
+			[
 				"H",
 				"HStoreField	class"
 			],
@@ -20,20 +264,8 @@
 				"Notification	class"
 			],
 			[
-				"he",
-				"help_text	statement"
-			],
-			[
 				"pass",
 				"password	statement"
-			],
-			[
-				"get",
-				"get_password_validators	function"
-			],
-			[
-				"add",
-				"add_fieldsets	statement"
 			],
 			[
 				"requ",
@@ -60,16 +292,8 @@
 				"date_hierarchy"
 			],
 			[
-				"admin",
-				"admin_order_field"
-			],
-			[
 				"Radio",
 				"HorizontalRadioSelect	class"
-			],
-			[
-				"Model",
-				"ModelForm	class"
 			],
 			[
 				"edit",
@@ -156,14 +380,6 @@
 				"suit_classes"
 			],
 			[
-				"fiel",
-				"fieldsets	statement"
-			],
-			[
-				"wid",
-				"widgets	module"
-			],
-			[
 				"Color",
 				"ColorField	class"
 			],
@@ -200,14 +416,6 @@
 				"LevelQuerySet	class"
 			],
 			[
-				"dis",
-				"distinct	param"
-			],
-			[
-				"has",
-				"hasattr	function"
-			],
-			[
 				"nul",
 				"null"
 			],
@@ -236,16 +444,8 @@
 				"fields	module"
 			],
 			[
-				"rela",
-				"related_name"
-			],
-			[
 				"ins",
 				"instance_type	param"
-			],
-			[
-				"co",
-				"connect	function"
 			],
 			[
 				"kwarg",
@@ -262,10 +462,6 @@
 			[
 				"post",
 				"post_save	instance"
-			],
-			[
-				"pos",
-				"post_delete	statement"
 			],
 			[
 				"displa",
@@ -290,14 +486,6 @@
 			[
 				"ha",
 				"half_pie	statement"
-			],
-			[
-				"Not",
-				"NotImplementedError	class"
-			],
-			[
-				"form",
-				"format_html	function"
 			],
 			[
 				"inline",
@@ -326,194 +514,6 @@
 			[
 				"get_c",
 				"get_context_for_tables_of_statistics"
-			],
-			[
-				"write",
-				"writer_name	param"
-			],
-			[
-				"pub",
-				"publish_parts	function"
-			],
-			[
-				"doc",
-				"docutils	module"
-			],
-			[
-				"ver",
-				"verbose_name	statement"
-			],
-			[
-				"mark",
-				"mark_safe	function"
-			],
-			[
-				"widge",
-				"widgets"
-			],
-			[
-				"wi",
-				"widget"
-			],
-			[
-				"Sta",
-				"StackedInline	class"
-			],
-			[
-				"field",
-				"fieldsets"
-			],
-			[
-				"MARK",
-				"Markup"
-			],
-			[
-				"sui",
-				"suit_classes"
-			],
-			[
-				"Topi",
-				"TopicInline	class"
-			],
-			[
-				"get_fi",
-				"get_field"
-			],
-			[
-				"Time",
-				"TimeStampedModel	class"
-			],
-			[
-				"objec",
-				"objects"
-			],
-			[
-				"con",
-				"convert_date_to_django_date_format	function"
-			],
-			[
-				"tr",
-				"truncatechars	function"
-			],
-			[
-				"templ",
-				"template	module"
-			],
-			[
-				"For",
-				"Forum	class"
-			],
-			[
-				"F",
-				"ForumsConfig	class"
-			],
-			[
-				"Mode",
-				"ModelForm	class"
-			],
-			[
-				"fk",
-				"fk_name"
-			],
-			[
-				"Tab",
-				"TabularInline	class"
-			],
-			[
-				"ran",
-				"random	statement"
-			],
-			[
-				"MA",
-				"MARKUP_CHOICES	statement"
-			],
-			[
-				"Pos",
-				"Post	class"
-			],
-			[
-				"uui",
-				"uuid4	function"
-			],
-			[
-				"aut",
-				"auto_now"
-			],
-			[
-				"mda",
-				"mdatetime	DateTimeField (mdatetime)"
-			],
-			[
-				"Top",
-				"TopicFactory	class"
-			],
-			[
-				"uni",
-				"unique"
-			],
-			[
-				"ge",
-				"generate_text_random_length_for_field_of_model	function"
-			],
-			[
-				"dae",
-				"date_hierarchy"
-			],
-			[
-				"try",
-				"try	Try/Except"
-			],
-			[
-				"unique_",
-				"unique_with"
-			],
-			[
-				"AUTH",
-				"AUTH_USER_MODEL"
-			],
-			[
-				"rel",
-				"related_name	param"
-			],
-			[
-				"min",
-				"msmallint	SmallIntegerField (msmallint)"
-			],
-			[
-				"Con",
-				"ConfiguredAutoSlugField	class"
-			],
-			[
-				"models",
-				"models_fields	module"
-			],
-			[
-				"le",
-				"legend_box_size	statement"
-			],
-			[
-				"ut",
-				"utils	module"
-			],
-			[
-				"Mark",
-				"MarkQuerySet	class"
-			],
-			[
-				"Q",
-				"QuerySet	class"
-			],
-			[
-				"mar",
-				"marks_manager	statement"
-			],
-			[
-				"ung",
-				"ungettext_lazy	function"
-			],
-			[
-				"tra",
-				"translation	module"
 			]
 		]
 	},
@@ -523,39 +523,47 @@
 			"file": "/media/wlysenko/66ABF2AC3D03BAAA/Web/A",
 			"settings":
 			{
-				"buffer_size": 88517,
+				"buffer_size": 86333,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "apps/notifications/models.py",
+			"file": "apps/admin/site.py",
 			"settings":
 			{
-				"buffer_size": 2538,
+				"buffer_size": 11460,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "apps/notifications/signals.py",
+			"file": "apps/admin/admin.py",
 			"settings":
 			{
-				"buffer_size": 1048,
+				"buffer_size": 88135,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "apps/notifications/migrations/0001_initial.py",
+			"file": "apps/admin/views.py",
 			"settings":
 			{
-				"buffer_size": 1974,
+				"buffer_size": 4525,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "apps/notifications/apps.py",
+			"file": "apps/admin/templates/admin/admin/changelist.html",
 			"settings":
 			{
-				"buffer_size": 365,
+				"buffer_size": 903,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "apps/users/admin.py",
+			"settings":
+			{
+				"buffer_size": 17932,
 				"line_ending": "Unix"
 			}
 		}
@@ -636,9 +644,21 @@
 	"command_palette":
 	{
 		"height": 357.0,
-		"last_filter": "remove",
+		"last_filter": "searc",
 		"selected_items":
 		[
+			[
+				"searc",
+				"Snippet: bs3-input-search"
+			],
+			[
+				"sear",
+				"Snippet: link - search"
+			],
+			[
+				"script",
+				"Snippet: <script>"
+			],
 			[
 				"remove",
 				"Package Control: Remove Package"
@@ -750,10 +770,6 @@
 			[
 				"js",
 				"Javascript Beautify"
-			],
-			[
-				"script",
-				"Snippet: <script>"
 			],
 			[
 				"Repr",
@@ -1000,10 +1016,6 @@
 				"Snippet: bs3-input-group-text-btn"
 			],
 			[
-				"searc",
-				"Snippet: bs3-input-search-h"
-			],
-			[
 				"bs3-btn",
 				"Snippet: bs3-button-info"
 			],
@@ -1146,10 +1158,6 @@
 			[
 				"ene",
 				"Package Control: Enable Package"
-			],
-			[
-				"scrip",
-				"Snippet: <script>"
 			]
 		],
 		"width": 575.0
@@ -1175,50 +1183,142 @@
 	[
 		"/home/wlysenko/.virtualenvs/programmerHelper/project",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/core",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/core/migrations",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/flavours/locale",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/forums/static",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/notifications",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/notifications/migrations",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/static",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/static/admin",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/static/admin/admin",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/static/admin/admin/css",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/static/admin/admin/js",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/templates",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/templates/admin",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/templates/admin/admin",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/badges/management/commands",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/comments/migrations",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/core/locale",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/core/templates/core",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/forums/management",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/management/commands",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/testing/management/commands",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/templates/users",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/templates/users/admin",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/templates/users/admin/edit_inline",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/settings",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/templates/admin",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/templates/admin/edit_inline",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/utils/django",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/utils/django/static/mylabour",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/utils/django/static/mylabour/css",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/utils/django/static/mylabour/js",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/utils/python"
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/management/commands",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/static/vendor/font-awesome/css",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/static/vendor/jquery/dist",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/utils",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/utils/django"
 	],
 	"file_history":
 	[
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/notifications/migrations/__init__.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/notifications/admin.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/models.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/templates/admin/admin/index.html",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/static/admin/admin/css/index.css",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/templates/admin/admin/base.html",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/core/urls.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/snippets/admin.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/apps.py",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/settings/base.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/notifications/migrations/0001_initial.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/notifications/urls.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/notifications/views.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/decorators.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/core/admin.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/settings/development.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/admin.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/static/admin/admin/js/index.js",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/views.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/admin.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/site.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/static/admin/admin/css/password_change.css",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/static/admin/admin/css/base.css",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/templates/admin/admin/password_change.html",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/templates/admin/admin/core.html",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/models.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/core/views.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/urls-2.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/utils.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/urls.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/templates/admin/admin/login.html",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/forms.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/templates/admin/admin/logout.html",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/static/admin/css/base.css",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/static/admin/css/login.css",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/utils/django/auth/backends.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/utils/django/backends/__init__.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/utils/django/auth/__init__.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/utils/django/backends/extended_session_store.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/utils/django/authentication_backends",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/.gitignore",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/templates/admin/login.html",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/templates/admin/core.html",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/templates/admin/base.html",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/templates/admin/index.html",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/static/vendor/jquery/dist/jquery.min.js",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/static/vendor/jquery/dist/jquery.js",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/bower.json",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/package.json",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/.bowerrc",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/static/vendor/jquery/bower.json",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/static/vendor/d3/d3.js",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/static/vendor/underscore/underscore-min.js",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/static/vendor/select2/select2.jquery.json",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/static/vendor/jquery-ui/jquery-ui.js",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/static/vendor/bootstrap/package.js",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/templates/admin/password_change.html",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/templates/admin/logout.html",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/.pdbrc",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/core/test2.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/core/tests.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/core/admin2.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/badges/managers.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/badges/models.py",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/notifications/signals.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/notifications/apps.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/badges/utils.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/badges/constants.py",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/diaries/querysets.py",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/diaries/models.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/diaries/admin.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/admin.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/models.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/forms.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/validators.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/diaries/managers.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/notifications/managers.py",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/managers.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/factories.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/constants.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/notifications/utils.py",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/notifications/models.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/settings/development.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/utils/python/utils.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/lib/python3.4/site-packages/django/db/models/manager.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/notifications/apps.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/notifications/admin.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/notifications/querysets.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/badges/urls.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/badges/admin.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/badges/signals.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/badges/apps.py",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/signals.py",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/apps.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/core/urls.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/badges/views.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/articles/urls.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/badges/management/commands/create_default_badges.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/forums/models.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/badges/migrations/0002_auto_20160925_1645.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/achievements/management/commands/__init__.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/achievements/management/__init__>py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/solutions/models.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/solutions/managers.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/snippets/models.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/questions/models.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/articles/models.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/achievements/migrations/0002_auto_20160925_1645.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/achievements/apps.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/admin.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/querysets.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/management/commands/factory_test_polls.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/factories.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/utils/django/factories_utils.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/constants.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/management/commands/create_test_superuser.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/tasks.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/notifications/migrations/0001_initial.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/secrets.json",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/notifications/migrations/__init__.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/notifications/urls.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/notifications/views.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/diaries/admin.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/forms.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/validators.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/factories.py",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/wsgi.py",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/templates/users/admin/user_admin_tab_tags.html",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/models.py",
@@ -1226,105 +1326,15 @@
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/diaries/migrations/0005_auto_20160925_0815.py",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/diaries/migrations/0001_initial.py",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/diaries/migrations/0006_auto_20160925_0833.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/diaries/managers.py",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/config/settings/thirdparty.py",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/utils/django/widgets.py",
 		"/home/wlysenko/.virtualenvs/programmerHelper/lib/python3.4/site-packages/django/forms/widgets.py",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/config/settings/base.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/core/admin.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/articles/urls.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/articles/models.py",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/testing/admin.py",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/templates/users/admin/edit_inline/tabular_tab_activity.html",
 		"/home/wlysenko/.virtualenvs/programmerHelper/lib/python3.4/site-packages/suit/templates/admin/edit_inline/tabular.html",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/templates/users/admin/edit_inline.html",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/admin.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/wlysenko",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/utils/django/models_utils.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/forums/migrations/0003_auto_20160923_1900.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/forums/migrations/0001_initial.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/articles/admin.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/comments/admin.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/comments/models.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/flavours/models.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/flavours/admin.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/library/admin.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/library/models.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/marks/models.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/marks/admin.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/newsletters/admin.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/newsletters/models.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/opinions/admin.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/opinions/models.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/questions/admin.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/questions/models.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/replies/models.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/replies/admin.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/snippets/models.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/snippets/admin.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/solutions/admin.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/solutions/models.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/utilities/admin.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/utilities/apps.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/forums/forms.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/forums/models.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/forums/admin.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/utils/django/models.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/visits/context_processors.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/config/settings/custom.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/visits/middleware.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/visits/managers.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/diaries/forms.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/templates/users/admin/user_admin_tab_details.html",
-		"/home/wlysenko/.virtualenvs/programmerHelper/lib/python3.4/site-packages/django/core/files/storage.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/management/commands/factory_test_polls.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/management/commands/__init__.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/listfilters.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/formsets.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/forms.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/factories.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/constants.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/articles/factories.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/articles/forms.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/newsletters/forms.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/lib/python3.4/site-packages/django/forms/models.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/lib/python3.4/site-packages/django/contrib/admin/options.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/lib/python3.4/site-packages/django/contrib/admin/helpers.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/lib/python3.4/site-packages/django/contrib/admin/templates/admin/edit_inline/tabular.html",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/templates/admin/edit_inline/stacked.html",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/templates/users/admin/change_form.html",
-		"/home/wlysenko/.virtualenvs/programmerHelper/lib/python3.4/site-packages/suit/templates/admin/change_form.html",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/snippets/forms.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/snippets/factories.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/templates/users/admin/edit_inline/stacked_OneToOne.html",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/core/widgets.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/diaries/factories.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/querysets.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/templates/users/admin/edit_inline/stacked_profile.html",
-		"/home/wlysenko/.virtualenvs/programmerHelper/lib/python3.4/site-packages/suit/templates/admin/edit_inline/stacked.html",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/templates/users/admin/users/change_list.html",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/templates/admin/edit_inline.html",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/utils/django/models_fields.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/utils/javascript/dynamic_upload_script.js",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/utils/django/static/mylabour/js/colorwidget.js",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/utils/django/static/mylabour/css/colorwidget.css",
-		"/home/wlysenko/.virtualenvs/programmerHelper/lib/python3.4/site-packages/django/db/models/fields/__init__.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/utils/python/utils.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/config/settings/development.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/utils/django/descriptors.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/lib/python3.4/site-packages/django/db/models/fields/related.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/lib/python3.4/site-packages/django/db/models/fields/related_descriptors.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/migrations/0003_auto_20160921_1526.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/management/commands/create_levels_of_users.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/management/commands/create_test_superuser.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/diaries/apps.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/AAAA/README.md",
-		"/media/wlysenko/66ABF2AC3D03BAAA/Web/Packages/Django/DjangoAppTemplate/LICENSE",
-		"/media/wlysenko/66ABF2AC3D03BAAA/Web/Packages/Django/DjangoAppTemplate/README.md",
-		"/home/wlysenko/.virtualenvs/programmerHelper/lib/python3.4/site-packages/django/core/management/templates.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/utils/django/management/commands/startapps_by_sample.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/lib/python3.4/site-packages/django/core/management/commands/startapp.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/AAAA/project_name/apps/core/models.py"
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/wlysenko"
 	],
 	"find":
 	{
@@ -1342,134 +1352,134 @@
 		"case_sensitive": true,
 		"find_history":
 		[
-			"notifications_notification",
-			"HStoreField",
-			", ",
-			"created_updated_profile",
-			"get_get_total_size",
-			"count_partitions",
-			"get_total_size",
-			"instance",
-			"CREATED_OBJECT",
-			"UPDATED_USER",
-			"UPDATED_OBJECT",
-			"CREATED_USER",
-			"UPDATED_OBJECT",
-			"CREATE_OBJECT",
-			"type",
-			"is_read",
-			"MESSAGE",
-			"_",
-			"CHANGING_REPUTATION",
-			"CHOICES_ACTIONS",
-			"CHOICES_NOTIFICATIONS",
-			"NEWBADGE",
-			"content",
-			"format_html",
-			"display_user_with_admin_url",
-			"notifications",
-			"RUSSIAN_LETTERS",
-			"ACCEPTABLE_CHARACTERS",
-			"deconstructible",
-			"UsernameValidator",
-			"ACCEPTABLE_CHARACTERS",
-			"UsernameValidator",
-			"ValidationError",
-			"ACCEPTABLE_CHARACTERS",
-			"password1",
-			"password_validation",
-			"span12",
-			"auth_password_validators",
-			"settings",
-			"password_validators_help_text_html",
-			"password_validation",
-			"UserNameValidator",
-			"min",
-			"again",
-			"display_name",
-			"displ",
-			"display_name",
-			"message",
+			"self.admin_model.model",
+			"self.admin_model.model._meta",
+			"pass",
+			"name_attr_display",
+			"attr_display",
+			"capfirst",
+			"force_text",
+			"capfirst",
+			"new_list_display",
+			"attr_display",
+			"obj_display",
+			"admin_model",
+			"field_value",
+			"list_value",
+			"list_values",
+			"list_display",
+			"get_list_display",
+			"fieldname",
+			"fieldnames",
+			"__str__",
+			"list_values",
+			"values",
+			"value",
+			"field_or_method",
+			"_build_app_dict",
+			"._registry",
+			"each_",
+			"field_value",
+			"fieldnames",
+			"queryset",
+			"model_verbose_name",
+			"field",
+			"Header",
+			"sidebar",
+			"Level",
+			"ChangelistView",
+			"admin_staff_member_required",
+			"_build_app_dict",
+			"CherckModelAdmin",
+			"View",
+			"register",
+			"changelist_view",
+			"statistics",
+			"preview",
+			"change",
+			"raw_id_fields",
+			"ModelAdmin",
+			"BaseModelAdmin",
+			"BaseModelAdminChecks",
+			"check(",
+			"ModelAdminChecks",
+			"checks_class",
+			"checks_class()",
+			"check(",
+			"admin_site",
+			"_registry_models",
+			"admin_class",
 			"AdminSite",
-			"self",
-			"display_diary_details",
-			"first_name",
-			"add_fieldsets",
-			"classes",
-			"settings",
-			"span12",
-			"display_name",
-			"UserCreateAdminModelForm",
-			"UserCreationForm",
-			"UserCreateAdminModelForm",
-			"UserChangeForm",
-			"().",
-			"self",
-			"add_",
-			" \n",
-			"request_finished",
-			"get_user_model",
-			"conf",
-			"REPUTATION",
-			"Reputation",
-			"get_statistics_usage_tags",
-			"user_top_tag",
-			"first_element",
-			"div_header",
-			"header",
-			"div_top_tag",
-			"245",
-			"tabs_tags_div",
-			"tabs_div_tags",
-			"div_link",
-			"tabs_div_tags",
-			"div_tag",
-			"tags",
-			"updated",
-			"convert_date_to_django_date_format",
-			"date_latest_changes",
-			"get_date_latest_changes_for_admin",
-			"updated",
-			"suit_tab_forms",
-			"Summary",
-			"'))\n",
-			"_date_latest_changes",
-			"updated",
-			"date_latest_changes",
-			"get_count_partitions",
-			"get_date_latest_changes",
-			"get_count_partitions",
-			"get_queryset",
-			"DiaryManager",
-			"count_partitions",
-			"date_latest_changes",
-			"admin_order_field",
-			"logger",
-			"percentage_part_14",
-			"percentage",
-			"result",
-			"percentage",
-			"real_name",
+			"LevelAdmin",
+			"AdminSite",
+			"ModelAdmin",
+			"DefaultAdminSite",
+			"AdminSite",
+			"DefaultAdminSite",
+			"AdminSite",
+			"admin",
+			"DefaultAdminSite",
+			"AdminSite",
+			"DefaultAdminSite",
+			"ThisAdminSite",
+			"DefaultAdminSite",
+			"ThisAdminSite",
+			"admin",
+			"site",
+			"admin",
+			"register_model",
 			"models",
-			"get_percentage_filling",
-			"WOMAN",
-			"UNKNOWN",
-			"SubWidget",
-			"<select",
-			"RadioSelect",
-			"HorizontalRadioSelect",
-			"SuitDateWidget",
-			"span12",
-			"CKEditorWidget",
-			"job",
-			"phone",
-			"job",
-			"longitude",
-			"location",
-			"personal_website",
-			"presents_on_github",
-			"real_name",
-			"ProfileAdminModelForm"
+			"contrib",
+			"_registry",
+			"admin_site",
+			"is_registered",
+			"unregister",
+			"register",
+			"link_fullscreen",
+			"Text1",
+			"absolute",
+			"nested_list_active_page",
+			"aaa",
+			"nested_list_active_page",
+			"thisLi",
+			"$(this)",
+			"this",
+			"all_items_nested_list",
+			"this_nested_list",
+			"hidden",
+			"$",
+			" data-toggle=\"collapse\"",
+			"addClass",
+			"removeClass",
+			"has_icon_class",
+			"icon_chevron_down",
+			"all_items_icons",
+			"all_items",
+			"all_items_icons",
+			"all_items",
+			"list-group-item",
+			"main_list",
+			"sidebar_apps ul li",
+			"main_list",
+			"\">\n              <li class=\"list-group-item\"><a href=\"#\">AAAAAAAAA</a></li>\n              <li class=\"list-group-it",
+			"active",
+			"home",
+			"list-group",
+			"main1",
+			"row",
+			"i",
+			"main2",
+			"<i class=\"fa fa-home fa-2x\"></i>",
+			"main1",
+			"background",
+			"#fff",
+			"each_context",
+			"each_c",
+			"padding-right: 0;",
+			"aaaaaaaa",
+			"left",
+			"background",
+			"all"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -1583,7 +1593,7 @@
 	"groups":
 	[
 		{
-			"selected": 1,
+			"selected": 3,
 			"sheets":
 			[
 				{
@@ -1592,15 +1602,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 88517,
+						"buffer_size": 86333,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								0,
-								0
+								600,
+								600
 							]
 						],
 						"settings":
@@ -1623,61 +1633,61 @@
 							},
 							"bracket_highlighter.regions":
 							[
-								"bh_single_quote",
-								"bh_single_quote_center",
-								"bh_single_quote_open",
-								"bh_single_quote_close",
-								"bh_single_quote_content",
-								"bh_double_quote",
-								"bh_double_quote_center",
-								"bh_double_quote_open",
-								"bh_double_quote_close",
-								"bh_double_quote_content",
-								"bh_c_define",
-								"bh_c_define_center",
-								"bh_c_define_open",
-								"bh_c_define_close",
-								"bh_c_define_content",
 								"bh_square",
 								"bh_square_center",
 								"bh_square_open",
 								"bh_square_close",
 								"bh_square_content",
+								"bh_double_quote",
+								"bh_double_quote_center",
+								"bh_double_quote_open",
+								"bh_double_quote_close",
+								"bh_double_quote_content",
 								"bh_default",
 								"bh_default_center",
 								"bh_default_open",
 								"bh_default_close",
 								"bh_default_content",
+								"bh_c_define",
+								"bh_c_define_center",
+								"bh_c_define_open",
+								"bh_c_define_close",
+								"bh_c_define_content",
 								"bh_curly",
 								"bh_curly_center",
 								"bh_curly_open",
 								"bh_curly_close",
 								"bh_curly_content",
-								"bh_regex",
-								"bh_regex_center",
-								"bh_regex_open",
-								"bh_regex_close",
-								"bh_regex_content",
-								"bh_tag",
-								"bh_tag_center",
-								"bh_tag_open",
-								"bh_tag_close",
-								"bh_tag_content",
+								"bh_single_quote",
+								"bh_single_quote_center",
+								"bh_single_quote_open",
+								"bh_single_quote_close",
+								"bh_single_quote_content",
 								"bh_round",
 								"bh_round_center",
 								"bh_round_open",
 								"bh_round_close",
 								"bh_round_content",
-								"bh_unmatched",
-								"bh_unmatched_center",
-								"bh_unmatched_open",
-								"bh_unmatched_close",
-								"bh_unmatched_content",
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
+								"bh_regex_content",
 								"bh_angle",
 								"bh_angle_center",
 								"bh_angle_open",
 								"bh_angle_close",
-								"bh_angle_content"
+								"bh_angle_content",
+								"bh_tag",
+								"bh_tag_center",
+								"bh_tag_open",
+								"bh_tag_close",
+								"bh_tag_content",
+								"bh_unmatched",
+								"bh_unmatched_center",
+								"bh_unmatched_open",
+								"bh_unmatched_close",
+								"bh_unmatched_content"
 							],
 							"color_scheme": "Packages/User/Color Highlighter/themes/Monokai Extended Bright (SL).tmTheme",
 							"syntax": "Packages/Text/Plain text.tmLanguage",
@@ -1688,24 +1698,24 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 4,
+					"stack_index": 5,
 					"type": "text"
 				},
 				{
 					"buffer": 1,
-					"file": "apps/notifications/models.py",
+					"file": "apps/admin/site.py",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 2538,
+						"buffer_size": 11460,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1700,
-								1700
+								2835,
+								2835
 							]
 						],
 						"settings":
@@ -1717,15 +1727,15 @@
 								{
 									"1":
 									[
-										1572,
-										1573
+										2964,
+										2965
 									]
 								},
 								"icon":
 								{
 									"1":
 									[
-										"Packages/BracketHighlighter/icons/single_quote.png",
+										"Packages/BracketHighlighter/icons/curly_bracket.png",
 										"brackethighlighter.default"
 									]
 								},
@@ -1733,8 +1743,8 @@
 								{
 									"1":
 									[
-										1565,
-										1566
+										2709,
+										2710
 									]
 								},
 								"unmatched":
@@ -1743,61 +1753,61 @@
 							},
 							"bracket_highlighter.regions":
 							[
-								"bh_single_quote",
-								"bh_single_quote_center",
-								"bh_single_quote_open",
-								"bh_single_quote_close",
-								"bh_single_quote_content",
-								"bh_double_quote",
-								"bh_double_quote_center",
-								"bh_double_quote_open",
-								"bh_double_quote_close",
-								"bh_double_quote_content",
-								"bh_c_define",
-								"bh_c_define_center",
-								"bh_c_define_open",
-								"bh_c_define_close",
-								"bh_c_define_content",
 								"bh_square",
 								"bh_square_center",
 								"bh_square_open",
 								"bh_square_close",
 								"bh_square_content",
+								"bh_double_quote",
+								"bh_double_quote_center",
+								"bh_double_quote_open",
+								"bh_double_quote_close",
+								"bh_double_quote_content",
 								"bh_default",
 								"bh_default_center",
 								"bh_default_open",
 								"bh_default_close",
 								"bh_default_content",
+								"bh_c_define",
+								"bh_c_define_center",
+								"bh_c_define_open",
+								"bh_c_define_close",
+								"bh_c_define_content",
 								"bh_curly",
 								"bh_curly_center",
 								"bh_curly_open",
 								"bh_curly_close",
 								"bh_curly_content",
-								"bh_regex",
-								"bh_regex_center",
-								"bh_regex_open",
-								"bh_regex_close",
-								"bh_regex_content",
-								"bh_tag",
-								"bh_tag_center",
-								"bh_tag_open",
-								"bh_tag_close",
-								"bh_tag_content",
+								"bh_single_quote",
+								"bh_single_quote_center",
+								"bh_single_quote_open",
+								"bh_single_quote_close",
+								"bh_single_quote_content",
 								"bh_round",
 								"bh_round_center",
 								"bh_round_open",
 								"bh_round_close",
 								"bh_round_content",
-								"bh_unmatched",
-								"bh_unmatched_center",
-								"bh_unmatched_open",
-								"bh_unmatched_close",
-								"bh_unmatched_content",
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
+								"bh_regex_content",
 								"bh_angle",
 								"bh_angle_center",
 								"bh_angle_open",
 								"bh_angle_close",
-								"bh_angle_content"
+								"bh_angle_content",
+								"bh_tag",
+								"bh_tag_center",
+								"bh_tag_open",
+								"bh_tag_close",
+								"bh_tag_content",
+								"bh_unmatched",
+								"bh_unmatched_center",
+								"bh_unmatched_open",
+								"bh_unmatched_close",
+								"bh_unmatched_content"
 							],
 							"color_scheme": "Packages/User/Color Highlighter/themes/Monokai Extended Bright (SL).tmTheme",
 							"editorconfig": true,
@@ -1808,258 +1818,27 @@
 							"trim_trailing_white_space_on_save": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 462.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 0,
-					"type": "text"
-				},
-				{
-					"buffer": 2,
-					"file": "apps/notifications/signals.py",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 1048,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								405,
-								405
-							]
-						],
-						"settings":
-						{
-							"bracket_highlighter.busy": false,
-							"bracket_highlighter.locations":
-							{
-								"close":
-								{
-								},
-								"icon":
-								{
-								},
-								"open":
-								{
-								},
-								"unmatched":
-								{
-								}
-							},
-							"bracket_highlighter.regions":
-							[
-								"bh_single_quote",
-								"bh_single_quote_center",
-								"bh_single_quote_open",
-								"bh_single_quote_close",
-								"bh_single_quote_content",
-								"bh_double_quote",
-								"bh_double_quote_center",
-								"bh_double_quote_open",
-								"bh_double_quote_close",
-								"bh_double_quote_content",
-								"bh_c_define",
-								"bh_c_define_center",
-								"bh_c_define_open",
-								"bh_c_define_close",
-								"bh_c_define_content",
-								"bh_square",
-								"bh_square_center",
-								"bh_square_open",
-								"bh_square_close",
-								"bh_square_content",
-								"bh_default",
-								"bh_default_center",
-								"bh_default_open",
-								"bh_default_close",
-								"bh_default_content",
-								"bh_curly",
-								"bh_curly_center",
-								"bh_curly_open",
-								"bh_curly_close",
-								"bh_curly_content",
-								"bh_regex",
-								"bh_regex_center",
-								"bh_regex_open",
-								"bh_regex_close",
-								"bh_regex_content",
-								"bh_tag",
-								"bh_tag_center",
-								"bh_tag_open",
-								"bh_tag_close",
-								"bh_tag_content",
-								"bh_round",
-								"bh_round_center",
-								"bh_round_open",
-								"bh_round_close",
-								"bh_round_content",
-								"bh_unmatched",
-								"bh_unmatched_center",
-								"bh_unmatched_open",
-								"bh_unmatched_close",
-								"bh_unmatched_content",
-								"bh_angle",
-								"bh_angle_center",
-								"bh_angle_open",
-								"bh_angle_close",
-								"bh_angle_content"
-							],
-							"color_scheme": "Packages/User/Color Highlighter/themes/Monokai Extended Bright (SL).tmTheme",
-							"editorconfig": true,
-							"ensure_newline_at_eof_on_save": true,
-							"syntax": "Packages/Djaneiro/Syntaxes/Python Django.tmLanguage",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true,
-							"trim_trailing_white_space_on_save": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 3,
-					"type": "text"
-				},
-				{
-					"buffer": 3,
-					"file": "apps/notifications/migrations/0001_initial.py",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 1974,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								540,
-								540
-							]
-						],
-						"settings":
-						{
-							"bracket_highlighter.busy": false,
-							"bracket_highlighter.locations":
-							{
-								"close":
-								{
-									"1":
-									[
-										541,
-										542
-									]
-								},
-								"icon":
-								{
-									"1":
-									[
-										"Packages/BracketHighlighter/icons/round_bracket.png",
-										"brackethighlighter.default"
-									]
-								},
-								"open":
-								{
-									"1":
-									[
-										540,
-										541
-									]
-								},
-								"unmatched":
-								{
-								}
-							},
-							"bracket_highlighter.regions":
-							[
-								"bh_single_quote",
-								"bh_single_quote_center",
-								"bh_single_quote_open",
-								"bh_single_quote_close",
-								"bh_single_quote_content",
-								"bh_double_quote",
-								"bh_double_quote_center",
-								"bh_double_quote_open",
-								"bh_double_quote_close",
-								"bh_double_quote_content",
-								"bh_c_define",
-								"bh_c_define_center",
-								"bh_c_define_open",
-								"bh_c_define_close",
-								"bh_c_define_content",
-								"bh_square",
-								"bh_square_center",
-								"bh_square_open",
-								"bh_square_close",
-								"bh_square_content",
-								"bh_default",
-								"bh_default_center",
-								"bh_default_open",
-								"bh_default_close",
-								"bh_default_content",
-								"bh_curly",
-								"bh_curly_center",
-								"bh_curly_open",
-								"bh_curly_close",
-								"bh_curly_content",
-								"bh_regex",
-								"bh_regex_center",
-								"bh_regex_open",
-								"bh_regex_close",
-								"bh_regex_content",
-								"bh_tag",
-								"bh_tag_center",
-								"bh_tag_open",
-								"bh_tag_close",
-								"bh_tag_content",
-								"bh_round",
-								"bh_round_center",
-								"bh_round_open",
-								"bh_round_close",
-								"bh_round_content",
-								"bh_unmatched",
-								"bh_unmatched_center",
-								"bh_unmatched_open",
-								"bh_unmatched_close",
-								"bh_unmatched_content",
-								"bh_angle",
-								"bh_angle_center",
-								"bh_angle_open",
-								"bh_angle_close",
-								"bh_angle_content"
-							],
-							"color_scheme": "Packages/User/Color Highlighter/themes/Monokai Extended Bright (SL).tmTheme",
-							"editorconfig": true,
-							"ensure_newline_at_eof_on_save": true,
-							"syntax": "Packages/Djaneiro/Syntaxes/Python Django.tmLanguage",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true,
-							"trim_trailing_white_space_on_save": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 1062.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 1,
 					"type": "text"
 				},
 				{
-					"buffer": 4,
-					"file": "apps/notifications/apps.py",
+					"buffer": 2,
+					"file": "apps/admin/admin.py",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 365,
+						"buffer_size": 88135,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								130,
-								130
+								87167,
+								87167
 							]
 						],
 						"settings":
@@ -2082,67 +1861,300 @@
 							},
 							"bracket_highlighter.regions":
 							[
-								"bh_single_quote",
-								"bh_single_quote_center",
-								"bh_single_quote_open",
-								"bh_single_quote_close",
-								"bh_single_quote_content",
-								"bh_double_quote",
-								"bh_double_quote_center",
-								"bh_double_quote_open",
-								"bh_double_quote_close",
-								"bh_double_quote_content",
-								"bh_c_define",
-								"bh_c_define_center",
-								"bh_c_define_open",
-								"bh_c_define_close",
-								"bh_c_define_content",
 								"bh_square",
 								"bh_square_center",
 								"bh_square_open",
 								"bh_square_close",
 								"bh_square_content",
+								"bh_double_quote",
+								"bh_double_quote_center",
+								"bh_double_quote_open",
+								"bh_double_quote_close",
+								"bh_double_quote_content",
 								"bh_default",
 								"bh_default_center",
 								"bh_default_open",
 								"bh_default_close",
 								"bh_default_content",
+								"bh_c_define",
+								"bh_c_define_center",
+								"bh_c_define_open",
+								"bh_c_define_close",
+								"bh_c_define_content",
 								"bh_curly",
 								"bh_curly_center",
 								"bh_curly_open",
 								"bh_curly_close",
 								"bh_curly_content",
-								"bh_regex",
-								"bh_regex_center",
-								"bh_regex_open",
-								"bh_regex_close",
-								"bh_regex_content",
-								"bh_tag",
-								"bh_tag_center",
-								"bh_tag_open",
-								"bh_tag_close",
-								"bh_tag_content",
+								"bh_single_quote",
+								"bh_single_quote_center",
+								"bh_single_quote_open",
+								"bh_single_quote_close",
+								"bh_single_quote_content",
 								"bh_round",
 								"bh_round_center",
 								"bh_round_open",
 								"bh_round_close",
 								"bh_round_content",
-								"bh_unmatched",
-								"bh_unmatched_center",
-								"bh_unmatched_open",
-								"bh_unmatched_close",
-								"bh_unmatched_content",
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
+								"bh_regex_content",
 								"bh_angle",
 								"bh_angle_center",
 								"bh_angle_open",
 								"bh_angle_close",
-								"bh_angle_content"
+								"bh_angle_content",
+								"bh_tag",
+								"bh_tag_center",
+								"bh_tag_open",
+								"bh_tag_close",
+								"bh_tag_content",
+								"bh_unmatched",
+								"bh_unmatched_center",
+								"bh_unmatched_open",
+								"bh_unmatched_close",
+								"bh_unmatched_content"
 							],
 							"color_scheme": "Packages/User/Color Highlighter/themes/Monokai Extended Bright (SL).tmTheme",
 							"editorconfig": true,
 							"ensure_newline_at_eof_on_save": true,
 							"syntax": "Packages/Djaneiro/Syntaxes/Python Django.tmLanguage",
 							"tab_size": 4,
+							"translate_tabs_to_spaces": true,
+							"trim_trailing_white_space_on_save": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 2800.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 4,
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "apps/admin/views.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 4525,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								3554,
+								3554
+							]
+						],
+						"settings":
+						{
+							"bracket_highlighter.busy": false,
+							"bracket_highlighter.locations":
+							{
+								"close":
+								{
+								},
+								"icon":
+								{
+								},
+								"open":
+								{
+								},
+								"unmatched":
+								{
+								}
+							},
+							"bracket_highlighter.regions":
+							[
+								"bh_square",
+								"bh_square_center",
+								"bh_square_open",
+								"bh_square_close",
+								"bh_square_content",
+								"bh_double_quote",
+								"bh_double_quote_center",
+								"bh_double_quote_open",
+								"bh_double_quote_close",
+								"bh_double_quote_content",
+								"bh_default",
+								"bh_default_center",
+								"bh_default_open",
+								"bh_default_close",
+								"bh_default_content",
+								"bh_c_define",
+								"bh_c_define_center",
+								"bh_c_define_open",
+								"bh_c_define_close",
+								"bh_c_define_content",
+								"bh_curly",
+								"bh_curly_center",
+								"bh_curly_open",
+								"bh_curly_close",
+								"bh_curly_content",
+								"bh_single_quote",
+								"bh_single_quote_center",
+								"bh_single_quote_open",
+								"bh_single_quote_close",
+								"bh_single_quote_content",
+								"bh_round",
+								"bh_round_center",
+								"bh_round_open",
+								"bh_round_close",
+								"bh_round_content",
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
+								"bh_regex_content",
+								"bh_angle",
+								"bh_angle_center",
+								"bh_angle_open",
+								"bh_angle_close",
+								"bh_angle_content",
+								"bh_tag",
+								"bh_tag_center",
+								"bh_tag_open",
+								"bh_tag_close",
+								"bh_tag_content",
+								"bh_unmatched",
+								"bh_unmatched_center",
+								"bh_unmatched_open",
+								"bh_unmatched_close",
+								"bh_unmatched_content"
+							],
+							"color_scheme": "Packages/User/Color Highlighter/themes/Monokai Extended Bright (SL).tmTheme",
+							"editorconfig": true,
+							"ensure_newline_at_eof_on_save": true,
+							"syntax": "Packages/Djaneiro/Syntaxes/Python Django.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true,
+							"trim_trailing_white_space_on_save": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 1748.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "apps/admin/templates/admin/admin/changelist.html",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 903,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								403,
+								403
+							]
+						],
+						"settings":
+						{
+							"bracket_highlighter.busy": false,
+							"bracket_highlighter.locations":
+							{
+								"close":
+								{
+									"1":
+									[
+										403,
+										404
+									]
+								},
+								"icon":
+								{
+									"1":
+									[
+										"Packages/BracketHighlighter/icons/double_quote.png",
+										"brackethighlighter.default"
+									]
+								},
+								"open":
+								{
+									"1":
+									[
+										391,
+										392
+									]
+								},
+								"unmatched":
+								{
+								}
+							},
+							"bracket_highlighter.regions":
+							[
+								"bh_square",
+								"bh_square_center",
+								"bh_square_open",
+								"bh_square_close",
+								"bh_square_content",
+								"bh_double_quote",
+								"bh_double_quote_center",
+								"bh_double_quote_open",
+								"bh_double_quote_close",
+								"bh_double_quote_content",
+								"bh_default",
+								"bh_default_center",
+								"bh_default_open",
+								"bh_default_close",
+								"bh_default_content",
+								"bh_c_define",
+								"bh_c_define_center",
+								"bh_c_define_open",
+								"bh_c_define_close",
+								"bh_c_define_content",
+								"bh_curly",
+								"bh_curly_center",
+								"bh_curly_open",
+								"bh_curly_close",
+								"bh_curly_content",
+								"bh_single_quote",
+								"bh_single_quote_center",
+								"bh_single_quote_open",
+								"bh_single_quote_close",
+								"bh_single_quote_content",
+								"bh_round",
+								"bh_round_center",
+								"bh_round_open",
+								"bh_round_close",
+								"bh_round_content",
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
+								"bh_regex_content",
+								"bh_angle",
+								"bh_angle_center",
+								"bh_angle_open",
+								"bh_angle_close",
+								"bh_angle_content",
+								"bh_tag",
+								"bh_tag_center",
+								"bh_tag_open",
+								"bh_tag_close",
+								"bh_tag_content",
+								"bh_unmatched",
+								"bh_unmatched_center",
+								"bh_unmatched_open",
+								"bh_unmatched_close",
+								"bh_unmatched_content"
+							],
+							"color_scheme": "Packages/User/Color Highlighter/themes/Monokai Extended Bright (SL).tmTheme",
+							"editorconfig": true,
+							"ensure_newline_at_eof_on_save": true,
+							"is_xml": false,
+							"open_with_edit": true,
+							"syntax": "Packages/Djaneiro/Syntaxes/HTML (Django).tmLanguage",
+							"tab_size": 2,
 							"translate_tabs_to_spaces": true,
 							"trim_trailing_white_space_on_save": true
 						},
@@ -2151,6 +2163,114 @@
 						"zoom_level": 1.0
 					},
 					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "apps/users/admin.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 17932,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1688,
+								1688
+							]
+						],
+						"settings":
+						{
+							"bracket_highlighter.busy": false,
+							"bracket_highlighter.locations":
+							{
+								"close":
+								{
+								},
+								"icon":
+								{
+								},
+								"open":
+								{
+								},
+								"unmatched":
+								{
+								}
+							},
+							"bracket_highlighter.regions":
+							[
+								"bh_square",
+								"bh_square_center",
+								"bh_square_open",
+								"bh_square_close",
+								"bh_square_content",
+								"bh_double_quote",
+								"bh_double_quote_center",
+								"bh_double_quote_open",
+								"bh_double_quote_close",
+								"bh_double_quote_content",
+								"bh_default",
+								"bh_default_center",
+								"bh_default_open",
+								"bh_default_close",
+								"bh_default_content",
+								"bh_c_define",
+								"bh_c_define_center",
+								"bh_c_define_open",
+								"bh_c_define_close",
+								"bh_c_define_content",
+								"bh_curly",
+								"bh_curly_center",
+								"bh_curly_open",
+								"bh_curly_close",
+								"bh_curly_content",
+								"bh_single_quote",
+								"bh_single_quote_center",
+								"bh_single_quote_open",
+								"bh_single_quote_close",
+								"bh_single_quote_content",
+								"bh_round",
+								"bh_round_center",
+								"bh_round_open",
+								"bh_round_close",
+								"bh_round_content",
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
+								"bh_regex_content",
+								"bh_angle",
+								"bh_angle_center",
+								"bh_angle_open",
+								"bh_angle_close",
+								"bh_angle_content",
+								"bh_tag",
+								"bh_tag_center",
+								"bh_tag_open",
+								"bh_tag_close",
+								"bh_tag_content",
+								"bh_unmatched",
+								"bh_unmatched_center",
+								"bh_unmatched_open",
+								"bh_unmatched_close",
+								"bh_unmatched_content"
+							],
+							"color_scheme": "Packages/User/Color Highlighter/themes/Monokai Extended Bright (SL).tmTheme",
+							"editorconfig": true,
+							"ensure_newline_at_eof_on_save": true,
+							"syntax": "Packages/Djaneiro/Syntaxes/Python Django.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true,
+							"trim_trailing_white_space_on_save": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 402.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 3,
 					"type": "text"
 				}
 			]

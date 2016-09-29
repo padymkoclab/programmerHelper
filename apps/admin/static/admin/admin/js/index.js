@@ -1,0 +1,95 @@
+jQuery(document).ready(function($) {
+
+    /*
+    Toggle display/hide the left sidebar
+     */
+    $('#toggle_sidebar').click(function(event) {
+        $('#wrapper').toggleClass('toggle_sidebar');
+    });
+
+    /*
+    Toggle FA icon chevron
+     */
+    $('#sidebar_apps ul li.main_list > a').click(function(event) {
+
+        event.preventDefault();
+
+        var $item= $(this).parent();
+
+        var has_icon_chevron_left;
+        var icon_chevron_left = 'fa-chevron-left';
+        var icon_chevron_down = 'fa-chevron-down';
+
+        var $all_items = $item.parent().find('li');
+        var $this_icon = $item.find('a span.fa');
+        var $this_nested_list = $item.find('.div_nested_list');
+
+        // clear class .active in all items
+        $all_items.removeClass('active');
+
+        // if item it was not changed from last click
+        if ($this_icon.hasClass(icon_chevron_left)) {
+            has_icon_chevron_left = true;
+        }
+
+        // all_items_nested_list.slideToggle();
+
+        // remove all icons in all items
+        var $all_items_icons = $all_items.find('a span.fa');
+        $all_items_icons.removeClass(icon_chevron_left);
+        $all_items_icons.removeClass(icon_chevron_down);
+
+        // add icon_chevron_left to all items
+        $all_items_icons.addClass(icon_chevron_left);
+
+        // if item it was not changed from last click
+        // add icon icon_chevron_down instead of icon_chevron_left
+        // to this item
+        if (has_icon_chevron_left === true) {
+
+            var $this_icon = $item.find('a span.fa');
+
+            $this_icon.removeClass(icon_chevron_left);
+            $this_icon.addClass(icon_chevron_down);
+
+            $item.addClass('active');
+
+        }
+
+        // debugger;
+        $item.parent().find('.div_nested_list').not($this_nested_list).slideUp();
+
+        $this_nested_list.slideToggle();
+
+    });
+
+    /*
+
+     */
+    $('#sidebar_apps .nested_list li').click(function(event) {
+        // $(this).toggleClass('nested_list_active_page');
+    });
+
+    /*
+    Fullscree window
+     */
+    $('a#link_fullscreen').click(function(event) {
+
+        function requestFullScreen(element) {
+            // Supports most browsers and their versions.
+            var requestMethod = element.requestFullScreen || element.webkitRequestFullScreen || element.mozRequestFullScreen || element.msRequestFullScreen;
+
+            if (requestMethod) { // Native full screen.
+                requestMethod.call(element);
+            } else if (typeof window.ActiveXObject !== "undefined") { // Older IE.
+                var wscript = new ActiveXObject("WScript.Shell");
+                if (wscript !== null) {
+                    wscript.SendKeys("{F11}");
+                }
+            }
+        }
+
+        var elem = document.body; // Make the body go full screen.
+        requestFullScreen(elem);
+    });
+});

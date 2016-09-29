@@ -5,9 +5,6 @@ from django.conf import settings
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
 from django.contrib.auth import password_validation
 
-from suit.widgets import AutosizedTextarea, SuitDateWidget
-from suit_ckeditor.widgets import CKEditorWidget
-
 from utils.django.widgets import HorizontalRadioSelect
 
 # from passwords.fields import PasswordField
@@ -113,13 +110,13 @@ class LevelAdminModelForm(forms.ModelForm):
         self.fields['name'].widget.attrs['class'] = 'span3'
         self.fields['name'].widget.attrs['placeholder'] = _('Enter name')
 
-    class Meta:
-        widgets = {
-            'description': AutosizedTextarea(attrs={
-                'class': 'span12',
-                'placeholder': _('Enter description'),
-            })
-        }
+    # class Meta:
+    #     widgets = {
+    #         'description': AutosizedTextarea(attrs={
+    #             'class': 'span12',
+    #             'placeholder': _('Enter description'),
+    #         })
+    #     }
 
 
 class ProfileAdminModelForm(forms.ModelForm):
@@ -160,9 +157,9 @@ class ProfileAdminModelForm(forms.ModelForm):
         self.fields['phone'].widget.attrs['class'] = 'span6'
         self.fields['phone'].widget.attrs['placeholder'] = _('Enter phone')
 
-    class Meta:
-        widgets = {
-            'about': CKEditorWidget(),
-            'date_birthday': SuitDateWidget(),
-            'gender': HorizontalRadioSelect(),
-        }
+    # class Meta:
+    #     widgets = {
+    #         'about': CKEditorWidget(),
+    #         'date_birthday': SuitDateWidget(),
+    #         'gender': HorizontalRadioSelect(),
+    #     }

@@ -1,0 +1,210 @@
+
+{% extends "admin/admin/index.html" %}
+
+{% load i18n %}
+{% load static %}
+
+{% block extra_css %}
+  {{ block.super }}
+  <link rel="stylesheet" href="{% static 'admin/admin/css/changelist.css' %}">
+{% endblock extra_css %}
+
+
+{% block content %}
+
+  {% block messages %}
+
+  {% endblock messages %}
+
+  {% block toolbox %}
+    <div class="row">
+      <div class="col-xs-12 text-right">
+        <button class="btn btn-warning">{% trans "Export" %}</button>
+        <button class="btn btn-danger">{% trans "Import" %}</button>
+        {% if has_add_permission is True %}
+          <button class="btn btn-success">{% trans "Add " %} {{ model_meta.verbose_name|lower }}</button>
+        {% endif %}
+      </div>
+    </div>
+  {% endblock toolbox %}
+
+  {% block searchbox %}
+    <div id="div_model_searchbox">
+        <div class="row">
+          <div class="col-xs-10">
+              <form action="" class="" method="POST">
+                <div class="input-group">
+                    <span class="input-group-addon" id="searchbox_span_icon">
+                      <span class="glyphicon glyphicon-search"></span>
+                    </span>
+                    <input type="text" class="form-control" placeholder="{% trans 'Search for ...' %}" aria-describedby="#searchbox_span_icon">
+                    <span class="input-group-btn">
+                      <button type="submit" class="btn btn-default">{% trans "Go" %}</button>
+                    </span>
+                </div>
+              </form>
+          </div>
+        </div>
+    </div>
+  {% endblock searchbox %}
+
+  {% block filters %}
+    <div id="div_filters">
+
+    </div>
+  {% endblock filters %}
+
+  {% block date_hierarchy %}
+    <div id="div_date_hierarchy">
+
+    </div>
+  {% endblock date_hierarchy %}
+
+  {% block actions %}
+    <div id="div_actions">
+      <div class="row">
+        <div class="col-xs-12">
+          <form action="" method="POST" class="form-horizontal">{% csrf_token %}
+            <div class="form-group">
+              <span class="control-label col-xs-1" for="select_actions">{% trans "Actions" %}</span>
+              <div class="col-xs-6">
+                <select name="action" id="select_actions" class="form-control">
+                  <option value="">Example1</option>
+                  <option value="">Example1</option>
+                  <option value="">Example1</option>
+                </select>
+              </div>
+              <button type="submit" class="btn btn-default">{% trans "Make it" %}</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  {% endblock actions %}
+
+  {% block table_changelist %}
+    <div id="changelist">
+      <div class="table-responsive">
+        <table class="table table-bordered table-hover">
+            <thead>
+              <tr>
+                <th>
+                  <input type="checkbox">
+                </th>
+              {% for obj_attribute_display, css_class in list_display_with_classes %}
+                  <th class="text-center">
+                    <span>{{ obj_attribute_display }}</span>
+                    <i class="fa fa-fw fa-sort pull-right"></i>
+                  </th>
+              {% endfor %}
+              </tr>
+            </thead>
+            <tbody>
+              {% for row_color, admin_url, list_value_with_classes in list_values_with_classes %}
+                <tr class="{% if row_color is not None %} bg-{{row_color}} {% endif %}">
+                    <td><input type="checkbox" name="obj_{{ forloop.counter }}"></td>
+                    {% for value, classes in list_value_with_classes %}
+                      <td class="text-{{ classes.align }}">
+                        {% if forloop.counter == 1 %}
+                          <a href="{{ admin_url }}">{{ value }}</a>
+                        {% else %}
+                          {{ value }}
+                        {% endif %}
+
+                      </td>
+                    {% endfor %}
+                </tr>
+              {% endfor %}
+            </tbody>
+            {% comment %}
+            <tfooter>
+              <tr>
+                <td>
+
+                </td>
+              </tr>
+            </tfooter>
+            {% endcomment %}
+        </table>
+        <nav aria-label="{% trans 'Changelist navigation' %}">
+          <ul class="pagination">
+            <li>
+              <a href="" aria-label="{% trans 'Very previous' %}">
+                <span aria-hidden="true">←</span>
+              </a>
+            </li>
+            <li>
+              <a href="" aria-label="{% trans 'Previous' %}">
+                <span aria-hidden="true">&laquo;</span>
+              </a>
+            </li>
+            <li class="active"><a href="">1</a></li>
+            <li><a href="">2</a></li>
+            <li><a href="">3</a></li>
+            <li><a href="">4</a></li>
+            <li><a href="">5</a></li>
+            <li><a href="">6</a></li>
+            <li><a href="">7</a></li>
+            <li><a href="">8</a></li>
+            <li><a href="">9</a></li>
+            <li>
+              <a href="" aria-label="{% trans 'Next' %}">
+                <span aria-hidden="true">&raquo;</span>
+              </a>
+            </li>
+            <li>
+              <a href="" aria-label="{% trans 'Very next' %}">
+                <span aria-hidden="true">→</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+  {% endblock table_changelist %}
+
+{% block display_control %}
+  <div id="display_control">
+    <div class="row">
+      <div class="col-sm-12">
+        <div class="col-xs-7">
+          <span class="control-label">{% blocktrans count counter=list_values_with_classes|length %}
+            Showing {{ counter }} entry from {{ counter }}
+          {% plural %}
+            Showing {{ counter }} entries from {{ counter }}
+          {% endblocktrans %}
+          </span>
+        </div>
+        <div class="col-xs-5">
+          <form action="" class="form-horizontal" method="GET">
+            <div class="form-group">
+              <span class="control-label col-xs-9">{% trans "Display control" %}</span>
+              <div class="col-xs-3">
+                <select name="count_entries_on_page" id="" class="form-control">
+                  <option value="10">10</option>
+                  <option value="20">20</option>
+                  <option value="30">30</option>
+                  <option value="40">40</option>
+                  <option value="50">50</option>
+                  <option value="60">60</option>
+                  <option value="70">70</option>
+                  <option value="80">80</option>
+                  <option value="90">90</option>
+                  <option value="100">100</option>
+                  <option value="show_all">{% trans "Show all" %}</option>
+                </select>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock display_control %}
+
+{% endblock content %}
+
+{% block extra_js %}
+  {{ block.super }}
+  <script type="text/javascript" src="{% static 'admin/admin/js/changelist.js' %}"></script>
+{% endblock extra_js %}

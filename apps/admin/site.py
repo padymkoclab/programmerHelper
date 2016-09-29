@@ -1,25 +1,31 @@
 
 import logging
 
+from django.core.urlresolvers import reverse
 from django.conf.urls import url, include
-from django.apps import apps
+# from django.apps import apps
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
-from django.db.models.base import ModelBase
-from django.template.response import TemplateResponse
-from django.urls import NoReverseMatch, reverse
-from django.utils import six
-from django.utils.text import capfirst
-from django.utils.translation import ugettext as _, ugettext_lazy
+# from django.db.models.base import ModelBase
+# from django.template.response import TemplateResponse
+# from django.urls import NoReverseMatch
+# from django.utils import six
+# from django.utils.text import capfirst
+from django.utils.translation import ugettext_lazy as _
+from django.views.decorators.cache import never_cache
+from django.contrib.auth import get_permission_codename
+from django.views.decorators.csrf import csrf_protect
 # from django.views.i18n import JavaScriptCatalog
 # from django.template.defaultfilters import truncatechars
-# from django.utils.translation import ugettext_lazy as _
 # from django.contrib import admin
 
 from .views import IndexView, LoginView, LogoutView, PasswordChangeView, PasswordChangeDoneView
 from .decorators import admin_staff_member_required
 from .admin import ModelAdmin, AppAdmin
 # actions
+
+
+logging = logging.getLogger('django.development')
 
 
 system_check_errors = []
@@ -33,7 +39,7 @@ class NotRegistered(Exception):
     pass
 
 
-class AdminSite:
+class SiteAdmin:
 
     admin_site_header = _('Admin part')
 
@@ -63,7 +69,9 @@ class AdminSite:
     password_change_done_template = None
 
     def __init__(self, name='admin'):
-        self._registry = {}  # model_class class -> admin_class instance
+        self._registry_models = {}
+        self._registry_app = {}
+        self._registry_other = {}
         self.name = name
         # self._actions = {'delete_selected': actions.delete_selected}
         # self._global_actions = self._actions.copy()
@@ -93,7 +101,7 @@ class AdminSite:
             'admin_site_header': self.admin_site_header,
             # 'site_url': site_url,
             'has_permission': self.has_permission(request),
-            'available_apps': self.get_app_list(request),
+            'avaliable_apps_models': self.get_avaliable_apps_models(request),
         }
 
     def get_urls(self):
@@ -104,10 +112,14 @@ class AdminSite:
         # from django.contrib.contenttypes import views as contenttype_views
 
         # Admin-site-wide views.
+
+        # PasswordChangeView = admin_staff_member_required(PasswordChangeView.as_view(), cacheable=True)
+        # PasswordChangeDoneView = admin_staff_member_required(PasswordChangeDoneView.as_view(), cacheable=True)
+
         urlpatterns = [
-            url(r'^$', IndexView, {}, 'index'),
-            url(r'^login/$', LoginView, {}, 'login'),
-            url(r'^logout/$', LogoutView, {}, 'logout'),
+            url(r'^$', admin_staff_member_required(IndexView.as_view(site_admin=self)), {}, 'index'),
+            url(r'^login/$', csrf_protect(never_cache(LoginView.as_view())), {}, 'login'),
+            url(r'^logout/$', admin_staff_member_required(LogoutView.as_view()), {}, 'logout'),
             url(r'^password_change/$', PasswordChangeView, {}, 'password_change'),
             url(r'^password_change/done/$', PasswordChangeDoneView, {}, 'password_change_done'),
             # url(r'^jsi18n/$', wrap(self.i18n_javascript, cacheable=True), name='jsi18n'),
@@ -129,7 +141,10 @@ class AdminSite:
         # Add in each model's views, and create a list of valid URLS for the
         # app_index
         valid_app_labels = []
-        for model, model_admin in self._registry.items():
+
+        # import ipdb; ipdb.set_trace()
+
+        for model, model_admin in self._registry_models.items():
             urlpatterns += [
                 url(r'^%s/%s/' % (model._meta.app_label, model._meta.model_name), include(model_admin.urls)),
             ]
@@ -138,11 +153,13 @@ class AdminSite:
 
         # If there were ModelAdmins registered, we should have a list of app
         # labels for which we need to allow access to the app_index view,
-        if valid_app_labels:
-            regex = r'^(?P<app_label>' + '|'.join(valid_app_labels) + ')/$'
-            urlpatterns += [
-                url(regex, admin_staff_member_required(self.app_index), name='app_list'),
-            ]
+        #
+        # if valid_app_labels:
+        #     regex = r'^(?P<app_label>' + '|'.join(valid_app_labels) + ')/$'
+        #     urlpatterns += [
+        #         url(regex, admin_staff_member_required(self.app_index), name='app_list'),
+        #     ]
+
         return urlpatterns
 
     @property
@@ -155,206 +172,79 @@ class AdminSite:
     def constants_view(self, request):
         pass
 
-    def register(self, model_or_iterable, admin_class=None, **options):
+    def register_model(self, model, model_admin_class):
         """
-        Registers the given model(s) with the given admin class.
-
-        The model(s) should be Model classes, not instances.
-
-        If an admin class isn't given, it will use ModelAdmin (the default
-        admin options). If keyword arguments are given -- e.g., list_display --
-        they'll be applied as options to the admin class.
-
-        If a model is already registered, this will raise AlreadyRegistered.
-
-        If a model is abstract, this will raise ImproperlyConfigured.
         """
-        if not admin_class:
-            admin_class = ModelAdmin
 
-        if isinstance(model_or_iterable, ModelBase):
-            model_or_iterable = [model_or_iterable]
-        for model in model_or_iterable:
-            if model._meta.abstract:
-                raise ImproperlyConfigured(
-                    'The model %s is abstract, so it cannot be registered with admin.' % model.__name__
+        if model._meta.abstract:
+            raise ImproperlyConfigured(
+                'The model {} is abstract, so it cannot be registered with admin.'.format(model._meta.model_name)
+            )
+
+        if model in self._registry_models:
+            raise AlreadyRegistered('The model {} is already registered'.format(model._meta.model_name))
+
+        # Ignore the registration if the model has been
+        # swapped out.
+        if not model._meta.swapped:
+
+            # Instantiate the admin class to save in the registry
+            model_admin = model_admin_class(model, self)
+            if model_admin_class is not ModelAdmin and settings.DEBUG:
+                system_check_errors.extend(model_admin.check())
+
+            self._registry_models[model] = model_admin
+
+    def get_avaliable_apps_models(self, request, label=None):
+
+        avaliable_apps_models = dict()
+
+        for model, admin_model in self._registry_models.items():
+
+            model._meta.app_label
+
+            has_module_permissions = admin_model.has_module_permissions(request)
+
+            if not has_module_permissions:
+                continue
+
+            model_permissions = admin_model.get_model_permissions(request)
+
+            if True not in model_permissions.values():
+                continue
+
+            app_label, model_name = model._meta.app_label, model._meta.model_name
+
+            model_attrs = {
+                'name': model._meta.verbose_name_plural,
+                'permissions': model_permissions,
+                'object_name': model._meta.object_name,
+            }
+
+            if model_permissions.get('add') is True:
+                model_attrs['add_url'] = reverse(
+                    'admin:{}_{}_add'.format(app_label, model_name),
+                    current_app=self.name
                 )
 
-            if model in self._registry:
-                raise AlreadyRegistered('The model %s is already registered' % model.__name__)
+            if model_permissions.get('change') is True:
+                model_attrs['changelist_url'] = reverse(
+                    'admin:{}_{}_changelist'.format(app_label, model_name),
+                    current_app=self.name
+                )
 
-            # Ignore the registration if the model has been
-            # swapped out.
-            if not model._meta.swapped:
-                # If we got **options then dynamically construct a subclass of
-                # admin_class with those **options.
-                if options:
-                    # For reasons I don't quite understand, without a __module__
-                    # the created class appears to "live" in the wrong place,
-                    # which causes issues later on.
-                    options['__module__'] = __name__
-                    admin_class = type("%sAdmin" % model.__name__, (admin_class,), options)
-
-                # Instantiate the admin class to save in the registry
-                admin_obj = admin_class(model, self)
-                if admin_class is not ModelAdmin and settings.DEBUG:
-                    system_check_errors.extend(admin_obj.check())
-
-                self._registry[model] = admin_obj
-
-    def unregister(self, model_or_iterable):
-        """
-        Unregisters the given model(s).
-
-        If a model isn't already registered, this will raise NotRegistered.
-        """
-        if isinstance(model_or_iterable, ModelBase):
-            model_or_iterable = [model_or_iterable]
-        for model in model_or_iterable:
-            if model not in self._registry:
-                raise NotRegistered('The model %s is not registered' % model.__name__)
-            del self._registry[model]
-
-    def is_registered(self, model):
-        """
-        Check if a model class is registered with this `AdminSite`.
-        """
-        return model in self._registry
-
-    def add_action(self, action, name=None):
-        """
-        Register an action to be available globally.
-        """
-        name = name or action.__name__
-        self._actions[name] = action
-        self._global_actions[name] = action
-
-    def disable_action(self, name):
-        """
-        Disable a globally-registered action. Raises KeyError for invalid names.
-        """
-        del self._actions[name]
-
-    def get_action(self, name):
-        """
-        Explicitly get a registered global action whether it's enabled or
-        not. Raises KeyError for invalid names.
-        """
-        return self._global_actions[name]
-
-    @property
-    def actions(self):
-        """
-        Get all the enabled actions as an iterable of (name, func).
-        """
-        return six.iteritems(self._actions)
-
-    def _build_app_dict(self, request, label=None):
-        """
-        Builds the app dictionary. Takes an optional label parameters to filter
-        models of a specific app.
-        """
-        app_dict = {}
-
-        if label:
-            models = {
-                m: m_a for m, m_a in self._registry.items()
-                if m._meta.app_label == label
-            }
-        else:
-            models = self._registry
-
-        for model, model_admin in models.items():
-            app_label = model._meta.app_label
-
-            has_module_perms = model_admin.has_module_permission(request)
-            if not has_module_perms:
-                if label:
-                    raise PermissionDenied
-                continue
-
-            perms = model_admin.get_model_perms(request)
-
-            # Check whether user has any perm for this module.
-            # If so, add the module to the model_list.
-            if True not in perms.values():
-                continue
-
-            info = (app_label, model._meta.model_name)
-            model_dict = {
-                'name': capfirst(model._meta.verbose_name_plural),
-                'object_name': model._meta.object_name,
-                'perms': perms,
-            }
-            if perms.get('change'):
-                try:
-                    model_dict['admin_url'] = reverse('admin:%s_%s_changelist' % info, current_app=self.name)
-                except NoReverseMatch:
-                    pass
-            if perms.get('add'):
-                try:
-                    model_dict['add_url'] = reverse('admin:%s_%s_add' % info, current_app=self.name)
-                except NoReverseMatch:
-                    pass
-
-            if app_label in app_dict:
-                app_dict[app_label]['models'].append(model_dict)
+            if app_label in avaliable_apps_models:
+                avaliable_apps_models[app_label]['models'].append(model_attrs)
             else:
-                app_dict[app_label] = {
-                    'name': apps.get_app_config(app_label).verbose_name,
-                    'app_label': app_label,
-                    'app_url': reverse(
-                        'admin:app_list',
-                        kwargs={'app_label': app_label},
-                        current_app=self.name,
-                    ),
-                    'has_module_perms': has_module_perms,
-                    'models': [model_dict],
+                avaliable_apps_models[app_label] = {
+                    'name': model._meta.app_config.verbose_name,
+                    'models': [model_attrs],
+                    'app_index_url': '#',
                 }
 
-        if label:
-            return app_dict.get(label)
-        return app_dict
+        avaliable_apps_models = avaliable_apps_models.values()
 
-    def get_app_list(self, request):
-        """
-        Returns a sorted list of all the installed apps that have been
-        registered in this site.
-        """
-        app_dict = self._build_app_dict(request)
-
-        # Sort the apps alphabetically.
-        app_list = sorted(app_dict.values(), key=lambda x: x['name'].lower())
-
-        # Sort the models alphabetically within each app.
-        for app in app_list:
-            app['models'].sort(key=lambda x: x['name'])
-
-        return app_list
-
-    def app_index(self, request, app_label, extra_context=None):
-        app_dict = self._build_app_dict(request, app_label)
-        if not app_dict:
-            raise Http404('The requested admin page does not exist.')
-        # Sort the models alphabetically within each app.
-        app_dict['models'].sort(key=lambda x: x['name'])
-        app_name = apps.get_app_config(app_label).verbose_name
-        context = dict(
-            self.each_context(request),
-            title=_('%(app)s administration') % {'app': app_name},
-            app_list=[app_dict],
-            app_label=app_label,
-        )
-        context.update(extra_context or {})
-
-        request.current_app = self.name
-
-        return TemplateResponse(request, self.app_index_template or [
-            'admin/%s/app_index.html' % app_label,
-            'admin/app_index.html'
-        ], context)
+        return avaliable_apps_models
 
 
-# This global object represents the default admin site, for the common case.
-# You can instantiate AdminSite in your own code to create a custom admin site.
-admin_site = AdminSite()
+DefaultSiteAdmin = SiteAdmin()

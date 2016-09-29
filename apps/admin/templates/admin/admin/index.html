@@ -9,224 +9,175 @@
   <link rel="stylesheet" href="{% static 'admin/admin/css/index.css' %}">
 {% endblock extra_css %}
 
-{% block sidebar %}
+{% block wrapper %}
 
-<div class="container">
+  <div id="sidebar" class="">
+    {% block sidebar %}
 
-  <!-- Brand title -->
-  <div class="row">
-    <div id="admin_site_header" class="text-center">
-      <a class="" href="{% url 'admin:index' %}">
-        <i class="fa fa-paw fa-2x"></i>
-        <span>{{ admin_site_header }}</span>
-      </a>
-    </div>
-  </div>
+        <!-- Brand title -->
+        <div class="">
+          <div id="admin_site_header" class="text-center">
+            <a class="" href="{% url 'admin:index' %}">
+              {% comment %}
 
-  <!-- Profile info -->
-  <div class="row">
-      <p class="lead text-center">{% trans "Welcome, " %}</p>
-      <div class="profile-avatar text-center">
-        <img src="{{ user.get_avatar_path }}" alt="" class="img img-circle">
-      </div>
-      <p class="profile-full-name text-center">{{ user.get_full_name }}</p>
-  </div>
-
-  <!-- -->
-  <div class="row">
-
-    <ul class="nav in" id="sidebar_apps">
-      <li>
-        <a href="">
-          <i class="fa fa-home"></i>
-          {% trans "List item 1" %}
-          <span class="fa fa-chevron-down"></span>
-        </a>
-        <ul class="nav list_models">
-          <li><a href="">Text1</a></li>
-          <li><a href="">Text2</a></li>
-          <li><a href="">Text3</a></li>
-        </ul>
-      </li>
-      <li>
-        <a href="">
-          <i class="fa fa-home"></i>
-          {% trans "List item 2" %}
-          <span class="fa fa-chevron-down"></span>
-        </a>
-      </li>
-      <li>
-        <a href="">
-          <i class="fa fa-home"></i>
-          {% trans "List item 3" %}
-          <span class="fa fa-chevron-down"></span>
-        </a>
-      </li>
-    </ul>
-
-  </div>
-
-</div>
-
-{% endblock sidebar %}
-
-{% block header %}
-
-  <!-- Header -->
-  <div id="header">
-    <nav class="navbar navbar-default">
-        <div class="nav navbar-nav">
-
-          <i class="fa fa-bars fa-2x navbar-brand"></i>
+              <i class="fa fa-paw fa-2x"></i>
+              {% endcomment %}
+              <span>{{ admin_site_header }}</span>
+            </a>
+          </div>
         </div>
 
-        <!-- Search box-->
-        <form action="" class="navbar-form navbar-left" method="POST">{% csrf_token %}
-          <div class="form-group">
-            <div class="input-group" id="wrapper_search_box">
-              <span class="input-group-btn">
-                <button class="btn btn-default" type="submit"><i class="fa fa-search fa-1x"></i></button>
-              </span>
-              <input type="search" class="form-control" required="required" placeholder="{% trans 'Enter condition for search' %}" id="search_box">
+        <!-- Profile info -->
+        <div class="">
+            <p class="lead text-center">{% trans "Welcome, " %}</p>
+            <div class="profile-avatar text-center">
+              <img src="{{ user.get_avatar_path }}" alt="" class="img img-circle">
             </div>
-          </div>
-        </form>
+            <p class="profile-full-name text-center">{{ user.get_full_name }}</p>
+        </div>
 
-        <!-- Toolbox-->
-        <ul class="nav navbar-nav navbar-right">
-          <li class="dropdown">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-              <i class="fa fa-envelope fa-1x" aria-hidden="true"></i>
-              <span class="caret"></span>
-            </a>
-            <ul class="dropdown-menu">
-              <li><a href="#"><i class="fa fa-envelope-o" aria-hidden="true"></i> {% trans "New message" %}</a></li>
-              <li><a href="#"><i class="fa fa-envelope-o" aria-hidden="true"></i> {% trans "New message" %}</a></li>
-              <li><a href="#"><i class="fa fa-envelope-o" aria-hidden="true"></i> {% trans "New message" %}</a></li>
-              <li><a href="#"><i class="fa fa-envelope-o" aria-hidden="true"></i> {% trans "New message" %}</a></li>
-              <li><a href="#"><i class="fa fa-envelope-o" aria-hidden="true"></i> {% trans "New message" %}</a></li>
-              <li role="separator" class="divider"></li>
-              <li><a href="#"><i class="fa fa-blind" aria-hidden="true"></i> {% trans "View all new messages" %}</a></li>
-            </ul>
-          </li>
-          <li class="dropdown">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-              <i class="fa fa-bell fa-1x" aria-hidden="true"></i>
-              <span class="caret"></span>
-            </a>
-            <ul class="dropdown-menu">
-              <li><a href="#"><i class="fa fa-envelope-o" aria-hidden="true"></i> {% trans "New message" %}</a></li>
-              <li><a href="#"><i class="fa fa-envelope-o" aria-hidden="true"></i> {% trans "New message" %}</a></li>
-              <li><a href="#"><i class="fa fa-envelope-o" aria-hidden="true"></i> {% trans "New message" %}</a></li>
-              <li><a href="#"><i class="fa fa-envelope-o" aria-hidden="true"></i> {% trans "New message" %}</a></li>
-              <li><a href="#"><i class="fa fa-envelope-o" aria-hidden="true"></i> {% trans "New message" %}</a></li>
-              <li role="separator" class="divider"></li>
-              <li><a href="#"><i class="fa fa-blind" aria-hidden="true"></i> {% trans "View all new reminders" %}</a></li>
-            </ul>
-          </li>
-          <li class="dropdown">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-              <img src="{{ user.get_avatar_path }}" alt="" class="img img-circle" height="20" width="20">
-              &nbsp;
-              {{ user.get_short_name }}
-              <span class="caret"></span>
-            </a>
-            <ul class="dropdown-menu">
-              <li><a href="#"><i class="fa fa-edit" aria-hidden="true"></i> {% trans "Profile" %}</a></li>
-              <li><a href="#"><i class="fa fa-edit" aria-hidden="true"></i> {% trans "Change password" %}</a></li>
-              <li><a href="#"><i class="fa fa-edit" aria-hidden="true"></i> {% trans "Documentation" %}</a></li>
-              <li role="separator" class="divider"></li>
-              <li><a href="{% url 'admin:logout' %}"><i class="fa fa-blind" aria-hidden="true"></i> {% trans "Logout" %}</a></li>
-            </ul>
-          </li>
-        </ul>
+        <!-- Sidebar for apps-->
+        <div id="sidebar_apps">
+          <ul class="list-group">
 
-    </nav>
+            {% for avaliable_app_models in avaliable_apps_models %}
+
+              <li class="main_list">
+                <a href="{{ avaliable_app_models.app_index_url }}">
+                  <i class="fa fa-home fa-lg"></i>
+                  {{ avaliable_app_models.name }}
+                  <span class="fa fa-chevron-left fa-1x"></span>
+                </a>
+                <div class="div_nested_list">
+                  <ul class="list-group nested_list">
+                    {% for avaliable_model in avaliable_app_models.models %}
+                    <li class=""><a href="{{ avaliable_model.changelist_url }}">{{ avaliable_model.name|capfirst }}</a></li>
+                    {% endfor %}
+                  </ul>
+                </div>
+              </li>
+
+            {% endfor %}
+
+          </ul>
+        </div>
+
+        <!-- Sitebar footer -->
+        <div id="sidebar_footer">
+          <a href="#" data-toggle="tooltip" data-placement="right" title="{% trans 'Configuration' %}">
+            <span class="glyphicon glyphicon-cog"></span>
+          </a>
+          <a href="#" data-toggle="tooltip" data-placement="right" title="{% trans 'Fullscreen' %}" id="link_fullscreen">
+            <span class="glyphicon glyphicon-fullscreen"></span>
+          </a>
+          <a href="#" data-toggle="tooltip" data-placement="right" title="{% trans 'Disable website' %}">
+            <span class="glyphicon glyphicon-off"></span>
+          </a>
+          <a href="#" data-toggle="tooltip" data-placement="right" title="{% trans 'Sign out' %}">
+            <i class="fa fa-sign-out fa-1x"></i>
+          </a>
+        </div>
+
+    {% endblock sidebar %}
   </div>
 
-{% endblock header %}
+  <div id="content" class="container-fluid">
+    <!-- Header -->
+    <div id="header" class="">
+      {% block header %}
 
-{% block breadcrumbs %}
+          <nav class="navbar navbar-default navbar-static-top">
+              <div class="nav navbar-nav">
 
-{% comment %}
-
-<ol class="breadcrumb">
-  <li><a href="#">Home</a></li>
-  <li><a href="#">Library</a></li>
-  <li class="active">Data</li>
-</ol>
-
-<nav aria-label="Page navigation">
-  <ul class="pagination">
-    <li>
-      <a href="#" aria-label="Previous">
-        <span aria-hidden="true">&laquo;</span>
-      </a>
-    </li>
-    <li><a href="#">1</a></li>
-    <li><a href="#">2</a></li>
-    <li><a href="#">3</a></li>
-    <li><a href="#">4</a></li>
-    <li><a href="#">5</a></li>
-    <li>
-      <a href="#" aria-label="Next">
-        <span aria-hidden="true">&raquo;</span>
-      </a>
-    </li>
-  </ul>
-</nav>
-{% endcomment %}
-
-{% endblock breadcrumbs %}
-
-
-{% block footer %}
-
-
-<div class="container-fluid">
-  <div class="row">
-    <div class="col-md-2">
-
-      <div id="MainMenu">
-        <div class="list-group panel">
-          <a href="#demo3" class="list-group-item list-group-item-success" data-toggle="collapse" data-parent="#MainMenu">Item 3</a>
-          <div class="collapse" id="demo3">
-            <a href="#SubMenu1" class="list-group-item" data-toggle="collapse" data-parent="#SubMenu1">Subitem 1 <i class="fa fa-caret-down"></i></a>
-            <div class="collapse list-group-submenu" id="SubMenu1">
-              <a href="#" class="list-group-item" data-parent="#SubMenu1">Subitem 1 a</a>
-              <a href="#" class="list-group-item" data-parent="#SubMenu1">Subitem 2 b</a>
-              <a href="#SubSubMenu1" class="list-group-item" data-toggle="collapse" data-parent="#SubSubMenu1">Subitem 3 c <i class="fa fa-caret-down"></i></a>
-              <div class="collapse list-group-submenu list-group-submenu-1" id="SubSubMenu1">
-                <a href="#" class="list-group-item" data-parent="#SubSubMenu1">Sub sub item 1</a>
-                <a href="#" class="list-group-item" data-parent="#SubSubMenu1">Sub sub item 2</a>
+                <i class="fa fa-bars fa-2x navbar-brand" id="toggle_sidebar"></i>
               </div>
-              <a href="#" class="list-group-item" data-parent="#SubMenu1">Subitem 4 d</a>
-            </div>
-            <a href="javascript:;" class="list-group-item">Subitem 2</a>
-            <a href="javascript:;" class="list-group-item">Subitem 3</a>
-          </div>
-          <a href="#demo4" class="list-group-item list-group-item" data-toggle="collapse" data-parent="#MainMenu">Item 4</a>
-          <div class="collapse" id="demo4">
-            <a href="" class="list-group-item">Subitem 1</a>
-            <a href="" class="list-group-item">Subitem 2</a>
-            <a href="" class="list-group-item">Subitem 3</a>
-          </div>
-           <a href="#demo5" class="list-group-item list-group-item" data-toggle="collapse" data-parent="#MainMenu">Item 5</a>
-            <div class="collapse" id="demo5">
-            <a href="#" class="list-group-item">Subitem 1</a>
-            <a href="" class="list-group-item">Subitem 2</a>
-            <a href="" class="list-group-item">Subitem 3</a>
-          </div>
-        </div>
-      </div>
+
+              <!-- Search box-->
+              <form action="" class="navbar-form navbar-left" method="POST">{% csrf_token %}
+                <div class="form-group">
+                  <div class="input-group" id="wrapper_search_box">
+                    <span class="input-group-btn">
+                      <button class="btn btn-default" type="submit"><i class="fa fa-search fa-1x"></i></button>
+                    </span>
+                    <input type="search" class="form-control" placeholder="{% trans 'Enter condition for a global search' %}" id="search_box">
+                  </div>
+                </div>
+              </form>
+
+              <!-- Toolbox-->
+              <ul class="nav navbar-nav navbar-right">
+                <li class="dropdown">
+                  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                    <i class="fa fa-envelope fa-1x" aria-hidden="true"></i>
+                    <span class="caret"></span>
+                  </a>
+                  <ul class="dropdown-menu">
+                    <li><a href="#"><i class="fa fa-envelope-o" aria-hidden="true"></i> {% trans "New message" %}</a></li>
+                    <li><a href="#"><i class="fa fa-envelope-o" aria-hidden="true"></i> {% trans "New message" %}</a></li>
+                    <li><a href="#"><i class="fa fa-envelope-o" aria-hidden="true"></i> {% trans "New message" %}</a></li>
+                    <li><a href="#"><i class="fa fa-envelope-o" aria-hidden="true"></i> {% trans "New message" %}</a></li>
+                    <li><a href="#"><i class="fa fa-envelope-o" aria-hidden="true"></i> {% trans "New message" %}</a></li>
+                    <li role="separator" class="divider"></li>
+                    <li><a href="#"><i class="fa fa-blind" aria-hidden="true"></i> {% trans "View all new messages" %}</a></li>
+                  </ul>
+                </li>
+                <li class="dropdown">
+                  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                    <i class="fa fa-bell fa-1x" aria-hidden="true"></i>
+                    <span class="caret"></span>
+                  </a>
+                  <ul class="dropdown-menu">
+                    <li><a href="#"><i class="fa fa-envelope-o" aria-hidden="true"></i> {% trans "New message" %}</a></li>
+                    <li><a href="#"><i class="fa fa-envelope-o" aria-hidden="true"></i> {% trans "New message" %}</a></li>
+                    <li><a href="#"><i class="fa fa-envelope-o" aria-hidden="true"></i> {% trans "New message" %}</a></li>
+                    <li><a href="#"><i class="fa fa-envelope-o" aria-hidden="true"></i> {% trans "New message" %}</a></li>
+                    <li><a href="#"><i class="fa fa-envelope-o" aria-hidden="true"></i> {% trans "New message" %}</a></li>
+                    <li role="separator" class="divider"></li>
+                    <li><a href="#"><i class="fa fa-blind" aria-hidden="true"></i> {% trans "View all new reminders" %}</a></li>
+                  </ul>
+                </li>
+                <li class="dropdown">
+                  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                    <img src="{{ user.get_avatar_path }}" alt="" class="img img-circle" height="20" width="20">
+                    &nbsp;
+                    {{ user.get_short_name }}
+                    <span class="caret"></span>
+                  </a>
+                  <ul class="dropdown-menu">
+                    <li><a href="#"><i class="fa fa-edit" aria-hidden="true"></i> {% trans "Profile" %}</a></li>
+                    <li><a href="#"><i class="fa fa-edit" aria-hidden="true"></i> {% trans "Change password" %}</a></li>
+                    <li><a href="#"><i class="fa fa-edit" aria-hidden="true"></i> {% trans "Documentation" %}</a></li>
+                    <li role="separator" class="divider"></li>
+                    <li><a href="{% url 'admin:logout' %}"><i class="fa fa-sign-out fa-lg" aria-hidden="true"></i> {% trans "Logout" %}</a></li>
+                  </ul>
+                </li>
+              </ul>
+
+          </nav>
+      {% endblock header %}
+    </div>
+
+    <div id="inner-content">
+
+      {% block breadcrumbs %}
+      <ol class="breadcrumb">
+        <li><a href="{% url 'admin:index' %}">{% trans "Home" %}</a></li>
+        <li><a href="{% url 'admin:app_index' model_meta.app_label %}">{{ model_meta.app_config.verbose_name }}</a></li>
+        <li class="active">{{ model_meta.verbose_name_plural|capfirst }}</li>
+      </ol>
+      {% endblock breadcrumbs %}
+
+      {% block content %}{% endblock content %}
 
     </div>
   </div>
-</div>
 
 
-  <p class="text-center lead">
-    {% trans "Website created from soul and with love" %}
-    <i class="fa fa-heart fa-1x"></i>
-  </p>
-{% endblock footer %}
+  {% block footer %}{% endblock footer %}
+
+{% endblock wrapper %}
+
+{% block extra_js %}
+  {{ block.super }}
+  <script type="text/javascript" src="{% static 'admin/admin/js/index.js' %}"></script>
+{% endblock extra_js %}
