@@ -1,0 +1,41 @@
+
+{% extends "admin/admin/index.html" %}
+
+{% load i18n %}
+
+
+{% block breadcrumbs %}
+  <li><a href="{{ index_url }}">{% trans "Home" %}</a></li>
+  <li><a href="{{ app_index_url }}">{{ app_name }}</a></li>
+  <li class="active">{% trans "Reports" %}</li>
+{% endblock breadcrumbs %}
+
+{% block content %}
+
+<div class="row">
+  <div class="col-xs-5 col-xs-offset-1">
+    <p class="well">
+    <label for="" class="">{% trans "Type of a report" %}</label>
+    <select name="" id="" class="form-control">
+      <option value="" selected>{% trans "Report in PDF" %}</option>
+      <option value="">{% trans "Report in Excel" %}</option>
+    </select>
+    </p>
+    <ul class="list-group">
+      <li class="list-group-item">
+        <input type="checkbox">
+        Example1
+      </li>
+      <li class="list-group-item">
+        <input type="checkbox">
+        Example2
+      </li>
+      <li class="list-group-item">
+        <input type="checkbox">
+        Example3
+      </li>
+    </ul>
+  </div>
+</div>
+
+{% endblock content %}

@@ -9,6 +9,12 @@
   <link rel="stylesheet" href="{% static 'admin/admin/css/changelist.css' %}">
 {% endblock extra_css %}
 
+{% block breadcrumbs %}
+  <li><a href="{{ index_url }}">{% trans "Home" %}</a></li>
+  <li><a href="{{ app_index }}">{{ model_meta.app_config.verbose_name|capfirst }}</a></li>
+  <li class="active">{{ model_meta.verbose_name_plural|capfirst }}</li>
+{% endblock breadcrumbs %}
+
 
 {% block content %}
 
@@ -20,7 +26,7 @@
     <div class="row">
       <div class="col-xs-12 text-right">
         <button class="btn btn-warning">{% trans "Export" %}</button>
-        <button class="btn btn-danger">{% trans "Import" %}</button>
+        <a href="{% url 'admin:import' %}" class="btn btn-danger">{% trans "Import" %}</a>
         {% if has_add_permission is True %}
           <button class="btn btn-success">{% trans "Add " %} {{ model_meta.verbose_name|lower }}</button>
         {% endif %}
@@ -91,20 +97,21 @@
                 <th>
                   <input type="checkbox">
                 </th>
-              {% for obj_attribute_display, css_class in list_display_with_classes %}
+              {% for obj_attribute_display, css_class in list_display_with_styles %}
                   <th class="text-center">
-                    <span>{{ obj_attribute_display }}</span>
+                    <span>{{ obj_attribute_display|capfirst }}</span>
                     <i class="fa fa-fw fa-sort pull-right"></i>
                   </th>
               {% endfor %}
               </tr>
             </thead>
             <tbody>
-              {% for row_color, admin_url, list_value_with_classes in list_values_with_classes %}
+              {% for row_color, admin_url, list_value_with_styles in list_values_with_styles %}
                 <tr class="{% if row_color is not None %} bg-{{row_color}} {% endif %}">
                     <td><input type="checkbox" name="obj_{{ forloop.counter }}"></td>
-                    {% for value, classes in list_value_with_classes %}
+                    {% for value, classes in list_value_with_styles %}
                       <td class="text-{{ classes.align }}">
+
                         {% if forloop.counter == 1 %}
                           <a href="{{ admin_url }}">{{ value }}</a>
                         {% else %}
@@ -168,7 +175,7 @@
     <div class="row">
       <div class="col-sm-12">
         <div class="col-xs-7">
-          <span class="control-label">{% blocktrans count counter=list_values_with_classes|length %}
+          <span class="control-label">{% blocktrans count counter=list_values_with_styles|length %}
             Showing {{ counter }} entry from {{ counter }}
           {% plural %}
             Showing {{ counter }} entries from {{ counter }}

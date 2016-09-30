@@ -3,7 +3,7 @@ import logging
 
 from django.core.urlresolvers import reverse
 from django.conf.urls import url, include
-# from django.apps import apps
+from django.apps import apps
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 # from django.db.models.base import ModelBase
@@ -19,9 +19,10 @@ from django.views.decorators.csrf import csrf_protect
 # from django.template.defaultfilters import truncatechars
 # from django.contrib import admin
 
-from .views import IndexView, LoginView, LogoutView, PasswordChangeView, PasswordChangeDoneView
+from .views import IndexView, LoginView, LogoutView, PasswordChangeView, PasswordChangeDoneView, AppIndexView, SettingsView
 from .decorators import admin_staff_member_required
-from .admin import ModelAdmin, AppAdmin
+from .admin import ModelAdmin
+from .exceptions import AlreadyRegisteredModel, AlreadyRegisteredApp
 # actions
 
 
@@ -29,14 +30,6 @@ logging = logging.getLogger('django.development')
 
 
 system_check_errors = []
-
-
-class AlreadyRegistered(Exception):
-    pass
-
-
-class NotRegistered(Exception):
-    pass
 
 
 class SiteAdmin:
@@ -70,7 +63,7 @@ class SiteAdmin:
 
     def __init__(self, name='admin'):
         self._registry_models = {}
-        self._registry_app = {}
+        self._registry_apps = {}
         self._registry_other = {}
         self.name = name
         # self._actions = {'delete_selected': actions.delete_selected}
@@ -97,68 +90,38 @@ class SiteAdmin:
         # site_url = script_name if self.site_url == '/' and script_name else self.site_url
 
         return {
-            'title': 'ERRRROR',
             'admin_site_header': self.admin_site_header,
-            # 'site_url': site_url,
+            'index_url': reverse('admin:index'),
             'has_permission': self.has_permission(request),
-            'avaliable_apps_models': self.get_avaliable_apps_models(request),
+            'avaliable_apps_with_models': self.get_avaliable_apps_with_models(request),
+            # 'urls_to_active_object': self.get_urls_to_active_object(request),
         }
 
     def get_urls(self):
-        # Since this module gets imported in the application's root package,
-        # it cannot import models from other applications at the module level,
-        # and django.contrib.contenttypes.views imports ContentType.
-        #
-        # from django.contrib.contenttypes import views as contenttype_views
 
-        # Admin-site-wide views.
-
-        # PasswordChangeView = admin_staff_member_required(PasswordChangeView.as_view(), cacheable=True)
-        # PasswordChangeDoneView = admin_staff_member_required(PasswordChangeDoneView.as_view(), cacheable=True)
-
+        # AdminPart site urls
         urlpatterns = [
             url(r'^$', admin_staff_member_required(IndexView.as_view(site_admin=self)), {}, 'index'),
             url(r'^login/$', csrf_protect(never_cache(LoginView.as_view())), {}, 'login'),
             url(r'^logout/$', admin_staff_member_required(LogoutView.as_view()), {}, 'logout'),
-            url(r'^password_change/$', PasswordChangeView, {}, 'password_change'),
-            url(r'^password_change/done/$', PasswordChangeDoneView, {}, 'password_change_done'),
+            url(r'^password_change/$', admin_staff_member_required(PasswordChangeView.as_view(), cacheable=True), {}, 'password_change'),
+            url(r'^password_change/done/$', admin_staff_member_required(PasswordChangeDoneView.as_view(), cacheable=True), {}, 'password_change_done'),
+            url(r'^settings/$', SettingsView.as_view(), {}, 'settings'),
             # url(r'^jsi18n/$', wrap(self.i18n_javascript, cacheable=True), name='jsi18n'),
-            #
-            # app:
-            #   changelist
-            #   change
-            #   preview
-            #   delete
-            #   history
-            #   statistics
-            #   reports
-            #
-            # site:
-            #   settings
-            #   constants
         ]
 
-        # Add in each model's views, and create a list of valid URLS for the
-        # app_index
-        valid_app_labels = []
-
-        # import ipdb; ipdb.set_trace()
-
-        for model, model_admin in self._registry_models.items():
+        # App urls
+        for app_label, app_admin in self._registry_apps.items():
             urlpatterns += [
-                url(r'^%s/%s/' % (model._meta.app_label, model._meta.model_name), include(model_admin.urls)),
+                url(r'{}/'.format(app_label), include(app_admin.urls)),
             ]
-            if model._meta.app_label not in valid_app_labels:
-                valid_app_labels.append(model._meta.app_label)
 
-        # If there were ModelAdmins registered, we should have a list of app
-        # labels for which we need to allow access to the app_index view,
-        #
-        # if valid_app_labels:
-        #     regex = r'^(?P<app_label>' + '|'.join(valid_app_labels) + ')/$'
-        #     urlpatterns += [
-        #         url(regex, admin_staff_member_required(self.app_index), name='app_list'),
-        #     ]
+        # Model urls
+        for model, model_admin in self._registry_models.items():
+
+            urlpatterns += [
+                url(r'{}/{}/'.format(model._meta.app_label, model._meta.model_name), include(model_admin.urls)),
+            ]
 
         return urlpatterns
 
@@ -182,7 +145,7 @@ class SiteAdmin:
             )
 
         if model in self._registry_models:
-            raise AlreadyRegistered('The model {} is already registered'.format(model._meta.model_name))
+            raise AlreadyRegisteredModel('The model {} is already registered'.format(model._meta.model_name))
 
         # Ignore the registration if the model has been
         # swapped out.
@@ -190,14 +153,31 @@ class SiteAdmin:
 
             # Instantiate the admin class to save in the registry
             model_admin = model_admin_class(model, self)
-            if model_admin_class is not ModelAdmin and settings.DEBUG:
-                system_check_errors.extend(model_admin.check())
+            # if model_admin_class is not ModelAdmin and settings.DEBUG:
+            #     system_check_errors.extend(model_admin.check())
 
             self._registry_models[model] = model_admin
 
-    def get_avaliable_apps_models(self, request, label=None):
+    def register_app(self, app_admin_class):
 
-        avaliable_apps_models = dict()
+        app_label = app_admin_class.get_app_label()
+
+        if app_label not in apps.app_configs:
+            raise ImproperlyConfigured(
+                'App with label "{}" is not registered.'.format(app_label)
+            )
+
+        if app_label in self._registry_apps.keys():
+            raise AlreadyRegisteredApp(
+                'In the admin already registered app with this name'.format(app_label)
+            )
+
+        app_admin = app_admin_class(self)
+        self._registry_apps[app_label] = app_admin
+
+    def get_avaliable_apps_with_models(self, request, label=None):
+
+        avaliable_apps_with_models = dict()
 
         for model, admin_model in self._registry_models.items():
 
@@ -216,9 +196,8 @@ class SiteAdmin:
             app_label, model_name = model._meta.app_label, model._meta.model_name
 
             model_attrs = {
-                'name': model._meta.verbose_name_plural,
+                'model_meta': model._meta,
                 'permissions': model_permissions,
-                'object_name': model._meta.object_name,
             }
 
             if model_permissions.get('add') is True:
@@ -233,18 +212,35 @@ class SiteAdmin:
                     current_app=self.name
                 )
 
-            if app_label in avaliable_apps_models:
-                avaliable_apps_models[app_label]['models'].append(model_attrs)
+            if app_label in avaliable_apps_with_models:
+                avaliable_apps_with_models[app_label]['models'].append(model_attrs)
             else:
-                avaliable_apps_models[app_label] = {
-                    'name': model._meta.app_config.verbose_name,
+
+                app_admin = self._registry_apps.get(app_label, None)
+
+                app_icon = getattr(app_admin, 'app_icon', 'exclamation-triangle')
+
+                avaliable_apps_with_models[app_label] = {
+                    'app_name': model._meta.app_config.verbose_name,
+                    'app_index_url': reverse('admin:{}_index'.format(app_label)),
+                    'app_reports_url': reverse('admin:{}_reports'.format(app_label)),
+                    'app_statistics_url': reverse('admin:{}_statistics'.format(app_label)),
                     'models': [model_attrs],
-                    'app_index_url': '#',
+                    'app_icon': app_icon,
                 }
 
-        avaliable_apps_models = avaliable_apps_models.values()
+        avaliable_apps_with_models = avaliable_apps_with_models.values()
 
-        return avaliable_apps_models
+        return avaliable_apps_with_models
+
+    def get_urls_to_active_object(self, request):
+
+        view_class = request.resolver_match.func.view_class
+
+        return (
+            ('Home', '##'),
+            ('Users', None),
+        )
 
 
 DefaultSiteAdmin = SiteAdmin()

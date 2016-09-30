@@ -145,22 +145,24 @@ body{
 
 #sidebar_apps ul li a {
   position: relative;
-  padding: 0 10px;
   display: block;
   text-decoration: none;
   cursor: pointer;
   color: #E7E7E7;
   font-weight: 500;
-  padding: 13px 15px 12px;
+  padding: 10px 0;
 }
 
-#sidebar_apps ul li.main_list > a i.fa {
-  margin-right: 5px;
+#sidebar_apps ul li.main_list > table td:nth-child(3) {
+  cursor: pointer;
 }
 
-#sidebar_apps ul li.main_list > a span.fa {
-  margin-left: 5px;
-  float: right;
+#sidebar_apps ul li.main_list > table td:nth-child(2n+1) i{
+    padding: 0 10px;
+}
+
+#sidebar_apps ul li.main_list > table td:nth-child(2){
+    width: 90%;
 }
 
 #sidebar_apps ul li.main_list a:hover {

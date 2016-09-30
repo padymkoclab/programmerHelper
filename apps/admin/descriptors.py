@@ -1,4 +1,6 @@
 
+from django.apps import AppConfig
+
 
 class SiteAdminStrictDescriptor:
     """
@@ -44,3 +46,24 @@ class ModelAdminStrictDescriptor:
 
     def __delete__(self, instance):
         del self.admin_model
+
+
+class SiteAppAdminStrictDescriptor:
+    """
+
+    """
+
+    def __init__(self, app_config):
+        self.app_config = app_config
+
+    def __get__(self, intance, owner):
+        return self.app_config
+
+    def __set__(self, intance, value):
+
+        if not isinstance(value, AppConfig):
+            raise TypeError('Attribute "app_config" must be instance of {}'.format(AppConfig))
+        self.app_config = value
+
+    def __delete__(self, instance):
+        del self.app_config

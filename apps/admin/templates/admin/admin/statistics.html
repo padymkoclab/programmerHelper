@@ -1,0 +1,30 @@
+
+{% extends "admin/admin/index.html" %}
+
+{% load i18n %}
+
+
+{% block breadcrumbs %}
+  <li><a href="{{ index_url }}">{% trans "Home" %}</a></li>
+  <li><a href="{{ app_index_url }}">{{ app_name }}</a></li>
+  <li class="active">{% trans "Statistics" %}</li>
+{% endblock breadcrumbs %}
+
+{% block content %}
+
+  <div class="row">
+    <div class="col-xs-6">
+      <p class="well">Truth</p>
+    </div>
+    <div class="col-xs-6">
+      <p class="well">Faith</p>
+    </div>
+    <div class="col-xs-6">
+      <p class="well">Courage</p>
+    </div>
+    <div class="col-xs-6">
+      <p class="well">Bravery</p>
+    </div>
+  </div>
+
+{% endblock content %}

@@ -22,3 +22,8 @@
 #div_actions form span{
     font-size: 16px;
 }
+
+
+#changelist table td, #changelist table th{
+    vertical-align: middle;
+}

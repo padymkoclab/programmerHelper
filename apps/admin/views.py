@@ -1,4 +1,7 @@
 
+from django.utils.html import format_html
+from django.db.models import NullBooleanField, BooleanField
+from django.apps import apps
 from django.db.models.fields.reverse_related import ManyToOneRel
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext_lazy as _
@@ -6,41 +9,31 @@ from django.views import generic
 from django.contrib.auth import login, logout
 from django.utils.text import capfirst, force_text
 
+from utils.django.views_mixins import ContextTitleMixin
+
 from .forms import LoginForm
 from .descriptors import SiteAdminStrictDescriptor, ModelAdminStrictDescriptor
+from .views_mixins import SiteAdminMixin, SiteModelAdminMixin, SiteAppAdminMixin
 
 
-class IndexView(generic.TemplateView):
+class IndexView(SiteAdminMixin, generic.TemplateView):
 
     template_name = 'admin/admin/index.html'
-    site_admin = SiteAdminStrictDescriptor('site_admin')
-
-    def __init__(self, site_admin, *args, **kwargs):
-
-        self.site_admin = site_admin
-
-        super().__init__(*args, **kwargs)
+    title = _('Index')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-
-        context.update(self.site_admin.each_context(self.request))
-
-        context['title'] = _('Index')
-
         return context
 
 
-class LoginView(generic.FormView):
+class LoginView(ContextTitleMixin, generic.FormView):
 
     template_name = 'admin/admin/login.html'
     form_class = LoginForm
+    title = _('Login')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-
-        context['title'] = _('Login')
-
         return context
 
     def form_valid(self, form):
@@ -84,21 +77,14 @@ class PasswordChangeDoneView(generic.TemplateView):
     pass
 
 
-class ChangeListView(generic.ListView):
+class ChangeListView(SiteModelAdminMixin, generic.ListView):
 
     template_name = 'admin/admin/changelist.html'
-
-    model_admin = ModelAdminStrictDescriptor('model_admin')
-    site_admin = SiteAdminStrictDescriptor('site_admin')
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.title = _('Select {} to change').format(
-            self.model_admin.model._meta.verbose_name_plural.lower()
-        )
-
-        self.default_classes = {
+        self.default_styles = {
             'align': 'left',
         }
 
@@ -110,55 +96,59 @@ class ChangeListView(generic.ListView):
 
         context = super().get_context_data(**kwargs)
 
-        context.update(self.site_admin.each_context(self.request))
+        model_meta = self.model_admin.model._meta
 
-        context['title'] = self.title
+        context['title'] = _('Select {} to change').format(model_meta.verbose_name_plural.lower())
 
-        context['model_meta'] = self.model_admin.model._meta
-
-        context['model_name'] = self.model_admin.model._meta.verbose_name_plural
+        context['model_meta'] = model_meta
+        context['app_index'] = reverse('admin:{}_index'.format(model_meta.app_label))
 
         context['has_add_permission'] = self.model_admin.has_add_permission(self.request)
 
-        context['list_display_with_classes'] = self.get_list_display_with_classes()
+        context['list_display_with_styles'] = self.get_list_display_with_styles()
 
-        context['list_values_with_classes'] = self.get_list_values_with_classes()
+        context['list_values_with_styles'] = self.get_list_values_with_styles()
 
         return context
 
     @property
-    def list_display_classes_by_column(self):
+    def list_display_styles_by_column(self):
 
-        columns_with_classes = {}
+        columns_with_styles = {}
 
-        for field_or_method in self.model_admin.get_list_display():
+        styles_by_column = {
+            column: styles
+            for columns, styles in self.model_admin.get_list_display_styles()
+            for column in columns
+        }
 
-            current_list_display_classes = [
-                styles for fields, styles in self.model_admin.get_list_display_classes()
-                if field_or_method in fields
-            ]
+        global_styles = styles_by_column.pop('__all__') if '__all__' in styles_by_column else dict()
 
-            current_list_display_classes = current_list_display_classes[0]
+        list_display_dict = dict.fromkeys(self.model_admin.get_list_display(), {})
 
-            classes = self.default_classes.copy()
+        for column, styles in list_display_dict.items():
 
-            classes.update(current_list_display_classes)
+            value = self.default_styles.copy()
+            value.update(global_styles)
+            value.update(styles_by_column.get(column, {}))
+            columns_with_styles[column] = value
 
-            columns_with_classes[field_or_method] = classes
+        return columns_with_styles
 
-        return columns_with_classes
+    def get_list_values_with_styles(self):
 
-
-    def get_list_values_with_classes(self):
-
-        list_values_with_classes = list()
+        list_values_with_styles = list()
 
         for obj in self.get_queryset():
 
             values = list()
             for field_or_method in self.model_admin.get_list_display():
 
-                value = getattr(obj, field_or_method)
+                if hasattr(obj, field_or_method):
+                    value = getattr(obj, field_or_method)
+                elif hasattr(self.model_admin, field_or_method):
+                    model_admin_method = getattr(self.model_admin, field_or_method)
+                    value = model_admin_method(obj)
 
                 fieldnames = [field.name for field in self.model_admin.model._meta.get_fields()]
 
@@ -169,13 +159,31 @@ class ChangeListView(generic.ListView):
                 elif field_or_method in fieldnames:
 
                     field = self.model_admin.model._meta.get_field(field_or_method)
+
                     if field.choices:
                         value = getattr(obj, 'get_{}_display'.format(field_or_method))()
+
+                    if isinstance(field, (NullBooleanField, BooleanField)):
+
+                        if value is True:
+                            bootstap_class = 'ok-sign'
+                            color = 'rgb(0, 255, 0)'
+                        elif value is False:
+                            bootstap_class = 'remove-sign'
+                            color = 'rgb(255, 0, 0)'
+                        elif value is None:
+                            bootstap_class = 'question-sign'
+                            color = 'rgb(0, 0, 0)'
+
+                        value = format_html(
+                            '<span class="glyphicon glyphicon-{}" style="color: {}"></span>',
+                            bootstap_class, color
+                        )
 
                 if value is None:
                     value = self.site_admin.empty_value_display
 
-                values.append((value, self.list_display_classes_by_column[field_or_method]))
+                values.append((value, self.list_display_styles_by_column[field_or_method]))
 
             row_color = self.get_row_color(obj)
 
@@ -184,10 +192,10 @@ class ChangeListView(generic.ListView):
                 self.model_admin.model._meta.model_name,
             ), args=(obj.pk, ))
 
-            list_values_with_classes.append((row_color, admin_url, values))
-        return list_values_with_classes
+            list_values_with_styles.append((row_color, admin_url, values))
+        return list_values_with_styles
 
-    def get_list_display_with_classes(self):
+    def get_list_display_with_styles(self):
 
         list_display = self.model_admin.get_list_display()
 
@@ -202,7 +210,16 @@ class ChangeListView(generic.ListView):
 
             else:
 
-                attr_display = getattr(self.model_admin.model, name_attr_display)
+                if hasattr(self.model_admin.model, name_attr_display):
+                    attr_display = getattr(self.model_admin.model, name_attr_display)
+                elif hasattr(self.model_admin, name_attr_display):
+                    attr_display = getattr(self.model_admin, name_attr_display)
+                else:
+                    raise AttributeError(
+                        'Either no model or model admin has no attribute {}'.format(
+                            name_attr_display
+                        )
+                    )
 
                 if callable(attr_display):
 
@@ -230,7 +247,7 @@ class ChangeListView(generic.ListView):
 
                     attr_display = field.verbose_name
 
-            new_list_display.append((attr_display, self.list_display_classes_by_column[name_attr_display]))
+            new_list_display.append((attr_display, self.list_display_styles_by_column[name_attr_display]))
 
         return new_list_display
 
@@ -248,13 +265,105 @@ class ChangeListView(generic.ListView):
         return row_color
 
 
-class AddView(generic.CreateView):
+class AddView(SiteModelAdminMixin, generic.CreateView):
 
-    model_admin = ModelAdminStrictDescriptor('model_admin')
-    site_admin = SiteAdminStrictDescriptor('site_admin')
+    pass
 
 
-class ChangeView(generic.UpdateView):
+class ChangeView(SiteModelAdminMixin, generic.UpdateView):
 
-    model_admin = ModelAdminStrictDescriptor('model_admin')
-    site_admin = SiteAdminStrictDescriptor('site_admin')
+    pass
+
+
+class AppIndexView(SiteAppAdminMixin, generic.TemplateView):
+
+    template_name = 'admin/admin/app_index.html'
+
+    def get_context_data(self, **kwargs):
+
+        context = super().get_context_data(**kwargs)
+
+        context['title'] = self.app_config.verbose_name
+        context['app_name'] = self.app_config.verbose_name
+        context['app_models_info'] = self.get_app_models_info()
+        context['reports_url'] = reverse('admin:{}_reports'.format(self.app_config.label))
+        context['statistics_url'] = reverse('admin:{}_statistics'.format(self.app_config.label))
+
+        return context
+
+    def get_app_models_info(self):
+
+        info = list()
+        for model in self.app_config.get_models():
+
+            info.append((
+                force_text(model._meta.verbose_name),
+                reverse('admin:{}_{}_changelist'.format(model._meta.app_label, model._meta.model_name)),
+                model._default_manager.count(),
+            ))
+
+        info.sort(key=lambda x: x[0].lower())
+
+        return info
+
+
+class AppReportView(SiteAppAdminMixin, generic.TemplateView):
+
+    template_name = 'admin/admin/reports.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        context['title'] = _('{} - Reports ').format(self.app_config.verbose_name)
+
+        context['app_name'] = self.app_config.verbose_name
+        context['app_index_url'] = reverse('admin:{}_index'.format(self.app_config.label))
+
+        return context
+
+
+class AppStatisticsView(SiteAppAdminMixin, generic.TemplateView):
+
+    template_name = 'admin/admin/statistics.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        context['title'] = _('{} - Statistics ').format(self.app_config.verbose_name)
+
+        context['app_name'] = self.app_config.verbose_name
+        context['app_index_url'] = reverse('admin:{}_index'.format(self.app_config.label))
+
+        return context
+
+
+class HistoryView(SiteModelAdminMixin, generic.DetailView):
+
+    pass
+
+
+class DeleteView(SiteModelAdminMixin, generic.DeleteView):
+
+    pass
+
+
+class ExportView(generic.View):
+
+    pass
+
+
+class ImportPreviewView(generic.View):
+
+    pass
+
+
+class ImportView(generic.View):
+
+    pass
+
+
+class SettingsView(SiteAdminMixin, generic.TemplateView):
+
+    template_name = ''
+
+    # constants

@@ -17,7 +17,7 @@
         <!-- Brand title -->
         <div class="">
           <div id="admin_site_header" class="text-center">
-            <a class="" href="{% url 'admin:index' %}">
+            <a class="" href="{{ index_url }}">
               {% comment %}
 
               <i class="fa fa-paw fa-2x"></i>
@@ -40,18 +40,22 @@
         <div id="sidebar_apps">
           <ul class="list-group">
 
-            {% for avaliable_app_models in avaliable_apps_models %}
+            {% for avaliable_app_with_models in avaliable_apps_with_models %}
 
               <li class="main_list">
-                <a href="{{ avaliable_app_models.app_index_url }}">
-                  <i class="fa fa-home fa-lg"></i>
-                  {{ avaliable_app_models.name }}
-                  <span class="fa fa-chevron-left fa-1x"></span>
-                </a>
+                <table>
+                  <tbody>
+                    <tr>
+                      <td><i class="fa fa-{{ avaliable_app_with_models.app_icon }} fa-lg"></i></td>
+                      <td><a href="{{ avaliable_app_with_models.app_index_url }}">{{ avaliable_app_with_models.app_name }}</a></td>
+                      <td><i class="fa fa-chevron-left fa-1x switch_nested_list"></i></td>
+                    </tr>
+                  </tbody>
+                </table>
                 <div class="div_nested_list">
                   <ul class="list-group nested_list">
-                    {% for avaliable_model in avaliable_app_models.models %}
-                    <li class=""><a href="{{ avaliable_model.changelist_url }}">{{ avaliable_model.name|capfirst }}</a></li>
+                    {% for avaliable_model in avaliable_app_with_models.models %}
+                    <li class=""><a href="{{ avaliable_model.changelist_url }}">{{ avaliable_model.model_meta.model_name|capfirst }}</a></li>
                     {% endfor %}
                   </ul>
                 </div>
@@ -159,15 +163,24 @@
 
     <div id="inner-content">
 
-      {% block breadcrumbs %}
-      <ol class="breadcrumb">
-        <li><a href="{% url 'admin:index' %}">{% trans "Home" %}</a></li>
-        <li><a href="{% url 'admin:app_index' model_meta.app_label %}">{{ model_meta.app_config.verbose_name }}</a></li>
-        <li class="active">{{ model_meta.verbose_name_plural|capfirst }}</li>
-      </ol>
-      {% endblock breadcrumbs %}
+      <div id="breadcrumb">
+        <ol class="breadcrumb">
+          {% block breadcrumbs %}
+            <li class="active">{% trans "Home" %}</li>
+          {% endblock breadcrumbs %}
+        </ol>
+      </div>
 
-      {% block content %}{% endblock content %}
+      {% block content %}
+
+      {% for i in avaliable_apps_with_models %}
+        {% for k, v in i.items %}
+          <p>{{ k }} {{ v }}</p>
+        {% endfor %}
+        <hr>
+      {% endfor %}
+
+      {% endblock content %}
 
     </div>
   </div>

@@ -18,7 +18,7 @@ from .models import Category, Utility
 from .forms import CategoryAdminModelForm, UtilityAdminModelForm
 
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('django.development')
 
 
 @AdminSite.register_app_admin_class

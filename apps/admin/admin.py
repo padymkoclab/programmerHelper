@@ -1,6 +1,4 @@
 
-import abc
-
 from django.contrib.admin.checks import (
     BaseModelAdminChecks, InlineModelAdminChecks, ModelAdminChecks,
 )
@@ -18,60 +16,7 @@ from django.views.decorators.csrf import csrf_protect
 from django.views.generic import RedirectView
 
 from .decorators import admin_staff_member_required
-from .views import AddView, ChangeListView, ChangeView
-
-
-class AppAdmin(abc.ABC):
-    """ """
-
-    def app_index(self, request):
-        pass
-
-    def statistics_view(self, request):
-        pass
-
-    def reports_view(self, request):
-        pass
-
-    @abc.abstractmethod
-    def get_context_for_tables_of_statistics(self):
-        """
-        return (
-            (_('Books'), (
-                (_('Count books'), Book.objects.count()),
-                (_('Count russian books'), Book.objects.get_count_russian_books()),
-                (_('Count english books'), Book.objects.get_count_english_books()),
-                (_('Count great books'), Book.objects.get_count_great_books()),
-                (_('Count big books'), Book.objects.get_count_big_books()),
-                (_('Count middle books'), Book.objects.get_count_middle_books()),
-                (_('Count tiny books'), Book.objects.get_count_tiny_books()),
-            )),
-        )
-        """
-
-        pass
-
-    @abc.abstractmethod
-    def get_context_for_charts_of_statistics(self):
-        """
-        return (
-            {
-                'title': _('Chart count books by size'),
-                'table': None,
-                'chart': Book.objects.get_chart_statistics_count_books_by_size(),
-            },
-            {
-                'title': _('Chart count replies for the past year'),
-                'table': {
-                    'fields': (_('Month, year'), _('Count replies')),
-                    'data': Book.replies_manager.get_statistics_count_replies_for_the_past_year(),
-                },
-                'chart': Book.replies_manager.get_chart_count_replies_for_the_past_year(),
-            },
-        )
-        """
-
-        pass
+from .views import AddView, ChangeListView, ChangeView, HistoryView, DeleteView
 
 
 class CheckModelAdmin:
@@ -106,14 +51,14 @@ class ModelAdmin:
     # show_full_result_count = True
 
     list_display = ('__str__', )
-    list_display_classes = (
+    list_display_styles = (
         (
             '__all__', {
                 'align': 'center',
             }
         ),
     )
-    colored_rows_by = None
+    colored_rows_by = str()
     ordering = tuple()
     # list_display_links = ()
     # list_filter = ()
@@ -182,8 +127,19 @@ class ModelAdmin:
                     ChangeView.as_view(site_admin=self.site_admin, model_admin=self)
                 ),
             ),
-            # url(r'^(.+)/history/$', wrap(self.history_view), name='%s_%s_history' % info),
-            # url(r'^(.+)/delete/$', wrap(self.delete_view), name='%s_%s_delete' % info),
+            url(
+                regex=r'^(.+)/history/$', name='{}_{}_history'.format(app_label, model_name), kwargs={},
+                view=admin_staff_member_required(
+                    HistoryView.as_view(site_admin=self.site_admin, model_admin=self)
+                ),
+            ),
+            url(
+                regex=r'^(.+)/delete/$', name='{}_{}_delete'.format(app_label, model_name), kwargs={},
+                view=admin_staff_member_required(
+                    DeleteView.as_view(site_admin=self.site_admin, model_admin=self)
+                ),
+            ),
+
             # url(r'^(.+)/preview/$', wrap(self.change_view), name='%s_%s_preview' % info),
             # url(r'^(.+)/statistics/$', wrap(self.change_view), name='%s_%s_statistics' % info),
             # url(r'^(.+)/reports/$', wrap(self.change_view), name='%s_%s_reports' % info),
@@ -201,7 +157,7 @@ class ModelAdmin:
         ordering = self.get_ordering()
 
         if ordering:
-            qs.order_by(**ordering)
+            qs.order_by(*ordering)
 
         return qs
 
@@ -243,9 +199,9 @@ class ModelAdmin:
         permission = '{}.{}'.format(self.model._meta.app_label, permission_codename)
         return request.user.has_permission(permission)
 
-    def get_list_display_classes(self):
+    def get_list_display_styles(self):
 
-        return self.list_display_classes
+        return self.list_display_styles
 
     def get_colored_rows_by(self):
 
