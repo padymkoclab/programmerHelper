@@ -19,7 +19,7 @@ from django.views.decorators.csrf import csrf_protect
 # from django.template.defaultfilters import truncatechars
 # from django.contrib import admin
 
-from .views import IndexView, LoginView, LogoutView, PasswordChangeView, PasswordChangeDoneView, AppIndexView, SettingsView
+from .views import IndexView, LoginView, LogoutView, PasswordChangeView, PasswordChangeDoneView, AppIndexView, SettingsView, ImportView, ExportView
 from .decorators import admin_staff_member_required
 from .admin import ModelAdmin
 from .exceptions import AlreadyRegisteredModel, AlreadyRegisteredApp
@@ -107,6 +107,8 @@ class SiteAdmin:
             url(r'^password_change/$', admin_staff_member_required(PasswordChangeView.as_view(), cacheable=True), {}, 'password_change'),
             url(r'^password_change/done/$', admin_staff_member_required(PasswordChangeDoneView.as_view(), cacheable=True), {}, 'password_change_done'),
             url(r'^settings/$', SettingsView.as_view(), {}, 'settings'),
+            url(r'^import/$', ImportView.as_view(), {}, 'import'),
+            url(r'^export/$', ExportView.as_view(), {}, 'export'),
             # url(r'^jsi18n/$', wrap(self.i18n_javascript, cacheable=True), name='jsi18n'),
         ]
 
@@ -128,12 +130,6 @@ class SiteAdmin:
     @property
     def urls(self):
         return self.get_urls(), 'admin', self.name
-
-    def settings_view(self, request):
-        pass
-
-    def constants_view(self, request):
-        pass
 
     def register_model(self, model, model_admin_class):
         """

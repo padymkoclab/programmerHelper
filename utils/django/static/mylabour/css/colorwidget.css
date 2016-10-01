@@ -1,9 +1,13 @@
 
 .colorfield input[type='text'] {
     width: 120px;
+    height: 22px;
+    padding: 2px;
 }
 
 
 .colorfield input[type='color'] {
-    width: 15px;
+    width: 20px;
+    height: 22px;
+    border-radius: 0;
 }

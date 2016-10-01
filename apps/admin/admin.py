@@ -60,6 +60,7 @@ class ModelAdmin:
     )
     colored_rows_by = str()
     ordering = tuple()
+    disabled_urls = tuple()
     # list_display_links = ()
     # list_filter = ()
     # list_select_related = False
@@ -108,42 +109,45 @@ class ModelAdmin:
 
         app_label, model_name = self.model._meta.app_label, self.model._meta.model_name
 
-        urlpatterns = [
-            url(
+        urls = dict(
+            changelist=url(
                 regex=r'^$', kwargs={}, name='{}_{}_changelist'.format(app_label, model_name),
                 view=admin_staff_member_required(
                     ChangeListView.as_view(site_admin=self.site_admin, model_admin=self)
                 ),
             ),
-            url(
+            add=url(
                 regex=r'^add/$', kwargs={}, name='{}_{}_add'.format(app_label, model_name),
                 view=admin_staff_member_required(
                     AddView.as_view(site_admin=self.site_admin, model_admin=self)
                 ),
             ),
-            url(
+            change=url(
                 regex=r'^(.+)/change/$', name='{}_{}_change'.format(app_label, model_name), kwargs={},
                 view=admin_staff_member_required(
                     ChangeView.as_view(site_admin=self.site_admin, model_admin=self)
                 ),
             ),
-            url(
+            history=url(
                 regex=r'^(.+)/history/$', name='{}_{}_history'.format(app_label, model_name), kwargs={},
                 view=admin_staff_member_required(
                     HistoryView.as_view(site_admin=self.site_admin, model_admin=self)
                 ),
             ),
-            url(
+            delete=url(
                 regex=r'^(.+)/delete/$', name='{}_{}_delete'.format(app_label, model_name), kwargs={},
                 view=admin_staff_member_required(
                     DeleteView.as_view(site_admin=self.site_admin, model_admin=self)
                 ),
             ),
+        )
 
-            # url(r'^(.+)/preview/$', wrap(self.change_view), name='%s_%s_preview' % info),
-            # url(r'^(.+)/statistics/$', wrap(self.change_view), name='%s_%s_statistics' % info),
-            # url(r'^(.+)/reports/$', wrap(self.change_view), name='%s_%s_reports' % info),
-        ]
+        urlpatterns = [url for url_name, url in urls.items() if url_name not in self.disabled_urls]
+
+        # url(r'^(.+)/preview/$', wrap(self.change_view), name='%s_%s_preview' % info),
+        # url(r'^(.+)/statistics/$', wrap(self.change_view), name='%s_%s_statistics' % info),
+        # url(r'^(.+)/reports/$', wrap(self.change_view), name='%s_%s_reports' % info),
+
         return urlpatterns
 
     @property

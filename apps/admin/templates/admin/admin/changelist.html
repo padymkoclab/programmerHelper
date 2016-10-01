@@ -11,7 +11,7 @@
 
 {% block breadcrumbs %}
   <li><a href="{{ index_url }}">{% trans "Home" %}</a></li>
-  <li><a href="{{ app_index }}">{{ model_meta.app_config.verbose_name|capfirst }}</a></li>
+  <li><a href="{{ app_index_url }}">{{ model_meta.app_config.verbose_name|capfirst }}</a></li>
   <li class="active">{{ model_meta.verbose_name_plural|capfirst }}</li>
 {% endblock breadcrumbs %}
 
@@ -26,9 +26,10 @@
     <div class="row">
       <div class="col-xs-12 text-right">
         <button class="btn btn-warning">{% trans "Export" %}</button>
+        <a href="{% url 'admin:export' %}" class="btn btn-danger">{% trans "Export" %}</a>
         <a href="{% url 'admin:import' %}" class="btn btn-danger">{% trans "Import" %}</a>
         {% if has_add_permission is True %}
-          <button class="btn btn-success">{% trans "Add " %} {{ model_meta.verbose_name|lower }}</button>
+          <a href="{{ add_url }}" class="btn btn-success">{% trans "Add " %} {{ model_meta.verbose_name|lower }}</a>
         {% endif %}
       </div>
     </div>

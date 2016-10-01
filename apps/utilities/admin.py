@@ -8,6 +8,8 @@ from django.contrib import admin
 
 from utils.django.listfilters import IsNewSimpleListFilter
 
+from apps.admin.admin import ModelAdmin
+
 from apps.core.admin import AppAdmin, AdminSite
 from apps.opinions.admin import OpinionGenericInline
 from apps.opinions.admin_mixins import OpinionsAdminMixin
@@ -21,7 +23,7 @@ from .forms import CategoryAdminModelForm, UtilityAdminModelForm
 logger = logging.getLogger('django.development')
 
 
-@AdminSite.register_app_admin_class
+# @AdminSite.register_app_admin_class
 class UtilitiesAppAdmin(AppAdmin):
 
     label = UtilitiesConfig.label
@@ -123,8 +125,8 @@ class UtilityInline(admin.StackedInline):
     ]
 
 
-@admin.register(Category, site=AdminSite)
-class CategoryAdmin(admin.ModelAdmin):
+# @admin.register(Category, site=AdminSite)
+class CategoryAdmin(ModelAdmin):
     '''
     Admin View for Category
     '''
@@ -158,7 +160,7 @@ class CategoryAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
 
         qs = super().get_queryset(request)
-        qs = qs.categories_with_all_additional_fields()
+        # qs = qs.categories_with_all_additional_fields()
         return qs
 
     def get_fieldsets(self, request, obj=None):
@@ -200,13 +202,13 @@ class CategoryAdmin(admin.ModelAdmin):
         return []
 
 
-@admin.register(Utility, site=AdminSite)
-class UtilityAdmin(OpinionsAdminMixin, admin.ModelAdmin):
+# @admin.register(Utility, site=AdminSite)
+class UtilityAdmin(OpinionsAdminMixin, ModelAdmin):
     '''
     Admin View for Utility
     '''
 
-    form = UtilityAdminModelForm
+    # form = UtilityAdminModelForm
     list_display = (
         'truncated_name',
         'category',
@@ -239,7 +241,7 @@ class UtilityAdmin(OpinionsAdminMixin, admin.ModelAdmin):
 
     def get_queryset(self, request):
         qs = super(UtilityAdmin, self).get_queryset(request)
-        qs = qs.utilities_with_all_additional_fields()
+        # qs = qs.utilities_with_all_additional_fields()
         return qs
 
     def get_fieldsets(self, request, obj=None):

@@ -1,4 +1,4 @@
-$(document).ready(function($){
+jQuery(document).ready(function($){
 
     $('div.colorfield input[type="color"]').change(function(){
         var color = $(this).val();

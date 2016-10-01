@@ -29,9 +29,6 @@ class Category(TimeStampedModel):
     Model of a category of utilities.
     """
 
-    def upload_category_image(instance, filename):
-        return upload_image(instance, filename)
-
     name = models.CharField(
         _('Name'), max_length=100, unique=True,
         validators=[MinLengthValidator(settings.MIN_LENGTH_FOR_NAME_OR_TITLE_OBJECT)]
@@ -41,7 +38,6 @@ class Category(TimeStampedModel):
         _('Description'), max_length=500,
         validators=[MinLengthValidator(50)]
     )
-    image = models.ImageField(_('Picture'), max_length=1000, upload_to=upload_category_image)
 
     class Meta:
         verbose_name = _("Category")

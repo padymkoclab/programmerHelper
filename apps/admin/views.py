@@ -1,4 +1,6 @@
 
+from django.core.exceptions import ImproperlyConfigured
+from django import forms
 from django.utils.html import format_html
 from django.db.models import NullBooleanField, BooleanField
 from django.apps import apps
@@ -11,7 +13,7 @@ from django.utils.text import capfirst, force_text
 
 from utils.django.views_mixins import ContextTitleMixin
 
-from .forms import LoginForm
+from .forms import LoginForm, AddModelForm
 from .descriptors import SiteAdminStrictDescriptor, ModelAdminStrictDescriptor
 from .views_mixins import SiteAdminMixin, SiteModelAdminMixin, SiteAppAdminMixin
 
@@ -101,9 +103,10 @@ class ChangeListView(SiteModelAdminMixin, generic.ListView):
         context['title'] = _('Select {} to change').format(model_meta.verbose_name_plural.lower())
 
         context['model_meta'] = model_meta
-        context['app_index'] = reverse('admin:{}_index'.format(model_meta.app_label))
+        context['app_index_url'] = reverse('admin:{}_index'.format(model_meta.app_label))
 
         context['has_add_permission'] = self.model_admin.has_add_permission(self.request)
+        context['add_url'] = reverse('admin:{}_{}_add'.format(model_meta.app_label, model_meta.model_name))
 
         context['list_display_with_styles'] = self.get_list_display_with_styles()
 
@@ -267,7 +270,41 @@ class ChangeListView(SiteModelAdminMixin, generic.ListView):
 
 class AddView(SiteModelAdminMixin, generic.CreateView):
 
-    pass
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.model_meta = self.model_admin.model._meta
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        context['title'] = _('Add {}').format(self.model_meta.verbose_name.lower())
+
+        context['model_meta'] = self.model_meta
+
+        context['app_index_url'] = reverse('admin:{}_index'.format(self.model_meta.app_label))
+
+        return context
+
+    def get_template_names(self):
+
+        return [
+            '{}/admin/{}/add_form.html'.format(self.model_meta.app_label, self.model_meta.model_name),
+            '{}/admin/add_form.html'.format(self.model_meta.app_label),
+            'admin/admin/add_form.html',
+        ]
+
+    def get_queryset(self):
+
+        return self.model_admin.model._default_manager
+
+    def get_form_class(self):
+
+        form = getattr(self.model_admin, 'form', AddModelForm)
+
+        return forms.models.modelform_factory(
+            self.model_admin.model, fields='__all__', form=form
+        )
 
 
 class ChangeView(SiteModelAdminMixin, generic.UpdateView):

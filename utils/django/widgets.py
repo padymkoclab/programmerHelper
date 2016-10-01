@@ -247,3 +247,17 @@ class ColorInput(forms.Widget):
             '<div class="colorfield"><input type="text" disabled="disabled" /><input{} /></div>',
             flatatt(final_attrs),
         )
+
+
+class AutosizedTextarea(forms.Textarea):
+
+    class Media:
+        js = ('mylabour/js/autoresize.js', )
+
+    def render(self, name, value, attrs=None):
+
+        output = super().render(name, value, attrs)
+
+        output += "<script>$('#{}').AutoResize();</script>".format(attrs['id'])
+
+        return output

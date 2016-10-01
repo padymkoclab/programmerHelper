@@ -378,6 +378,7 @@ class UserAdmin(ModelAdmin):
 
 
 from apps.utilities.models import Utility, Category
+from apps.utilities.admin import UtilityAdmin, CategoryAdmin
 from apps.utilities.apps import UtilitiesConfig
 
 
@@ -385,16 +386,6 @@ class UtilityAppAdmin(AppAdmin):
 
     app_config_class = UtilitiesConfig
     app_icon = 'home'
-
-
-class UtilityAdmin(ModelAdmin):
-
-    pass
-
-
-class CategoryAdmin(ModelAdmin):
-
-    pass
 
 
 class UserAppAdmin(AppAdmin):
@@ -413,6 +404,8 @@ class ProfileAdmin(ModelAdmin):
         'get_percentage_filling',
         'updated',
     )
+
+    # disabled_urls = ('add', 'delete')
 
     list_display_styles = (
         (

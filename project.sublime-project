@@ -1,28 +1,29 @@
-{
-	"build_systems":
-	[
-		{
-			"file_regex": "^[ ]*File \"(...*?)\", line ([0-9]*)",
-			"name": "ProgrammerHelper Python Builder",
-			"selector": "source.python",
-			"shell_cmd": "\"/home/wlysenko/.virtualenvs/programmerHelper/bin/python\" -u \"$file\""
-		},
-		{
-			"file_regex": "^[ ]*File \"(...*?)\", line ([0-9]*)",
-			"name": "Anaconda Python Builder",
-			"selector": "source.python",
-			"shell_cmd": "\"/home/wlysenko/.virtualenvs/programmerHelper/bin/python\" -u \"$file\""
-		}
-	],
-	"folders":
-	[
-		{
-			"follow_symlinks": true,
-			"path": "."
-		}
-	],
-	"settings":
-	{
-		"python_interpreter": "/home/wlysenko/.virtualenvs/programmerHelper/bin/python"
-	}
+ {
+    "build_systems":
+    [
+            {
+                    "file_regex": "^[ ]*File \"(...*?)\", line ([0-9]*)",
+                    "name": "ProgrammerHelper Python Builder",
+                    "selector": "source.python",
+                    "shell_cmd": "\"/home/wlysenko/.virtualenvs/programmerHelper/bin/python\" -u \"$file\""
+            },
+            {
+                    "file_regex": "^[ ]*File \"(...*?)\", line ([0-9]*)",
+                    "name": "Anaconda Python Builder",
+                    "selector": "source.python",
+                    "shell_cmd": "\"/home/wlysenko/.virtualenvs/programmerHelper/bin/python\" -u \"$file\""
+            }
+    ],
+        "folders":
+        [
+                {
+                    "follow_symlinks": true,
+                        "path": "."
+                }
+    ],
+    "settings":
+    {
+            "python_interpreter": "/home/wlysenko/.virtualenvs/programmerHelper/bin/python"
+    }
+
 }

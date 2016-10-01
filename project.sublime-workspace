@@ -4,8 +4,184 @@
 		"selected_items":
 		[
 			[
+				"min",
+				"min_length	statement"
+			],
+			[
+				"ut",
+				"utils	module"
+			],
+			[
+				"forma",
+				"format_html	import"
+			],
+			[
+				"outer",
+				"outerHeight	.outerHeight()"
+			],
+			[
+				"widget",
+				"widgets"
+			],
+			[
+				"sc",
+				"scrollTop	.scrollTop()"
+			],
+			[
 				"model",
-				"model_admin"
+				"model_admin	statement"
+			],
+			[
+				"field",
+				"fields	param"
+			],
+			[
+				"form",
+				"forms	module"
+			],
+			[
+				"dis",
+				"disabled_fields"
+			],
+			[
+				"dict",
+				"dictionary	param"
+			],
+			[
+				"lib",
+				"library	module"
+			],
+			[
+				"templa",
+				"template	module"
+			],
+			[
+				"exte",
+				"exceptions	module"
+			],
+			[
+				"fiel",
+				"field	forstmt"
+			],
+			[
+				"Model",
+				"ModelForm	class"
+			],
+			[
+				"ModelF",
+				"ModelForm	class"
+			],
+			[
+				"model_",
+				"model_meta	statement"
+			],
+			[
+				"verbose",
+				"verbose_name"
+			],
+			[
+				"sele",
+				"selected	Attr"
+			],
+			[
+				"list_dis",
+				"list_display_classes"
+			],
+			[
+				"has",
+				"hasattr	function"
+			],
+			[
+				"Index",
+				"IndexError	class"
+			],
+			[
+				"re",
+				"reverse	function"
+			],
+			[
+				"mode",
+				"model"
+			],
+			[
+				"app_",
+				"app_label"
+			],
+			[
+				"app",
+				"app_config	statement"
+			],
+			[
+				"get_",
+				"get_app_config	function"
+			],
+			[
+				"__init",
+				"__init__	function"
+			],
+			[
+				"Site",
+				"SiteModelAdminMixin	class"
+			],
+			[
+				"view",
+				"views_mixins	module"
+			],
+			[
+				"views",
+				"views_mixins	module"
+			],
+			[
+				"IM",
+				"ImproperlyConfigured"
+			],
+			[
+				"conte",
+				"context	statement"
+			],
+			[
+				"ver",
+				"verbose_name_plural"
+			],
+			[
+				"con",
+				"context	statement"
+			],
+			[
+				"De",
+				"DeleteView	class"
+			],
+			[
+				"_re",
+				"_registry_models	statement"
+			],
+			[
+				"url",
+				"urlpatterns	statement"
+			],
+			[
+				"_regis",
+				"_registry_apps"
+			],
+			[
+				"app_a",
+				"app_admin_class	param"
+			],
+			[
+				"Im",
+				"ImproperlyConfigured	class"
+			],
+			[
+				"Impo",
+				"ImportWarning	class"
+			],
+			[
+				"_regi",
+				"_registry_apps"
+			],
+			[
+				"User",
+				"UsersConfig	class"
 			],
 			[
 				"cla",
@@ -48,10 +224,6 @@
 				"is_superuser	statement"
 			],
 			[
-				"Model",
-				"ModelAdmin	class"
-			],
-			[
 				"Admin",
 				"AdminSiteStrictDescriptor	class"
 			],
@@ -68,31 +240,11 @@
 				"verbose_name"
 			],
 			[
-				"has",
-				"hasattr"
-			],
-			[
-				"fiel",
-				"fieldnames"
-			],
-			[
 				"admin",
 				"admin_model"
 			],
 			[
-				"templa",
-				"template_name"
-			],
-			[
-				"form",
-				"format	function"
-			],
-			[
 				"_registry_",
-				"_registry_models	statement"
-			],
-			[
-				"_regi",
 				"_registry_models	statement"
 			],
 			[
@@ -156,16 +308,8 @@
 				"transition"
 			],
 			[
-				"re",
-				"required	Attr"
-			],
-			[
 				"in",
 				"include	function"
-			],
-			[
-				"con",
-				"conf	module"
 			],
 			[
 				"cs",
@@ -186,14 +330,6 @@
 			[
 				"st",
 				"staff_member_required	function"
-			],
-			[
-				"app",
-				"app_name	statement"
-			],
-			[
-				"conte",
-				"context	param"
 			],
 			[
 				"csrf",
@@ -262,18 +398,6 @@
 			[
 				"rela",
 				"related_name	param"
-			],
-			[
-				"dis",
-				"dispatch	module"
-			],
-			[
-				"De",
-				"DetailView	class"
-			],
-			[
-				"view",
-				"views	module"
 			],
 			[
 				"models",
@@ -390,130 +514,6 @@
 			[
 				"pr",
 				"property	class"
-			],
-			[
-				"forma",
-				"format_html	function"
-			],
-			[
-				"verso",
-				"verbose_name"
-			],
-			[
-				"Prof",
-				"ProfileInline	class"
-			],
-			[
-				"suit_",
-				"suit_classes"
-			],
-			[
-				"Color",
-				"ColorField	class"
-			],
-			[
-				"Text",
-				"TextInput	class"
-			],
-			[
-				"Date",
-				"DateTimeInput	class"
-			],
-			[
-				"I",
-				"IntegerField	class"
-			],
-			[
-				"Se",
-				"SelectMultiple	class"
-			],
-			[
-				"sh",
-				"short_description"
-			],
-			[
-				"Leve",
-				"LevelManager	statement"
-			],
-			[
-				"from",
-				"from_queryset"
-			],
-			[
-				"Le",
-				"LevelQuerySet	class"
-			],
-			[
-				"nul",
-				"null"
-			],
-			[
-				"rand",
-				"random	statement"
-			],
-			[
-				"Fuzz",
-				"FuzzyChoice	class"
-			],
-			[
-				"Fuz",
-				"FuzzyInteger	class"
-			],
-			[
-				"fuzz",
-				"fuzzy	module"
-			],
-			[
-				"Re",
-				"ReverseOneToOneDescriptor	import"
-			],
-			[
-				"fi",
-				"fields	module"
-			],
-			[
-				"ins",
-				"instance_type	param"
-			],
-			[
-				"kwarg",
-				"kwargs"
-			],
-			[
-				"get_",
-				"get_user_model	function"
-			],
-			[
-				"post",
-				"post_save	instance"
-			],
-			[
-				"displa",
-				"display_name"
-			],
-			[
-				"AUT",
-				"AUTH_PROFILE_MODULE"
-			],
-			[
-				"uud",
-				"uuid4	function"
-			],
-			[
-				"Pho",
-				"PhoneField	class"
-			],
-			[
-				"PRE",
-				"PRETTY_COLORS"
-			],
-			[
-				"ha",
-				"half_pie	statement"
-			],
-			[
-				"inline",
-				"inlines	statement"
 			]
 		]
 	},
@@ -523,15 +523,7 @@
 			"file": "/media/wlysenko/66ABF2AC3D03BAAA/Web/A",
 			"settings":
 			{
-				"buffer_size": 86333,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "apps/admin/site.py",
-			"settings":
-			{
-				"buffer_size": 8452,
+				"buffer_size": 86999,
 				"line_ending": "Unix"
 			}
 		},
@@ -539,15 +531,7 @@
 			"file": "apps/admin/admin.py",
 			"settings":
 			{
-				"buffer_size": 8005,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "apps/admin/views.py",
-			"settings":
-			{
-				"buffer_size": 7571,
+				"buffer_size": 6902,
 				"line_ending": "Unix"
 			}
 		},
@@ -555,15 +539,15 @@
 			"file": "apps/admin/templates/admin/admin/changelist.html",
 			"settings":
 			{
-				"buffer_size": 7129,
+				"buffer_size": 7537,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "apps/admin/templates/admin/admin/index.html",
+			"file": "apps/admin/views.py",
 			"settings":
 			{
-				"buffer_size": 8152,
+				"buffer_size": 12401,
 				"line_ending": "Unix"
 			}
 		},
@@ -571,7 +555,7 @@
 			"file": "apps/users/admin.py",
 			"settings":
 			{
-				"buffer_size": 16115,
+				"buffer_size": 16158,
 				"line_ending": "Unix"
 			}
 		}
@@ -628,6 +612,38 @@
 			],
 			[
 				"Packages/Python/Python.sublime-build",
+				""
+			]
+		],
+		[
+			[
+				[
+					"Packages/C++/C++ Single File.sublime-build",
+					""
+				],
+				[
+					"Packages/C++/C++ Single File.sublime-build",
+					"Run"
+				]
+			],
+			[
+				"Packages/C++/C++ Single File.sublime-build",
+				"Run"
+			]
+		],
+		[
+			[
+				[
+					"Packages/Rust/Rust.sublime-build",
+					""
+				],
+				[
+					"Packages/Rust/Rust.sublime-build",
+					"Run"
+				]
+			],
+			[
+				"Packages/Rust/Rust.sublime-build",
 				""
 			]
 		],
@@ -1200,27 +1216,75 @@
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/templates",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/templates/admin",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/templates/admin/admin",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/templatetags",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/utils",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/utils/django"
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/utils/django",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/utils/django/static",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/utils/django/static/mylabour",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/utils/django/static/mylabour/js"
 	],
 	"file_history":
 	[
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/utilities/models.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/site.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/templates/admin/admin/add_form.html",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/forms.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/utilities/forms.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/utilities/admin.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/utils/django/static/mylabour/js/autoresize.js",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/forms.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/utils/django/widgets.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/templates/admin/admin/core.html",
+		"/home/wlysenko/.virtualenvs/programmerHelper/lib/python3.4/site-packages/django/forms/models.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/static/admin/admin/js/autoresize.js",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/admin.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/comments/forms.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/comments/admin.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/lib/python3.4/site-packages/django/views/generic/edit.py",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/templates/admin/admin/index.html",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/utils/django/static/mylabour/js/colorwidget.js",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/utils/django/static/mylabour/css/colorwidget.css",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/templatetags/admin_filters.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/templatetags/__init__.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/templatetags/admin_tags.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/static/admin/admin/css/add_form.html",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/templates/admin/admin/changelist.html",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/.bowerrc",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/bower.json",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/.coveragerc",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/.editorconfig",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/project.sublime-project",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/programmerHelper/apps/admin/views_mixins.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/admin.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/views.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/views_mixins.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/templates/admin/admin/statistics.html",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/templates/admin/admin/reports.html",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/descriptors.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/templates/admin/admin/import.html",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/templates/admin/admin/export.html",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/static/admin/admin/css/changelist.css",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/templates/admin/admin/app_index.html",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/utils/django/views_mixins.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/app.py",
+		"/home/wlysenko/Documents/ruby.rb",
+		"/home/wlysenko/Documents/1.cpp",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/apps.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/utils/django/models_utils.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/utils/django/mixins.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/settings/development.py",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/static/admin/admin/css/index.css",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/static/admin/admin/js/index.js",
+		"/home/wlysenko/.virtualenvs/programmerHelper/lib/python3.4/site-packages/django/template/defaultfilters.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/exceptions.py",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/static/admin/admin/js/changelist.js",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/static/admin/admin/js/autoslug.js",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/static/admin/admin/js/index.js",
 		"/home/wlysenko/.virtualenvs/programmerHelper/lib/python3.4/site-packages/django/db/models/options.py",
 		"/home/wlysenko/.virtualenvs/programmerHelper/lib/python3.4/site-packages/django/db/models/base.py",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/models.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/forms.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/descriptors.py",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/core/urls.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/templates/admin/admin/changelist.html",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/#urls2.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/templates/admin/admin/core.html",
 		"/home/wlysenko/.config/sublime-text-3/Packages/User/Preferences.sublime-settings",
 		"/home/wlysenko/.config/sublime-text-3/Packages/Default/Preferences.sublime-settings",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/templates/admin/admin/base.html",
@@ -1229,11 +1293,6 @@
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/settings/base.py",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/decorators.py",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/core/admin.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/settings/development.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/admin.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/views.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/admin.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/site.py",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/static/admin/admin/css/password_change.css",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/static/admin/admin/css/base.css",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/templates/admin/admin/password_change.html",
@@ -1243,7 +1302,6 @@
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/utils.py",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/urls.py",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/templates/admin/admin/login.html",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/forms.py",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/templates/admin/admin/logout.html",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/static/admin/css/base.css",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/static/admin/css/login.css",
@@ -1259,9 +1317,7 @@
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/templates/admin/index.html",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/static/vendor/jquery/dist/jquery.min.js",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/static/vendor/jquery/dist/jquery.js",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/bower.json",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/package.json",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/.bowerrc",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/static/vendor/jquery/bower.json",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/static/vendor/d3/d3.js",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/static/vendor/underscore/underscore-min.js",
@@ -1297,43 +1353,7 @@
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/badges/signals.py",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/badges/apps.py",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/signals.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/apps.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/badges/views.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/articles/urls.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/badges/management/commands/create_default_badges.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/forums/models.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/badges/migrations/0002_auto_20160925_1645.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/achievements/management/commands/__init__.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/achievements/management/__init__>py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/solutions/models.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/solutions/managers.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/snippets/models.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/questions/models.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/articles/models.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/achievements/migrations/0002_auto_20160925_1645.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/achievements/apps.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/admin.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/querysets.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/management/commands/factory_test_polls.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/factories.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/utils/django/factories_utils.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/constants.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/management/commands/create_test_superuser.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/tasks.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/notifications/migrations/0001_initial.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/secrets.json",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/notifications/migrations/__init__.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/notifications/urls.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/notifications/views.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/diaries/admin.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/validators.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/factories.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/wsgi.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/templates/users/admin/user_admin_tab_tags.html",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/polls/models.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/testing/models.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/diaries/migrations/0005_auto_20160925_0815.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/diaries/migrations/0001_initial.py"
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/badges/views.py"
 	],
 	"find":
 	{
@@ -1351,134 +1371,134 @@
 		"case_sensitive": true,
 		"find_history":
 		[
-			"Data",
-			"Export",
-			"get_avaliable_apps_models",
-			"View",
-			"generic",
-			"model_name",
-			"admin_url",
-			"control-label",
-			"span",
-			"color",
-			", ",
-			"blockname",
-			"block changelist",
-			"100",
-			" 0",
-			"get_color_row",
-			"object",
-			"function",
-			"colored_rows_by",
-			"row_color",
-			"get_percentage_filling",
-			"classes",
-			"get_list_display_classes",
-			"classes",
-			"current_list_display_classes",
-			"classes",
-			"now_is_checked",
-			"css",
-			"extra_css",
-			"checkbox",
-			"results",
-			"searchbox_span_icon",
-			"model_filters",
-			"model_searchbox",
-			"date_hierarchy",
-			"breadcrumbs",
-			" get_fields(",
-			" fields(",
-			"app_label",
-			"\n\nclass ",
-			"class ",
-			" get_field(",
-			"get_field",
-			"fields(",
-			"field",
-			"list_display_classes",
-			"CreateView",
-			"model_info",
-			"update",
-			"model_name",
-			"model_permissions",
-			"reverse",
-			"object_name",
-			"model_attrs",
-			"avaliable_models",
-			"avaliable_apps_models",
-			"UserInline",
-			"system_check_errors",
-			"admin_class",
-			"admin_obj",
-			"ModelAdmin",
-			"get_avaliable_apps_models",
-			"app_label",
-			"get_avaliable_apps_models",
-			"avaliable_apps_models_list",
-			"app_label",
-			"apps_models_list",
-			"app_label",
-			"apps_models_list",
-			"get_model_permissions",
-			"create",
-			"has_create_permission",
-			"request.user",
-			"get_permission_codename",
-			"return",
-			"get_permission_codename",
-			"request",
-			"has_module_permissions",
-			"has_module_perms",
-			"admin_site",
-			"self.admin_site",
-			"admin_site",
-			"SiteAdmin",
-			"admin_site",
-			"admin_model",
-			"has_module_perms",
-			"ModelAdminStrictDescriptor",
-			"AdminModelStrictDescriptor",
-			"ModelAdmin",
-			"AdminSiteStrictDescriptor",
-			"SiteAdminStrictDescriptor",
-			"AdminSite",
-			"SiteAdmin",
-			"DefaultAdminSite",
-			"AdminSite",
-			"admin_site",
-			"AdminSite",
-			"LoginForm",
+			"www",
+			"urlpatterns",
 			"url",
-			"from django.conf.urls import url",
-			"admin_site",
-			"context.update(self.admin_model.admin_site.each_context(self.request))",
-			"each_context(self.request, context)",
-			"padding-right: 15px",
-			"    border-radius: 0;",
-			"wrapper1",
-			"wrapper_",
-			"wrapper",
-			"sidebar1",
-			"field",
-			"get_field",
-			"value",
-			"list_display",
-			"list_display_classes",
-			"self.admin_model.list_display",
-			"ManyToOneRel",
-			"field",
-			"None",
-			"classes_on_value",
-			"default_classes_on_value",
-			"list_value_with_classes",
-			"list_values_with_classes",
+			"DeleteView",
+			"url",
+			"disabled_urls",
+			"is not None",
+			"if",
+			"length_help_text",
+			"mark_safe",
+			"min_length",
+			"format_html",
+			"help_text",
+			"output",
+			"mark_safe",
+			"output",
+			"el_id",
+			"AutosizedTextarea",
+			")\n",
+			"offsetHeight",
+			"clientHeight",
+			"scrollHeight",
+			"scrollTop",
+			"$a",
+			"scrollTop",
+			"outerHeight",
+			"description",
+			"admin.ModelAdmin",
+			"ModelAdmin",
+			"admin_view",
+			"\n    \"\"\"\n    A form for updating users. Includes all the fields on\n    the user, but replaces the password field with admin's\n    password hash display field.\n    \"\"\"\n\n    def __init__(self, *args, **kwargs):\n        super().__init__(*args, **kwargs)\n\n        self.fields['alias'].widget.attrs['class'] = 'span9'\n        self.fields['alias'].widget.attrs['placeholder'] = _('Enter desire name')\n\n        self.fields['username'].widget.attrs['class'] = 'span9'\n        self.fields['username'].widget.attrs['placeholder'] = _('Enter username')\n\n        self.fields['email'].widget.attrs['class'] = 'span9'\n        self.fields['email'].widget.attrs['placeholder'] = _('Enter email')\n\n    password = ReadOnlyPasswordHashField()\n\n    def clean_password(self):\n        return self.initial[\"password\"]\n",
+			"admin_view",
+			"sui",
+			"AddModelForm",
+			"fields",
+			"form",
+			"AddModelForm",
+			"fields",
+			"AddForm",
+			"Level",
+			"_meta",
+			"ModelFormMetaclass",
+			"ModelForm",
+			"20px",
+			"form_bootstrap_class",
+			"left",
+			"addons",
+			"get_item_by_key",
+			"MyName",
+			"template",
+			"AddForm",
+			"ImproperlyConfigured",
+			"form_bootstrap_class",
+			"form_add",
+			"extra_css",
+			"verbose_name",
+			"generator",
+			"Generator",
+			"genera",
+			"tatic",
+			"Static",
 			"classes",
-			"list_values",
-			"get_list_values_with_classes",
-			"css_class",
-			"class",
-			"self.model"
+			"Level",
+			"primary",
+			"class=\"sr-only\" ",
+			"help_text",
+			"field",
+			"{{",
+			"fields",
+			"all",
+			"fields",
+			"forms",
+			"verbose_name",
+			"model_meta",
+			"_meta",
+			"model_meta",
+			"admin/{}",
+			"app_index",
+			"app_index_url",
+			"import",
+			"Admin",
+			"settings",
+			"-  ",
+			"-",
+			"inbox",
+			"danger",
+			"warning",
+			"danger",
+			"Example",
+			"Example1",
+			" }}</",
+			"arku",
+			"marku",
+			"SiteAppAdminMixin",
+			"model_admin",
+			"AppConfig",
+			"admin_model",
+			"span",
+			"format_html",
+			"mark_safe",
+			"value",
+			"mark_safe",
+			"True",
+			"_classes",
+			"self.get_list_display",
+			"self.list_display",
+			"self.list_display_styles",
+			"list_display_classes",
+			"list_display_styles",
+			"classes",
+			"list_display_styles",
+			"value",
+			"classes",
+			"styles_by_column",
+			"classes_by_column",
+			"field",
+			"styles_for_all",
+			"date_joined', ",
+			"date_joined",
+			"list_display_classes",
+			"app_",
+			"chat",
+			"Chat",
+			"chat",
+			"chat ",
+			"app_label",
+			"model_meta",
+			"model_name"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -1592,7 +1612,7 @@
 	"groups":
 	[
 		{
-			"selected": 5,
+			"selected": 0,
 			"sheets":
 			[
 				{
@@ -1601,15 +1621,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 86333,
+						"buffer_size": 86999,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								660,
-								660
+								219,
+								219
 							]
 						],
 						"settings":
@@ -1632,36 +1652,6 @@
 							},
 							"bracket_highlighter.regions":
 							[
-								"bh_round",
-								"bh_round_center",
-								"bh_round_open",
-								"bh_round_close",
-								"bh_round_content",
-								"bh_single_quote",
-								"bh_single_quote_center",
-								"bh_single_quote_open",
-								"bh_single_quote_close",
-								"bh_single_quote_content",
-								"bh_square",
-								"bh_square_center",
-								"bh_square_open",
-								"bh_square_close",
-								"bh_square_content",
-								"bh_unmatched",
-								"bh_unmatched_center",
-								"bh_unmatched_open",
-								"bh_unmatched_close",
-								"bh_unmatched_content",
-								"bh_default",
-								"bh_default_center",
-								"bh_default_open",
-								"bh_default_close",
-								"bh_default_content",
-								"bh_angle",
-								"bh_angle_center",
-								"bh_angle_open",
-								"bh_angle_close",
-								"bh_angle_content",
 								"bh_c_define",
 								"bh_c_define_center",
 								"bh_c_define_open",
@@ -1672,21 +1662,51 @@
 								"bh_curly_open",
 								"bh_curly_close",
 								"bh_curly_content",
-								"bh_regex",
-								"bh_regex_center",
-								"bh_regex_open",
-								"bh_regex_close",
-								"bh_regex_content",
+								"bh_angle",
+								"bh_angle_center",
+								"bh_angle_open",
+								"bh_angle_close",
+								"bh_angle_content",
+								"bh_square",
+								"bh_square_center",
+								"bh_square_open",
+								"bh_square_close",
+								"bh_square_content",
+								"bh_double_quote",
+								"bh_double_quote_center",
+								"bh_double_quote_open",
+								"bh_double_quote_close",
+								"bh_double_quote_content",
+								"bh_default",
+								"bh_default_center",
+								"bh_default_open",
+								"bh_default_close",
+								"bh_default_content",
 								"bh_tag",
 								"bh_tag_center",
 								"bh_tag_open",
 								"bh_tag_close",
 								"bh_tag_content",
-								"bh_double_quote",
-								"bh_double_quote_center",
-								"bh_double_quote_open",
-								"bh_double_quote_close",
-								"bh_double_quote_content"
+								"bh_round",
+								"bh_round_center",
+								"bh_round_open",
+								"bh_round_close",
+								"bh_round_content",
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
+								"bh_regex_content",
+								"bh_single_quote",
+								"bh_single_quote_center",
+								"bh_single_quote_open",
+								"bh_single_quote_close",
+								"bh_single_quote_content",
+								"bh_unmatched",
+								"bh_unmatched_center",
+								"bh_unmatched_open",
+								"bh_unmatched_close",
+								"bh_unmatched_content"
 							],
 							"color_scheme": "Packages/User/Color Highlighter/themes/Monokai Extended Bright (SL).tmTheme",
 							"syntax": "Packages/Text/Plain text.tmLanguage",
@@ -1697,132 +1717,24 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 6,
+					"stack_index": 0,
 					"type": "text"
 				},
 				{
 					"buffer": 1,
-					"file": "apps/admin/site.py",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 8452,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								8452,
-								8452
-							]
-						],
-						"settings":
-						{
-							"bracket_highlighter.busy": false,
-							"bracket_highlighter.locations":
-							{
-								"close":
-								{
-								},
-								"icon":
-								{
-								},
-								"open":
-								{
-								},
-								"unmatched":
-								{
-								}
-							},
-							"bracket_highlighter.regions":
-							[
-								"bh_round",
-								"bh_round_center",
-								"bh_round_open",
-								"bh_round_close",
-								"bh_round_content",
-								"bh_single_quote",
-								"bh_single_quote_center",
-								"bh_single_quote_open",
-								"bh_single_quote_close",
-								"bh_single_quote_content",
-								"bh_square",
-								"bh_square_center",
-								"bh_square_open",
-								"bh_square_close",
-								"bh_square_content",
-								"bh_unmatched",
-								"bh_unmatched_center",
-								"bh_unmatched_open",
-								"bh_unmatched_close",
-								"bh_unmatched_content",
-								"bh_default",
-								"bh_default_center",
-								"bh_default_open",
-								"bh_default_close",
-								"bh_default_content",
-								"bh_angle",
-								"bh_angle_center",
-								"bh_angle_open",
-								"bh_angle_close",
-								"bh_angle_content",
-								"bh_c_define",
-								"bh_c_define_center",
-								"bh_c_define_open",
-								"bh_c_define_close",
-								"bh_c_define_content",
-								"bh_curly",
-								"bh_curly_center",
-								"bh_curly_open",
-								"bh_curly_close",
-								"bh_curly_content",
-								"bh_regex",
-								"bh_regex_center",
-								"bh_regex_open",
-								"bh_regex_close",
-								"bh_regex_content",
-								"bh_tag",
-								"bh_tag_center",
-								"bh_tag_open",
-								"bh_tag_close",
-								"bh_tag_content",
-								"bh_double_quote",
-								"bh_double_quote_center",
-								"bh_double_quote_open",
-								"bh_double_quote_close",
-								"bh_double_quote_content"
-							],
-							"color_scheme": "Packages/User/Color Highlighter/themes/Monokai Extended Bright (SL).tmTheme",
-							"editorconfig": true,
-							"ensure_newline_at_eof_on_save": true,
-							"syntax": "Packages/Djaneiro/Syntaxes/Python Django.tmLanguage",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true,
-							"trim_trailing_white_space_on_save": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 1158.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 1,
-					"type": "text"
-				},
-				{
-					"buffer": 2,
 					"file": "apps/admin/admin.py",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 8005,
+						"buffer_size": 6902,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								6833,
-								6833
+								3625,
+								3625
 							]
 						],
 						"settings":
@@ -1834,8 +1746,8 @@
 								{
 									"1":
 									[
-										6847,
-										6848
+										4526,
+										4527
 									]
 								},
 								"icon":
@@ -1850,8 +1762,8 @@
 								{
 									"1":
 									[
-										6833,
-										6834
+										3049,
+										3050
 									]
 								},
 								"unmatched":
@@ -1860,36 +1772,6 @@
 							},
 							"bracket_highlighter.regions":
 							[
-								"bh_round",
-								"bh_round_center",
-								"bh_round_open",
-								"bh_round_close",
-								"bh_round_content",
-								"bh_single_quote",
-								"bh_single_quote_center",
-								"bh_single_quote_open",
-								"bh_single_quote_close",
-								"bh_single_quote_content",
-								"bh_square",
-								"bh_square_center",
-								"bh_square_open",
-								"bh_square_close",
-								"bh_square_content",
-								"bh_unmatched",
-								"bh_unmatched_center",
-								"bh_unmatched_open",
-								"bh_unmatched_close",
-								"bh_unmatched_content",
-								"bh_default",
-								"bh_default_center",
-								"bh_default_open",
-								"bh_default_close",
-								"bh_default_content",
-								"bh_angle",
-								"bh_angle_center",
-								"bh_angle_open",
-								"bh_angle_close",
-								"bh_angle_content",
 								"bh_c_define",
 								"bh_c_define_center",
 								"bh_c_define_open",
@@ -1900,21 +1782,51 @@
 								"bh_curly_open",
 								"bh_curly_close",
 								"bh_curly_content",
-								"bh_regex",
-								"bh_regex_center",
-								"bh_regex_open",
-								"bh_regex_close",
-								"bh_regex_content",
+								"bh_angle",
+								"bh_angle_center",
+								"bh_angle_open",
+								"bh_angle_close",
+								"bh_angle_content",
+								"bh_square",
+								"bh_square_center",
+								"bh_square_open",
+								"bh_square_close",
+								"bh_square_content",
+								"bh_double_quote",
+								"bh_double_quote_center",
+								"bh_double_quote_open",
+								"bh_double_quote_close",
+								"bh_double_quote_content",
+								"bh_default",
+								"bh_default_center",
+								"bh_default_open",
+								"bh_default_close",
+								"bh_default_content",
 								"bh_tag",
 								"bh_tag_center",
 								"bh_tag_open",
 								"bh_tag_close",
 								"bh_tag_content",
-								"bh_double_quote",
-								"bh_double_quote_center",
-								"bh_double_quote_open",
-								"bh_double_quote_close",
-								"bh_double_quote_content"
+								"bh_round",
+								"bh_round_center",
+								"bh_round_open",
+								"bh_round_close",
+								"bh_round_content",
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
+								"bh_regex_content",
+								"bh_single_quote",
+								"bh_single_quote_center",
+								"bh_single_quote_open",
+								"bh_single_quote_close",
+								"bh_single_quote_content",
+								"bh_unmatched",
+								"bh_unmatched_center",
+								"bh_unmatched_open",
+								"bh_unmatched_close",
+								"bh_unmatched_content"
 							],
 							"color_scheme": "Packages/User/Color Highlighter/themes/Monokai Extended Bright (SL).tmTheme",
 							"editorconfig": true,
@@ -1925,10 +1837,134 @@
 							"trim_trailing_white_space_on_save": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 2110.0,
+						"translation.y": 1680.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 2,
+					"stack_index": 4,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "apps/admin/templates/admin/admin/changelist.html",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 7537,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								985,
+								985
+							]
+						],
+						"settings":
+						{
+							"bracket_highlighter.busy": false,
+							"bracket_highlighter.locations":
+							{
+								"close":
+								{
+									"1":
+									[
+										986,
+										987
+									]
+								},
+								"icon":
+								{
+									"1":
+									[
+										"Packages/BracketHighlighter/icons/curly_bracket.png",
+										"brackethighlighter.default"
+									]
+								},
+								"open":
+								{
+									"1":
+									[
+										976,
+										977
+									]
+								},
+								"unmatched":
+								{
+								}
+							},
+							"bracket_highlighter.regions":
+							[
+								"bh_c_define",
+								"bh_c_define_center",
+								"bh_c_define_open",
+								"bh_c_define_close",
+								"bh_c_define_content",
+								"bh_curly",
+								"bh_curly_center",
+								"bh_curly_open",
+								"bh_curly_close",
+								"bh_curly_content",
+								"bh_angle",
+								"bh_angle_center",
+								"bh_angle_open",
+								"bh_angle_close",
+								"bh_angle_content",
+								"bh_square",
+								"bh_square_center",
+								"bh_square_open",
+								"bh_square_close",
+								"bh_square_content",
+								"bh_double_quote",
+								"bh_double_quote_center",
+								"bh_double_quote_open",
+								"bh_double_quote_close",
+								"bh_double_quote_content",
+								"bh_default",
+								"bh_default_center",
+								"bh_default_open",
+								"bh_default_close",
+								"bh_default_content",
+								"bh_tag",
+								"bh_tag_center",
+								"bh_tag_open",
+								"bh_tag_close",
+								"bh_tag_content",
+								"bh_round",
+								"bh_round_center",
+								"bh_round_open",
+								"bh_round_close",
+								"bh_round_content",
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
+								"bh_regex_content",
+								"bh_single_quote",
+								"bh_single_quote_center",
+								"bh_single_quote_open",
+								"bh_single_quote_close",
+								"bh_single_quote_content",
+								"bh_unmatched",
+								"bh_unmatched_center",
+								"bh_unmatched_open",
+								"bh_unmatched_close",
+								"bh_unmatched_content"
+							],
+							"color_scheme": "Packages/User/Color Highlighter/themes/Monokai Extended Bright (SL).tmTheme",
+							"editorconfig": true,
+							"ensure_newline_at_eof_on_save": true,
+							"is_xml": false,
+							"syntax": "Packages/Djaneiro/Syntaxes/HTML (Django).tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true,
+							"trim_trailing_white_space_on_save": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 84.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 3,
 					"type": "text"
 				},
 				{
@@ -1937,15 +1973,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 7571,
+						"buffer_size": 12401,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								3020,
-								3020
+								2851,
+								2851
 							]
 						],
 						"settings":
@@ -1955,12 +1991,27 @@
 							{
 								"close":
 								{
+									"1":
+									[
+										2857,
+										2858
+									]
 								},
 								"icon":
 								{
+									"1":
+									[
+										"Packages/BracketHighlighter/icons/round_bracket.png",
+										"brackethighlighter.default"
+									]
 								},
 								"open":
 								{
+									"1":
+									[
+										2836,
+										2837
+									]
 								},
 								"unmatched":
 								{
@@ -1968,36 +2019,6 @@
 							},
 							"bracket_highlighter.regions":
 							[
-								"bh_round",
-								"bh_round_center",
-								"bh_round_open",
-								"bh_round_close",
-								"bh_round_content",
-								"bh_single_quote",
-								"bh_single_quote_center",
-								"bh_single_quote_open",
-								"bh_single_quote_close",
-								"bh_single_quote_content",
-								"bh_square",
-								"bh_square_center",
-								"bh_square_open",
-								"bh_square_close",
-								"bh_square_content",
-								"bh_unmatched",
-								"bh_unmatched_center",
-								"bh_unmatched_open",
-								"bh_unmatched_close",
-								"bh_unmatched_content",
-								"bh_default",
-								"bh_default_center",
-								"bh_default_open",
-								"bh_default_close",
-								"bh_default_content",
-								"bh_angle",
-								"bh_angle_center",
-								"bh_angle_open",
-								"bh_angle_close",
-								"bh_angle_content",
 								"bh_c_define",
 								"bh_c_define_center",
 								"bh_c_define_open",
@@ -2008,21 +2029,51 @@
 								"bh_curly_open",
 								"bh_curly_close",
 								"bh_curly_content",
-								"bh_regex",
-								"bh_regex_center",
-								"bh_regex_open",
-								"bh_regex_close",
-								"bh_regex_content",
+								"bh_angle",
+								"bh_angle_center",
+								"bh_angle_open",
+								"bh_angle_close",
+								"bh_angle_content",
+								"bh_square",
+								"bh_square_center",
+								"bh_square_open",
+								"bh_square_close",
+								"bh_square_content",
+								"bh_double_quote",
+								"bh_double_quote_center",
+								"bh_double_quote_open",
+								"bh_double_quote_close",
+								"bh_double_quote_content",
+								"bh_default",
+								"bh_default_center",
+								"bh_default_open",
+								"bh_default_close",
+								"bh_default_content",
 								"bh_tag",
 								"bh_tag_center",
 								"bh_tag_open",
 								"bh_tag_close",
 								"bh_tag_content",
-								"bh_double_quote",
-								"bh_double_quote_center",
-								"bh_double_quote_open",
-								"bh_double_quote_close",
-								"bh_double_quote_content"
+								"bh_round",
+								"bh_round_center",
+								"bh_round_open",
+								"bh_round_close",
+								"bh_round_content",
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
+								"bh_regex_content",
+								"bh_single_quote",
+								"bh_single_quote_center",
+								"bh_single_quote_open",
+								"bh_single_quote_close",
+								"bh_single_quote_content",
+								"bh_unmatched",
+								"bh_unmatched_center",
+								"bh_unmatched_open",
+								"bh_unmatched_close",
+								"bh_unmatched_content"
 							],
 							"color_scheme": "Packages/User/Color Highlighter/themes/Monokai Extended Bright (SL).tmTheme",
 							"editorconfig": true,
@@ -2033,265 +2084,27 @@
 							"trim_trailing_white_space_on_save": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 1442.0,
+						"translation.y": 1190.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 4,
+					"stack_index": 1,
 					"type": "text"
 				},
 				{
 					"buffer": 4,
-					"file": "apps/admin/templates/admin/admin/changelist.html",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 7129,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								378,
-								378
-							]
-						],
-						"settings":
-						{
-							"bracket_highlighter.busy": false,
-							"bracket_highlighter.locations":
-							{
-								"close":
-								{
-									"1":
-									[
-										378,
-										379
-									]
-								},
-								"icon":
-								{
-									"1":
-									[
-										"Packages/BracketHighlighter/icons/double_quote.png",
-										"brackethighlighter.default"
-									]
-								},
-								"open":
-								{
-									"1":
-									[
-										357,
-										358
-									]
-								},
-								"unmatched":
-								{
-								}
-							},
-							"bracket_highlighter.regions":
-							[
-								"bh_round",
-								"bh_round_center",
-								"bh_round_open",
-								"bh_round_close",
-								"bh_round_content",
-								"bh_single_quote",
-								"bh_single_quote_center",
-								"bh_single_quote_open",
-								"bh_single_quote_close",
-								"bh_single_quote_content",
-								"bh_square",
-								"bh_square_center",
-								"bh_square_open",
-								"bh_square_close",
-								"bh_square_content",
-								"bh_unmatched",
-								"bh_unmatched_center",
-								"bh_unmatched_open",
-								"bh_unmatched_close",
-								"bh_unmatched_content",
-								"bh_default",
-								"bh_default_center",
-								"bh_default_open",
-								"bh_default_close",
-								"bh_default_content",
-								"bh_angle",
-								"bh_angle_center",
-								"bh_angle_open",
-								"bh_angle_close",
-								"bh_angle_content",
-								"bh_c_define",
-								"bh_c_define_center",
-								"bh_c_define_open",
-								"bh_c_define_close",
-								"bh_c_define_content",
-								"bh_curly",
-								"bh_curly_center",
-								"bh_curly_open",
-								"bh_curly_close",
-								"bh_curly_content",
-								"bh_regex",
-								"bh_regex_center",
-								"bh_regex_open",
-								"bh_regex_close",
-								"bh_regex_content",
-								"bh_tag",
-								"bh_tag_center",
-								"bh_tag_open",
-								"bh_tag_close",
-								"bh_tag_content",
-								"bh_double_quote",
-								"bh_double_quote_center",
-								"bh_double_quote_open",
-								"bh_double_quote_close",
-								"bh_double_quote_content"
-							],
-							"color_scheme": "Packages/User/Color Highlighter/themes/Monokai Extended Bright (SL).tmTheme",
-							"editorconfig": true,
-							"ensure_newline_at_eof_on_save": true,
-							"is_xml": false,
-							"syntax": "Packages/Djaneiro/Syntaxes/HTML (Django).tmLanguage",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true,
-							"trim_trailing_white_space_on_save": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 14.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 3,
-					"type": "text"
-				},
-				{
-					"buffer": 5,
-					"file": "apps/admin/templates/admin/admin/index.html",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 8152,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								2801,
-								2801
-							]
-						],
-						"settings":
-						{
-							"bracket_highlighter.busy": false,
-							"bracket_highlighter.locations":
-							{
-								"close":
-								{
-								},
-								"icon":
-								{
-								},
-								"open":
-								{
-								},
-								"unmatched":
-								{
-									"1":
-									[
-										2797,
-										2800
-									]
-								}
-							},
-							"bracket_highlighter.regions":
-							[
-								"bh_round",
-								"bh_round_center",
-								"bh_round_open",
-								"bh_round_close",
-								"bh_round_content",
-								"bh_single_quote",
-								"bh_single_quote_center",
-								"bh_single_quote_open",
-								"bh_single_quote_close",
-								"bh_single_quote_content",
-								"bh_square",
-								"bh_square_center",
-								"bh_square_open",
-								"bh_square_close",
-								"bh_square_content",
-								"bh_unmatched",
-								"bh_unmatched_center",
-								"bh_unmatched_open",
-								"bh_unmatched_close",
-								"bh_unmatched_content",
-								"bh_default",
-								"bh_default_center",
-								"bh_default_open",
-								"bh_default_close",
-								"bh_default_content",
-								"bh_angle",
-								"bh_angle_center",
-								"bh_angle_open",
-								"bh_angle_close",
-								"bh_angle_content",
-								"bh_c_define",
-								"bh_c_define_center",
-								"bh_c_define_open",
-								"bh_c_define_close",
-								"bh_c_define_content",
-								"bh_curly",
-								"bh_curly_center",
-								"bh_curly_open",
-								"bh_curly_close",
-								"bh_curly_content",
-								"bh_regex",
-								"bh_regex_center",
-								"bh_regex_open",
-								"bh_regex_close",
-								"bh_regex_content",
-								"bh_tag",
-								"bh_tag_center",
-								"bh_tag_open",
-								"bh_tag_close",
-								"bh_tag_content",
-								"bh_double_quote",
-								"bh_double_quote_center",
-								"bh_double_quote_open",
-								"bh_double_quote_close",
-								"bh_double_quote_content"
-							],
-							"color_scheme": "Packages/User/Color Highlighter/themes/Monokai Extended Bright (SL).tmTheme",
-							"editorconfig": true,
-							"ensure_newline_at_eof_on_save": true,
-							"is_xml": false,
-							"syntax": "Packages/Djaneiro/Syntaxes/HTML (Django).tmLanguage",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true,
-							"trim_trailing_white_space_on_save": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 0,
-					"type": "text"
-				},
-				{
-					"buffer": 6,
 					"file": "apps/users/admin.py",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 16115,
+						"buffer_size": 16158,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								12270,
-								12270
+								11743,
+								11743
 							]
 						],
 						"settings":
@@ -2301,27 +2114,12 @@
 							{
 								"close":
 								{
-									"1":
-									[
-										12270,
-										12271
-									]
 								},
 								"icon":
 								{
-									"1":
-									[
-										"Packages/BracketHighlighter/icons/single_quote.png",
-										"brackethighlighter.default"
-									]
 								},
 								"open":
 								{
-									"1":
-									[
-										12247,
-										12248
-									]
 								},
 								"unmatched":
 								{
@@ -2329,36 +2127,6 @@
 							},
 							"bracket_highlighter.regions":
 							[
-								"bh_round",
-								"bh_round_center",
-								"bh_round_open",
-								"bh_round_close",
-								"bh_round_content",
-								"bh_single_quote",
-								"bh_single_quote_center",
-								"bh_single_quote_open",
-								"bh_single_quote_close",
-								"bh_single_quote_content",
-								"bh_square",
-								"bh_square_center",
-								"bh_square_open",
-								"bh_square_close",
-								"bh_square_content",
-								"bh_unmatched",
-								"bh_unmatched_center",
-								"bh_unmatched_open",
-								"bh_unmatched_close",
-								"bh_unmatched_content",
-								"bh_default",
-								"bh_default_center",
-								"bh_default_open",
-								"bh_default_close",
-								"bh_default_content",
-								"bh_angle",
-								"bh_angle_center",
-								"bh_angle_open",
-								"bh_angle_close",
-								"bh_angle_content",
 								"bh_c_define",
 								"bh_c_define_center",
 								"bh_c_define_open",
@@ -2369,21 +2137,51 @@
 								"bh_curly_open",
 								"bh_curly_close",
 								"bh_curly_content",
-								"bh_regex",
-								"bh_regex_center",
-								"bh_regex_open",
-								"bh_regex_close",
-								"bh_regex_content",
+								"bh_angle",
+								"bh_angle_center",
+								"bh_angle_open",
+								"bh_angle_close",
+								"bh_angle_content",
+								"bh_square",
+								"bh_square_center",
+								"bh_square_open",
+								"bh_square_close",
+								"bh_square_content",
+								"bh_double_quote",
+								"bh_double_quote_center",
+								"bh_double_quote_open",
+								"bh_double_quote_close",
+								"bh_double_quote_content",
+								"bh_default",
+								"bh_default_center",
+								"bh_default_open",
+								"bh_default_close",
+								"bh_default_content",
 								"bh_tag",
 								"bh_tag_center",
 								"bh_tag_open",
 								"bh_tag_close",
 								"bh_tag_content",
-								"bh_double_quote",
-								"bh_double_quote_center",
-								"bh_double_quote_open",
-								"bh_double_quote_close",
-								"bh_double_quote_content"
+								"bh_round",
+								"bh_round_center",
+								"bh_round_open",
+								"bh_round_close",
+								"bh_round_content",
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
+								"bh_regex_content",
+								"bh_single_quote",
+								"bh_single_quote_center",
+								"bh_single_quote_open",
+								"bh_single_quote_close",
+								"bh_single_quote_content",
+								"bh_unmatched",
+								"bh_unmatched_center",
+								"bh_unmatched_open",
+								"bh_unmatched_close",
+								"bh_unmatched_content"
 							],
 							"color_scheme": "Packages/User/Color Highlighter/themes/Monokai Extended Bright (SL).tmTheme",
 							"editorconfig": true,
@@ -2394,10 +2192,10 @@
 							"trim_trailing_white_space_on_save": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 960.0,
+						"translation.y": 5418.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 5,
+					"stack_index": 2,
 					"type": "text"
 				}
 			]
@@ -2405,7 +2203,7 @@
 	],
 	"incremental_find":
 	{
-		"height": 48.0
+		"height": 27.0
 	},
 	"input":
 	{

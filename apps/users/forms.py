@@ -5,7 +5,9 @@ from django.conf import settings
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
 from django.contrib.auth import password_validation
 
-from utils.django.widgets import HorizontalRadioSelect
+from utils.django.widgets import HorizontalRadioSelect, AutosizedTextarea
+
+from apps.admin.forms import AddModelForm
 
 # from passwords.fields import PasswordField
 # from passwords.validators import (
@@ -102,21 +104,15 @@ class UserChangeForm(forms.ModelForm):
         return self.initial["password"]
 
 
-class LevelAdminModelForm(forms.ModelForm):
+class LevelAdminModelForm(AddModelForm):
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    fields_without_classes = ('color', )
+    disabled_fields = ('slug', )
 
-        self.fields['name'].widget.attrs['class'] = 'span3'
-        self.fields['name'].widget.attrs['placeholder'] = _('Enter name')
-
-    # class Meta:
-    #     widgets = {
-    #         'description': AutosizedTextarea(attrs={
-    #             'class': 'span12',
-    #             'placeholder': _('Enter description'),
-    #         })
-    #     }
+    class Meta:
+        widgets = {
+            'description': AutosizedTextarea(),
+        }
 
 
 class ProfileAdminModelForm(forms.ModelForm):

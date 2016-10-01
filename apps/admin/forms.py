@@ -2,6 +2,7 @@
 from django.contrib.auth import authenticate
 from django.utils.translation import ugettext_lazy as _
 from django import forms
+from django.utils.html import mark_safe
 
 
 class LoginForm(forms.Form):
@@ -66,3 +67,57 @@ class LoginForm(forms.Form):
 class LogoutForm(forms.Form):
 
     pass
+
+
+class AddModelForm(forms.ModelForm):
+
+    fields_without_classes = tuple()
+    disabled_fields = tuple()
+    fields_placeholders = tuple()
+    addons = dict()
+
+    def __init__(self, *args, **kwargs):
+
+        super().__init__(*args, **kwargs)
+
+        if self.fields_without_classes is not '__all__':
+
+            for name, field in self.fields.items():
+
+                if name in self.fields_without_classes:
+                    continue
+
+                classes = getattr(field.widget.attrs, 'class', [])
+                classes.append('form-control')
+
+                field.widget.attrs['class'] = ' '.join(classes)
+
+                if name in self.disabled_fields:
+                    field.disabled = True
+
+                verbose_name = self.Meta.model._meta.get_field(name).verbose_name
+
+                field.widget.attrs['placeholder'] = 'Enter {}'.format(verbose_name.lower())
+
+                field.help_text = self._get_help_text_to_field(field)
+
+    @staticmethod
+    def _get_help_text_to_field(field):
+
+        help_text = field.help_text + '<br />' if field.help_text else ''
+
+        min_length = getattr(field, 'min_length', -1)
+        max_length = getattr(field, 'max_length', -1)
+
+        if (min_length == -1 and max_length == -1) or (min_length is None and max_length is None):
+            length_help_text = ''
+        # elif min_length is not None and max_length is None:
+        #     length_help_text = 'Length from {} characters.'.format(min_length)
+        elif min_length is None and max_length > 1:
+            length_help_text = 'Length not more then {} characters.'.format(max_length)
+        else:
+            length_help_text = 'Length from {} to {} characters.'.format(min_length, max_length)
+
+        help_text = mark_safe(help_text + length_help_text)
+
+        return help_text

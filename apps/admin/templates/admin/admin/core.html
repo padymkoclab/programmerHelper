@@ -13,7 +13,17 @@
   <link rel="stylesheet" href="{% static 'vendor/bootstrap/dist/css/bootstrap-theme.min.css' %}">
   <link rel="stylesheet" href="{% static 'vendor/font-awesome/css/font-awesome.min.css' %}">
 
+  <!-- JS libraries -->
+  <script src="{% static 'vendor/jquery/dist/jquery.min.js' %}" type="text/javascript" charset="utf-8"></script>
+  <script src="{% static 'vendor/jquery-ui/jquery-ui.min.js' %}" type="text/javascript" charset="utf-8"></script>
+  <script src="{% static 'vendor/bootstrap/dist/js/bootstrap.min.js' %}" type="text/javascript" charset="utf-8"></script>
+
   {% block extra_css %}{% endblock extra_css %}
+
+  {% block extra_head %}
+  {{ form.media }}
+  {% endblock extra_head %}
+
 </head>
 <body>
 
@@ -21,11 +31,6 @@
 <div id="wrapper" class="">
   {% block wrapper %}{% endblock wrapper %}
 </div>
-
-<!-- JS libraries -->
-<script src="{% static 'vendor/jquery/dist/jquery.min.js' %}" type="text/javascript" charset="utf-8"></script>
-<script src="{% static 'vendor/jquery-ui/jquery-ui.min.js' %}" type="text/javascript" charset="utf-8"></script>
-<script src="{% static 'vendor/bootstrap/dist/js/bootstrap.min.js' %}" type="text/javascript" charset="utf-8"></script>
 
 {% block extra_js %}{% endblock extra_js %}
 
