@@ -4,6 +4,8 @@
 {% load i18n %}
 {% load static %}
 
+{% load admin_filters %}
+
 {% block extra_css %}
   {{ block.super }}
   <link rel="stylesheet" href="{% static 'admin/admin/css/changelist.css' %}">
@@ -11,7 +13,7 @@
 
 {% block breadcrumbs %}
   <li><a href="{{ index_url }}">{% trans "Home" %}</a></li>
-  <li><a href="{{ app_index_url }}">{{ model_meta.app_config.verbose_name|capfirst }}</a></li>
+  <li><a href="{{ model_meta|get_admin_url:'app' }}">{{ model_meta.app_config.verbose_name|capfirst }}</a></li>
   <li class="active">{{ model_meta.verbose_name_plural|capfirst }}</li>
 {% endblock breadcrumbs %}
 
@@ -29,7 +31,7 @@
         <a href="{% url 'admin:export' %}" class="btn btn-danger">{% trans "Export" %}</a>
         <a href="{% url 'admin:import' %}" class="btn btn-danger">{% trans "Import" %}</a>
         {% if has_add_permission is True %}
-          <a href="{{ add_url }}" class="btn btn-success">{% trans "Add " %} {{ model_meta.verbose_name|lower }}</a>
+          <a href="{{ model_meta|get_admin_url:'add' }}" class="btn btn-success">{% trans "Add " %} {{ model_meta.verbose_name|lower }}</a>
         {% endif %}
       </div>
     </div>

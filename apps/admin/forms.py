@@ -121,3 +121,43 @@ class AddModelForm(forms.ModelForm):
         help_text = mark_safe(help_text + length_help_text)
 
         return help_text
+
+
+class AddChangeDisplayForm:
+
+    def __init__(self, form, fieldsets):
+        self.fieldsets = fieldsets
+        self.form = form
+
+    def __iter__(self):
+
+        for name, options in self.fieldsets:
+            yield FieldSet(self.form, name, **options)
+
+
+class FieldSet:
+
+    def __init__(self, form, name, fields, classes=None, description=None):
+        self.form = form
+        self.name = name
+        self.fields = fields
+        self.classes = classes
+        self.description = description
+
+    def __iter__(self):
+        for field in self.fields:
+            yield FieldSetLine(self.form, field)
+
+
+class FieldSetLine:
+
+    def __init__(self, form, field):
+        self.field = form[field]
+
+    def __str__(self):
+        return str(self.field)
+
+    def label_tag(self):
+
+        # override label_tag on BoundField
+        return self.field.label_tag(attrs={'class': 'col-xs-2 control-label'})

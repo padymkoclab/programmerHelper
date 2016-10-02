@@ -5,100 +5,116 @@
 {% load static %}
 
 {% load admin_filters %}
+{% load utils_filters %}
+{% load admin_tags %}
 
 {% block extra_css %}
   {{ block.super }}
   <link rel="stylesheet" href="{% static 'admin/admin/css/add_form.css' %}">
 {% endblock extra_css %}
 
+{% block extra_head %}
+  {{ block.super }}
+  <script src="{% static 'admin/admin/js/prepopulated_fields.js' %}"></script>
+{% endblock extra_head %}
+
 
 {% block breadcrumbs %}
   <li><a href="{{ index_url }}">{% trans "Home" %}</a></li>
-  <li><a href="{{ app_index_url }}">{{ model_meta.app_config.verbose_name|capfirst }}</a></li>
+  <li><a href="{{ model_meta|get_admin_url:'app' }}">{{ model_meta.app_config.verbose_name|capfirst }}</a></li>
+  <li><a href="{{ model_meta|get_admin_url:'changelist' }}">{{ model_meta.verbose_name_plural|capfirst }}</a></li>
   <li class="active">{% trans "Add" %} {{ model_meta.verbose_name|lower }}</li>
 {% endblock breadcrumbs %}
 
 
 {% block content %}
-
   {{ block.super }}
 
   <form action="" method="POST" {% if form.is_multipart %}enctype="multipart/form-data"{% endif %} class="form-horizontal" id="form_add">
-    {% csrf_token %}
+  {% csrf_token %}
+    {% for fieldset in form %}
+      <fieldset class="{{ fieldset.classes }}">
 
-    {% if form.non_field_errors %}
-      {% for error in form.non_field_errors %}
-        <p class="text-danger">{{ error }}</p>
-      {% endfor %}
-    {% endif %}
+      {% if fieldset.name %}
+        <legend>{{ fieldset.name }}</legend>
+      {% endif %}
+      {% if fieldset.description %}
+        <p class="text-info">{{ fieldset.description }}</p>
+      {% endif %}
 
-    {% for field in form %}
-
-      {% if field.is_hidden is False %}
-
-        {% if field.errors %}
-          {% for error in field.errors %}
+        {{ fieldset.form.non_field_errors }}
+        {% if fieldset.form.non_field_errors %}
+          {% for error in fieldset.form.non_field_errors %}
             <p class="text-danger">{{ error }}</p>
           {% endfor %}
         {% endif %}
 
-        {% comment %}
-          Made own templatetag for addons
-        {% endcomment %}
+          {% for fieldline in fieldset %}
+            <div class="form-group">
 
-        <div class="form-group">
+              {{ fieldline.label_tag }}
 
-          <label for="{{ field.id_for_label }}" class="col-xs-2 control-label">{{ field.label }} {{ form.label_suffix }}</label>
+              <div class="col-xs-10">
 
-          <div class="col-xs-10">
-
-            {% with form.addons|get_item_by_key:field.name as addons %}
-
-              {% if addons != '' %}
-                <div class="input-group">
-                  {% if addons.left %}
-                    <div class="input-group-addon">{{ addons.left}}</div>
-                  {% endif %}
-                  {{ field }}
-                  {% if addons.right %}
-                    <div class="input-group-addon">{{ addons.right}}</div>
-                  {% endif %}
-                </div>
-
-              {% else %}
-                {{ field }}
+              {% if fieldline.field.is_hidden is True %}
+                <p class="danger">This field is hidden</p>
               {% endif %}
 
-            {% endwith %}
+                {% if fieldline.field.errors %}
+                  {% for error in fieldline.field.errors %}
+                    <p class="text-danger">{{ error }}</p>
+                  {% endfor %}
+                {% endif %}
 
-            {% if field.help_text %}
-              <p class="help-block">{{ field.help_text }}</p>
-            {% endif %}
+                {% with fieldset.form.addons|get_item_by_key:fieldline.field.name as addons %}
 
-          </div>
+                  {% if addons != '' %}
+                    <div class="input-group">
+                      {% if addons.left %}
+                        <div class="input-group-addon">{{ addons.left }}</div>
+                      {% endif %}
+                      {{ fieldline.field }}
+                      {% if addons.right %}
+                        <div class="input-group-addon">{{ addons.right }}</div>
+                      {% endif %}
+                    </div>
 
-        </div>
+                  {% else %}
+                    {{ fieldline.field }}
+                  {% endif %}
 
+                {% endwith %}
 
+                {% if fieldline.field.help_text %}
+                  <p class="help-block">{{ fieldline.field.help_text }}</p>
+                {% endif %}
+
+              </div>
+            </div>
+          {% endfor %}
+      </fieldset>
+    {% endfor %}
+
+    <div class="row">
+      <div class="col-xs-12 text-right">
+        <button class="btn btn-primary" type="submit" id="" name="_clicked_button" value="save">{% trans "Save" %}</button>
+        <button class="btn btn-primary" type="submit" id="" name="_clicked_button" value="save_and_continue">{% trans "Save and continue" %}</button>
+        <button class="btn btn-primary" type="submit" id="" name="_clicked_button" value="save_and_add_another">{% trans "Save and add another" %}</button>
+      </div>
+    </div>
+
+  </form>
+
+<!--
       {% comment %}
+      Made own templatetag for addons
       <p>Name {{ field.name }}</p>
       <p>Value {{ field.value }}</p>
       <p>Initial {{ field.initial }}</p>
       <p>Css_classes {{ field.css_classes }}</p>
       {% endcomment %}
+-->
 
-      {% endif %}
-
-    {% endfor %}
-
-  <div class="row">
-    <div class="col-xs-12 text-right">
-      <button class="btn btn-primary" type="submit" id="">{% trans "Save" %}</button>
-      <button class="btn btn-primary" type="submit" id="">{% trans "Save and continue" %}</button>
-      <button class="btn btn-primary" type="submit" id="">{% trans "Save and add another" %}</button>
-    </div>
-  </div>
-
-  </form>
+  {% prepopulated_fields_js %}
 
 {% endblock content %}

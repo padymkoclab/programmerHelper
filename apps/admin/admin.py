@@ -1,4 +1,5 @@
 
+from django import forms
 from django.contrib.admin.checks import (
     BaseModelAdminChecks, InlineModelAdminChecks, ModelAdminChecks,
 )
@@ -15,6 +16,9 @@ from django.utils.translation import (
 from django.views.decorators.csrf import csrf_protect
 from django.views.generic import RedirectView
 
+from utils.python.utils import flatten
+
+from .forms import AddModelForm
 from .decorators import admin_staff_member_required
 from .views import AddView, ChangeListView, ChangeView, HistoryView, DeleteView
 
@@ -36,20 +40,16 @@ class CheckModelAdmin:
 class ModelAdmin:
 
     # raw_id_fields = ()
-    # fields = None
     # exclude = None
-    # fieldsets = None
-    # form = forms.ModelForm
     # filter_vertical = ()
     # filter_horizontal = ()
     # radio_fields = {}
-    # prepopulated_fields = {}
     # formfield_overrides = {}
     # readonly_fields = ()
-    # ordering = None
     # view_on_site = True
     # show_full_result_count = True
 
+    form = AddModelForm
     list_display = ('__str__', )
     list_display_styles = (
         (
@@ -58,9 +58,13 @@ class ModelAdmin:
             }
         ),
     )
-    colored_rows_by = str()
-    ordering = tuple()
-    disabled_urls = tuple()
+    colored_rows_by = ''
+    ordering = ()
+    disabled_urls = ()
+    prepopulated_fields = {}
+    fields = ()
+    fieldsets = ()
+
     # list_display_links = ()
     # list_filter = ()
     # list_select_related = False
@@ -100,42 +104,42 @@ class ModelAdmin:
         self.site_admin = site_admin
 
     def __str__(self):
-        return 'ERRRO'.format()
+        return 'Admin model class "{}" for a model "{}"'.format(self.__class__.__name__, self.model)
 
     def check(self, **kwargs):
         return self.checks_class().check(self, **kwargs)
 
     def get_urls(self):
 
-        app_label, model_name = self.model._meta.app_label, self.model._meta.model_name
+        info = self.model._meta.app_label, self.model._meta.model_name
 
         urls = dict(
             changelist=url(
-                regex=r'^$', kwargs={}, name='{}_{}_changelist'.format(app_label, model_name),
+                regex=r'^$', kwargs={}, name='{}_{}_changelist'.format(*info),
                 view=admin_staff_member_required(
                     ChangeListView.as_view(site_admin=self.site_admin, model_admin=self)
                 ),
             ),
             add=url(
-                regex=r'^add/$', kwargs={}, name='{}_{}_add'.format(app_label, model_name),
+                regex=r'^add/$', kwargs={}, name='{}_{}_add'.format(*info),
                 view=admin_staff_member_required(
                     AddView.as_view(site_admin=self.site_admin, model_admin=self)
                 ),
             ),
             change=url(
-                regex=r'^(.+)/change/$', name='{}_{}_change'.format(app_label, model_name), kwargs={},
+                regex=r'^(?P<pk>.+)/change/$', name='{}_{}_change'.format(*info), kwargs={},
                 view=admin_staff_member_required(
                     ChangeView.as_view(site_admin=self.site_admin, model_admin=self)
                 ),
             ),
             history=url(
-                regex=r'^(.+)/history/$', name='{}_{}_history'.format(app_label, model_name), kwargs={},
+                regex=r'^(.+)/history/$', name='{}_{}_history'.format(*info), kwargs={},
                 view=admin_staff_member_required(
                     HistoryView.as_view(site_admin=self.site_admin, model_admin=self)
                 ),
             ),
             delete=url(
-                regex=r'^(.+)/delete/$', name='{}_{}_delete'.format(app_label, model_name), kwargs={},
+                regex=r'^(.+)/delete/$', name='{}_{}_delete'.format(*info), kwargs={},
                 view=admin_staff_member_required(
                     DeleteView.as_view(site_admin=self.site_admin, model_admin=self)
                 ),
@@ -210,6 +214,40 @@ class ModelAdmin:
     def get_colored_rows_by(self):
 
         return self.colored_rows_by
+
+    def get_prepopulated_fields(self):
+
+        return self.prepopulated_fields
+
+    def get_fields(self, request, obj=None):
+
+        return self.fields or ()
+
+    def get_fieldsets(self, request, obj=None):
+
+        if self.fieldsets:
+            return self.fieldsets
+
+        return (
+            (
+                None, {
+                    'fields': self.get_fields(request, obj),
+                }
+            ),
+        )
+
+    def get_form(self, request):
+
+        fields = self.get_fields(request)
+        fieldsets = self.get_fieldsets(request)
+
+        if not fields:
+            fields = tuple(flatten([options['fields'] for label, options in fieldsets]))
+
+        if not fields:
+            fields = forms.ALL_FIELDS
+
+        return forms.models.modelform_factory(self.model, fields=fields, form=self.form)
 
 
 class OtherAdmin:

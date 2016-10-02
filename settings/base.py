@@ -1,4 +1,6 @@
 
+from django.contrib.messages import constants as messages
+
 from unipath import Path
 
 from utils.django.utils import get_secret_value_for_setting_from_file
@@ -222,17 +224,17 @@ LOGGING = {
 # MESSAGES
 # -----------------------------
 
-# MESSAGE_LEVEL = 'messages.INFO'
+MESSAGE_LEVEL = messages.INFO
 
-# MESSAGE_STORAGE = 'django.contrib.messages.storage.fallback.FallbackStorage'
+MESSAGE_STORAGE = 'django.contrib.messages.storage.fallback.FallbackStorage'
 
-# MESSAGE_TAGS = {
-#     messages.DEBUG: 'debug',
-#     messages.INFO: 'info',
-#     messages.SUCCESS: 'success',
-#     messages.WARNING: 'warning',
-#     messages.ERROR: 'error',
-# }
+MESSAGE_TAGS = {
+    messages.DEBUG: 'debug',
+    messages.INFO: 'info',
+    messages.SUCCESS: 'success',
+    messages.WARNING: 'warning',
+    messages.ERROR: 'error',
+}
 
 # ----------------------------------------
 # GLOBALIZATION

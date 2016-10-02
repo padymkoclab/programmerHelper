@@ -168,17 +168,23 @@ class CategoryAdmin(ModelAdmin):
         fieldsets = [
             [
                 Category._meta.verbose_name, {
+                    'description': _("""
+                        I used to develop Django sites by running them on my OS X laptop locally and deploying to a
+                        Linode VPS.
+                        I had a whole section of this post written up about tricks and tips for working with that
+                        setup."""
+                                     ),
+                    'classes': _('text-success ', ),
                     'fields': [
                         'name',
                         'slug',
                         'description',
-                        'image',
                     ]
                 }
             ]
         ]
 
-        if obj:
+        if obj is not None:
             fieldsets.append([
                 _('Additional information'), {
                     'classes': ('collapse', ),

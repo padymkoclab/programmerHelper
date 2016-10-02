@@ -163,6 +163,18 @@
 
     <div id="inner-content">
 
+      {% block messages %}
+        <div id="messages">
+          {% if messages %}
+            <ul class="list-unstyled">
+              {% for message in messages %}
+                <li class="bg-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %}">{{ message }}</li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        </div>
+      {% endblock messages %}
+
       <div id="breadcrumb">
         <ol class="breadcrumb">
           {% block breadcrumbs %}
@@ -173,12 +185,7 @@
 
       {% block content %}
 
-      {% for i in avaliable_apps_with_models %}
-        {% for k, v in i.items %}
-          <p>{{ k }} {{ v }}</p>
-        {% endfor %}
-        <hr>
-      {% endfor %}
+
 
       {% endblock content %}
 
@@ -186,7 +193,16 @@
   </div>
 
 
-  {% block footer %}{% endblock footer %}
+  {% block footer %}
+
+  {% for i in avaliable_apps_with_models %}
+        {% for k, v in i.items %}
+          <p>{{ k }} {{ v }}</p>
+        {% endfor %}
+        <hr>
+      {% endfor %}
+
+{% endblock footer %}
 
 {% endblock wrapper %}
 

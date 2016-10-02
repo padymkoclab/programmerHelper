@@ -31,7 +31,10 @@ class Category(TimeStampedModel):
 
     name = models.CharField(
         _('Name'), max_length=100, unique=True,
-        validators=[MinLengthValidator(settings.MIN_LENGTH_FOR_NAME_OR_TITLE_OBJECT)]
+        validators=[MinLengthValidator(settings.MIN_LENGTH_FOR_NAME_OR_TITLE_OBJECT)],
+        error_messages={
+            'unique': _('Category with this name already exists.'),
+        }
     )
     slug = ConfiguredAutoSlugField(populate_from='name', unique=True)
     description = models.CharField(
