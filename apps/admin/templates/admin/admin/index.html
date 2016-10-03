@@ -4,6 +4,9 @@
 {% load i18n %}
 {% load static %}
 
+{% load utils_filters %}
+
+
 {% block extra_css %}
   {{ block.super }}
   <link rel="stylesheet" href="{% static 'admin/admin/css/index.css' %}">
@@ -168,7 +171,21 @@
           {% if messages %}
             <ul class="list-unstyled">
               {% for message in messages %}
-                <li class="bg-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %}">{{ message }}</li>
+
+                <li class="bg-{% spaceless %}
+                {% if 'error' == message.extra_tags %}danger{% endif %}
+                {% if 'updated' == message.extra_tags %}success{% endif %}
+                {% if 'deleted' == message.extra_tags %}success{% endif %}
+                {% if 'created' == message.extra_tags %}success{% endif %}{% endspaceless %}
+                ">
+                  <span class="glyphicon glyphicon-{% spaceless %}
+                  {% if 'error' in message.extra_tags %}exclamation-sign{% endif %}
+                  {% if 'updated' in message.extra_tags %}check{% endif %}
+                  {% if 'deleted' in message.extra_tags %}remove{% endif %}
+                  {% if 'created' in message.extra_tags %}ok{% endif %}{% endspaceless %}
+                  "></span>
+                  {{ message }}
+                </li>
               {% endfor %}
             </ul>
           {% endif %}
@@ -183,11 +200,11 @@
         </ol>
       </div>
 
+      <div id="content_results">
       {% block content %}
 
-
-
       {% endblock content %}
+      </div>
 
     </div>
   </div>

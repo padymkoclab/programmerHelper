@@ -1,10 +1,12 @@
 
+from django.core.paginator import Paginator
+from django.template.response import TemplateResponse
 from django.contrib import messages
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django import forms
 from django.utils.html import format_html
 from django.shortcuts import render, get_object_or_404
-from django.db.models import NullBooleanField, BooleanField
+from django.db import models
 from django.apps import apps
 from django.http import HttpResponseRedirect, Http404
 from django.db.models.fields.reverse_related import ManyToOneRel
@@ -82,12 +84,14 @@ class PasswordChangeDoneView(generic.TemplateView):
     pass
 
 
-class ChangeListView(SiteModelAdminMixin, generic.ListView):
+class ChangeListView(SiteModelAdminMixin, generic.View):
 
-    template_name = 'admin/admin/changelist.html'
+    per_page = 5
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+        self.model_meta = self.model_admin.model._meta
 
         self.default_styles = {
             'align': 'left',
@@ -95,25 +99,83 @@ class ChangeListView(SiteModelAdminMixin, generic.ListView):
 
     def get_queryset(self):
 
-        return self.model_admin.get_queryset(self.request)
+        qs = self.model_admin.get_queryset(self.request)
+
+        search_fields = self.model_admin.get_search_fields()
+
+        if search_fields:
+
+            q = self.request.GET.get('q', '')
+            q = q.strip()
+
+            if q and search_fields:
+
+                type_search = self.request.GET.get('type_search')
+                if type_search not in ('contains', 'startswith', 'endswith'):
+                    raise ValueError('Not correct value of "type_search".')
+
+                ignorecase = self.request.GET.get('ignorecase')
+
+                # convert ignorecase to the Django`s lookup type
+                ignorecase = '' if ignorecase is None else 'i'
+
+                # make a lookup format for the search
+                lookup = '__{}{}'.format(ignorecase, type_search)
+
+                # make the same conditions for each field in the search_fields
+                conditions = {'{}{}'.format(field, lookup): q for field in search_fields}
+
+                # filter by conditions on the all fields listed the search_fields
+                qs = qs.filter(**conditions)
+
+        return qs
+
+    def get(self, request):
+
+        return self.render_to_response(request)
 
     def get_context_data(self, **kwargs):
 
-        context = super().get_context_data(**kwargs)
+        context = self.site_admin.each_context(self.request)
 
-        model_meta = self.model_admin.model._meta
+        context['title'] = _('Select {} to change').format(self.model_meta.verbose_name_plural.lower())
 
-        context['title'] = _('Select {} to change').format(model_meta.verbose_name_plural.lower())
+        context['model_meta'] = self.model_meta
+        context['model_admin'] = self.model_admin
 
-        context['model_meta'] = model_meta
+        listing_search_fields = [
+            force_text(self.model_meta.get_field(field).verbose_name)
+            for field in self.model_admin.search_fields
+        ]
+        context['listing_search_fields'] = ', '.join(listing_search_fields)
 
-        context['has_add_permission'] = self.model_admin.has_add_permission(self.request)
+        # context['has_add_permission'] = self.model_admin.has_add_permission(self.request)
+
+        get_list_values_with_styles = self.get_list_values_with_styles()
+
+        # import ipdb; ipdb.set_trace()
+
+        context['object_list'] = Paginator(get_list_values_with_styles, self.per_page)
 
         context['list_display_with_styles'] = self.get_list_display_with_styles()
 
-        context['list_values_with_styles'] = self.get_list_values_with_styles()
-
         return context
+
+    def render_to_response(self, request):
+
+        return TemplateResponse(
+            request,
+            template=self.get_template_names(),
+            context=self.get_context_data()
+        )
+
+    def get_template_names(self):
+
+        return [
+            '{}/admin/{}/admin/changelist.html'.format(self.model_meta.app_label, self.model_meta.model_name),
+            '{}/admin/admin/changelist.html'.format(self.model_meta.app_label),
+            'admin/admin/changelist.html',
+        ]
 
     @property
     def list_display_styles_by_column(self):
@@ -158,7 +220,12 @@ class ChangeListView(SiteModelAdminMixin, generic.ListView):
 
                 # if it is not field, then it is method
                 if callable(value):
-                    value = value()
+
+                    if hasattr(value, 'boolean'):
+                        value = value()
+                        value = self.convert_boolean_to_bootstrap_icon(value)
+                    else:
+                        value = value()
 
                 elif field_or_method in fieldnames:
 
@@ -167,22 +234,8 @@ class ChangeListView(SiteModelAdminMixin, generic.ListView):
                     if field.choices:
                         value = getattr(obj, 'get_{}_display'.format(field_or_method))()
 
-                    if isinstance(field, (NullBooleanField, BooleanField)):
-
-                        if value is True:
-                            bootstap_class = 'ok-sign'
-                            color = 'rgb(0, 255, 0)'
-                        elif value is False:
-                            bootstap_class = 'remove-sign'
-                            color = 'rgb(255, 0, 0)'
-                        elif value is None:
-                            bootstap_class = 'question-sign'
-                            color = 'rgb(0, 0, 0)'
-
-                        value = format_html(
-                            '<span class="glyphicon glyphicon-{}" style="color: {}"></span>',
-                            bootstap_class, color
-                        )
+                    if isinstance(field, (models.NullBooleanField, models.BooleanField)):
+                        value = self.convert_boolean_to_bootstrap_icon(value)
 
                 if value is None:
                     value = self.site_admin.empty_value_display
@@ -191,10 +244,7 @@ class ChangeListView(SiteModelAdminMixin, generic.ListView):
 
             row_color = self.get_row_color(obj)
 
-            admin_url = reverse('admin:{}_{}_change'.format(
-                self.model_admin.model._meta.app_label,
-                self.model_admin.model._meta.model_name,
-            ), args=(obj.pk, ))
+            admin_url = self.site_admin.get_url('change', self.model_meta, kwargs={'pk': obj.pk})
 
             list_values_with_styles.append((row_color, admin_url, values))
         return list_values_with_styles
@@ -268,6 +318,24 @@ class ChangeListView(SiteModelAdminMixin, generic.ListView):
 
         return row_color
 
+    @staticmethod
+    def convert_boolean_to_bootstrap_icon(value):
+
+        if value is True:
+            bootstap_class = 'ok-sign'
+            color = 'rgb(0, 255, 0)'
+        elif value is False:
+            bootstap_class = 'remove-sign'
+            color = 'rgb(255, 0, 0)'
+        elif value is None:
+            bootstap_class = 'question-sign'
+            color = 'rgb(0, 0, 0)'
+
+        return format_html(
+            '<span class="glyphicon glyphicon-{}" style="color: {}"></span>',
+            bootstap_class, color
+        )
+
 
 class AddView(SiteModelAdminMixin, generic.View):
 
@@ -330,6 +398,11 @@ class AddChangeView(ContextAdminMixin, generic.FormView):
 
         context['title'] = self.get_title()
 
+        context['is_change'] = False if self.obj is None else True
+        context['object'] = self.obj
+
+        context['permissions'] = self.model_admin.get_model_permissions(self.request)
+
         context['model_meta'] = self.model_meta
 
         modelform = self.get_modelform()
@@ -344,9 +417,9 @@ class AddChangeView(ContextAdminMixin, generic.FormView):
     def get_template_names(self):
 
         return [
-            '{}/admin/{}/add_form.html'.format(self.model_meta.app_label, self.model_meta.model_name),
-            '{}/admin/add_form.html'.format(self.model_meta.app_label),
-            'admin/admin/add_form.html',
+            '{}/admin/{}/addchange_form.html'.format(self.model_meta.app_label, self.model_meta.model_name),
+            '{}/admin/addchange_form.html'.format(self.model_meta.app_label),
+            'admin/admin/addchange_form.html',
         ]
 
     def post(self, request):
@@ -380,8 +453,6 @@ class AddChangeView(ContextAdminMixin, generic.FormView):
 
         if self.request.method == 'POST':
 
-            # self.request.POST.pop('_clicked_button_save')
-
             kwargs.update({
                 'data': self.request.POST,
                 'files': self.request.FILES,
@@ -396,17 +467,18 @@ class AddChangeView(ContextAdminMixin, generic.FormView):
 
     def form_invalid(self, form):
 
-        form.add_error(None, 'AAAAAAAAAAAA')
-
         self.add_message('invalid')
 
+        return HttpResponseRedirect(redirect_to=self.get_success_url())
         return self.render_to_response(context=self.get_context_data(form=form))
 
     def form_valid(self, form):
 
         self.add_message('valid')
 
-        # form.save()
+        self.object = form.save(commit=False)
+
+        self.object.save()
 
         return HttpResponseRedirect(redirect_to=self.get_success_url())
 
@@ -434,16 +506,14 @@ class AddChangeView(ContextAdminMixin, generic.FormView):
 
     def get_success_url(self):
 
-        url_info = self.model_meta.app_label, self.model_meta.model_name
-
         _clicked_button = self.request.POST['_clicked_button']
 
         if _clicked_button == 'save':
-            return reverse('admin:{}_{}_changelist'.format(*url_info))
+            return self.site_admin.get_url('changelist', self.model_meta)
         elif _clicked_button == 'save_and_add_another':
-            return reverse('admin:{}_{}_add'.format(*url_info))
+            return self.site_admin.get_url('add', self.model_meta)
         elif _clicked_button == 'save_and_continue':
-            return reverse('admin:{}_{}_change'.format(*url_info), kwargs={'pk': self})
+            return self.site_admin.get_url('change', self.model_meta, kwargs={'pk': self.object.pk})
 
 
 class AppIndexView(SiteAppAdminMixin, generic.TemplateView):
@@ -457,8 +527,8 @@ class AppIndexView(SiteAppAdminMixin, generic.TemplateView):
         context['title'] = self.app_config.verbose_name
         context['app_name'] = self.app_config.verbose_name
         context['app_models_info'] = self.get_app_models_info()
-        context['reports_url'] = reverse('admin:{}_reports'.format(self.app_config.label))
-        context['statistics_url'] = reverse('admin:{}_statistics'.format(self.app_config.label))
+        context['reports_url'] = self.site_admin.get_url('reports', self.app_config.label)
+        context['statistics_url'] = self.site_admin.get_url('statistics', self.app_config.label)
 
         return context
 
@@ -469,7 +539,7 @@ class AppIndexView(SiteAppAdminMixin, generic.TemplateView):
 
             info.append((
                 force_text(model._meta.verbose_name),
-                reverse('admin:{}_{}_changelist'.format(model._meta.app_label, model._meta.model_name)),
+                self.site_admin.get_url('changelist', model._meta),
                 model._default_manager.count(),
             ))
 
@@ -513,7 +583,85 @@ class HistoryView(SiteModelAdminMixin, generic.DetailView):
 
 class DeleteView(SiteModelAdminMixin, generic.DeleteView):
 
-    pass
+    pk_url_kwarg = 'pk'
+    context_object_name = 'object'
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.model = self.model_admin.model
+        self.model_meta = self.model._meta
+
+    def dispatch(self, request, *args, **kwargs):
+
+        if not self.model_admin.has_delete_permission(request):
+            raise PermissionDenied
+
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_template_names(self):
+
+        return [
+            '{}/admin/{}/confirm_delete.html'.format(self.model_meta.app_label, self.model_meta.model_name),
+            '{}/admin/confirm_delete.html'.format(self.model_meta.app_label),
+            'admin/admin/confirm_delete.html',
+        ]
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        context['model_meta'] = self.model_meta
+        context['related_objects'] = self.get_related_objects()
+        context['title'] = _('Delete {}').format(
+            self.model_meta.verbose_name.lower()
+        )
+
+        return context
+
+    def get_success_url(self):
+
+        return self.site_admin.get_url('changelist', self.model_meta)
+
+    def get_related_objects(self):
+
+        related_objects = list()
+
+        candidate_relations_to_delete = [
+            i for i in self.object._meta.get_fields(include_hidden=True)
+            if i.auto_created and not i.concrete and (i.one_to_one or i.one_to_many)
+        ]
+
+        for relationship in candidate_relations_to_delete:
+            if relationship.on_delete != models.DO_NOTHING:
+
+                related_model = relationship.related_model
+                type_relationship = relationship.on_delete.__name__
+                objects = related_model._base_manager.filter(
+                    **{'{}__in'.format(
+                        relationship.field.name): [self.object.pk]}
+                )
+
+                related_objects.append(
+                    (related_model._meta, type_relationship, objects)
+                )
+
+        return related_objects
+
+    def delete(self, request, *args, **kwargs):
+
+        self.object = self.get_object()
+        success_url = self.get_success_url()
+        self.object.delete()
+
+        messages.add_message(
+            request,
+            messages.SUCCESS,
+            _('Successfully deleted {} "{}"').format(self.model_meta.verbose_name.lower(), self.object),
+            extra_tags='deleted',
+
+        )
+
+        return HttpResponseRedirect(success_url)
 
 
 class ExportView(generic.View):

@@ -31,7 +31,7 @@ class Category(TimeStampedModel):
 
     name = models.CharField(
         _('Name'), max_length=100, unique=True,
-        validators=[MinLengthValidator(settings.MIN_LENGTH_FOR_NAME_OR_TITLE_OBJECT)],
+        validators=[MinLengthValidator(10)],
         error_messages={
             'unique': _('Category with this name already exists.'),
         }
@@ -114,7 +114,7 @@ class Utility(CommentsModelMixin, OpinionsModelMixin, TimeStampedModel):
 
     name = models.CharField(
         _('Name'), max_length=200,
-        validators=[MinLengthValidator(settings.MIN_LENGTH_FOR_NAME_OR_TITLE_OBJECT)]
+        validators=[MinLengthValidator(10)]
     )
     description = models.TextField(_('Description'), validators=[MinLengthValidator(50)])
     category = models.ForeignKey(

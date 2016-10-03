@@ -7,15 +7,62 @@
 import io
 import base64
 from IPython.core import display as JupyterDisplay
+import inspect
+import subprocess
 
 
-class classproperty:
+def open_in_sublime(object_):
 
-    def __init__(self, f):
-        self.f = f
+    path = inspect.getfile(object_)
+    subprocess.call(['subl', path])
 
-    def __get__(self, obj, owner):
-        return self.f(owner)
+
+class staticmethod_(object):
+    """Pure the Python implementation of decorator staticmethod."""
+
+    def __init__(self, method):
+        self.method = method
+
+    def __get__(self, obj, objtype=None):
+        return self.method
+
+
+class classmethod_(object):
+    """Pure the Python implementation of decorator classmethod."""
+
+    def __init__(self, method):
+        self.method = method
+
+    def __get__(self, obj, objtype=None):
+
+        objtype = type(obj) if objtype is None else objtype
+
+        return lambda *args, **kwargs: self.method(objtype, *args, **kwargs)
+
+
+class staticclassmethod(object):
+
+    def __init__(self, method):
+        self.method = method
+
+    def __get__(self, obj, objtype=None):
+
+        objtype = type(obj) if objtype is None else objtype
+
+        def method(*args, **kwargs):
+            return self.method(*args, **kwargs)
+
+        return method
+
+
+class classproperty(object):
+
+    def __init__(self, method):
+        self.method = method
+
+    def __get__(self, obj, objtype=None):
+        objtype = type(obj) if objtype is None else objtype
+        return self.method(objtype)
 
 
 def check_method_of_object(obj, method):

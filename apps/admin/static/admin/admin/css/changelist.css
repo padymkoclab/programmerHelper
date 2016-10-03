@@ -10,11 +10,19 @@
 }
 
 #changelist table thead th{
-    color: rgb(255, 255, 255);
     background-color: #222;
 }
 
-#changelist table thead th:nth-child(1), #changelist table tbody td:nth-child(1){
+#changelist table thead th table{
+    background-color: #222;
+    color: rgb(255, 255, 255);
+}
+
+#changelist table thead th table tr td{
+    width: 99%;
+}
+
+#changelist > table thead th:nth-child(1), #changelist > table tbody td:nth-child(1){
     width: 5px;
     text-align: center;
 }

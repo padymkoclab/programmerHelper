@@ -15,6 +15,7 @@
 
 {% block extra_head %}
   {{ block.super }}
+  {{ form.media }}
   <script src="{% static 'admin/admin/js/prepopulated_fields.js' %}"></script>
 {% endblock extra_head %}
 
@@ -23,7 +24,7 @@
   <li><a href="{{ index_url }}">{% trans "Home" %}</a></li>
   <li><a href="{{ model_meta|get_admin_url:'app' }}">{{ model_meta.app_config.verbose_name|capfirst }}</a></li>
   <li><a href="{{ model_meta|get_admin_url:'changelist' }}">{{ model_meta.verbose_name_plural|capfirst }}</a></li>
-  <li class="active">{% trans "Add" %} {{ model_meta.verbose_name|lower }}</li>
+  <li class="active">{% if is_change is True %}{% trans "Change" %}{% else %}{% trans "Add" %}{% endif %} {{ model_meta.verbose_name|lower }}</li>
 {% endblock breadcrumbs %}
 
 
@@ -96,7 +97,24 @@
     {% endfor %}
 
     <div class="row">
-      <div class="col-xs-12 text-right">
+      <div class="col-sm-6">
+
+        {% if is_change is True %}
+
+        {% if permissions.delete %}
+          <a class="btn btn-danger" href="{{ object|get_admin_url:'delete' }}" id="">{% trans "Delete" %}</a>
+        {% endif %}
+
+        {% if object.get_absolute_url %}
+          <a class="btn btn-info" href="{{ object.get_absolute_url }}" id="">{% trans "Preview" %}</a>
+        {% endif %}
+
+        <a class="btn btn-warning" href="{{ object|get_admin_url:'history' }}" id="">{% trans "History" %}</a>
+
+        {% endif %}
+
+      </div>
+      <div class="col-sm-6 text-right">
         <button class="btn btn-primary" type="submit" id="" name="_clicked_button" value="save">{% trans "Save" %}</button>
         <button class="btn btn-primary" type="submit" id="" name="_clicked_button" value="save_and_continue">{% trans "Save and continue" %}</button>
         <button class="btn btn-primary" type="submit" id="" name="_clicked_button" value="save_and_add_another">{% trans "Save and add another" %}</button>

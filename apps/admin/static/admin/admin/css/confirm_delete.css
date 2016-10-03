@@ -1,0 +1,17 @@
+
+#confirm_delete_div
+{
+    border-radius: 5px;
+}
+
+#confirm_delete_div div button[type='submit']
+{
+    margin: 15px 0;
+}
+
+#confirm_delete_div > div:first-child > p
+{
+    font-size: 20px;
+
+    padding: 20px;
+}

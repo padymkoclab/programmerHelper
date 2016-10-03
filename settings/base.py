@@ -3,7 +3,7 @@ from django.contrib.messages import constants as messages
 
 from unipath import Path
 
-from utils.django.utils import get_secret_value_for_setting_from_file
+from utils.django.settings_utils import get_setting_from_file, InvalidTemplateVariable
 
 from .custom import *
 from .thirdparty import *
@@ -13,7 +13,7 @@ BASE_DIR = Path(__file__).ancestor(2)
 
 SITE_ID = 1
 
-SECRET_KEY = get_secret_value_for_setting_from_file(filename='secrets.json', setting_name='SECRET_KEY')
+SECRET_KEY = get_setting_from_file(filename='secrets.json', setting_name='SECRET_KEY')
 
 # Application definition
 
@@ -89,6 +89,7 @@ MIDDLEWARE = DJANGO_MIDDLEWARE_CLASSES + MY_MIDDLEWARE_CLASSES
 
 ROOT_URLCONF = 'apps.core.urls'
 
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -108,6 +109,7 @@ TEMPLATES = [
                 # 'django.core.context_processors.request',
                 # 'django.template.context_processors.tz',
             ],
+            'string_if_invalid': InvalidTemplateVariable('%s'),
         },
     },
 ]

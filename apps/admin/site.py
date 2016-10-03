@@ -131,6 +131,53 @@ class SiteAdmin:
     def urls(self):
         return self.get_urls(), 'admin', self.name
 
+    def get_url(self, key_name, *args, **kwargs):
+
+        model_meta = args[0]
+        app_label = args[0]
+
+        if key_name == 'changelist':
+            return reverse(
+                'admin:{}_{}_changelist'.format(model_meta.app_label, model_meta.model_name),
+                current_app=self.name
+            )
+        elif key_name == 'add':
+            return reverse(
+                'admin:{}_{}_add'.format(model_meta.app_label, model_meta.model_name),
+                current_app=self.name
+            )
+        elif key_name == 'delete':
+            return reverse(
+                'admin:{}_{}_delete'.format(model_meta.app_label, model_meta.model_name),
+                current_app=self.name
+            )
+        elif key_name == 'history':
+            return reverse(
+                'admin:{}_{}_history'.format(model_meta.app_label, model_meta.model_name),
+                current_app=self.name
+            )
+        elif key_name == 'app_index':
+            return reverse(
+                'admin:{}_index'.format(model_meta.app_label),
+                current_app=self.name
+            )
+        elif key_name == 'change':
+            return reverse(
+                'admin:{}_{}_change'.format(model_meta.app_label, model_meta.model_name),
+                current_app=self.name,
+                **kwargs
+            )
+        elif key_name == 'reports':
+            return reverse(
+                'admin:{}_reports'.format(app_label),
+                current_app=self.name
+            )
+        elif key_name == 'statistics':
+            return reverse(
+                'admin:{}_statistics'.format(app_label),
+                current_app=self.name
+            )
+
     def register_model(self, model, model_admin_class):
         """
         """
@@ -177,8 +224,6 @@ class SiteAdmin:
 
         for model, admin_model in self._registry_models.items():
 
-            model._meta.app_label
-
             has_module_permissions = admin_model.has_module_permissions(request)
 
             if not has_module_permissions:
@@ -189,38 +234,30 @@ class SiteAdmin:
             if True not in model_permissions.values():
                 continue
 
-            app_label, model_name = model._meta.app_label, model._meta.model_name
-
             model_attrs = {
                 'model_meta': model._meta,
                 'permissions': model_permissions,
             }
 
             if model_permissions.get('add') is True:
-                model_attrs['add_url'] = reverse(
-                    'admin:{}_{}_add'.format(app_label, model_name),
-                    current_app=self.name
-                )
+                model_attrs['add_url'] = self.get_url('add', model._meta)
 
             if model_permissions.get('change') is True:
-                model_attrs['changelist_url'] = reverse(
-                    'admin:{}_{}_changelist'.format(app_label, model_name),
-                    current_app=self.name
-                )
+                model_attrs['changelist_url'] = self.get_url('changelist', model._meta)
 
-            if app_label in avaliable_apps_with_models:
-                avaliable_apps_with_models[app_label]['models'].append(model_attrs)
+            if model._meta.app_label in avaliable_apps_with_models:
+                avaliable_apps_with_models[model._meta.app_label]['models'].append(model_attrs)
             else:
 
-                app_admin = self._registry_apps.get(app_label, None)
+                app_admin = self._registry_apps.get(model._meta.app_label, None)
 
                 app_icon = getattr(app_admin, 'app_icon', 'exclamation-triangle')
 
-                avaliable_apps_with_models[app_label] = {
+                avaliable_apps_with_models[model._meta.app_label] = {
                     'app_name': model._meta.app_config.verbose_name,
-                    'app_index_url': reverse('admin:{}_index'.format(app_label)),
-                    'app_reports_url': reverse('admin:{}_reports'.format(app_label)),
-                    'app_statistics_url': reverse('admin:{}_statistics'.format(app_label)),
+                    'app_index_url': self.get_url('app_index', model._meta),
+                    'app_reports_url': self.get_url('reports', model._meta.app_label),
+                    'app_statistics_url': self.get_url('statistics', model._meta.app_label),
                     'models': [model_attrs],
                     'app_icon': app_icon,
                 }

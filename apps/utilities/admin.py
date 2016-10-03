@@ -140,7 +140,26 @@ class CategoryAdmin(ModelAdmin):
         'get_total_count_comments',
         'is_new',
         'updated',
-        'created')
+        'created',
+    )
+    list_display_styles = (
+        (
+            ('__all__', ), {
+                'align': 'center',
+            },
+        ),
+        (
+            ('name', ), {
+                'align': 'left',
+            },
+        ),
+        (
+            ('updated', 'created'), {
+                'align': 'right',
+            },
+        ),
+    )
+    colored_rows_by = 'determinate_color_rows'
     list_filter = (
         IsNewSimpleListFilter,
         'updated',
@@ -206,6 +225,17 @@ class CategoryAdmin(ModelAdmin):
             inlines = [UtilityInline]
             return [inline(self.model, self.admin_site) for inline in inlines]
         return []
+
+    def determinate_color_rows(self, obj):
+        total_mark = obj.get_total_mark()
+
+        row_color = None
+        if total_mark > 0:
+            row_color = 'success'
+        elif total_mark < 0:
+            row_color = 'danger'
+
+        return row_color
 
 
 # @admin.register(Utility, site=AdminSite)

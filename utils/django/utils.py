@@ -6,10 +6,8 @@ import pprint
 import pip
 import pathlib
 import time
-import json
 
 from django.utils import timezone
-from django.core.exceptions import ImproperlyConfigured
 from django.db import connection
 
 import factory
@@ -31,19 +29,6 @@ def join_enumarate(sep, iterable) -> str:
 
     iterable = ('{0}. {1}'.format(i + 1, str(obj)) for i, obj in enumerate(iterable))
     return sep.join(iterable)
-
-
-def get_secret_value_for_setting_from_file(setting_name, filename='secrets.json'):
-    """Getting secrets settings for website from JSON-file."""
-    try:
-        with open(filename, 'r') as f:
-            secrets_in_json = json.loads(f.read())
-        return secrets_in_json[setting_name]
-    except FileNotFoundError:
-        raise FileNotFoundError('File "{0}" not found'.format(filename))
-    except KeyError:
-        message = 'Failed configured value for {0}'.format(setting_name.upper())
-        raise ImproperlyConfigured(message)
 
 
 def get_choice_lexers():

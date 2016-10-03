@@ -1,0 +1,77 @@
+
+{% extends "admin/admin/index.html" %}
+
+{% load static %}
+{% load i18n %}
+
+{% load admin_filters %}
+
+
+{% block extra_css %}
+  {{ block.super }}
+  <link rel="stylesheet" href="{% static 'admin/admin/css/confirm_delete.css' %}">
+{% endblock extra_css %}
+
+
+{% block breadcrumbs %}
+  <li><a href="{{ index_url }}">{% trans "Home" %}</a></li>
+  <li><a href="{{ model_meta|get_admin_url:'app' }}">{{ model_meta.app_config.verbose_name|capfirst }}</a></li>
+  <li><a href="{{ model_meta|get_admin_url:'changelist' }}">{{ model_meta.verbose_name_plural|capfirst }}</a></li>
+  <li class="active">{% trans "Delete" %} {{ model_meta.verbose_name|lower }}</li>
+{% endblock breadcrumbs %}
+
+
+{% block content %}
+  <div class="row bg-danger" id="confirm_delete_div">
+    <div class="col-sm-12">
+
+      {% with model_meta.verbose_name.lower as object_name %}
+
+          <p>
+          {% blocktrans %}
+            Are you sure you want to delete the {{ object_name }} "{{ object }}"?
+          {% endblocktrans %}
+          {% if related_objects %}
+            {% trans "All of the following related items will be deleted too:" %}
+            {% endif %}
+          </p>
+
+      {% endwith %}
+
+    </div>
+    <div class="col-sm-12">
+
+      {% if related_objects %}
+
+        {% for model_meta, type_relationship, objects in related_objects %}
+          <p>
+
+          {% with object_name=model_meta.verbose_name objects_name=model_meta.verbose_name_plural %}
+
+            {% blocktrans count counter=objects|length %}
+              {{ object_name }}
+            {% plural %}
+              {{ objects_name }}
+            {% endblocktrans %}
+
+          {% endwith %}
+
+             - [{{ type_relationship }}]
+            </p>
+          <ol>
+            {% for object in objects %}
+              <li>{{ object }}</li>
+            {% endfor %}
+          </ol>
+        {% endfor %}
+      {% endif %}
+
+    </div>
+    <div class="col-sm-12">
+      <form action="" method="POST">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger pull-right">{% trans "Confirm" %}</button>
+      </form>
+    </div>
+  </div>
+{% endblock content %}

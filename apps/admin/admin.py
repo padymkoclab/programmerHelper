@@ -1,20 +1,16 @@
 
 from django import forms
-from django.contrib.admin.checks import (
-    BaseModelAdminChecks, InlineModelAdminChecks, ModelAdminChecks,
-)
+# from django.contrib.admin.checks import ModelAdminChecks
 from django.conf.urls import url
 from django.contrib.auth import get_permission_codename
-from django.urls import reverse
-from django.utils.encoding import force_text
-from django.utils.html import escape, format_html
-from django.utils.safestring import mark_safe
-from django.utils.text import capfirst, get_text_list
-from django.utils.translation import (
-    override as translation_override, string_concat, ugettext as _, ungettext,
-)
-from django.views.decorators.csrf import csrf_protect
-from django.views.generic import RedirectView
+# from django.urls import reverse
+# from django.utils.encoding import force_text
+# from django.utils.html import escape, format_html
+# from django.utils.safestring import mark_safe
+# from django.utils.text import capfirst, get_text_list
+from django.utils.translation import ugettext_lazy as _, ungettext
+# from django.views.decorators.csrf import csrf_protect
+# from django.views.generic import RedirectView
 
 from utils.python.utils import flatten
 
@@ -71,7 +67,7 @@ class ModelAdmin:
     # list_per_page = 100
     # list_max_show_all = 200
     # list_editable = ()
-    # search_fields = ()
+    search_fields = ()
     # date_hierarchy = None
     # save_as = False
     # save_as_continue = True
@@ -133,13 +129,13 @@ class ModelAdmin:
                 ),
             ),
             history=url(
-                regex=r'^(.+)/history/$', name='{}_{}_history'.format(*info), kwargs={},
+                regex=r'^(?P<pk>.+)/history/$', name='{}_{}_history'.format(*info), kwargs={},
                 view=admin_staff_member_required(
                     HistoryView.as_view(site_admin=self.site_admin, model_admin=self)
                 ),
             ),
             delete=url(
-                regex=r'^(.+)/delete/$', name='{}_{}_delete'.format(*info), kwargs={},
+                regex=r'^(?P<pk>.+)/delete/$', name='{}_{}_delete'.format(*info), kwargs={},
                 view=admin_staff_member_required(
                     DeleteView.as_view(site_admin=self.site_admin, model_admin=self)
                 ),
@@ -248,6 +244,10 @@ class ModelAdmin:
             fields = forms.ALL_FIELDS
 
         return forms.models.modelform_factory(self.model, fields=fields, form=self.form)
+
+    def get_search_fields(self):
+
+        return self.search_fields
 
 
 class OtherAdmin:
