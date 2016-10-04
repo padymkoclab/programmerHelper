@@ -31,106 +31,122 @@
 {% block content %}
   {{ block.super }}
 
-  <form action="" method="POST" {% if form.is_multipart %}enctype="multipart/form-data"{% endif %} class="form-horizontal" id="form_add">
-  {% csrf_token %}
-    {% for fieldset in form %}
-      <fieldset class="{{ fieldset.classes }}">
+  <div class="row" id="buttons">
+    <div class="col-sm-6">
 
-      {% if fieldset.name %}
-        <legend>{{ fieldset.name }}</legend>
-      {% endif %}
-      {% if fieldset.description %}
-        <p class="text-info">{{ fieldset.description }}</p>
+      {% if is_change is True %}
+
+      {% if permissions.delete %}
+        <a class="btn btn-danger" href="{{ object|get_admin_url:'delete' }}" id="">{% trans "Delete" %}</a>
       {% endif %}
 
-        {{ fieldset.form.non_field_errors }}
-        {% if fieldset.form.non_field_errors %}
-          {% for error in fieldset.form.non_field_errors %}
-            <p class="text-danger">{{ error }}</p>
-          {% endfor %}
-        {% endif %}
+      {% if object.get_absolute_url %}
+        <a class="btn btn-info" href="{{ object.get_absolute_url }}" id="">{% trans "Preview" %}</a>
+      {% endif %}
 
-          {% for fieldline in fieldset %}
-            <div class="form-group">
+      <a class="btn btn-warning" href="{{ object|get_admin_url:'history' }}" id="">{% trans "History" %}</a>
 
-              {{ fieldline.label_tag }}
+      {% endif %}
 
-              <div class="col-xs-10">
+    </div>
+    <div class="col-sm-6 text-right">
+      <button class="btn btn-primary" type="submit" id="" form="form_addchange" name="_clicked_button" value="save">{% trans "Save" %}</button>
+      <button class="btn btn-primary" type="submit" id="" form="form_addchange" name="_clicked_button" value="save_and_continue">{% trans "Save and continue" %}</button>
+      <button class="btn btn-primary" type="submit" id="" form="form_addchange" name="_clicked_button" value="save_and_add_another">{% trans "Save and add another" %}</button>
+    </div>
+  </div>
 
-              {% if fieldline.field.is_hidden is True %}
-                <p class="danger">This field is hidden</p>
+
+  <div>
+    <ul class="nav nav-tabs" role="tablist">
+
+      {% for fieldset in form %}
+      <li role="presentation" class="{% if forloop.counter == 1 %}active{% endif %}">
+        <a href="#fieldset{{ forloop.counter }}" role="tab" data-toggle="tab">
+          {% if fieldset.name %}
+            {{ fieldset.name }}
+          {% else %}
+            {% blocktrans with forloop.counter as num %}
+                Fieldset # {{ num }}
+            {% endblocktrans %}
+          {% endif %}
+        </a>
+      </li>
+      {% endfor %}
+
+    </ul>
+  </div>
+
+  <form action="" method="POST" {% if form.is_multipart %}enctype="multipart/form-data"{% endif %} class="form-horizontal" id="form_addchange">
+    <div class="tab-content">
+      {% for fieldset in form %}
+        <div class="tab-pane {% if forloop.counter == 1 %}active{% endif %}" id="fieldset{{ forloop.counter }}" role="tabpanel">
+            {% csrf_token %}
+            <fieldset class="{{ fieldset.classes }}">
+
+            {% if fieldset.description %}
+              <legend>{{ fieldset.description }}</legend>
+            {% endif %}
+
+              {{ fieldset.form.non_field_errors }}
+              {% if fieldset.form.non_field_errors %}
+                {% for error in fieldset.form.non_field_errors %}
+                  <p class="text-danger">{{ error }}</p>
+                {% endfor %}
               {% endif %}
 
-                {% if fieldline.field.errors %}
-                  {% for error in fieldline.field.errors %}
-                    <p class="text-danger">{{ error }}</p>
-                  {% endfor %}
-                {% endif %}
+                {% for fieldline in fieldset %}
+                  <div class="form-group">
 
-                {% with fieldset.form.addons|get_item_by_key:fieldline.field.name as addons %}
+                    {{ fieldline.label_tag }}
 
-                  {% if addons != '' %}
-                    <div class="input-group">
-                      {% if addons.left %}
-                        <div class="input-group-addon">{{ addons.left }}</div>
+                    <div class="col-xs-10">
+
+                    {% if fieldline.field.is_hidden is True %}
+                      <p class="danger">This field is hidden</p>
+                    {% endif %}
+
+                      {% if fieldline.field.errors %}
+                        {% for error in fieldline.field.errors %}
+                          <p class="text-danger">{{ error }}</p>
+                        {% endfor %}
                       {% endif %}
-                      {{ fieldline.field }}
-                      {% if addons.right %}
-                        <div class="input-group-addon">{{ addons.right }}</div>
+
+                      {% with fieldset.form.addons|get_item_by_key:fieldline.field.name as addons %}
+
+                        {% if addons != '' %}
+                          <div class="input-group">
+                            {% if addons.left %}
+                              <div class="input-group-addon">{{ addons.left }}</div>
+                            {% endif %}
+                            {{ fieldline.field }}
+                            {% if addons.right %}
+                              <div class="input-group-addon">{{ addons.right }}</div>
+                            {% endif %}
+                          </div>
+
+                        {% else %}
+                          {{ fieldline.field }}
+                        {% endif %}
+
+                      {% endwith %}
+
+                      {% if fieldline.field.help_text %}
+                        <p class="help-block">{{ fieldline.field.help_text }}</p>
                       {% endif %}
+
                     </div>
-
-                  {% else %}
-                    {{ fieldline.field }}
-                  {% endif %}
-
-                {% endwith %}
-
-                {% if fieldline.field.help_text %}
-                  <p class="help-block">{{ fieldline.field.help_text }}</p>
-                {% endif %}
-
-              </div>
-            </div>
-          {% endfor %}
-      </fieldset>
-    {% endfor %}
-
-    <div class="row">
-      <div class="col-sm-6">
-
-        {% if is_change is True %}
-
-        {% if permissions.delete %}
-          <a class="btn btn-danger" href="{{ object|get_admin_url:'delete' }}" id="">{% trans "Delete" %}</a>
-        {% endif %}
-
-        {% if object.get_absolute_url %}
-          <a class="btn btn-info" href="{{ object.get_absolute_url }}" id="">{% trans "Preview" %}</a>
-        {% endif %}
-
-        <a class="btn btn-warning" href="{{ object|get_admin_url:'history' }}" id="">{% trans "History" %}</a>
-
-        {% endif %}
-
-      </div>
-      <div class="col-sm-6 text-right">
-        <button class="btn btn-primary" type="submit" id="" name="_clicked_button" value="save">{% trans "Save" %}</button>
-        <button class="btn btn-primary" type="submit" id="" name="_clicked_button" value="save_and_continue">{% trans "Save and continue" %}</button>
-        <button class="btn btn-primary" type="submit" id="" name="_clicked_button" value="save_and_add_another">{% trans "Save and add another" %}</button>
-      </div>
+                  </div>
+                {% endfor %}
+            </fieldset>
+          </div>
+      {% endfor %}
     </div>
-
   </form>
 
 <!--
-      {% comment %}
-      Made own templatetag for addons
-      <p>Name {{ field.name }}</p>
-      <p>Value {{ field.value }}</p>
-      <p>Initial {{ field.initial }}</p>
-      <p>Css_classes {{ field.css_classes }}</p>
-      {% endcomment %}
+Made own templatetag for addons
+<p>Css_classes {{ field.css_classes }}</p>
 -->
 
   {% prepopulated_fields_js %}

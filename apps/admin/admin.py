@@ -1,4 +1,7 @@
 
+import collections
+
+from django.contrib import messages
 from django import forms
 # from django.contrib.admin.checks import ModelAdminChecks
 from django.conf.urls import url
@@ -7,14 +10,14 @@ from django.contrib.auth import get_permission_codename
 # from django.utils.encoding import force_text
 # from django.utils.html import escape, format_html
 # from django.utils.safestring import mark_safe
-# from django.utils.text import capfirst, get_text_list
+from django.utils.text import capfirst, get_text_list
 from django.utils.translation import ugettext_lazy as _, ungettext
 # from django.views.decorators.csrf import csrf_protect
 # from django.views.generic import RedirectView
 
 from utils.python.utils import flatten
 
-from .forms import AddModelForm
+from .forms import AddChangeModelForm
 from .decorators import admin_staff_member_required
 from .views import AddView, ChangeListView, ChangeView, HistoryView, DeleteView
 
@@ -41,11 +44,11 @@ class ModelAdmin:
     # filter_horizontal = ()
     # radio_fields = {}
     # formfield_overrides = {}
-    # readonly_fields = ()
+    readonly_fields = ()
     # view_on_site = True
     # show_full_result_count = True
 
-    form = AddModelForm
+    form = AddChangeModelForm
     list_display = ('__str__', )
     list_display_styles = (
         (
@@ -64,7 +67,7 @@ class ModelAdmin:
     # list_display_links = ()
     # list_filter = ()
     # list_select_related = False
-    # list_per_page = 100
+    list_per_page = 100
     # list_max_show_all = 200
     # list_editable = ()
     search_fields = ()
@@ -85,7 +88,7 @@ class ModelAdmin:
     # object_history_template = None
 
     # # Actions
-    # actions = []
+    actions = ()
     # action_form = helpers.ActionForm
     # actions_on_top = True
     # actions_on_bottom = False
@@ -248,6 +251,47 @@ class ModelAdmin:
     def get_search_fields(self):
 
         return self.search_fields
+
+    def get_actions(self):
+
+        global_actions = self.site_admin.actions
+
+        local_actions = dict()
+        if self.actions:
+            for action in self.actions:
+
+                action = action if callable(action) else getattr(self.model_admin, action)
+
+                local_actions[action.__name__] = action
+
+        global_actions.update(local_actions)
+
+        actions = collections.OrderedDict()
+
+        for name, func in global_actions.items():
+
+            if hasattr(func, 'short_description'):
+                description = func.short_description
+                description = description.format(self.model._meta.verbose_name_plural.lower())
+            else:
+                description = name.replace('_', ' ')
+                description = capfirst(description)
+                description = '{} {}'.format(description, self.model._meta.verbose_name_plural.lower())
+
+            actions[name] = dict(func=func, description=description)
+
+        return actions
+
+    def message_user(self, request, msg, level=messages.INFO, extra_tags='', fail_silently=False):
+
+        if isinstance(level, str):
+            level = messages.DEFAULT_LEVELS[level]
+
+        messages.add_message(request, level, msg, extra_tags, fail_silently)
+
+    def get_readonly_fields(self, request, obj=None):
+
+        return self.readonly_fields
 
 
 class OtherAdmin:

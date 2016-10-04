@@ -63,3 +63,15 @@ def get_admin_url(model_meta_or_object, url_main_name):
             logger.error('Wrong input data')
     except Exception as e:
         logger.error('Does not working: {}'.format(e))
+
+
+@register.filter
+def show_all_objects(request, total_count_objects):
+
+    var = 'list_per_page'
+
+    GET_ = request.GET.copy()
+    GET_.pop(var, None)
+    GET_.setdefault(var, total_count_objects)
+
+    return '?' + GET_.urlencode()

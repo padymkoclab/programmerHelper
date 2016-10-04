@@ -19,11 +19,20 @@ from django.views.decorators.csrf import csrf_protect
 # from django.template.defaultfilters import truncatechars
 # from django.contrib import admin
 
-from .views import IndexView, LoginView, LogoutView, PasswordChangeView, PasswordChangeDoneView, AppIndexView, SettingsView, ImportView, ExportView
+from .views import (
+    IndexView,
+    LoginView,
+    LogoutView,
+    PasswordChangeView,
+    PasswordChangeDoneView,
+    AppIndexView,
+    SettingsView,
+    ImportView,
+    ExportView,
+)
 from .decorators import admin_staff_member_required
-from .admin import ModelAdmin
 from .exceptions import AlreadyRegisteredModel, AlreadyRegisteredApp
-# actions
+from .actions import delete_selected
 
 
 logging = logging.getLogger('django.development')
@@ -66,8 +75,20 @@ class SiteAdmin:
         self._registry_apps = {}
         self._registry_other = {}
         self.name = name
-        # self._actions = {'delete_selected': actions.delete_selected}
+        self._actions = dict(delete_selected=delete_selected)
         # self._global_actions = self._actions.copy()
+
+    @property
+    def actions(self):
+        return self._actions
+
+    def add_action(self, action, name=None):
+
+        name = action.__name__ if name is None else name
+        self._actions[name] = action
+
+    def disable_action(self, action_name):
+        del self._actions[action_name]
 
     @property
     def empty_value_display(self):
@@ -274,6 +295,12 @@ class SiteAdmin:
             ('Home', '##'),
             ('Users', None),
         )
+
+    def is_registered_model(self, model):
+
+        if model in self._registry_models.keys():
+            return True
+        return False
 
 
 DefaultSiteAdmin = SiteAdmin()

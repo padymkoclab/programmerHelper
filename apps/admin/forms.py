@@ -69,7 +69,13 @@ class LogoutForm(forms.Form):
     pass
 
 
-class AddModelForm(forms.ModelForm):
+class ReadOnlyWidget(forms.Widget):
+
+    def render(self, name, value, attrs=None):
+        return value
+
+
+class AddChangeModelForm(forms.ModelForm):
 
     fields_without_classes = tuple()
     disabled_fields = tuple()
@@ -83,6 +89,11 @@ class AddModelForm(forms.ModelForm):
         if self.fields_without_classes is not '__all__':
 
             for name, field in self.fields.items():
+
+                if name in ['name']:
+                # if name in self.model_admin.get_readonly_fields():
+                    field.widget = ReadOnlyWidget()
+                    continue
 
                 if name in self.fields_without_classes:
                     continue

@@ -174,15 +174,19 @@
 
                 <li class="bg-{% spaceless %}
                 {% if 'error' == message.extra_tags %}danger{% endif %}
+                {% if 'info' == message.extra_tags %}info{% endif %}
+                {% if 'warning' == message.extra_tags %}warning{% endif %}
                 {% if 'updated' == message.extra_tags %}success{% endif %}
                 {% if 'deleted' == message.extra_tags %}success{% endif %}
                 {% if 'created' == message.extra_tags %}success{% endif %}{% endspaceless %}
                 ">
                   <span class="glyphicon glyphicon-{% spaceless %}
-                  {% if 'error' in message.extra_tags %}exclamation-sign{% endif %}
-                  {% if 'updated' in message.extra_tags %}check{% endif %}
-                  {% if 'deleted' in message.extra_tags %}remove{% endif %}
-                  {% if 'created' in message.extra_tags %}ok{% endif %}{% endspaceless %}
+                  {% if 'error' == message.extra_tags %}exclamation-sign{% endif %}
+                  {% if 'info' == message.extra_tags %}{% endif %}
+                  {% if 'warning' == message.extra_tags %}{% endif %}
+                  {% if 'updated' == message.extra_tags %}check{% endif %}
+                  {% if 'deleted' == message.extra_tags %}remove{% endif %}
+                  {% if 'created' == message.extra_tags %}ok{% endif %}{% endspaceless %}
                   "></span>
                   {{ message }}
                 </li>

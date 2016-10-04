@@ -381,6 +381,9 @@ from apps.utilities.models import Utility, Category
 from apps.utilities.admin import UtilityAdmin, CategoryAdmin
 from apps.utilities.apps import UtilitiesConfig
 
+from apps.articles.models import Article
+from apps.articles.admin import ArticleAdmin, ArticlesAppAdmin
+
 
 class UtilityAppAdmin(AppAdmin):
 
@@ -570,8 +573,11 @@ DefaultSiteAdmin = type('SiteAdmin', (SiteAdmin, ), dict())()
 
 DefaultSiteAdmin.register_app(UserAppAdmin)
 DefaultSiteAdmin.register_app(UtilityAppAdmin)
+DefaultSiteAdmin.register_app(ArticlesAppAdmin)
+
 DefaultSiteAdmin.register_model(Level, LevelAdmin)
 DefaultSiteAdmin.register_model(User, UserAdmin)
 DefaultSiteAdmin.register_model(Profile, ProfileAdmin)
 DefaultSiteAdmin.register_model(Utility, UtilityAdmin)
 DefaultSiteAdmin.register_model(Category, CategoryAdmin)
+DefaultSiteAdmin.register_model(Article, ArticleAdmin)

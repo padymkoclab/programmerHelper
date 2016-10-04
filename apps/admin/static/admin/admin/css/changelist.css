@@ -10,11 +10,11 @@
 }
 
 #changelist table thead th{
-    background-color: #222;
+    background-color: rgb(42, 63, 84);
 }
 
 #changelist table thead th table{
-    background-color: #222;
+    background-color: rgb(42, 63, 84);
     color: rgb(255, 255, 255);
 }
 
@@ -34,4 +34,16 @@
 
 #changelist table td, #changelist table th{
     vertical-align: middle;
+}
+
+#navigation{
+    border-top: 1px solid #337AB7;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #337AB7;
+}
+
+
+#navigation ul{
+    padding: 0;
+    margin: 10px;
 }

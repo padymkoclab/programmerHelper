@@ -1,5 +1,6 @@
 
-from django.core.paginator import Paginator
+from django.http.request import QueryDict
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.template.response import TemplateResponse
 from django.contrib import messages
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
@@ -11,7 +12,7 @@ from django.apps import apps
 from django.http import HttpResponseRedirect, Http404
 from django.db.models.fields.reverse_related import ManyToOneRel
 from django.core.urlresolvers import reverse
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext_lazy as _, ungettext
 from django.views import generic
 from django.contrib.auth import login, logout
 from django.utils.text import capfirst, force_text
@@ -86,8 +87,6 @@ class PasswordChangeDoneView(generic.TemplateView):
 
 class ChangeListView(SiteModelAdminMixin, generic.View):
 
-    per_page = 5
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -97,51 +96,96 @@ class ChangeListView(SiteModelAdminMixin, generic.View):
             'align': 'left',
         }
 
-    def get_queryset(self):
+        self.list_per_page = self.model_admin.list_per_page
 
-        qs = self.model_admin.get_queryset(self.request)
+    def post(self, request):
 
-        search_fields = self.model_admin.get_search_fields()
+        pks_selected_objects = request.POST.getlist('selected_objects')
+        queryset = self.model_admin.model._default_manager.filter(pk__in=pks_selected_objects)
 
-        if search_fields:
+        if not queryset.exists():
 
-            q = self.request.GET.get('q', '')
-            q = q.strip()
+            messages.add_message(
+                request, messages.WARNING,
+                "Items must be selected in order to perform actions on them. No items have been changed.",
+                extra_tags='warning'
+            )
 
-            if q and search_fields:
+            return self.render_to_response(request)
 
-                type_search = self.request.GET.get('type_search')
-                if type_search not in ('contains', 'startswith', 'endswith'):
-                    raise ValueError('Not correct value of "type_search".')
+        action = request.POST.get('action')
 
-                ignorecase = self.request.GET.get('ignorecase')
+        actions = self.model_admin.get_actions()
 
-                # convert ignorecase to the Django`s lookup type
-                ignorecase = '' if ignorecase is None else 'i'
+        # get function of action
+        func = actions[action]['func']
 
-                # make a lookup format for the search
-                lookup = '__{}{}'.format(ignorecase, type_search)
+        # make action
+        func(self.model_admin, request, queryset)
 
-                # make the same conditions for each field in the search_fields
-                conditions = {'{}{}'.format(field, lookup): q for field in search_fields}
-
-                # filter by conditions on the all fields listed the search_fields
-                qs = qs.filter(**conditions)
-
-        return qs
+        return self.render_to_response(request)
 
     def get(self, request):
 
         return self.render_to_response(request)
 
+    def get_queryset(self, request):
+
+        qs = self.model_admin.get_queryset(request)
+
+        search_fields = self.model_admin.get_search_fields()
+
+        if search_fields:
+
+            if self.q and search_fields:
+
+                if self.type_search not in ('contains', 'startswith', 'endswith'):
+                    raise ValueError('Not correct value of "type_search".')
+
+                # convert ignorecase to the Django`s lookup type
+                self.ignorecase = '' if self.ignorecase is None else 'i'
+
+                # make a lookup format for the search
+                lookup = '__{}{}'.format(self.ignorecase, self.type_search)
+
+                # make the same conditions for each field in the search_fields
+                conditions = {'{}{}'.format(field, lookup): self.q for field in search_fields}
+
+                # filter by conditions on the all fields listed the search_fields
+                qs = qs.filter(**conditions)
+
+                count = qs.count()
+
+                object_name = self.model_meta.verbose_name if count == 1 else self.model_meta.verbose_name_plural
+                object_name = object_name.lower()
+
+                msg = ungettext(
+                    'By a condition "{}" found {} {}',
+                    'By a condition "{}" found {} {}',
+                    count
+                ).format(self.q, count, object_name)
+
+                self.model_admin.message_user(request, msg, extra_tags='info', level='INFO')
+
+        return qs
+
     def get_context_data(self, **kwargs):
 
         context = self.site_admin.each_context(self.request)
+
+        self.q = self.request.GET.get('q', '')
+        self.q = self.q.strip()
+        self.ignorecase = self.request.GET.get('ignorecase', '1')
+        self.type_search = self.request.GET.get('type_search', 'contains')
 
         context['title'] = _('Select {} to change').format(self.model_meta.verbose_name_plural.lower())
 
         context['model_meta'] = self.model_meta
         context['model_admin'] = self.model_admin
+
+        context['q'] = self.q
+        context['ignorecase'] = self.ignorecase
+        context['type_search'] = self.type_search
 
         listing_search_fields = [
             force_text(self.model_meta.get_field(field).verbose_name)
@@ -151,13 +195,35 @@ class ChangeListView(SiteModelAdminMixin, generic.View):
 
         # context['has_add_permission'] = self.model_admin.has_add_permission(self.request)
 
-        get_list_values_with_styles = self.get_list_values_with_styles()
+        list_values_with_styles = self.get_list_values_with_styles()
 
-        # import ipdb; ipdb.set_trace()
+        list_per_page = self.request.GET.get('list_per_page', self.list_per_page)
+        list_per_page = int(list_per_page)
 
-        context['object_list'] = Paginator(get_list_values_with_styles, self.per_page)
+        paginator = Paginator(list_values_with_styles, list_per_page)
+        total_count_objects = paginator.count
+
+        page = self.request.GET.get('page')
+
+        try:
+            page_object_list = paginator.page(page)
+        except PageNotAnInteger:
+            page = 1
+            page_object_list = paginator.page(page)
+        except EmptyPage:
+            page = paginator.num_pages
+            page_object_list = paginator.page(page)
+
+        context['page_object_list'] = page_object_list
+        context['total_count_objects'] = total_count_objects
+
+        list_per_page = total_count_objects if total_count_objects < list_per_page else list_per_page
+
+        context['list_per_page'] = list_per_page
 
         context['list_display_with_styles'] = self.get_list_display_with_styles()
+
+        context['actions'] = self.model_admin.get_actions()
 
         return context
 
@@ -205,7 +271,7 @@ class ChangeListView(SiteModelAdminMixin, generic.View):
 
         list_values_with_styles = list()
 
-        for obj in self.get_queryset():
+        for obj in self.get_queryset(self.request):
 
             values = list()
             for field_or_method in self.model_admin.get_list_display():
@@ -246,7 +312,7 @@ class ChangeListView(SiteModelAdminMixin, generic.View):
 
             admin_url = self.site_admin.get_url('change', self.model_meta, kwargs={'pk': obj.pk})
 
-            list_values_with_styles.append((row_color, admin_url, values))
+            list_values_with_styles.append((row_color, admin_url, obj.pk, values))
         return list_values_with_styles
 
     def get_list_display_with_styles(self):
@@ -462,47 +528,40 @@ class AddChangeView(ContextAdminMixin, generic.FormView):
 
     def get_form(self):
 
-        fieldsets = self.model_admin.get_fieldsets(self.request)
+        fieldsets = self.model_admin.get_fieldsets(self.request, self.obj)
         return AddChangeDisplayForm(self.get_modelform(), fieldsets=fieldsets)
 
     def form_invalid(self, form):
 
-        self.add_message('invalid')
+        object_name = self.model_meta.verbose_name.lower()
 
-        return HttpResponseRedirect(redirect_to=self.get_success_url())
+        if self.obj is None:
+            msg = _('Could not create a new {}').format(object_name)
+        else:
+            msg = _('Could not update the {} "{}"').format(object_name, self.obj)
+
+        self.model_admin.message_user(self.request, msg, 'ERROR', 'error')
+
         return self.render_to_response(context=self.get_context_data(form=form))
 
     def form_valid(self, form):
-
-        self.add_message('valid')
 
         self.object = form.save(commit=False)
 
         self.object.save()
 
+        object_name = self.model_meta.verbose_name.lower()
+
+        if self.obj is None:
+            extra_tags = 'created'
+            msg = _('Succefully created new {} "{}"').format(object_name, self.object)
+        else:
+            extra_tags = 'updated'
+            msg = _('Succefully updated {} "{}"').format(object_name, self.object)
+
+        self.model_admin.message_user(self.request, msg, 'SUCCESS', extra_tags)
+
         return HttpResponseRedirect(redirect_to=self.get_success_url())
-
-    def add_message(self, status):
-
-        if status == 'invalid':
-
-            msg_level = messages.ERROR
-
-            if self.obj is None:
-                msg = 'Could not create an object'
-            else:
-                msg = 'Could not updated an object'
-
-        if status == 'valid':
-
-            msg_level = messages.SUCCESS
-
-            if self.obj is None:
-                msg = 'Succefully created new object'
-            else:
-                msg = 'Succefully updated object'
-
-        messages.add_message(self.request, msg_level, msg)
 
     def get_success_url(self):
 
@@ -537,11 +596,12 @@ class AppIndexView(SiteAppAdminMixin, generic.TemplateView):
         info = list()
         for model in self.app_config.get_models():
 
-            info.append((
-                force_text(model._meta.verbose_name),
-                self.site_admin.get_url('changelist', model._meta),
-                model._default_manager.count(),
-            ))
+            if self.site_admin.is_registered_model(model):
+                info.append((
+                    force_text(model._meta.verbose_name),
+                    self.site_admin.get_url('changelist', model._meta),
+                    model._default_manager.count(),
+                ))
 
         info.sort(key=lambda x: x[0].lower())
 

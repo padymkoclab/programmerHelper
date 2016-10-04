@@ -3,9 +3,11 @@ from django.template.defaultfilters import truncatechars
 from django.utils.translation import ugettext_lazy as _
 from django.contrib import admin
 
-from apps.core.admin import AdminSite, AppAdmin
 from apps.marks.admin import MarkGenericInline
 from apps.comments.admin import CommentGenericInline
+
+from apps.admin.admin import ModelAdmin
+from apps.admin.app import AppAdmin
 
 from .forms import ArticleAdminModelForm, SubsectionAdminModelForm
 from .formsets import SubsectionFormset
@@ -14,10 +16,10 @@ from .apps import ArticlesConfig
 from .actions import make_articles_as_draft, make_articles_as_published
 
 
-@AdminSite.register_app_admin_class
-class AppAdmin(AppAdmin):
+class ArticlesAppAdmin(AppAdmin):
 
-    label = ArticlesConfig.label
+    app_config_class = ArticlesConfig
+    app_icon = 'users'
 
     def get_context_for_tables_of_statistics(self):
 
@@ -107,8 +109,8 @@ class SubsectionInline(admin.StackedInline):
     suit_classes = 'suit-tab suit-tab-subsections'
 
 
-@admin.register(Article, site=AdminSite)
-class ArticleAdmin(admin.ModelAdmin):
+# @admin.register(Article, site=AdminSite)
+class ArticleAdmin(ModelAdmin):
     '''
     Admin View for Article
     '''
@@ -231,28 +233,6 @@ class ArticleAdmin(admin.ModelAdmin):
             return [inline(self.model, self.admin_site) for inline in inlines]
 
         return []
-
-    def suit_row_attributes(self, obj, request):
-
-        css_class = 'default'
-        if obj.rating is not None:
-            if 4 <= obj.rating <= 5:
-                css_class = 'success'
-            if obj.rating < 2:
-                css_class = 'error'
-
-        return {'class': css_class}
-
-    def suit_cell_attributes(self, obj, column):
-
-        if column in ['created', 'updated']:
-            css_class = 'right'
-        elif column == 'name':
-            css_class = 'left'
-        else:
-            css_class = 'center'
-
-        return {'class': 'text-{}'.format(css_class)}
 
     def truncated_name(self, obj):
 

@@ -2,14 +2,14 @@
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 
-from apps.admin.forms import AddModelForm
+from apps.admin.forms import AddChangeModelForm
 
 from utils.django.widgets import AutosizedTextarea
 
 from .models import Category, Utility
 
 
-class CategoryAdminModelForm(AddModelForm):
+class CategoryAdminModelForm(AddChangeModelForm):
 
     disabled_fields = ('slug', )
 
@@ -19,7 +19,7 @@ class CategoryAdminModelForm(AddModelForm):
         }
 
 
-class UtilityAdminModelForm(AddModelForm):
+class UtilityAdminModelForm(AddChangeModelForm):
 
     class Meta:
         widgets = {

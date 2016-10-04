@@ -47,3 +47,39 @@ def prepopulated_fields_js(context):
     except Exception as e:
         logger.critical('Does not working "prepopulated_fields": {}'.format(e))
         return ''
+
+
+@register.simple_tag(takes_context=True)
+def urlencode_with_conssidering_pagination(context, page, position):
+
+    try:
+
+        if position == 'previous':
+            num = page.previous_page_number()
+        elif position == 'next':
+            num = page.next_page_number()
+        else:
+            num = position
+
+        if not isinstance(position, int) and num < 1:
+            raise Exception('Invalid number page')
+
+        request = context.get('request')
+
+        querydict = request.GET.copy()
+
+        querydict.pop('page', 1)
+
+        list_per_page = request.resolver_match.func.view_initkwargs['model_admin'].list_per_page
+
+        list_per_page = querydict.pop('list_per_page', [list_per_page])[-1]
+
+        num = str(num)
+
+        querydict.setdefault('page', num)
+        querydict.setdefault('list_per_page', list_per_page)
+
+        return '?' + querydict.urlencode()
+
+    except ZeroDivisionError:
+        return ''

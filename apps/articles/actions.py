@@ -12,12 +12,12 @@ def update_status_and_return_msg(model_admin, request, queryset, status):
     rows_updated = queryset.update(status=status)
 
     msg = ungettext_lazy(
-        'Updated %(num)d article',
-        'Updated %(num)d articles',
+        'Updated {} article',
+        'Updated {} articles',
         rows_updated,
-    ) % {'num': rows_updated}
+    ).format(rows_updated)
 
-    model_admin.message_user(request, msg)
+    model_admin.message_user(request, msg, extra_tags='updated')
 
 
 def make_articles_as_draft(model_admin, request, queryset):

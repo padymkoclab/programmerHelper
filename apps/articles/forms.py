@@ -2,8 +2,8 @@
 from django.utils.translation import ugettext_lazy as _
 from django import forms
 
-from suit.widgets import AutosizedTextarea
-from apps.core.widgets import CKEditorAdminWidget
+# from suit.widgets import AutosizedTextarea
+# from apps.core.widgets import CKEditorAdminWidget
 
 from utils.django.widgets import AdminImageThumbnail, SplitInputsArrayWidget
 
@@ -38,17 +38,17 @@ class ArticleAdminModelForm(forms.ModelForm):
             attrs={'class': 'span12'}
         )
 
-        self.fields['quotation'].widget = AutosizedTextarea(attrs={
-            'class': 'span12',
-            'placeholder': _('Enter quotation'),
-        })
+        # self.fields['quotation'].widget = AutosizedTextarea(attrs={
+        #     'class': 'span12',
+        #     'placeholder': _('Enter quotation'),
+        # })
 
     class Meta:
         widgets = {
             'status': forms.RadioSelect(),
             'image': AdminImageThumbnail(),
-            'heading': CKEditorAdminWidget(),
-            'conclusion': CKEditorAdminWidget(),
+            # 'heading': CKEditorAdminWidget(),
+            # 'conclusion': CKEditorAdminWidget(),
         }
 
     def clean_tags(self):
@@ -70,7 +70,7 @@ class SubsectionAdminModelForm(forms.ModelForm):
         self.fields['slug'].disabled = True
         self.fields['slug'].widget.attrs['class'] = 'span12'
 
-    class Meta:
-        widgets = {
-            'content': CKEditorAdminWidget(),
-        }
+    # class Meta:
+    #     widgets = {
+    #         'content': CKEditorAdminWidget(),
+    #     }

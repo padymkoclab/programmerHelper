@@ -2,7 +2,7 @@
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 
-from suit.widgets import AutosizedTextarea
+# from suit.widgets import AutosizedTextarea
 
 from .models import Tag
 
@@ -29,7 +29,7 @@ class TagAdminModelForm(forms.ModelForm):
         self.fields['name'].widget.attrs['class'] = 'span12'
         self.fields['name'].widget.attrs['placeholder'] = _('Enter name')
 
-        self.fields['description'].widget = AutosizedTextarea(attrs={
-            'class': 'span12',
-            'placeholder': _('Enter description'),
-        })
+        # self.fields['description'].widget = AutosizedTextarea(attrs={
+        #     'class': 'span12',
+        #     'placeholder': _('Enter description'),
+        # })

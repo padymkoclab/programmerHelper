@@ -165,6 +165,7 @@ class CategoryAdmin(ModelAdmin):
         'updated',
         'created',
     )
+    list_per_page = 10
     search_fields = ('name', )
     prepopulated_fields = {'slug': ('name', )}
     readonly_fields = [
@@ -174,6 +175,7 @@ class CategoryAdmin(ModelAdmin):
         'get_count_utilities',
         'updated',
         'created',
+        'name',
     ]
 
     def get_queryset(self, request):
@@ -208,15 +210,16 @@ class CategoryAdmin(ModelAdmin):
                 _('Additional information'), {
                     'classes': ('collapse', ),
                     'fields': [
-                        'get_total_mark',
-                        'get_total_count_opinions',
-                        'get_total_count_comments',
-                        'get_count_utilities',
-                        'updated',
-                        'created',
+                        # 'get_total_mark',
+                        # 'get_total_count_opinions',
+                        # 'get_total_count_comments',
+                        # 'get_count_utilities',
+                        # 'updated',
+                        # 'created',
                     ]
                 }
             ])
+
         return fieldsets
 
     def get_inline_instances(self, request, obj=None):

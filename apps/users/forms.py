@@ -7,7 +7,7 @@ from django.contrib.auth import password_validation
 
 from utils.django.widgets import HorizontalRadioSelect, AutosizedTextarea
 
-from apps.admin.forms import AddModelForm
+from apps.admin.forms import AddChangeModelForm
 
 # from passwords.fields import PasswordField
 # from passwords.validators import (
@@ -104,7 +104,7 @@ class UserChangeForm(forms.ModelForm):
         return self.initial["password"]
 
 
-class LevelAdminModelForm(AddModelForm):
+class LevelAdminModelForm(AddChangeModelForm):
 
     fields_without_classes = ('color', )
     disabled_fields = ('slug', )
