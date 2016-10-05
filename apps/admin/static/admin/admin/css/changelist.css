@@ -9,17 +9,10 @@
     background-color: rgb(255, 255, 255);
 }
 
+
 #changelist table thead th{
     background-color: rgb(42, 63, 84);
-}
-
-#changelist table thead th table{
-    background-color: rgb(42, 63, 84);
     color: rgb(255, 255, 255);
-}
-
-#changelist table thead th table tr td{
-    width: 99%;
 }
 
 #changelist > table thead th:nth-child(1), #changelist > table tbody td:nth-child(1){
@@ -34,6 +27,20 @@
 
 #changelist table td, #changelist table th{
     vertical-align: middle;
+}
+
+
+#changelist table th > span{
+    display: inline-block;
+}
+
+#changelist table th span:first-child{
+    width: 80%;
+}
+
+
+#changelist table th .sort_icon{
+    width: 5%;
 }
 
 #navigation{

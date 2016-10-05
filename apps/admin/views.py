@@ -1,4 +1,6 @@
 
+import collections
+
 from django.http.request import QueryDict
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.template.response import TemplateResponse
@@ -20,6 +22,7 @@ from django.utils.text import capfirst, force_text
 from utils.django.views_mixins import ContextTitleMixin
 
 from .forms import LoginForm, AddChangeDisplayForm
+from .utils import pretty_label_or_short_description
 from .descriptors import SiteAdminStrictDescriptor, ModelAdminStrictDescriptor
 from .views_mixins import SiteAdminMixin, SiteModelAdminMixin, SiteAppAdminMixin, ContextAdminMixin
 
@@ -178,31 +181,17 @@ class ChangeListView(SiteModelAdminMixin, generic.View):
         self.ignorecase = self.request.GET.get('ignorecase', '1')
         self.type_search = self.request.GET.get('type_search', 'contains')
 
-        context['title'] = _('Select {} to change').format(self.model_meta.verbose_name_plural.lower())
-
-        context['model_meta'] = self.model_meta
-        context['model_admin'] = self.model_admin
-
-        context['q'] = self.q
-        context['ignorecase'] = self.ignorecase
-        context['type_search'] = self.type_search
-
         listing_search_fields = [
             force_text(self.model_meta.get_field(field).verbose_name)
             for field in self.model_admin.search_fields
         ]
-        context['listing_search_fields'] = ', '.join(listing_search_fields)
 
-        context['has_add_permission'] = self.model_admin.has_add_permission(self.request)
-        context['has_export_permission'] = self.model_admin.has_add_permission(self.request)
-        context['has_import_permission'] = self.model_admin.has_add_permission(self.request)
-
-        list_values_with_styles = self.get_list_values_with_styles()
+        qs = self.get_queryset(self.request)
 
         list_per_page = self.request.GET.get('list_per_page', self.list_per_page)
         list_per_page = int(list_per_page)
 
-        paginator = Paginator(list_values_with_styles, list_per_page)
+        paginator = Paginator(qs, list_per_page)
         total_count_objects = paginator.count
 
         page = self.request.GET.get('page')
@@ -216,16 +205,25 @@ class ChangeListView(SiteModelAdminMixin, generic.View):
             page = paginator.num_pages
             page_object_list = paginator.page(page)
 
-        context['page_object_list'] = page_object_list
-        context['total_count_objects'] = total_count_objects
-
         list_per_page = total_count_objects if total_count_objects < list_per_page else list_per_page
 
-        context['list_per_page'] = list_per_page
-
-        context['list_display_with_styles'] = self.get_list_display_with_styles()
-
-        context['actions'] = self.model_admin.get_actions()
+        context.update({
+            'title': _('Select {} to change').format(self.model_meta.verbose_name_plural.lower()),
+            'model_meta': self.model_meta,
+            'model_admin': self.model_admin,
+            'q': self.q,
+            'ignorecase': self.ignorecase,
+            'type_search': self.type_search,
+            'listing_search_fields': ', '.join(listing_search_fields),
+            'has_add_permission': self.model_admin.has_add_permission(self.request),
+            'has_export_permission': self.model_admin.has_add_permission(self.request),
+            'has_import_permission': self.model_admin.has_add_permission(self.request),
+            'total_count_objects': total_count_objects,
+            'list_per_page': list_per_page,
+            'actions': self.model_admin.get_actions(),
+            'page_object_list': page_object_list,
+            'table_header': self.get_table_header(),
+        })
 
         return context
 
@@ -246,7 +244,7 @@ class ChangeListView(SiteModelAdminMixin, generic.View):
         ]
 
     @property
-    def list_display_styles_by_column(self):
+    def get_styles_for_column(self):
 
         columns_with_styles = {}
 
@@ -283,8 +281,6 @@ class ChangeListView(SiteModelAdminMixin, generic.View):
                 elif hasattr(self.model_admin, field_or_method):
                     model_admin_method = getattr(self.model_admin, field_or_method)
                     value = model_admin_method(obj)
-                else:
-                    raise Exception(field_or_method)
 
                 fieldnames = [field.name for field in self.model_admin.model._meta.get_fields()]
 
@@ -310,7 +306,7 @@ class ChangeListView(SiteModelAdminMixin, generic.View):
                 if value is None:
                     value = self.site_admin.empty_value_display
 
-                values.append((value, self.list_display_styles_by_column[field_or_method]))
+                values.append((value, self.get_styles_for_column[field_or_method]))
 
             row_color = self.get_row_color(obj)
 
@@ -319,92 +315,57 @@ class ChangeListView(SiteModelAdminMixin, generic.View):
             list_values_with_styles.append((row_color, admin_url, obj.pk, values))
         return list_values_with_styles
 
-    def get_list_display_with_styles(self):
+    def get_table_header(self):
 
         list_display = self.model_admin.get_list_display()
 
-        new_list_display = list()
+        table_header = collections.OrderedDict()
 
-        for name_attr_display in list_display:
+        for column_name in list_display:
 
             # made also __all__
-            if name_attr_display == '__str__':
-
-                attr_display = self.model_admin.model._meta.verbose_name
+            if column_name == '__str__':
+                display_name = self.model_meta.verbose_name
 
             else:
 
-                if hasattr(self.model_admin.model, name_attr_display):
-                    attr_display = getattr(self.model_admin.model, name_attr_display)
-                elif hasattr(self.model_admin, name_attr_display):
-                    attr_display = getattr(self.model_admin, name_attr_display)
+                if hasattr(self.model_admin.model, column_name):
+                    attr = getattr(self.model_admin.model, column_name)
+                elif hasattr(self.model_admin, column_name):
+                    attr = getattr(self.model_admin, column_name)
+
+                if callable(attr):
+                    display_name = pretty_label_or_short_description(attr)
+                elif isinstance(attr, property):
+                    attr = attr.fget
+                    display_name = pretty_label_or_short_description(attr)
                 else:
-                    raise AttributeError(
-                        'Either no model or model admin has no attribute {}'.format(
-                            name_attr_display
-                        )
-                    )
-
-                if callable(attr_display):
-
-                    if hasattr(attr_display, 'short_description'):
-                        attr_display = force_text(attr_display.short_description)
-                    else:
-                        attr_display = attr_display.__name__.replace('_', ' ')
-                        attr_display = force_text(attr_display)
-                        attr_display = capfirst(attr_display)
-
-                elif isinstance(attr_display, property):
-
-                    attr_display = attr_display.fget.__name__.replace('_', ' ')
-                    attr_display = force_text(attr_display)
-                    attr_display = capfirst(attr_display)
-
-                else:
-
-                    field = self.model_admin.model._meta.get_field(name_attr_display)
+                    field = self.model_meta.get_field(column_name)
 
                     if isinstance(field, ManyToOneRel):
                         raise TypeError(
                             'Does not support for field ({}) with type ManyToOneRel.'.format(field.name)
                         )
 
-                    attr_display = field.verbose_name
+                    display_name = field.verbose_name
 
-            new_list_display.append((attr_display, self.list_display_styles_by_column[name_attr_display]))
+                styles = self.get_styles_for_column[column_name]
+                is_sortable = self.is_sortable_column(column_name)
 
-        return new_list_display
+            table_header[column_name] = {
+                'display_name': display_name,
+                'is_sortable': is_sortable,
+                'styles': styles,
+            }
 
-    def get_row_color(self, obj):
+        return table_header
 
-        colored_rows_by = self.model_admin.get_colored_rows_by()
+    def is_sortable_column(self, column_name):
 
-        row_color = None
-        if hasattr(self.model_admin, colored_rows_by):
+        if column_name in (i.name for i in self.model_meta.concrete_fields):
+            return True
 
-            colored_rows_by = getattr(self.model_admin, colored_rows_by)
-            if callable(colored_rows_by):
-                row_color = colored_rows_by(obj)
-
-        return row_color
-
-    @staticmethod
-    def convert_boolean_to_bootstrap_icon(value):
-
-        if value is True:
-            bootstap_class = 'ok-sign'
-            color = 'rgb(0, 255, 0)'
-        elif value is False:
-            bootstap_class = 'remove-sign'
-            color = 'rgb(255, 0, 0)'
-        elif value is None:
-            bootstap_class = 'question-sign'
-            color = 'rgb(0, 0, 0)'
-
-        return format_html(
-            '<span class="glyphicon glyphicon-{}" style="color: {}"></span>',
-            bootstap_class, color
-        )
+        return False
 
 
 class AddView(SiteModelAdminMixin, generic.View):

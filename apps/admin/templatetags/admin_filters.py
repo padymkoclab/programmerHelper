@@ -75,3 +75,9 @@ def show_all_objects(request, total_count_objects):
     GET_.setdefault(var, total_count_objects)
 
     return '?' + GET_.urlencode()
+
+
+@register.filter
+def date_hierarchy(page_object_list):
+
+    return page_object_list

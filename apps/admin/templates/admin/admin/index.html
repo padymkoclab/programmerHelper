@@ -215,6 +215,7 @@
 
 
   {% block footer %}
+{% comment %}
 
   {% for i in avaliable_apps_with_models %}
         {% for k, v in i.items %}
@@ -223,6 +224,7 @@
         <hr>
       {% endfor %}
 
+{% endcomment %}
 {% endblock footer %}
 
 {% endblock wrapper %}

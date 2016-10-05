@@ -111,10 +111,13 @@
       </div>
     {% endblock filters %}
 
-    {% block date_hierarchy %}
-      <div id="div_date_hierarchy">
-      </div>
-    {% endblock date_hierarchy %}
+    {% if model_admin.date_hierarchy is not None %}
+      {% block date_hierarchy %}
+        <div id="div_date_hierarchy">
+          {{ page_object_list|date_hierarchy }}
+        </div>
+      {% endblock date_hierarchy %}
+    {% endif %}
 
     {% block actions_and_display_control %}
       <div id="div_actions_and_display_control">
@@ -166,7 +169,6 @@
     {% block table_changelist %}
 
       <div id="changelist">
-
         <div class="table-responsive">
           <table class="table table-bordered table-hover">
               <thead>
@@ -174,49 +176,19 @@
                   <th>
                     <input type="checkbox">
                   </th>
-                {% for obj_attribute_display, css_class in list_display_with_styles %}
+                  {% for column in table_header.values %}
                     <th class="text-center">
-                      <table>
-                        <tbody>
-                          <tr>
-                            <td><span>{{ obj_attribute_display|capfirst }}</span></td>
-                            <td><i class="fa fa-fw fa-sort"></i></td>
-                          </tr>
-                        </tbody>
-                      </table>
+                      <span>{{ column.display_name }}</span>
+                      {% if column.is_sortable is True %}
+                      <span class="sort_icon">
+                        <i class="fa fa-fw fa-sort"></i>
+                      </span>
+                      {% endif %}
                     </th>
-                {% endfor %}
+                  {% endfor %}
                 </tr>
               </thead>
-              <tbody>
-                {% for row_color, admin_url, obj_pk, list_value_with_styles in page_object_list.object_list %}
-                  <tr class="{% if row_color is not None %}bg-{{row_color}}{% endif %}">
-                      <td>
-                        <input type="checkbox" form="form_actions" name="selected_objects" value="{{ obj_pk }}">
-                      </td>
-                      {% for value, classes in list_value_with_styles %}
-                        <td class="text-{{ classes.align }}">
-
-                          {% if forloop.counter == 1 %}
-                            <a href="{{ admin_url }}">{{ value }}</a>
-                          {% else %}
-                            {{ value }}
-                          {% endif %}
-
-                        </td>
-                      {% endfor %}
-                  </tr>
-                {% endfor %}
-              </tbody>
-              {% comment %}
-              <tfooter>
-                <tr>
-                  <td>
-
-                  </td>
-                </tr>
-              </tfooter>
-              {% endcomment %}
+              <tbody>{% display_object_list %}</tbody>
           </table>
         </div>
 

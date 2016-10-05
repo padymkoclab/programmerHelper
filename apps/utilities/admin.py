@@ -131,6 +131,7 @@ class CategoryAdmin(ModelAdmin):
     Admin View for Category
     '''
 
+    list_display_links = ('name', )
     form = CategoryAdminModelForm
     list_display = (
         'name',
@@ -258,7 +259,7 @@ class UtilityAdmin(OpinionsAdminMixin, ModelAdmin):
         'updated',
         'created',
     )
-
+    date_hierarchy = 'created'
     list_filter = (
         ('category', admin.RelatedOnlyFieldListFilter),
         IsNewSimpleListFilter,
