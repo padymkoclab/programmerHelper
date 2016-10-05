@@ -38,9 +38,6 @@ from .actions import delete_selected
 logging = logging.getLogger('django.development')
 
 
-system_check_errors = []
-
-
 class SiteAdmin:
 
     admin_site_header = _('Admin part')

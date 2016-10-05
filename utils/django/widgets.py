@@ -261,3 +261,9 @@ class AutosizedTextarea(forms.Textarea):
         output += "<script>$('#{}').AutoResize();</script>".format(attrs['id'])
 
         return output
+
+
+class ReadOnlyWidget(forms.Widget):
+
+    def render(self, name, value, attrs=None):
+        return value

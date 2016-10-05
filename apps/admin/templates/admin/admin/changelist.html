@@ -24,9 +24,12 @@
   {% block toolbox %}
     <div class="row">
       <div class="col-xs-12 text-right">
-        <button class="btn btn-warning">{% trans "Export" %}</button>
-        <a href="{% url 'admin:export' %}" class="btn btn-danger">{% trans "Export" %}</a>
-        <a href="{% url 'admin:import' %}" class="btn btn-danger">{% trans "Import" %}</a>
+        {% if has_export_permission is True %}
+          <button class="btn btn-warning">{% trans "Export" %}</button>
+        {% endif %}
+        {% if has_import_permission is True %}
+          <a href="{% url 'admin:import' %}" class="btn btn-danger">{% trans "Import" %}</a>
+        {% endif %}
         {% if has_add_permission is True %}
           <a href="{{ model_meta|get_admin_url:'add' }}" class="btn btn-success">{% trans "Add " %} {{ model_meta.verbose_name|lower }}</a>
         {% endif %}
@@ -118,17 +121,31 @@
         <div class="row">
           <div class="col-xs-12 col-sm-8">
             <form action="" method="POST" class="form-horizontal" id="form_actions">{% csrf_token %}
-              <div class="form-group">
-                <span class="control-label col-xs-1" for="select_actions">{% trans "Actions" %}</span>
-                <div class="col-xs-6">
-                  <select name="action" id="select_actions" class="form-control">
-                    {% for action_name, options in actions.items %}
-                      <option value="{{ action_name }}">{{ options.description }}</option>
-                    {% endfor %}
-                  </select>
-                </div>
-                <button type="submit" class="btn btn-default">{% trans "Make it" %}</button>
-              </div>
+              <table>
+                <tbody>
+                  <tr>
+                    <td><span for="select_actions">{% trans "Actions" %}</span></td>
+                    <td>
+                      <select name="action" id="select_actions" class="form-control">
+                        {% for action_name, options in actions.items %}
+                          <option value="{{ action_name }}">{{ options.description }}</option>
+                        {% endfor %}
+                      </select>
+                    </td>
+                    {% if model_admin.actions_selection_counter is True %}
+                    <td>
+                        <span>
+                          <span>{% trans 'Selected' %}</span>
+                          <span id="count_selected_objects">0</span>
+                          <span>{% blocktrans %}from {{ total_count_objects  }}{% endblocktrans %}
+                          </span>
+                        </span>
+                    </td>
+                    {% endif %}
+                    <td><button type="submit" class="btn btn-default">{% trans "Make it" %}</button></td>
+                  </tr>
+                </tbody>
+              </table>
             </form>
           </div>
           <div class="col-xs-12 col-sm-4">

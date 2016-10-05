@@ -83,3 +83,21 @@ def urlencode_with_conssidering_pagination(context, page, position):
 
     except ZeroDivisionError:
         return ''
+
+
+@register.simple_tag
+def get_addons_for_field(fieldline_field):
+
+    field_name = fieldline_field.field.name
+
+    form_addons = getattr(fieldline_field.field.form, 'addons', {})
+
+    field_addons = form_addons.get(field_name)
+
+    if field_addons is not None:
+        return {
+            'left': field_addons.get('left', None),
+            'right': field_addons.get('right', None),
+        }
+
+    return

@@ -3,6 +3,8 @@ from django.db import models
 
 from utils.django.functions_db import Round
 
+from .querysets import CategoryQuerySet, UtilityQuerySet
+
 
 class CategoryManager(models.Manager):
 
@@ -22,3 +24,7 @@ class UtilityManager(models.Manager):
         self = self.utilities_with_count_opinions()
         count_opinions = self.aggregate(sum=models.Sum('count_opinions'))['sum']
         return count_opinions or 0
+
+
+CategoryManager = CategoryManager.from_queryset(CategoryQuerySet)
+UtilityManager = UtilityManager.from_queryset(UtilityQuerySet)

@@ -175,13 +175,12 @@ class CategoryAdmin(ModelAdmin):
         'get_count_utilities',
         'updated',
         'created',
-        'name',
     ]
 
     def get_queryset(self, request):
 
         qs = super().get_queryset(request)
-        # qs = qs.categories_with_all_additional_fields()
+        qs = qs.categories_with_all_additional_fields()
         return qs
 
     def get_fieldsets(self, request, obj=None):
@@ -210,12 +209,12 @@ class CategoryAdmin(ModelAdmin):
                 _('Additional information'), {
                     'classes': ('collapse', ),
                     'fields': [
-                        # 'get_total_mark',
-                        # 'get_total_count_opinions',
-                        # 'get_total_count_comments',
-                        # 'get_count_utilities',
-                        # 'updated',
-                        # 'created',
+                        'get_total_mark',
+                        'get_total_count_opinions',
+                        'get_total_count_comments',
+                        'get_count_utilities',
+                        'updated',
+                        'created',
                     ]
                 }
             ])
@@ -233,10 +232,11 @@ class CategoryAdmin(ModelAdmin):
         total_mark = obj.get_total_mark()
 
         row_color = None
-        if total_mark > 0:
-            row_color = 'success'
-        elif total_mark < 0:
-            row_color = 'danger'
+        if total_mark is not None:
+            if total_mark > 0:
+                row_color = 'success'
+            elif total_mark < 0:
+                row_color = 'danger'
 
         return row_color
 
@@ -247,9 +247,9 @@ class UtilityAdmin(OpinionsAdminMixin, ModelAdmin):
     Admin View for Utility
     '''
 
-    # form = UtilityAdminModelForm
+    form = UtilityAdminModelForm
     list_display = (
-        'truncated_name',
+        'name',
         'category',
         'get_rating',
         'get_count_opinions',
@@ -280,7 +280,7 @@ class UtilityAdmin(OpinionsAdminMixin, ModelAdmin):
 
     def get_queryset(self, request):
         qs = super(UtilityAdmin, self).get_queryset(request)
-        # qs = qs.utilities_with_all_additional_fields()
+        qs = qs.utilities_with_all_additional_fields()
         return qs
 
     def get_fieldsets(self, request, obj=None):
@@ -327,27 +327,3 @@ class UtilityAdmin(OpinionsAdminMixin, ModelAdmin):
             ]
             return [inline(self.model, self.admin_site) for inline in inlines]
         return []
-
-    def suit_cell_attributes(self, obj, column):
-
-        if column in ['truncated_name', 'category']:
-            css_class = 'text-left'
-        elif column in ['created', 'updated']:
-            css_class = 'text-right'
-        else:
-            css_class = 'text-center'
-
-        return {'class': css_class}
-
-    def suit_row_attributes(self, obj, request):
-
-        if obj.rating is not None:
-            if obj.rating > 0:
-                return {'class': 'success'}
-            elif obj.rating < 0:
-                return {'class': 'error'}
-
-    def truncated_name(self, obj):
-        return truncatechars(force_text(obj), 50)
-    truncated_name.short_description = Utility._meta.get_field('name').verbose_name
-    truncated_name.admin_order_field = 'name'

@@ -1,6 +1,4 @@
 
-
-
 from django.db import models
 
 from utils.python.logging_utils import create_logger_by_filename

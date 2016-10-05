@@ -20,7 +20,6 @@ from apps.opinions.models_mixins import OpinionsModelMixin
 # from apps.flavours.managers import FlavourManager
 # from apps.flavours.models_mixins import FlavourModelMixin
 
-from .querysets import UtilityQuerySet, CategoryQuerySet
 from .managers import CategoryManager, UtilityManager
 
 
@@ -49,7 +48,7 @@ class Category(TimeStampedModel):
         ordering = ['name']
 
     objects = models.Manager()
-    objects = CategoryManager.from_queryset(CategoryQuerySet)()
+    objects = CategoryManager()
 
     def __str__(self):
         return '{0.name}'.format(self)
@@ -135,7 +134,7 @@ class Utility(CommentsModelMixin, OpinionsModelMixin, TimeStampedModel):
         unique_together = ['category', 'name']
 
     objects = models.Manager()
-    objects = UtilityManager.from_queryset(UtilityQuerySet)()
+    objects = UtilityManager()
 
     comments_manager = CommentManager()
     opinions_manager = OpinionManager()

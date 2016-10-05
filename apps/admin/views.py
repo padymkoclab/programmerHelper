@@ -193,7 +193,9 @@ class ChangeListView(SiteModelAdminMixin, generic.View):
         ]
         context['listing_search_fields'] = ', '.join(listing_search_fields)
 
-        # context['has_add_permission'] = self.model_admin.has_add_permission(self.request)
+        context['has_add_permission'] = self.model_admin.has_add_permission(self.request)
+        context['has_export_permission'] = self.model_admin.has_add_permission(self.request)
+        context['has_import_permission'] = self.model_admin.has_add_permission(self.request)
 
         list_values_with_styles = self.get_list_values_with_styles()
 
@@ -281,6 +283,8 @@ class ChangeListView(SiteModelAdminMixin, generic.View):
                 elif hasattr(self.model_admin, field_or_method):
                     model_admin_method = getattr(self.model_admin, field_or_method)
                     value = model_admin_method(obj)
+                else:
+                    raise Exception(field_or_method)
 
                 fieldnames = [field.name for field in self.model_admin.model._meta.get_fields()]
 
@@ -464,10 +468,9 @@ class AddChangeView(ContextAdminMixin, generic.FormView):
 
         context['title'] = self.get_title()
 
-        context['is_change'] = False if self.obj is None else True
         context['object'] = self.obj
 
-        context['permissions'] = self.model_admin.get_model_permissions(self.request)
+        context['has_delete_permission'] = self.model_admin.has_delete_permission(self.request)
 
         context['model_meta'] = self.model_meta
 
@@ -528,8 +531,12 @@ class AddChangeView(ContextAdminMixin, generic.FormView):
 
     def get_form(self):
 
-        fieldsets = self.model_admin.get_fieldsets(self.request, self.obj)
-        return AddChangeDisplayForm(self.get_modelform(), fieldsets=fieldsets)
+        return AddChangeDisplayForm(
+            self.get_modelform(),
+            fieldsets=self.model_admin.get_fieldsets(self.request, self.obj),
+            readonly_fields=self.model_admin.get_readonly_fields(self.request, self.obj),
+            model_admin=self.model_admin,
+        )
 
     def form_invalid(self, form):
 

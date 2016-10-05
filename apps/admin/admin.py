@@ -1,4 +1,5 @@
 
+import logging
 import collections
 
 from django.contrib import messages
@@ -20,6 +21,9 @@ from utils.python.utils import flatten
 from .forms import AddChangeModelForm
 from .decorators import admin_staff_member_required
 from .views import AddView, ChangeListView, ChangeView, HistoryView, DeleteView
+
+
+logger = logging.getLogger('django.development')
 
 
 class CheckModelAdmin:
@@ -79,7 +83,7 @@ class ModelAdmin:
     # preserve_filters = True
     # inlines = []
 
-    # # Custom templates (designed to be over-ridden in subclasses)
+    # Custom templates (designed to be over-ridden in subclasses)
     # add_form_template = None
     # change_form_template = None
     # change_list_template = None
@@ -87,12 +91,12 @@ class ModelAdmin:
     # delete_selected_confirmation_template = None
     # object_history_template = None
 
-    # # Actions
+    # Actions
     actions = ()
     # action_form = helpers.ActionForm
     # actions_on_top = True
     # actions_on_bottom = False
-    # actions_selection_counter = True
+    actions_selection_counter = True
     checks_class = CheckModelAdmin
 
     # views
@@ -181,6 +185,8 @@ class ModelAdmin:
         return request.user.has_module_permissions(self.model._meta.app_label)
 
     def get_model_permissions(self, request):
+
+        logger.info('New permission: make reports, export/import data')
 
         return {
             'add': self.has_add_permission(request),

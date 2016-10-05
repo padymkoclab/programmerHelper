@@ -24,7 +24,7 @@
   <li><a href="{{ index_url }}">{% trans "Home" %}</a></li>
   <li><a href="{{ model_meta|get_admin_url:'app' }}">{{ model_meta.app_config.verbose_name|capfirst }}</a></li>
   <li><a href="{{ model_meta|get_admin_url:'changelist' }}">{{ model_meta.verbose_name_plural|capfirst }}</a></li>
-  <li class="active">{% if is_change is True %}{% trans "Change" %}{% else %}{% trans "Add" %}{% endif %} {{ model_meta.verbose_name|lower }}</li>
+  <li class="active">{% if object is not None %}{% trans "Change" %}{% else %}{% trans "Add" %}{% endif %} {{ model_meta.verbose_name|lower }}</li>
 {% endblock breadcrumbs %}
 
 
@@ -34,17 +34,17 @@
   <div class="row" id="buttons">
     <div class="col-sm-6">
 
-      {% if is_change is True %}
+      {% if object is not None %}
 
-      {% if permissions.delete %}
-        <a class="btn btn-danger" href="{{ object|get_admin_url:'delete' }}" id="">{% trans "Delete" %}</a>
-      {% endif %}
+        {% if has_delete_permission is True %}
+          <a class="btn btn-danger" href="{{ object|get_admin_url:'delete' }}" id="">{% trans "Delete" %}</a>
+        {% endif %}
 
-      {% if object.get_absolute_url %}
-        <a class="btn btn-info" href="{{ object.get_absolute_url }}" id="">{% trans "Preview" %}</a>
-      {% endif %}
+        {% if object.get_absolute_url %}
+          <a class="btn btn-info" href="{{ object.get_absolute_url }}" id="">{% trans "Preview" %}</a>
+        {% endif %}
 
-      <a class="btn btn-warning" href="{{ object|get_admin_url:'history' }}" id="">{% trans "History" %}</a>
+        <a class="btn btn-warning" href="{{ object|get_admin_url:'history' }}" id="">{% trans "History" %}</a>
 
       {% endif %}
 
@@ -61,7 +61,7 @@
     <ul class="nav nav-tabs" role="tablist">
 
       {% for fieldset in form %}
-      <li role="presentation" class="{% if forloop.counter == 1 %}active{% endif %}">
+      <li role="presentation" class="{% if forloop.revcounter == 1 %}active{% endif %}">
         <a href="#fieldset{{ forloop.counter }}" role="tab" data-toggle="tab">
           {% if fieldset.name %}
             {{ fieldset.name }}
@@ -80,7 +80,7 @@
   <form action="" method="POST" {% if form.is_multipart %}enctype="multipart/form-data"{% endif %} class="form-horizontal" id="form_addchange">
     <div class="tab-content">
       {% for fieldset in form %}
-        <div class="tab-pane {% if forloop.counter == 1 %}active{% endif %}" id="fieldset{{ forloop.counter }}" role="tabpanel">
+        <div class="tab-pane {% if forloop.revcounter == 1 %}active{% endif %}" id="fieldset{{ forloop.counter }}" role="tabpanel">
             {% csrf_token %}
             <fieldset class="{{ fieldset.classes }}">
 
@@ -98,7 +98,7 @@
                 {% for fieldline in fieldset %}
                   <div class="form-group">
 
-                    {{ fieldline.label_tag }}
+                    {{ fieldline.field.label_tag }}
 
                     <div class="col-xs-10">
 
@@ -112,24 +112,31 @@
                         {% endfor %}
                       {% endif %}
 
-                      {% with fieldset.form.addons|get_item_by_key:fieldline.field.name as addons %}
+                      {% if fieldline.field.is_readonly is False %}
 
-                        {% if addons != '' %}
-                          <div class="input-group">
-                            {% if addons.left %}
-                              <div class="input-group-addon">{{ addons.left }}</div>
-                            {% endif %}
-                            {{ fieldline.field }}
-                            {% if addons.right %}
-                              <div class="input-group-addon">{{ addons.right }}</div>
-                            {% endif %}
-                          </div>
+                        {% get_addons_for_field fieldline.field as field_addons %}
 
-                        {% else %}
-                          {{ fieldline.field }}
-                        {% endif %}
+                          {% if field_addons is not None %}
+                            <div class="input-group">
 
-                      {% endwith %}
+                              {% if field_addons.left %}
+                                <div class="input-group-addon">{{ field_addons.left }}</div>
+                              {% endif %}
+                              {{ fieldline.field }}
+
+                              {% if field_addons.right %}
+                                <div class="input-group-addon">{{ field_addons.right }}</div>
+                              {% endif %}
+                            </div>
+                          {% else %}
+                              {{ fieldline.field }}
+                          {% endif %}
+
+                      {% else %}
+                        <p class="form-control-static">{{ fieldline.field }}</p>
+                      {% endif %}
+
+
 
                       {% if fieldline.field.help_text %}
                         <p class="help-block">{{ fieldline.field.help_text }}</p>
