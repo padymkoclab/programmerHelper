@@ -1,0 +1,94 @@
+
+{% extends "admin/admin/index.html" %}
+
+{% load i18n %}
+{% load static %}
+
+{% load admin_tags %}
+
+{% block extra_css %}
+  {{ block.super }}
+  <link rel="stylesheet" href="{% static 'admin/admin/css/export_data.css' %}">
+{% endblock extra_css %}
+
+
+{% block breadcrumbs %}
+  <li><a href="{{ index_url }}">{% trans "Home" %}</a></li>
+  <li><a href="{{ index_url }}">{% trans "Export" %}</a></li>
+  <li class="active">{{ title }}</li>
+{% endblock breadcrumbs %}
+
+
+{% block content %}
+
+  <div class="row" id="export_data_div">
+
+    <div class="col-sm-12">
+      <div class="text-right">
+        <form action="" method="GET" id="form_export_data">
+          <input type="hidden" name="pk_model_content_type" value="{{ pk_model_content_type }}">
+          <button class="btn btn-info" type="submit">{% trans "Preview" %}</button>
+          <button class="btn btn-success" type="submit">{% trans "Export" %}</button>
+        </form>
+      </div>
+      <h4>{% trans "Format" %}</h4>
+      <table class="table table-bordered" id="table_formats">
+        <tbody>
+          <tr class="text-center">
+            <td class="active_format_output"><label for="radio_json"><input type="radio" name="output_format" form="form_export_data" value="json" checked="checked">JSON</label></td>
+            <td><label for="radio_csv"><input type="radio" name="output_format" form="form_export_data" value="csv">CSV</label></td>
+            <td><label for="radio_yaml"><input type="radio" name="output_format" form="form_export_data" value="yaml">YAML</label></td>
+            <td><label for="radio_xml"><input type="radio" name="output_format" form="form_export_data" value="xml">XML</label></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="col-sm-12">
+      <h4>{% trans "Fields" %}</h4>
+      <table class="table table-bordered">
+        <caption></caption>
+        <thead>
+          <tr>
+            <th><input type="checkbox" id="" checked="checked"></th>
+            <th>{% trans "Field name" %}</th>
+            <th>{% trans "Type data" %}</th>
+            <th>{% trans "Help text" %}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% display_fields model_meta %}
+        </tbody>
+      </table>
+    </div>
+    <div class="col-sm-12">
+      <h4>{{ model_meta.verbose_name_plural }}</h4>
+      <table class="table table-bordered table-condensed" id="table_object_list">
+        <caption>
+          {% with count=queryset|length %}
+            {% trans "Selected" %} <span>{{ count }}</span> {% trans "from" %} {{ count }}
+          {% endwith %}
+        </caption>
+        <thead>
+          <tr>
+            <th><input type="checkbox" id="" checked="checked"></th>
+            <th>{{ model_meta.verbose_name }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for obj in queryset %}
+            <tr>
+              <td><input type="checkbox" name="object" id="" value="{{ obj.pk }}" form="form_export_data" checked="checked"></td>
+              <td>{{ obj }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+{% endblock content %}
+
+
+{% block extra_js %}
+  {{ block.super }}
+  <script type="text/javascript" src="{% static 'admin/admin/js/export_data.js' %}"></script>
+{% endblock extra_js %}

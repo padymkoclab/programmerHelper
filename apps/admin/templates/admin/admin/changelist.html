@@ -25,10 +25,10 @@
     <div class="row">
       <div class="col-xs-12 text-right">
         {% if has_export_permission is True %}
-          <button class="btn btn-warning">{% trans "Export" %}</button>
+          <a href="{{ page_object_list.paginator.object_list|get_admin_url:'export' }}" class="btn btn-warning">{% trans "Export" %}</a>
         {% endif %}
         {% if has_import_permission is True %}
-          <a href="{% url 'admin:import' %}" class="btn btn-danger">{% trans "Import" %}</a>
+          <a href="{{ model_admin.model|get_admin_url:'import' }}" class="btn btn-danger">{% trans "Import" %}</a>
         {% endif %}
         {% if has_add_permission is True %}
           <a href="{{ model_meta|get_admin_url:'add' }}" class="btn btn-success">{% trans "Add " %} {{ model_meta.verbose_name|lower }}</a>
@@ -44,7 +44,7 @@
       <div id="div_model_searchbox">
           <div class="row">
             <div class="col-xs-10">
-                <form action="" class="" method="GET" id="form_search">
+                <form action="" class="" method="GET" id="form_changelist">
                   <div class="input-group">
                       <span class="input-group-addon" id="menu_search_options">
                         <span class="caret dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"></span>
@@ -111,14 +111,6 @@
       </div>
     {% endblock filters %}
 
-    {% if model_admin.date_hierarchy is not None %}
-      {% block date_hierarchy %}
-        <div id="div_date_hierarchy">
-          {{ page_object_list|date_hierarchy }}
-        </div>
-      {% endblock date_hierarchy %}
-    {% endif %}
-
     {% block actions_and_display_control %}
       <div id="div_actions_and_display_control">
         <div class="row">
@@ -156,9 +148,9 @@
               <div class="form-group">
                 <label class="control-label col-xs-4" for="list_per_page">{% trans "List per page" %}</label>
                 <div class="col-xs-4">
-                  <input type="number" name="list_per_page" id="list_per_page" value="{{ list_per_page }}" min="1" max="{{ page_object_list.paginator.count }}" class="form-control" form="form_search">
+                  <input type="number" name="list_per_page" id="list_per_page" value="{{ list_per_page }}" min="1" max="{{ page_object_list.paginator.count }}" class="form-control" form="form_changelist">
                 </div>
-                <input type="submit" form="form_search" value='{% trans "Change it" %}' class="btn btn-default">
+                <input type="submit" form="form_changelist" value='{% trans "Change it" %}' class="btn btn-default">
               </div>
             </form>
           </div>
@@ -166,29 +158,21 @@
       </div>
     {% endblock actions_and_display_control %}
 
+      {% block date_hierarchy %}
+        <div id="div_date_hierarchy">
+          {% display_date_hierarchy model_admin page_object_list.object_list %}
+        </div>
+      {% endblock date_hierarchy %}
+
     {% block table_changelist %}
 
       <div id="changelist">
         <div class="table-responsive">
           <table class="table table-bordered table-hover">
               <thead>
-                <tr>
-                  <th>
-                    <input type="checkbox">
-                  </th>
-                  {% for column in table_header.values %}
-                    <th class="text-center">
-                      <span>{{ column.display_name }}</span>
-                      {% if column.is_sortable is True %}
-                      <span class="sort_icon">
-                        <i class="fa fa-fw fa-sort"></i>
-                      </span>
-                      {% endif %}
-                    </th>
-                  {% endfor %}
-                </tr>
+                {% display_table_header model_admin %}
               </thead>
-              <tbody>{% display_object_list %}</tbody>
+              <tbody>{% display_object_list model_admin page_object_list %}</tbody>
           </table>
         </div>
 
@@ -197,7 +181,7 @@
 
             <li aria-label="Previous" class="{% if not page_object_list.has_previous %}disabled{% endif %}">
               {% if page_object_list.has_previous %}
-              <a href="{% urlencode_with_conssidering_pagination page_object_list 'previous' %}">
+              <a href="{% urlencode_with_considering_pagination page_object_list 'previous' %}">
                 <span aria-hidden="true">&laquo;</span>
               </a>
               {% else %}
@@ -207,7 +191,7 @@
 
             {% for num in page_object_list.paginator.page_range %}
               <li class="{% if num == page_object_list.number  %}active{% endif %}">
-                <a href="{% urlencode_with_conssidering_pagination page_object_list num %}">
+                <a href="{% urlencode_with_considering_pagination page_object_list num %}">
                   {{ num }}
                 </a>
               </li>
@@ -215,7 +199,7 @@
 
             <li aria-label="Next" class="{% if not page_object_list.has_next %}disabled{% endif %}">
             {% if page_object_list.has_next %}
-              <a href="{% urlencode_with_conssidering_pagination page_object_list 'next' %}">
+              <a href="{% urlencode_with_considering_pagination page_object_list 'next' %}">
                 <span aria-hidden="true">&raquo;</span>
               </a>
             {% else %}

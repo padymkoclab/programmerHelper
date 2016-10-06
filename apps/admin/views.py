@@ -1,6 +1,8 @@
 
+import json
 import collections
 
+from django.contrib.contenttypes.models import ContentType
 from django.http.request import QueryDict
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.template.response import TemplateResponse
@@ -94,14 +96,9 @@ class ChangeListView(SiteModelAdminMixin, generic.View):
         super().__init__(*args, **kwargs)
 
         self.model_meta = self.model_admin.model._meta
-
-        self.default_styles = {
-            'align': 'left',
-        }
-
         self.list_per_page = self.model_admin.list_per_page
 
-    def post(self, request):
+    def post(self, request, *args, **kwargs):
 
         pks_selected_objects = request.POST.getlist('selected_objects')
         queryset = self.model_admin.model._default_manager.filter(pk__in=pks_selected_objects)
@@ -128,13 +125,17 @@ class ChangeListView(SiteModelAdminMixin, generic.View):
 
         return self.render_to_response(request)
 
-    def get(self, request):
+    def get(self, request, *args, **kwargs):
 
         return self.render_to_response(request)
 
     def get_queryset(self, request):
 
+        # Queryset
         qs = self.model_admin.get_queryset(request)
+
+        # Filtration
+        restrictions = {}
 
         search_fields = self.model_admin.get_search_fields()
 
@@ -152,25 +153,67 @@ class ChangeListView(SiteModelAdminMixin, generic.View):
                 lookup = '__{}{}'.format(self.ignorecase, self.type_search)
 
                 # make the same conditions for each field in the search_fields
-                conditions = {'{}{}'.format(field, lookup): self.q for field in search_fields}
+                search_restrictions = {'{}{}'.format(field, lookup): self.q for field in search_fields}
 
-                # filter by conditions on the all fields listed the search_fields
-                qs = qs.filter(**conditions)
+                restrictions.update(search_restrictions)
 
-                count = qs.count()
+                # count = qs.count()
 
-                object_name = self.model_meta.verbose_name if count == 1 else self.model_meta.verbose_name_plural
-                object_name = object_name.lower()
+                # object_name = self.model_meta.verbose_name if count == 1 else self.model_meta.verbose_name_plural
+                # object_name = object_name.lower()
 
-                msg = ungettext(
-                    'By a condition "{}" found {} {}',
-                    'By a condition "{}" found {} {}',
-                    count
-                ).format(self.q, count, object_name)
+                # msg = ungettext(
+                #     'By a condition "{}" found {} {}',
+                #     'By a condition "{}" found {} {}',
+                #     count
+                # ).format(self.q, count, object_name)
 
-                self.model_admin.message_user(request, msg, extra_tags='info', level='INFO')
+                # self.model_admin.message_user(request, msg, extra_tags='info', level='INFO')
+
+        if self.model_admin.date_hierarchy:
+            field_name = self.model_admin.date_hierarchy
+
+            year_lookup = field_name + '__year'
+            month_lookup = field_name + '__month'
+            day_lookup = field_name + '__day'
+
+            by_year = request.GET.get(year_lookup)
+            by_month = request.GET.get(month_lookup)
+            by_day = request.GET.get(day_lookup)
+
+            if by_year is not None:
+                restrictions[year_lookup] = by_year
+
+            if by_month is not None:
+                restrictions[month_lookup] = by_month
+
+            if by_day is not None:
+                restrictions[day_lookup] = by_day
+
+        if restrictions:
+
+            # filter by conditions on the all fields listed the search_fields
+            # as well as by date_hierarchy
+            qs = qs.filter(**restrictions)
+
+        # Ordering
+        ordering = self.get_ordering()
+        qs = qs.order_by(*ordering)
 
         return qs
+
+    def get_ordering(self):
+
+        ordering = self.model_admin.get_ordering()
+
+        if not ordering:
+            ordering = self.model_meta.ordering
+
+        clickedColumn = self.request.GET.get('__clickedColumn')
+        if clickedColumn is not None:
+            ordering = self.determinate_dynamic_ordering(clickedColumn)
+
+        return ordering or ()
 
     def get_context_data(self, **kwargs):
 
@@ -222,7 +265,7 @@ class ChangeListView(SiteModelAdminMixin, generic.View):
             'list_per_page': list_per_page,
             'actions': self.model_admin.get_actions(),
             'page_object_list': page_object_list,
-            'table_header': self.get_table_header(),
+            'ordering': self.get_ordering(),
         })
 
         return context
@@ -243,129 +286,56 @@ class ChangeListView(SiteModelAdminMixin, generic.View):
             'admin/admin/changelist.html',
         ]
 
-    @property
-    def get_styles_for_column(self):
+    def determinate_dynamic_ordering(self, clickedColumn):
 
-        columns_with_styles = {}
+        sortable_fields = self.request.GET.getlist('sortable_field')
+        sortable_fields = [json.loads(i) for i in sortable_fields]
 
-        styles_by_column = {
-            column: styles
-            for columns, styles in self.model_admin.get_list_display_styles()
-            for column in columns
-        }
+        concrete_fields = [i.name for i in self.model_meta.concrete_fields]
 
-        global_styles = styles_by_column.pop('__all__') if '__all__' in styles_by_column else dict()
+        ordering = list()
+        for sortable_field in sortable_fields:
+            for column_name, options in sortable_field.items():
+                order = options['order']
 
-        list_display_dict = dict.fromkeys(self.model_admin.get_list_display(), {})
+                if order is not None or column_name == clickedColumn:
 
-        for column, styles in list_display_dict.items():
+                    position = options['position']
 
-            value = self.default_styles.copy()
-            value.update(global_styles)
-            value.update(styles_by_column.get(column, {}))
-            columns_with_styles[column] = value
+                    if column_name == clickedColumn:
+                        position = 1
 
-        return columns_with_styles
-
-    def get_list_values_with_styles(self):
-
-        list_values_with_styles = list()
-
-        for obj in self.get_queryset(self.request):
-
-            values = list()
-            for field_or_method in self.model_admin.get_list_display():
-
-                if hasattr(obj, field_or_method):
-                    value = getattr(obj, field_or_method)
-                elif hasattr(self.model_admin, field_or_method):
-                    model_admin_method = getattr(self.model_admin, field_or_method)
-                    value = model_admin_method(obj)
-
-                fieldnames = [field.name for field in self.model_admin.model._meta.get_fields()]
-
-                # if it is not field, then it is method
-                if callable(value):
-
-                    if hasattr(value, 'boolean'):
-                        value = value()
-                        value = self.convert_boolean_to_bootstrap_icon(value)
+                        order = options['order']
+                        if options['order'] == None:
+                            options['order'] = 'asc'
+                        elif options['order'] == 'desc':
+                            options['order'] = 'asc'
+                        elif options['order'] == 'asc':
+                            options['order'] = 'desc'
                     else:
-                        value = value()
+                        position += 1
 
-                elif field_or_method in fieldnames:
+                    if column_name not in concrete_fields:
+                        if hasattr(self.model_admin.model, column_name):
+                            column_name = getattr(self.model_admin.model, column_name).admin_order_field
+                        elif hasattr(self.model_admin, column_name):
+                            column_name = getattr(self.model_admin, column_name).admin_order_field
+                        else:
+                            raise AttributeError('Instance has not method or field {}'.format(column_name))
 
-                    field = self.model_admin.model._meta.get_field(field_or_method)
 
-                    if field.choices:
-                        value = getattr(obj, 'get_{}_display'.format(field_or_method))()
+                    if options['order'] == 'asc':
+                        field_name = column_name
+                    elif options['order'] == 'desc':
+                        field_name = '-' + column_name
 
-                    if isinstance(field, (models.NullBooleanField, models.BooleanField)):
-                        value = self.convert_boolean_to_bootstrap_icon(value)
+                    ordering.append((field_name, position))
 
-                if value is None:
-                    value = self.site_admin.empty_value_display
+            ordering.sort(key=lambda i: i[1])
 
-                values.append((value, self.get_styles_for_column[field_or_method]))
+        ordering = [i[0] for i in ordering]
 
-            row_color = self.get_row_color(obj)
-
-            admin_url = self.site_admin.get_url('change', self.model_meta, kwargs={'pk': obj.pk})
-
-            list_values_with_styles.append((row_color, admin_url, obj.pk, values))
-        return list_values_with_styles
-
-    def get_table_header(self):
-
-        list_display = self.model_admin.get_list_display()
-
-        table_header = collections.OrderedDict()
-
-        for column_name in list_display:
-
-            # made also __all__
-            if column_name == '__str__':
-                display_name = self.model_meta.verbose_name
-
-            else:
-
-                if hasattr(self.model_admin.model, column_name):
-                    attr = getattr(self.model_admin.model, column_name)
-                elif hasattr(self.model_admin, column_name):
-                    attr = getattr(self.model_admin, column_name)
-
-                if callable(attr):
-                    display_name = pretty_label_or_short_description(attr)
-                elif isinstance(attr, property):
-                    attr = attr.fget
-                    display_name = pretty_label_or_short_description(attr)
-                else:
-                    field = self.model_meta.get_field(column_name)
-
-                    if isinstance(field, ManyToOneRel):
-                        raise TypeError(
-                            'Does not support for field ({}) with type ManyToOneRel.'.format(field.name)
-                        )
-
-                    display_name = field.verbose_name
-
-                styles = self.get_styles_for_column[column_name]
-                is_sortable = self.is_sortable_column(column_name)
-
-            table_header[column_name] = {
-                'display_name': display_name,
-                'is_sortable': is_sortable,
-                'styles': styles,
-            }
-
-        return table_header
-
-    def is_sortable_column(self, column_name):
-
-        if column_name in (i.name for i in self.model_meta.concrete_fields):
-            return True
-
-        return False
+        return ordering
 
 
 class AddView(SiteModelAdminMixin, generic.View):
@@ -452,7 +422,7 @@ class AddChangeView(ContextAdminMixin, generic.FormView):
             'admin/admin/addchange_form.html',
         ]
 
-    def post(self, request):
+    def post(self, request, *args, **kwargs):
 
         form = self.get_modelform()
 
@@ -692,17 +662,55 @@ class DeleteView(SiteModelAdminMixin, generic.DeleteView):
         return HttpResponseRedirect(success_url)
 
 
-class ExportView(generic.View):
+class ExportView(SiteAdminMixin, generic.TemplateView):
+
+    template_name = 'admin/admin/export.html'
+    title = _('Export')
+
+
+class ExportDataView(SiteAdminMixin, generic.TemplateView):
+
+    template_name = 'admin/admin/export.html'
+
+    def get(self, request, *args, **kwargs):
+
+        self.pk_model_content_type = kwargs['pk_model_content_type']
+        self.pks_object_for_export = kwargs['pks_object_for_export']
+
+        import ipdb; ipdb.set_trace()
+
+        return super().get(request, *args, **kwargs)
+
+    def get_queryset(self):
+
+        pks_object_for_export = self.pks_object_for_export.split(',')
+
+        pk_model_content_type = int(self.pk_model_content_type)
+        model_content_type = ContentType.objects.get(pk=pk_model_content_type)
+
+        qs = model_content_type.get_all_objects_for_this_type(pk__in=pks_object_for_export)
+
+        return qs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        qs = self.get_queryset()
+
+        context['title'] = _('Export {}').format(qs.model._meta.verbose_name_plural.lower())
+        context['queryset'] = qs
+        context['model_meta'] = qs.model._meta
+        context['pk_model_content_type'] = self.pk_model_content_type
+
+        return context
+
+
+class ImportPreviewView(SiteAdminMixin, generic.View):
 
     pass
 
 
-class ImportPreviewView(generic.View):
-
-    pass
-
-
-class ImportView(generic.View):
+class ImportView(SiteAdminMixin, generic.View):
 
     pass
 

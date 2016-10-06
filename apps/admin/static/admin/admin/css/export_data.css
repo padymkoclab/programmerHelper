@@ -1,0 +1,40 @@
+
+
+#export_data_div table tr th{
+    background-color: rgb(200, 200, 200);
+}
+
+
+#export_data_div table tr td{
+    background-color: rgb(255, 255, 255);
+}
+
+#export_data_div table tr th:first-child{
+    width: 5px;
+}
+
+
+input[type="radio"][name="output_format"]{
+    display: none;
+}
+
+
+#table_formats td{
+    padding: 0;
+}
+
+#table_formats td label{
+    display: block;
+    margin: 0;
+    padding: 10px;
+}
+
+#table_formats td label:hover{
+    cursor: pointer;
+}
+
+
+.active_format_output{
+    background-color: #337ab7 !important;
+    color:  rgb(255, 255, 255);
+}

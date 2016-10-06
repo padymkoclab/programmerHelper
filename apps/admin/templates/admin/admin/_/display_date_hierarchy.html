@@ -1,0 +1,12 @@
+
+{% if back %}
+  <a href="{{ back.query_string }}">{{ back.display_text }}</a> :
+{% endif %}
+
+{% for choice in choices %}
+  {% if choice.link is None %}
+    <span class="text-muted">{{ choice.display_text }}</span>
+  {% else %}
+    <a href="{{ choice.link }}">{{ choice.display_text }}</a> |
+  {% endif %}
+{% endfor %}

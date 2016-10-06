@@ -5,19 +5,23 @@
 }
 
 
-#changelist table{
+table thead th.is_sortable:hover{
+    cursor: pointer;
+}
+
+    table thead th.is_sortable:hover table tr{
+        color: #222;
+    }
+
+
+#changelist table.table{
     background-color: rgb(255, 255, 255);
 }
 
 
 #changelist table thead th{
-    background-color: rgb(42, 63, 84);
-    color: rgb(255, 255, 255);
-}
-
-#changelist > table thead th:nth-child(1), #changelist > table tbody td:nth-child(1){
-    width: 5px;
-    text-align: center;
+    color: rgb(42, 63, 84);
+    background-color: rgb(234, 228, 240);
 }
 
 #div_actions form span{
@@ -29,18 +33,9 @@
     vertical-align: middle;
 }
 
-
-#changelist table th > span{
-    display: inline-block;
-}
-
-#changelist table th span:first-child{
-    width: 80%;
-}
-
-
-#changelist table th .sort_icon{
-    width: 5%;
+#changelist > table thead th:nth-child(1), #changelist > table tbody td:nth-child(1){
+    width: 5px;
+    text-align: center;
 }
 
 #navigation{

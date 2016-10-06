@@ -1,6 +1,7 @@
 
 import logging
 
+from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.core.urlresolvers import reverse
 from django import template
@@ -26,12 +27,13 @@ def add_classes_to_label_tag(field, classes):
 
 
 @register.filter
-def get_admin_url(model_meta_or_object, url_main_name):
+def get_admin_url(object_, url_main_name):
+
     try:
 
-        if isinstance(model_meta_or_object, models.options.Options):
+        if isinstance(object_, models.options.Options):
 
-            model_meta = model_meta_or_object
+            model_meta = object_
 
             if url_main_name == 'app':
                 return reverse('admin:{}_index'.format(model_meta.app_label))
@@ -40,27 +42,46 @@ def get_admin_url(model_meta_or_object, url_main_name):
             elif url_main_name == 'add':
                 return reverse('admin:{}_{}_add'.format(model_meta.app_label, model_meta.model_name))
 
-        elif isinstance(model_meta_or_object, models.Model):
+        elif isinstance(object_, models.Model):
 
-            object_ = model_meta_or_object
+            instance = object_
 
             if url_main_name == 'change':
                 return reverse(
-                    'admin:{}_{}_change'.format(object_._meta.app_label, object_._meta.model_name),
-                    kwargs={'pk': object_.pk}
+                    'admin:{}_{}_change'.format(instance._meta.app_label, instance._meta.model_name),
+                    kwargs={'pk': instance.pk}
                 )
             elif url_main_name == 'delete':
                 return reverse(
-                    'admin:{}_{}_delete'.format(object_._meta.app_label, object_._meta.model_name),
-                    kwargs={'pk': object_.pk}
+                    'admin:{}_{}_delete'.format(instance._meta.app_label, instance._meta.model_name),
+                    kwargs={'pk': instance.pk}
                 )
             elif url_main_name == 'history':
                 return reverse(
-                    'admin:{}_{}_history'.format(object_._meta.app_label, object_._meta.model_name),
-                    kwargs={'pk': object_.pk}
+                    'admin:{}_{}_history'.format(instance._meta.app_label, instance._meta.model_name),
+                    kwargs={'pk': instance.pk}
                 )
-        else:
-            logger.error('Wrong input data')
+            elif url_main_name == 'import':
+                pk_model_content_type = ContentType.objects.get_for_model(instance).pk
+                return reverse(
+                    'admin:import',
+                    kwargs={'pk_model_content_type': pk_model_content_type}
+                )
+
+        elif isinstance(object_, models.QuerySet):
+
+            queryset = object_
+
+            if url_main_name == 'export':
+                pk_model_content_type = ContentType.objects.get_for_model(queryset.model).pk
+                pks_object_for_export = ','.join(str(i['pk']) for i in queryset.only('pk').values('pk'))
+                return reverse(
+                    'admin:export',
+                    kwargs={
+                        'pk_model_content_type': pk_model_content_type,
+                        'pks_object_for_export': pks_object_for_export,
+                    }
+                )
     except Exception as e:
         logger.error('Does not working: {}'.format(e))
 
@@ -75,9 +96,3 @@ def show_all_objects(request, total_count_objects):
     GET_.setdefault(var, total_count_objects)
 
     return '?' + GET_.urlencode()
-
-
-@register.filter
-def date_hierarchy(page_object_list):
-
-    return page_object_list

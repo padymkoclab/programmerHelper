@@ -1,0 +1,9 @@
+
+{% for name, verbose_name, type_, help_text in data %}
+  <tr>
+    <td><input type="checkbox" name="fields" id="" value="{{ name }}" form="form_export_data" checked></td>
+    <td>{{ verbose_name }}</td>
+    <td>{{ type_ }}</td>
+    <td>{{ help_text }}</td>
+  </tr>
+{% endfor %}

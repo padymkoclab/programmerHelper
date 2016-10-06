@@ -178,7 +178,7 @@ LOGGING = {
             'format': '[%(server_time)s] %(message)s'
         },
         'django.development': {
-            'format': '%(name)s - %(module)s - %(message)s',
+            'format': '%(name)s - %(module)s - %(filename)s - %(lineno)s - %(message)s',
         }
     },
     'handlers': {

@@ -31,5 +31,22 @@ jQuery(function(){
         check_up_count_selected_objects();
     });
 
+   $('table thead th.is_sortable').bind('click', function(e){
+
+        var value_clicked_column = $(this).find('input[type="hidden"]').val();
+        var object = JSON.parse(value_clicked_column);
+
+        var name_clicked_column = Object.keys(object)[0];
+
+        var $form_changelist = $('form#form_changelist');
+
+        var $hidden_input = $('<input />').
+            attr('name', '__clickedColumn').
+            attr('value', name_clicked_column).
+            attr('type', 'hidden');
+        $form_changelist.append($hidden_input);
+        $form_changelist.submit();
+   });
+
 });
 

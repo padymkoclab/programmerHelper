@@ -1,0 +1,34 @@
+
+<tr>
+  <th>
+    <input type="checkbox">
+  </th>
+  {% for header in headers %}
+    <th class="{% if header.is_sortable is True %}is_sortable{% endif %}">
+      <table>
+        <tbody>
+          <tr>
+
+            {% if header.is_sortable is True %}
+
+              <input type="hidden" name="sortable_field" value="{{ header.sortable_data }}" form="form_changelist">
+
+              {% if header.position is not None and header.order is not None %}
+                {% if header.order == 'asc' %}
+                  <td class="text-success">{{ header.position }}<i class="fa fa-fw fa-sort-asc"></i></td>
+                {% else %}
+                  <td class="text-danger">{{ header.position }}<i class="fa fa-fw fa-sort-desc"></i></td>
+                {% endif %}
+              {% else %}
+                <td><i class="fa fa-fw fa-sort"></i></td>
+              {% endif %}
+            {% endif %}
+
+            <td>{{ header.display_name }}</td>
+
+          </tr>
+        </tbody>
+      </table>
+    </th>
+  {% endfor %}
+</tr>

@@ -248,6 +248,7 @@ class UtilityAdmin(OpinionsAdminMixin, ModelAdmin):
     Admin View for Utility
     '''
 
+    ordering = ('-category', )
     form = UtilityAdminModelForm
     list_display = (
         'name',
@@ -261,9 +262,9 @@ class UtilityAdmin(OpinionsAdminMixin, ModelAdmin):
     )
     date_hierarchy = 'created'
     list_filter = (
-        ('category', admin.RelatedOnlyFieldListFilter),
-        IsNewSimpleListFilter,
-        'updated',
+        # ('category', admin.RelatedOnlyFieldListFilter),
+        # IsNewSimpleListFilter,
+        # 'updated',
         'created',
     )
     search_fields = ('name', )

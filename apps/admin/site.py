@@ -29,6 +29,7 @@ from .views import (
     SettingsView,
     ImportView,
     ExportView,
+    ExportDataView,
 )
 from .decorators import admin_staff_member_required
 from .exceptions import AlreadyRegisteredModel, AlreadyRegisteredApp
@@ -122,11 +123,27 @@ class SiteAdmin:
             url(r'^$', admin_staff_member_required(IndexView.as_view(site_admin=self)), {}, 'index'),
             url(r'^login/$', csrf_protect(never_cache(LoginView.as_view())), {}, 'login'),
             url(r'^logout/$', admin_staff_member_required(LogoutView.as_view()), {}, 'logout'),
-            url(r'^password_change/$', admin_staff_member_required(PasswordChangeView.as_view(), cacheable=True), {}, 'password_change'),
-            url(r'^password_change/done/$', admin_staff_member_required(PasswordChangeDoneView.as_view(), cacheable=True), {}, 'password_change_done'),
+            url(
+                r'^password_change/$',
+                admin_staff_member_required(PasswordChangeView.as_view(), cacheable=True),
+                {}, 'password_change'),
+            url(
+                r'^password_change/done/$',
+                admin_staff_member_required(PasswordChangeDoneView.as_view(), cacheable=True),
+                {}, 'password_change_done'),
+            url(
+                r'^import/(?P<pk_model_content_type>\d+)/$',
+                admin_staff_member_required(ImportView.as_view(site_admin=self)),
+                {}, 'import'),
+            url(
+                r'^export/$',
+                admin_staff_member_required(ExportView.as_view(site_admin=self)),
+                {}, 'export'),
+            url(
+                r'^export/(?P<pk_model_content_type>\d+)/(?P<pks_object_for_export>[\,\-\w]+)/$',
+                admin_staff_member_required(ExportDataView.as_view(site_admin=self)),
+                {}, 'export'),
             url(r'^settings/$', SettingsView.as_view(), {}, 'settings'),
-            url(r'^import/$', ImportView.as_view(), {}, 'import'),
-            url(r'^export/$', ExportView.as_view(), {}, 'export'),
             # url(r'^jsi18n/$', wrap(self.i18n_javascript, cacheable=True), name='jsi18n'),
         ]
 
@@ -140,7 +157,10 @@ class SiteAdmin:
         for model, model_admin in self._registry_models.items():
 
             urlpatterns += [
-                url(r'{}/{}/'.format(model._meta.app_label, model._meta.model_name), include(model_admin.urls)),
+                url(
+                    r'{}/{}/'.format(model._meta.app_label, model._meta.model_name),
+                    include(model_admin.urls)
+                ),
             ]
 
         return urlpatterns

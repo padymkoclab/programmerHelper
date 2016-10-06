@@ -69,7 +69,7 @@ class ModelAdmin:
     fieldsets = ()
 
     list_display_links = ()
-    # list_filter = ()
+    list_filter = ()
     # list_select_related = False
     list_per_page = 100
     # list_max_show_all = 200
@@ -298,6 +298,10 @@ class ModelAdmin:
     def get_readonly_fields(self, request, obj=None):
 
         return self.readonly_fields
+
+    def get_list_filters(self, request):
+
+        return self.list_filters
 
 
 class OtherAdmin:
