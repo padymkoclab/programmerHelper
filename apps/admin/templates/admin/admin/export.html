@@ -25,31 +25,31 @@
 
     <div class="col-sm-12">
       <div class="text-right">
-        <form action="" method="GET" id="form_export_data">
-          <input type="hidden" name="pk_model_content_type" value="{{ pk_model_content_type }}">
-          <button class="btn btn-info" type="submit">{% trans "Preview" %}</button>
-          <button class="btn btn-success" type="submit">{% trans "Export" %}</button>
+        <form action="" method="GET" id="form_export_data" target="_blank">
+          <input type="hidden" name="pk_model" value="{{ pk_model }}">
+          <input class="btn btn-info" type="submit" name="__preview" value="{% trans "Preview" %}" />
+          <input class="btn btn-success" type="submit"name="__export"  value="{% trans "Export" %}" />
         </form>
       </div>
       <h4>{% trans "Format" %}</h4>
       <table class="table table-bordered" id="table_formats">
         <tbody>
           <tr class="text-center">
-            <td class="active_format_output"><label for="radio_json"><input type="radio" name="output_format" form="form_export_data" value="json" checked="checked">JSON</label></td>
-            <td><label for="radio_csv"><input type="radio" name="output_format" form="form_export_data" value="csv">CSV</label></td>
-            <td><label for="radio_yaml"><input type="radio" name="output_format" form="form_export_data" value="yaml">YAML</label></td>
-            <td><label for="radio_xml"><input type="radio" name="output_format" form="form_export_data" value="xml">XML</label></td>
+            <td><label for="radio_json" class="active_format_output"><input type="radio" id="radio_json" name="output_format" form="form_export_data" value="json" checked="checked">JSON</label></td>
+            <td><label for="radio_csv"><input type="radio" name="output_format" id="radio_csv" form="form_export_data" value="csv">CSV</label></td>
+            <td><label for="radio_yaml"><input type="radio" name="output_format" id="radio_yaml" form="form_export_data" value="yaml">YAML</label></td>
+            <td><label for="radio_xml"><input type="radio" name="output_format" id="radio_xml" form="form_export_data" value="xml">XML</label></td>
           </tr>
         </tbody>
       </table>
     </div>
     <div class="col-sm-12">
       <h4>{% trans "Fields" %}</h4>
-      <table class="table table-bordered">
+      <table class="table table-bordered" id="table_fields">
         <caption></caption>
         <thead>
           <tr>
-            <th><input type="checkbox" id="" checked="checked"></th>
+            <th><input type="checkbox" checked="checked"></th>
             <th>{% trans "Field name" %}</th>
             <th>{% trans "Type data" %}</th>
             <th>{% trans "Help text" %}</th>
@@ -65,7 +65,7 @@
       <table class="table table-bordered table-condensed" id="table_object_list">
         <caption>
           {% with count=queryset|length %}
-            {% trans "Selected" %} <span>{{ count }}</span> {% trans "from" %} {{ count }}
+            {% trans "Selected" %} <span id="count_selected_objects">{{ count }}</span> {% trans "from" %} {{ count }}
           {% endwith %}
         </caption>
         <thead>
@@ -77,7 +77,7 @@
         <tbody>
           {% for obj in queryset %}
             <tr>
-              <td><input type="checkbox" name="object" id="" value="{{ obj.pk }}" form="form_export_data" checked="checked"></td>
+              <td><input type="checkbox" name="pks_selected_objects_for_export" id="" value="{{ obj.pk }}" form="form_export_data" checked="checked"></td>
               <td>{{ obj }}</td>
             </tr>
           {% endfor %}
@@ -90,5 +90,7 @@
 
 {% block extra_js %}
   {{ block.super }}
+  <script type="text/javascript" src="{% static 'admin/admin/js/checkboxes_selected.js' %}"></script>
+
   <script type="text/javascript" src="{% static 'admin/admin/js/export_data.js' %}"></script>
 {% endblock extra_js %}

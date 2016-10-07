@@ -28,8 +28,8 @@ from .views import (
     AppIndexView,
     SettingsView,
     ImportView,
-    ExportView,
-    ExportDataView,
+    ExportIndexView,
+    ExportModelView,
 )
 from .decorators import admin_staff_member_required
 from .exceptions import AlreadyRegisteredModel, AlreadyRegisteredApp
@@ -132,17 +132,17 @@ class SiteAdmin:
                 admin_staff_member_required(PasswordChangeDoneView.as_view(), cacheable=True),
                 {}, 'password_change_done'),
             url(
-                r'^import/(?P<pk_model_content_type>\d+)/$',
+                r'^import/(?P<pk_model>\d+)/$',
                 admin_staff_member_required(ImportView.as_view(site_admin=self)),
                 {}, 'import'),
             url(
                 r'^export/$',
-                admin_staff_member_required(ExportView.as_view(site_admin=self)),
-                {}, 'export'),
+                admin_staff_member_required(ExportIndexView.as_view(site_admin=self)),
+                {}, 'export_index'),
             url(
-                r'^export/(?P<pk_model_content_type>\d+)/(?P<pks_object_for_export>[\,\-\w]+)/$',
-                admin_staff_member_required(ExportDataView.as_view(site_admin=self)),
-                {}, 'export'),
+                r'^export/(?P<pk_model>\d+)/(?P<listing_pks_objects>[\,\-\w]+)/$',
+                admin_staff_member_required(ExportModelView.as_view(site_admin=self)),
+                {}, 'export_model'),
             url(r'^settings/$', SettingsView.as_view(), {}, 'settings'),
             # url(r'^jsi18n/$', wrap(self.i18n_javascript, cacheable=True), name='jsi18n'),
         ]

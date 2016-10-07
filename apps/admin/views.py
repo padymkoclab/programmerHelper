@@ -2,6 +2,7 @@
 import json
 import collections
 
+from django.core import serializers
 from django.contrib.contenttypes.models import ContentType
 from django.http.request import QueryDict
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
@@ -13,7 +14,7 @@ from django.utils.html import format_html
 from django.shortcuts import render, get_object_or_404
 from django.db import models
 from django.apps import apps
-from django.http import HttpResponseRedirect, Http404
+from django.http import HttpResponseRedirect, Http404, HttpResponse
 from django.db.models.fields.reverse_related import ManyToOneRel
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext_lazy as _, ungettext
@@ -662,33 +663,47 @@ class DeleteView(SiteModelAdminMixin, generic.DeleteView):
         return HttpResponseRedirect(success_url)
 
 
-class ExportView(SiteAdminMixin, generic.TemplateView):
+class ExportIndexView(SiteAdminMixin, generic.TemplateView):
 
     template_name = 'admin/admin/export.html'
     title = _('Export')
 
 
-class ExportDataView(SiteAdminMixin, generic.TemplateView):
+class ExportModelView(SiteAdminMixin, generic.TemplateView):
 
     template_name = 'admin/admin/export.html'
 
     def get(self, request, *args, **kwargs):
 
-        self.pk_model_content_type = kwargs['pk_model_content_type']
-        self.pks_object_for_export = kwargs['pks_object_for_export']
+        self.pk_model = kwargs['pk_model']
+        self.listing_pks_objects = kwargs['listing_pks_objects']
 
-        import ipdb; ipdb.set_trace()
+        # if is submit data
+        self.output_format = request.GET.get('output_format')
+
+        if self.output_format is not None:
+
+            if '__preview' in request.GET.keys():
+                return self.preview()
+            elif '__export' in request.GET.keys():
+                return self.export()
 
         return super().get(request, *args, **kwargs)
 
+    def get_model_content_type(self):
+
+        pk_model = int(self.pk_model)
+        model_content_type = ContentType.objects.get(pk=pk_model)
+
+        return model_content_type
+
     def get_queryset(self):
 
-        pks_object_for_export = self.pks_object_for_export.split(',')
+        listing_pks_objects = self.listing_pks_objects.split(',')
 
-        pk_model_content_type = int(self.pk_model_content_type)
-        model_content_type = ContentType.objects.get(pk=pk_model_content_type)
+        model_content_type = self.get_model_content_type()
 
-        qs = model_content_type.get_all_objects_for_this_type(pk__in=pks_object_for_export)
+        qs = model_content_type.get_all_objects_for_this_type(pk__in=listing_pks_objects)
 
         return qs
 
@@ -700,9 +715,24 @@ class ExportDataView(SiteAdminMixin, generic.TemplateView):
         context['title'] = _('Export {}').format(qs.model._meta.verbose_name_plural.lower())
         context['queryset'] = qs
         context['model_meta'] = qs.model._meta
-        context['pk_model_content_type'] = self.pk_model_content_type
+        context['pk_model'] = self.pk_model
 
         return context
+
+    def preview(self):
+
+        # submit - Preview
+        if self.output_format is not None:
+
+            fields = self.request.GET.getlist('fields')
+
+            pks_selected_objects_for_export = self.request.GET.getlist('pks_selected_objects_for_export')
+
+            model_content_type = self.get_model_content_type()
+            queryset = model_content_type.get_all_objects_for_this_type(pk__in=pks_selected_objects_for_export)
+
+            data = serializers.serialize(self.output_format, queryset, fields=fields)
+            return HttpResponse(data)
 
 
 class ImportPreviewView(SiteAdminMixin, generic.View):
