@@ -132,9 +132,13 @@ class SiteAdmin:
                 admin_staff_member_required(PasswordChangeDoneView.as_view(), cacheable=True),
                 {}, 'password_change_done'),
             url(
+                r'^import/$',
+                admin_staff_member_required(ImportView.as_view(site_admin=self)),
+                {}, 'import_index'),
+            url(
                 r'^import/(?P<pk_model>\d+)/$',
                 admin_staff_member_required(ImportView.as_view(site_admin=self)),
-                {}, 'import'),
+                {}, 'import_preview'),
             url(
                 r'^export/$',
                 admin_staff_member_required(ExportIndexView.as_view(site_admin=self)),

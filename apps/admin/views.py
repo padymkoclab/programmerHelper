@@ -1,4 +1,6 @@
 
+import logging
+import io
 import json
 import collections
 
@@ -23,11 +25,26 @@ from django.contrib.auth import login, logout
 from django.utils.text import capfirst, force_text
 
 from utils.django.views_mixins import ContextTitleMixin
+from utils.python.utils import get_filename_with_datetime
 
-from .forms import LoginForm, AddChangeDisplayForm
+from .forms import LoginForm, AddChangeDisplayForm, ImportForm
 from .utils import pretty_label_or_short_description
 from .descriptors import SiteAdminStrictDescriptor, ModelAdminStrictDescriptor
-from .views_mixins import SiteAdminMixin, SiteModelAdminMixin, SiteAppAdminMixin, ContextAdminMixin
+from .views_mixins import SiteAdminMixin, SiteModelAdminMixin, SiteAppAdminMixin
+
+
+logger = logging.getLogger('django.development')
+
+
+class SiteAdminView(generic.View):
+
+    def get_context_data(self, **kwargs):
+
+        context = dict()
+        context.update(self.site_admin.each_context(self.request))
+        context.update(**kwargs)
+
+        return context
 
 
 class IndexView(SiteAdminMixin, generic.TemplateView):
@@ -367,7 +384,7 @@ class ChangeView(SiteModelAdminMixin, generic.View):
         return AddChangeView.as_view(model_admin=self.model_admin, site_admin=self.site_admin)(request, obj)
 
 
-class AddChangeView(ContextAdminMixin, generic.FormView):
+class AddChangeView(generic.FormView):
 
     model_admin = None
     site_admin = None
@@ -514,9 +531,25 @@ class AddChangeView(ContextAdminMixin, generic.FormView):
             return self.site_admin.get_url('change', self.model_meta, kwargs={'pk': self.object.pk})
 
 
-class AppIndexView(SiteAppAdminMixin, generic.TemplateView):
+class AppIndexView(SiteAppAdminMixin, SiteAdminView):
 
-    template_name = 'admin/admin/app_index.html'
+    def get(self, request, *args, **kwargs):
+
+        return self.render_to_response(self.get_context_data())
+
+    def get_template_names(self):
+
+        return (
+            'admin/admin/app_index.html',
+        )
+
+    def render_to_response(self, context):
+
+        return TemplateResponse(
+            self.request,
+            template=self.get_template_names(),
+            context=context,
+        )
 
     def get_context_data(self, **kwargs):
 
@@ -669,18 +702,16 @@ class ExportIndexView(SiteAdminMixin, generic.TemplateView):
     title = _('Export')
 
 
-class ExportModelView(SiteAdminMixin, generic.TemplateView):
-
-    template_name = 'admin/admin/export.html'
+class ExportModelView(SiteAdminMixin, SiteAdminView):
 
     def get(self, request, *args, **kwargs):
 
         self.pk_model = kwargs['pk_model']
         self.listing_pks_objects = kwargs['listing_pks_objects']
 
-        # if is submit data
         self.output_format = request.GET.get('output_format')
 
+        # if is submit data
         if self.output_format is not None:
 
             if '__preview' in request.GET.keys():
@@ -688,7 +719,17 @@ class ExportModelView(SiteAdminMixin, generic.TemplateView):
             elif '__export' in request.GET.keys():
                 return self.export()
 
-        return super().get(request, *args, **kwargs)
+        return self.render_to_response(request)
+
+    def get_template_names(self):
+
+        return [
+            'admin/admin/export_model.html',
+        ]
+
+    def render_to_response(self, request):
+
+        return TemplateResponse(request, template=self.get_template_names(), context=self.get_context_data())
 
     def get_model_content_type(self):
 
@@ -697,17 +738,8 @@ class ExportModelView(SiteAdminMixin, generic.TemplateView):
 
         return model_content_type
 
-    def get_queryset(self):
-
-        listing_pks_objects = self.listing_pks_objects.split(',')
-
-        model_content_type = self.get_model_content_type()
-
-        qs = model_content_type.get_all_objects_for_this_type(pk__in=listing_pks_objects)
-
-        return qs
-
     def get_context_data(self, **kwargs):
+
         context = super().get_context_data(**kwargs)
 
         qs = self.get_queryset()
@@ -719,33 +751,162 @@ class ExportModelView(SiteAdminMixin, generic.TemplateView):
 
         return context
 
+    def get_queryset(self):
+
+        listing_pks_objects = self.listing_pks_objects.split(',')
+
+        model_content_type = self.get_model_content_type()
+
+        qs = model_content_type.get_all_objects_for_this_type(pk__in=listing_pks_objects)
+
+        return qs
+
+    def get_serialized_data(self):
+        fields = self.request.GET.getlist('fields')
+
+        pks_selected_objects_for_export = self.request.GET.getlist('pks_selected_objects_for_export')
+
+        model_content_type = self.get_model_content_type()
+        queryset = model_content_type.get_all_objects_for_this_type(pk__in=pks_selected_objects_for_export)
+
+        return serializers.serialize(self.output_format, queryset, fields=fields)
+
+    def get_response_with_serialised_data(self):
+        content_type = 'text/' + self.output_format
+        response = HttpResponse(content_type=content_type)
+        data = self.get_serialized_data()
+        response.write(data)
+        return response
+
     def preview(self):
 
-        # submit - Preview
-        if self.output_format is not None:
+        return self.get_response_with_serialised_data()
 
-            fields = self.request.GET.getlist('fields')
+    def export(self):
 
-            pks_selected_objects_for_export = self.request.GET.getlist('pks_selected_objects_for_export')
+        response = self.get_response_with_serialised_data()
 
-            model_content_type = self.get_model_content_type()
-            queryset = model_content_type.get_all_objects_for_this_type(pk__in=pks_selected_objects_for_export)
+        model_content_type = self.get_model_content_type()
+        model_meta = model_content_type.model_class()._meta
 
-            data = serializers.serialize(self.output_format, queryset, fields=fields)
-            return HttpResponse(data)
+        filename = get_filename_with_datetime(model_meta.verbose_name_plural, self.output_format)
+        response['Content-Disposition'] = 'attachment; filename="{}"'.format(filename)
 
-
-class ImportPreviewView(SiteAdminMixin, generic.View):
-
-    pass
+        return response
 
 
-class ImportView(SiteAdminMixin, generic.View):
+class ImportView(SiteAdminMixin, SiteAdminView):
 
-    pass
+    title = _('Import')
+
+    def get(self, request, *args, **kwargs):
+
+        return self.render_to_response(self.get_context_data())
+
+    def post(self, request, *args, **kwargs):
+
+        form = self.get_form()
+
+        if form.is_valid():
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
+
+    def render_to_response(self, context):
+
+        return TemplateResponse(
+            self.request,
+            template=self.get_template_names(),
+            context=context,
+        )
+
+    def get_context_data(self, **kwargs):
+
+        if 'form' not in kwargs:
+            kwargs['form'] = self.get_form()
+
+        return super().get_context_data(**kwargs)
+
+    def get_template_names(self):
+
+        return (
+            'admin/admin/import.html',
+        )
+
+    def form_valid(self, form):
+
+        file = form.files['file']
+        content = file.read()
+
+        if file.content_type == 'application/octet-stream':
+            format_ = 'json'
+        elif file.content_type == 'application/x-yaml':
+            format_ = 'yaml'
+        elif file.content_type == 'application/xml':
+            format_ = 'xml'
+        elif file.content_type == 'text/csv':
+            format_ = 'csv'
+
+        deserialize_objects = serializers.deserialize(format_, content)
+        deserialize_objects = tuple(deserialize_objects)
+
+        first_obj = deserialize_objects[0].object
+        model_meta = first_obj._meta
+        qs = model_meta.model._default_manager.all()
+        pks = qs.values_list('pk', flat=True)
+
+        count_inconsistent_objects = int()
+        count_consistent_objects = int()
+        objects = list()
+
+        for deserialize_object in deserialize_objects:
+
+            obj = deserialize_object.object
+
+            logger.warning('Made function find_conflicts if it imported!')
+
+            if obj.pk in pks:
+                is_consistend = False
+                count_inconsistent_objects += 1
+            else:
+                is_consistend = True
+                count_consistent_objects += 1
+
+            objects.append((obj.pk, obj, is_consistend))
+
+        import_details = dict(
+            objects=objects,
+            model_meta=model_meta,
+            count_objects_for_import=len(deserialize_objects),
+            count_exists_objects=qs.count(),
+            count_inconsistent_objects=count_inconsistent_objects,
+            count_consistent_objects=count_consistent_objects,
+        )
+
+        return self.render_to_response(self.get_context_data(import_details=import_details))
+
+    def form_invalid(self, form):
+
+        return self.render_to_response(self.get_context_data(form=form))
+
+    def get_form(self):
+
+        return ImportForm(**self.get_form_kwargs())
+
+    def get_form_kwargs(self):
+
+        kwargs = {}
+
+        if self.request.method == 'POST':
+            kwargs.update({
+                'data': self.request.POST,
+                'files': self.request.FILES,
+            })
+
+        return kwargs
 
 
-class SettingsView(SiteAdminMixin, generic.TemplateView):
+class SettingsView(SiteAdminMixin, SiteAdminView):
 
     template_name = ''
 

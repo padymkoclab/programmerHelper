@@ -63,10 +63,7 @@ def get_admin_url(object_, url_main_name):
                 )
             elif url_main_name == 'import':
                 pk_model_content_type = ContentType.objects.get_for_model(instance).pk
-                return reverse(
-                    'admin:import',
-                    kwargs={'pk_model_content_type': pk_model_content_type}
-                )
+                return reverse('admin:import_index')
 
         elif isinstance(object_, models.QuerySet):
 
@@ -74,12 +71,12 @@ def get_admin_url(object_, url_main_name):
 
             if url_main_name == 'export':
                 pk_model_content_type = ContentType.objects.get_for_model(queryset.model).pk
-                pks_object_for_export = ','.join(str(i['pk']) for i in queryset.only('pk').values('pk'))
+                listing_pks_objects = ','.join(str(i['pk']) for i in queryset.only('pk').values('pk'))
                 return reverse(
-                    'admin:export',
+                    'admin:export_model',
                     kwargs={
-                        'pk_model_content_type': pk_model_content_type,
-                        'pks_object_for_export': pks_object_for_export,
+                        'pk_model': pk_model_content_type,
+                        'listing_pks_objects': listing_pks_objects,
                     }
                 )
     except Exception as e:

@@ -13,7 +13,7 @@ from django.contrib import admin
 from django.conf import settings
 from django.apps import AppConfig
 
-from utils.django.utils import get_filename_with_datetime
+from utils.python.utils import get_filename_with_datetime
 
 
 class AppAdmin(abc.ABC):

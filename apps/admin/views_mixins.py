@@ -4,20 +4,7 @@ from utils.django.views_mixins import ContextTitleMixin
 from .descriptors import SiteAdminStrictDescriptor, ModelAdminStrictDescriptor, SiteAppAdminStrictDescriptor
 
 
-class ContextAdminMixin:
-    """
-
-    """
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-
-        context.update(self.site_admin.each_context(self.request))
-
-        return context
-
-
-class SiteAdminMixin(ContextTitleMixin, ContextAdminMixin):
+class SiteAdminMixin(ContextTitleMixin):
 
     site_admin = SiteAdminStrictDescriptor('site_admin')
 

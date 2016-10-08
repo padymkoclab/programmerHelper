@@ -1,0 +1,124 @@
+
+{% extends "admin/admin/index.html" %}
+
+{% load i18n %}
+{% load static %}
+
+
+{% block breadcrumbs %}
+  <li><a href="{{ index_url }}">{% trans "Home" %}</a></li>
+  <li class="active">{{ title }}</li>
+{% endblock breadcrumbs %}
+
+
+{% block content %}
+
+  <div class="row">
+
+    <div class="col-sm-6">
+      <form action="" method="POST" enctype="multipart/form-data">{% csrf_token %}
+        {{ form.file.label_tag}}
+        {{ form.file }}
+        <p class="help-block">{{ form.file.help_text }}</p>
+        <button type="submit" class="btn btn-default">{% trans "Upload" %}</button>
+      </form>
+    </div>
+
+    {% if import_details %}
+
+      <div class="col-sm-6">
+        <p class="lead bg-info">
+          {% blocktrans with objects_name=import_details.model_meta.verbose_name_plural.lower count_objects_for_import=import_details.count_objects_for_import %}
+            Now you trying make import data of {{ objects_name }} in count {{ count_objects_for_import }}.
+          {% endblocktrans %}
+
+          {% blocktrans count counter=import_details.count_exists_objects %}
+            Right now already exists {{ counter }} object.
+          {% plural %}
+            Right now already exists {{ counter }} objects.
+          {% endblocktrans %}
+
+          {% blocktrans with count_consistent_objects=import_details.count_consistent_objects count_inconsistent_objects=import_details.count_inconsistent_objects%}
+              Status importing data is next: consistens - {{ count_consistent_objects }}, inconsistent - {{ count_inconsistent_objects }}.
+          {% endblocktrans %}
+
+          {% trans "If you agree, then click corresponding button." %}
+
+        </p>
+
+        <button class="btn btn-success pull-right">{% trans "Confirm" %}</button>
+      </div>
+
+      <div class="col-sm-12">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>{% trans "Primary key" %}</th>
+              <th>{{ import_details.model_meta.verbose_name }}</th>
+              <th>{% trans "Is consistent" %}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for pk, object, is_consistent in import_details.objects %}
+              <tr>
+                  <td>{{ pk }}</td>
+                  <td>{{ object }}</td>
+                  <td class="text-center">{{ is_consistent }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+    {% endif %}
+
+        <div class="col-lg-6 col-sm-6 col-12">
+            <h4>Input Groups</h4>
+            <div class="input-group">
+                <label class="input-group-btn">
+                    <span class="btn btn-primary">
+                        Browse&hellip; <input type="file" style="display: none;" multiple>
+                    </span>
+                </label>
+                <input type="text" class="form-control" readonly>
+            </div>
+            <span class="help-block">
+                Try selecting one or more files and watch the feedback
+            </span>
+        </div>
+
+  </div>
+{% endblock content %}
+
+{% block extra_js %}
+  {{ block.super }}
+  <script>
+  $(function() {
+
+  // We can attach the `fileselect` event to all file inputs on the page
+  $(document).on('change', ':file', function() {
+    var input = $(this),
+        numFiles = input.get(0).files ? input.get(0).files.length : 1,
+        label = input.val().replace(/\\/g, '/').replace(/.*\//, '');
+    input.trigger('fileselect', [numFiles, label]);
+  });
+
+  // We can watch for our custom `fileselect` event like this
+  $(document).ready( function() {
+      $(':file').on('fileselect', function(event, numFiles, label) {
+
+          var input = $(this).parents('.input-group').find(':text'),
+              log = numFiles > 1 ? numFiles + ' files selected' : label;
+
+          if( input.length ) {
+              input.val(log);
+          } else {
+              if( log ) alert(log);
+          }
+
+      });
+  });
+
+});
+  </script>
+{% endblock extra_js %}
