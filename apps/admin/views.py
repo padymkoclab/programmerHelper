@@ -1,35 +1,38 @@
 
 import logging
-import io
+# import io
 import json
-import collections
+# import collections
 
 from django.core import serializers
 from django.contrib.contenttypes.models import ContentType
-from django.http.request import QueryDict
+# from django.http.request import QueryDict
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.template.response import TemplateResponse
 from django.contrib import messages
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
-from django import forms
-from django.utils.html import format_html
-from django.shortcuts import render, get_object_or_404
+# from django import forms
+# from django.utils.html import format_html, format_html_join
+# from django.shortcuts import render, get_object_or_404
 from django.db import models
-from django.apps import apps
+# from django.apps import apps
 from django.http import HttpResponseRedirect, Http404, HttpResponse
-from django.db.models.fields.reverse_related import ManyToOneRel
+# from django.db.models.fields.reverse_related import ManyToOneRel
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext_lazy as _, ungettext
 from django.views import generic
 from django.contrib.auth import login, logout
-from django.utils.text import capfirst, force_text
+# from django.utils.text import capfirst
+from django.utils.encoding import force_text
 
 from utils.django.views_mixins import ContextTitleMixin
 from utils.python.utils import get_filename_with_datetime
 
+from .filters import DateTimeFilter
+from .forms_utils import BootstrapErrorList
 from .forms import LoginForm, AddChangeDisplayForm, ImportForm
-from .utils import pretty_label_or_short_description
-from .descriptors import SiteAdminStrictDescriptor, ModelAdminStrictDescriptor
+# from .utils import pretty_label_or_short_description
+# from .descriptors import SiteAdminStrictDescriptor, ModelAdminStrictDescriptor
 from .views_mixins import SiteAdminMixin, SiteModelAdminMixin, SiteAppAdminMixin
 
 
@@ -47,14 +50,31 @@ class SiteAdminView(generic.View):
         return context
 
 
-class IndexView(SiteAdminMixin, generic.TemplateView):
+class IndexView(SiteAdminMixin, SiteAdminView):
 
-    template_name = 'admin/admin/index.html'
     title = _('Index')
+
+    def get(self, request, *args, **kwargs):
+
+        return self.render_to_response(self.get_context_data())
+
+    def render_to_response(self, context):
+
+        return TemplateResponse(
+            self.request,
+            template=self.get_template_names(),
+            context=context,
+            )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         return context
+
+    def get_template_names(self):
+
+        return (
+            'admin/admin/index.html',
+            )
 
 
 class LoginView(ContextTitleMixin, generic.FormView):
@@ -108,13 +128,15 @@ class PasswordChangeDoneView(generic.TemplateView):
     pass
 
 
-class ChangeListView(SiteModelAdminMixin, generic.View):
+class ChangeListView(SiteModelAdminMixin, SiteAdminView):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         self.model_meta = self.model_admin.model._meta
         self.list_per_page = self.model_admin.list_per_page
+
+        self.expected_parameters = set()
 
     def post(self, request, *args, **kwargs):
 
@@ -127,7 +149,7 @@ class ChangeListView(SiteModelAdminMixin, generic.View):
                 request, messages.WARNING,
                 "Items must be selected in order to perform actions on them. No items have been changed.",
                 extra_tags='warning'
-            )
+                )
 
             return self.render_to_response(request)
 
@@ -208,6 +230,12 @@ class ChangeListView(SiteModelAdminMixin, generic.View):
             if by_day is not None:
                 restrictions[day_lookup] = by_day
 
+        for param, value in self.request.GET.items():
+
+            if param in self.expected_parameters and value:
+
+                restrictions[param] = value
+
         if restrictions:
 
             # filter by conditions on the all fields listed the search_fields
@@ -235,7 +263,7 @@ class ChangeListView(SiteModelAdminMixin, generic.View):
 
     def get_context_data(self, **kwargs):
 
-        context = self.site_admin.each_context(self.request)
+        context = super().get_context_data(**kwargs)
 
         self.q = self.request.GET.get('q', '')
         self.q = self.q.strip()
@@ -246,6 +274,8 @@ class ChangeListView(SiteModelAdminMixin, generic.View):
             force_text(self.model_meta.get_field(field).verbose_name)
             for field in self.model_admin.search_fields
         ]
+
+        filters = self.get_filters()
 
         qs = self.get_queryset(self.request)
 
@@ -284,6 +314,8 @@ class ChangeListView(SiteModelAdminMixin, generic.View):
             'actions': self.model_admin.get_actions(),
             'page_object_list': page_object_list,
             'ordering': self.get_ordering(),
+            'filters': filters,
+            'view': self,
         })
 
         return context
@@ -294,7 +326,7 @@ class ChangeListView(SiteModelAdminMixin, generic.View):
             request,
             template=self.get_template_names(),
             context=self.get_context_data()
-        )
+            )
 
     def get_template_names(self):
 
@@ -302,7 +334,7 @@ class ChangeListView(SiteModelAdminMixin, generic.View):
             '{}/admin/{}/admin/changelist.html'.format(self.model_meta.app_label, self.model_meta.model_name),
             '{}/admin/admin/changelist.html'.format(self.model_meta.app_label),
             'admin/admin/changelist.html',
-        ]
+            ]
 
     def determinate_dynamic_ordering(self, clickedColumn):
 
@@ -324,7 +356,7 @@ class ChangeListView(SiteModelAdminMixin, generic.View):
                         position = 1
 
                         order = options['order']
-                        if options['order'] == None:
+                        if options['order'] is None:
                             options['order'] = 'asc'
                         elif options['order'] == 'desc':
                             options['order'] = 'asc'
@@ -341,7 +373,6 @@ class ChangeListView(SiteModelAdminMixin, generic.View):
                         else:
                             raise AttributeError('Instance has not method or field {}'.format(column_name))
 
-
                     if options['order'] == 'asc':
                         field_name = column_name
                     elif options['order'] == 'desc':
@@ -354,6 +385,47 @@ class ChangeListView(SiteModelAdminMixin, generic.View):
         ordering = [i[0] for i in ordering]
 
         return ordering
+
+    def get_filters(self):
+
+        filters = list()
+        list_filter = self.model_admin.get_list_filter(self.request)
+
+        for filter_ in list_filter:
+            if isinstance(filter_, (tuple, list)):
+                field_name, type_filter = filter_
+            else:
+                field_name, type_filter = filter_, None
+
+            field = self.model_meta.get_field(field_name)
+
+            if isinstance(field, (models.DateTimeField, models.DateField)):
+
+                filter_ = DateTimeFilter(field_name, field, self.model_meta.model)
+
+                filters.append(filter_)
+
+                expected_parameters = filter_.expected_parameters()
+
+                # ! resolve conficts parameters
+                self.expected_parameters.update(expected_parameters)
+
+        return filters
+
+    def get_querystring(self, **params):
+
+        GET_ = self.request.GET.copy()
+
+        for key, value in params.items():
+
+            if value is None:
+                GET_.pop(key, None)
+            else:
+                GET_[key] = value
+
+        querystring = GET_.urlencode()
+
+        return '?' + querystring
 
 
 class AddView(SiteModelAdminMixin, generic.View):
@@ -408,7 +480,7 @@ class AddChangeView(generic.FormView):
         if self.obj is not None:
             return _('Change {} "{}"').format(
                 self.model_meta.verbose_name.lower(), self.obj
-            )
+                )
         return _('Add {}').format(self.model_meta.verbose_name.lower())
 
     def get_context_data(self, **kwargs):
@@ -438,7 +510,7 @@ class AddChangeView(generic.FormView):
             '{}/admin/{}/addchange_form.html'.format(self.model_meta.app_label, self.model_meta.model_name),
             '{}/admin/addchange_form.html'.format(self.model_meta.app_label),
             'admin/admin/addchange_form.html',
-        ]
+            ]
 
     def post(self, request, *args, **kwargs):
 
@@ -474,7 +546,7 @@ class AddChangeView(generic.FormView):
             kwargs.update({
                 'data': self.request.POST,
                 'files': self.request.FILES,
-            })
+                })
 
         return kwargs
 
@@ -485,7 +557,7 @@ class AddChangeView(generic.FormView):
             fieldsets=self.model_admin.get_fieldsets(self.request, self.obj),
             readonly_fields=self.model_admin.get_readonly_fields(self.request, self.obj),
             model_admin=self.model_admin,
-        )
+            )
 
     def form_invalid(self, form):
 
@@ -541,7 +613,7 @@ class AppIndexView(SiteAppAdminMixin, SiteAdminView):
 
         return (
             'admin/admin/app_index.html',
-        )
+            )
 
     def render_to_response(self, context):
 
@@ -549,7 +621,7 @@ class AppIndexView(SiteAppAdminMixin, SiteAdminView):
             self.request,
             template=self.get_template_names(),
             context=context,
-        )
+            )
 
     def get_context_data(self, **kwargs):
 
@@ -573,7 +645,7 @@ class AppIndexView(SiteAppAdminMixin, SiteAdminView):
                     force_text(model._meta.verbose_name),
                     self.site_admin.get_url('changelist', model._meta),
                     model._default_manager.count(),
-                ))
+                    ))
 
         info.sort(key=lambda x: x[0].lower())
 
@@ -637,7 +709,7 @@ class DeleteView(SiteModelAdminMixin, generic.DeleteView):
             '{}/admin/{}/confirm_delete.html'.format(self.model_meta.app_label, self.model_meta.model_name),
             '{}/admin/confirm_delete.html'.format(self.model_meta.app_label),
             'admin/admin/confirm_delete.html',
-        ]
+            ]
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -646,7 +718,7 @@ class DeleteView(SiteModelAdminMixin, generic.DeleteView):
         context['related_objects'] = self.get_related_objects()
         context['title'] = _('Delete {}').format(
             self.model_meta.verbose_name.lower()
-        )
+            )
 
         return context
 
@@ -661,7 +733,7 @@ class DeleteView(SiteModelAdminMixin, generic.DeleteView):
         candidate_relations_to_delete = [
             i for i in self.object._meta.get_fields(include_hidden=True)
             if i.auto_created and not i.concrete and (i.one_to_one or i.one_to_many)
-        ]
+            ]
 
         for relationship in candidate_relations_to_delete:
             if relationship.on_delete != models.DO_NOTHING:
@@ -671,11 +743,11 @@ class DeleteView(SiteModelAdminMixin, generic.DeleteView):
                 objects = related_model._base_manager.filter(
                     **{'{}__in'.format(
                         relationship.field.name): [self.object.pk]}
-                )
+                        )
 
                 related_objects.append(
                     (related_model._meta, type_relationship, objects)
-                )
+                    )
 
         return related_objects
 
@@ -691,7 +763,7 @@ class DeleteView(SiteModelAdminMixin, generic.DeleteView):
             _('Successfully deleted {} "{}"').format(self.model_meta.verbose_name.lower(), self.object),
             extra_tags='deleted',
 
-        )
+            )
 
         return HttpResponseRedirect(success_url)
 
@@ -725,7 +797,7 @@ class ExportModelView(SiteAdminMixin, SiteAdminView):
 
         return [
             'admin/admin/export_model.html',
-        ]
+            ]
 
     def render_to_response(self, request):
 
@@ -818,7 +890,7 @@ class ImportView(SiteAdminMixin, SiteAdminView):
             self.request,
             template=self.get_template_names(),
             context=context,
-        )
+            )
 
     def get_context_data(self, **kwargs):
 
@@ -831,7 +903,7 @@ class ImportView(SiteAdminMixin, SiteAdminView):
 
         return (
             'admin/admin/import.html',
-        )
+            )
 
     def form_valid(self, form):
 
@@ -842,7 +914,8 @@ class ImportView(SiteAdminMixin, SiteAdminView):
             format_ = 'json'
         elif file.content_type == 'application/x-yaml':
             format_ = 'yaml'
-        elif file.content_type == 'application/xml':
+        elif file.content_type == 'text/xml':
+            content = content.decode('utf-8')
             format_ = 'xml'
         elif file.content_type == 'text/csv':
             format_ = 'csv'
@@ -881,7 +954,7 @@ class ImportView(SiteAdminMixin, SiteAdminView):
             count_exists_objects=qs.count(),
             count_inconsistent_objects=count_inconsistent_objects,
             count_consistent_objects=count_consistent_objects,
-        )
+            )
 
         return self.render_to_response(self.get_context_data(import_details=import_details))
 
@@ -891,7 +964,7 @@ class ImportView(SiteAdminMixin, SiteAdminView):
 
     def get_form(self):
 
-        return ImportForm(**self.get_form_kwargs())
+        return ImportForm(error_class=BootstrapErrorList, **self.get_form_kwargs())
 
     def get_form_kwargs(self):
 
@@ -901,7 +974,7 @@ class ImportView(SiteAdminMixin, SiteAdminView):
             kwargs.update({
                 'data': self.request.POST,
                 'files': self.request.FILES,
-            })
+                })
 
         return kwargs
 

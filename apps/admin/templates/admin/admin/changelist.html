@@ -103,13 +103,33 @@
     {% endif %}
   {% endblock searchbox %}
 
-  {% if page_object_list.object_list %}
-
     {% block filters %}
       <div id="div_filters">
+          <div class="row">
+              <div id="display_filters">
+                <form action="" method="GET">
+                  <div class="col-sm-12 text-center">
+                      <button id="btn_hide_filters" class="btn btn-info btn-block" type="button">{% trans "Hide filters" %}</button>
+                      <button id="btn_apply_filters" class="btn btn-success btn-block" type="submit">{% trans "Apply filters" %}</button>
+                  </div>
 
+                  {% for filter_ in filters %}
+                  <div class="col-sm-12">
+                      {% display_admin_filter view filter_ %}
+                  </div>
+                  {% endfor %}
+                </form>
+              </div>
+              <div id="hidden_filters" class="hidden">
+                  <p id="btn_show_filters">
+                      {% trans "Show filters" %}
+                  </p>
+              </div>
+          </div>
       </div>
     {% endblock filters %}
+
+    {% if page_object_list.object_list %}
 
     {% block actions_and_display_control %}
       <div id="div_actions_and_display_control">

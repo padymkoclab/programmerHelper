@@ -1,0 +1,25 @@
+
+{% load i18n %}
+
+<div class="input-group {% if file.errors %}has-error{% endif %}">
+  <label for="{{ file.id_for_label }}" class="input-group-btn">
+    <span class="btn btn-primary">
+      {% trans "Choose file" %}
+      {{ filefield_display_html }}
+    </span>
+  </label>
+  <input type="text" name="" id="display_{{ file.id_for_label }}" readonly class="form-control" placeholder="{% trans "No chosen file" %}">
+
+  <script>
+  (function($){
+    $('#{{ file.id_for_label }}').bind({
+      change: function(e){
+        var fake_filepath = $(this).val();
+        var filename = fake_filepath.replace(/.*\\/, '');
+        $('#display_{{ file.id_for_label }}').val(filename);
+      },
+    })
+  })(jQuery);
+  </script>
+
+</div>

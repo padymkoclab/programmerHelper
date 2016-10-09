@@ -55,3 +55,47 @@ table thead th.is_sortable:hover{
     text-align: center;
      padding: 0 10px;
 }
+
+
+#display_filters{
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 100%;
+    z-index: 1000;
+    width: 200px;
+    overflow-y: scroll;
+    overflow-x: scroll;
+    background-color: rgb(42, 63, 84);
+    color: rgb(0, 255, 0);
+    padding: 5px;
+}
+
+#display_filters a{
+    color: rgb(0, 255, 0);
+}
+
+
+#btn_show_filters:hover{
+    cursor: pointer;
+}
+
+
+#btn_show_filters{
+    position: fixed;
+    top: 50%;
+
+    -webkit-transform: rotate(-90deg); /* Safari */
+    -moz-transform: rotate(-90deg); /* Firefox */
+    -ms-transform: rotate(-90deg); /* IE */
+    -o-transform: rotate(-90deg); /* Opera */
+    filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=3); /* Internet Explorer */
+
+    right: -61px;
+    background: red;
+    text-align: center;
+    z-index: 1000;
+    width: 150px;
+    font-size: 17px;
+    font-weight: bold;
+}

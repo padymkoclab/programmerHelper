@@ -299,9 +299,9 @@ class ModelAdmin:
 
         return self.readonly_fields
 
-    def get_list_filters(self, request):
+    def get_list_filter(self, request):
 
-        return self.list_filters
+        return self.list_filter
 
 
 class OtherAdmin:

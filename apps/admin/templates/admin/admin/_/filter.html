@@ -1,0 +1,18 @@
+
+<p class="lead">{{ filter_.title }}</p>
+{% for choice in choices %}
+    <div><a href="{{ choice.querystring|iriencode }}">{{ choice.display_text }}</a></div>
+{% endfor %}
+
+{% for expected_parameter in filter_.expected_parameters %}
+    <label for="{{ expected_parameter }}">{{ expected_parameter }}</label>
+    <input type="text" name="{{ expected_parameter }}" id="{{ expected_parameter }}" readonly="readonly" class="form-control">
+    <script type="text/javascript">
+        $('#{{ expected_parameter }}').datepicker({
+            show: true,
+            altFormat: "yy-mm-dd",
+            dateFormat: "yy-mm-dd",
+            altField: '[name="q"]'
+        });
+    </script>
+{% endfor %}

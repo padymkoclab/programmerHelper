@@ -1,8 +1,10 @@
 
 import datetime
 
+from django.forms.utils import ErrorList
 from django.db.models.query_utils import DeferredAttribute
-from django.utils.html import format_html
+from django.utils.html import format_html, format_html_join
+from django.utils.text import force_text
 from django.utils.safestring import SafeText
 
 from utils.django.datetime_utils import convert_date_to_django_date_format
@@ -185,3 +187,24 @@ class ReadonlyField:
             return convert_date_to_django_date_format(value)
 
         return str(value)
+
+
+class BootstrapErrorList(ErrorList):
+
+    def __str__(self):
+        return self.as_ul()
+
+    def as_ul(self):
+
+        if not self.data:
+            return ''
+
+        return format_html(
+            '<ol class="{}">{}</ol>',
+            self.error_class,
+            format_html_join(
+                '',
+                '<li class="text-danger">{}</li>',
+                ((force_text(i), ) for i in self)
+            )
+        )

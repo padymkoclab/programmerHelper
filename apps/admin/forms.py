@@ -1,14 +1,11 @@
 
-import mimetypes
-
 from django.contrib.auth import authenticate
 from django.utils.translation import ugettext_lazy as _
 from django import forms
 from django.utils.safestring import mark_safe
 
-import magic
-
 from .forms_utils import FieldSet
+from .widgets import BootstrapFileInput
 
 
 class LoginForm(forms.Form):
@@ -145,10 +142,12 @@ class AddChangeDisplayForm:
 
 class ImportForm(forms.Form):
 
-    file = forms.FileField(help_text=_('Choices file in format: CSV, XML, YAML or JSON.'))
+    error_css_class = 'text-danger'
+
+    file = forms.FileField(help_text=_('File must be in format: CSV, XML, YAML or JSON.'))
 
     def clean_file(self):
 
         file = self.cleaned_data['file']
-        if file.content_type not in ('application/xml', 'application/octet-stream', 'application/x-yaml', 'text/csv'):
+        if file.content_type not in ('text/xml', 'application/octet-stream', 'application/x-yaml', 'text/csv'):
             self.add_error('file', _('Unsupported file type {}').format(file.content_type))

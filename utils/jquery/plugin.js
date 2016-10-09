@@ -2,6 +2,13 @@
 // jQuery plugin
 
 (function($) {
+
+
+    var has_event_listener = function(element, event_name){
+        var events = $._data(element[0]).events;
+        return events.hasOwnProperty(event_name)
+    };
+    
     var author = 'Seti Volkylany';
 
     /**

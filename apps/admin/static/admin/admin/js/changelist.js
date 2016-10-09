@@ -1,3 +1,4 @@
+
 jQuery(function(){
 
     check_up_count_selected_objects = function check_up_count_selected_objects (){
@@ -48,5 +49,12 @@ jQuery(function(){
         $form_changelist.submit();
    });
 
-});
+   /*
+   Toggle right sidebar with filters
+   */
+   $('#btn_hide_filters,#btn_show_filters').bind('click', function(e){
+       $('#display_filters').toggleClass('hidden');
+       $('#hidden_filters').toggleClass('hidden');
+   });
 
+});

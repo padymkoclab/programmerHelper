@@ -21,6 +21,17 @@ logger = logging.getLogger('django.development')
 register = template.Library()
 
 
+@register.inclusion_tag('admin/admin/_/display_bootstrap_fileinput.html')
+def as_bootstrap_fileinput(form_filefield):
+
+    filefield_display_html = form_filefield.as_widget(attrs={'style': 'display: none;'})
+
+    return {
+        'file': form_filefield,
+        'filefield_display_html': filefield_display_html,
+    }
+
+
 @register.simple_tag(takes_context=True)
 def prepopulated_fields_js(context):
 
@@ -187,7 +198,6 @@ def display_object_list(model_admin, page_object_list):
 
             # keep all values with styles
             values = list()
-
 
             for i, column_with_styles in enumerate(columns_with_styles):
 
@@ -564,3 +574,16 @@ def display_fields(model_meta):
     return {
         'data': data
     }
+
+
+@register.simple_tag
+def display_admin_filter(changelist_view, filter_):
+
+    template_ = template.loader.get_template(filter_.template)
+
+    choices = filter_.choices(changelist_view=changelist_view)
+
+    return template_.render(context=template.Context({
+        'filter_': filter_,
+        'choices': choices,
+    }))
