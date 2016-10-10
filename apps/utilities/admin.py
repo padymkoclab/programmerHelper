@@ -162,7 +162,7 @@ class CategoryAdmin(ModelAdmin):
     )
     colored_rows_by = 'determinate_color_rows'
     list_filter = (
-        IsNewSimpleListFilter,
+        # IsNewSimpleListFilter,
         'updated',
         'created',
     )
@@ -262,12 +262,12 @@ class UtilityAdmin(OpinionsAdminMixin, ModelAdmin):
     )
     date_hierarchy = 'created'
     list_filter = (
-        # ('category', admin.RelatedOnlyFieldListFilter),
+        ('category', admin.RelatedOnlyFieldListFilter),
         # IsNewSimpleListFilter,
-        # 'updated',
+        'updated',
         'created',
     )
-    search_fields = ('name', )
+    search_fields = ('=name', 'description', '^category__name', 'category__name$')
     readonly_fields = [
         'get_rating',
         'get_count_comments',
@@ -302,7 +302,7 @@ class UtilityAdmin(OpinionsAdminMixin, ModelAdmin):
 
         if obj:
             fieldsets.append([
-                _('Additional information'), {
+                _('Summary'), {
                     'classes': ('collapse', ),
                     'fields': [
                         'get_rating',

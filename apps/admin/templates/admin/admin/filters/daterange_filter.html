@@ -1,0 +1,17 @@
+
+<p class="lead">{{ filter_.title }}</p>
+
+{% for filter_detail in details %}
+
+    <label for="{{ filter_detail.id }}">{{ filter_detail.label }}</label>
+    <input type="text" name="{{ filter_detail.expected_parameter }}" id="{{ filter_detail.id }}" readonly="readonly" class="form-control" value="{{ filter_detail.value }}">
+    <script type="text/javascript">
+        $('#{{ filter_detail.id }}').datepicker({
+            // show: true,
+            // altFormat: "yy-mm-dd",
+            dateFormat: "yy-mm-dd",
+            // altField: '[name="q"]'
+        });
+    </script>
+
+{% endfor %}

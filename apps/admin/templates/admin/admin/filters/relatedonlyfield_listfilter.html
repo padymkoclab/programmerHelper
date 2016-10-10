@@ -1,0 +1,10 @@
+
+{% load utils_filters %}
+
+<p class="lead">{{ filter_.title }}</p>
+
+<select name="{{ details.expected_parameter }}" class="form-control">
+    {% for choice in details.choices %}
+        <option value="{{ choice.value }}" {% if choice.is_selected is True %}selected{% endif %}>{{ choice.text_dislay }}</option>
+    {% endfor %}
+</select>

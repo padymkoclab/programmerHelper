@@ -1,9 +1,11 @@
 
+import functools
 import logging
 import collections
 
 from django.contrib import messages
 from django import forms
+from django.db import models
 # from django.contrib.admin.checks import ModelAdminChecks
 from django.conf.urls import url
 from django.contrib.auth import get_permission_codename
@@ -19,6 +21,7 @@ from django.utils.translation import ugettext_lazy as _, ungettext
 from utils.python.utils import flatten
 
 from .forms import AddChangeModelForm
+from .widgets import RelatedFieldWidgetWrapper
 from .decorators import admin_staff_member_required
 from .views import AddView, ChangeListView, ChangeView, HistoryView, DeleteView
 
@@ -81,7 +84,7 @@ class ModelAdmin:
     # save_on_top = False
     # paginator = Paginator
     # preserve_filters = True
-    # inlines = []
+    inlines = []
 
     # Custom templates (designed to be over-ridden in subclasses)
     # add_form_template = None
@@ -252,7 +255,39 @@ class ModelAdmin:
         if not fields:
             fields = forms.ALL_FIELDS
 
-        return forms.models.modelform_factory(self.model, fields=fields, form=self.form)
+        return forms.models.modelform_factory(
+            self.model,
+            fields=fields,
+            form=self.form,
+            formfield_callback=functools.partial(self.override_admin_formfield, request=request)
+        )
+
+    def override_admin_formfield(self, db_field, request, **kwargs):
+
+        if isinstance(db_field, (models.ForeignKey, models.ManyToManyField)):
+
+            if isinstance(db_field, models.ForeignKey):
+                formfield = self.formfield_for_foreignkey(db_field, request, **kwargs)
+
+            elif isinstance(db_field, models.ManyToManyField):
+                formfield = self.formfield_for_manytomany(db_field, request, **kwargs)
+
+            formfield.widget = RelatedFieldWidgetWrapper(formfield.widget, db_field)
+
+            return formfield
+
+        return db_field.formfield(**kwargs)
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+
+        # if 'queryset' not in kwargs:
+        #     queryset =
+        #     kwargs['kwargs'] = queryset
+
+        return db_field.formfield(**kwargs)
+
+    def formfield_for_manytomany(self, db_field, request, **kwargs):
+        return forms.ModelChoiceField(queryset=1)
 
     def get_search_fields(self):
 
@@ -302,6 +337,11 @@ class ModelAdmin:
     def get_list_filter(self, request):
 
         return self.list_filter
+
+    def get_inline_instances(self, request, obj=None):
+
+        # make premission check here
+        return [inline(self.model, self.admin_site) for inline in self.inlines]
 
 
 class OtherAdmin:

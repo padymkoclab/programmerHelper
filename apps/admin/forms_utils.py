@@ -186,6 +186,9 @@ class ReadonlyField:
         if isinstance(value, datetime.date):
             return convert_date_to_django_date_format(value)
 
+        if value is None:
+            return self.model_admin.site_admin.empty_value_display
+
         return str(value)
 
 

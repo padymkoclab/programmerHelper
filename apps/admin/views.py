@@ -1,9 +1,12 @@
 
+import operator
+import functools
 import logging
 # import io
 import json
 # import collections
 
+from django.contrib.admin import filters as django_filters
 from django.core import serializers
 from django.contrib.contenttypes.models import ContentType
 # from django.http.request import QueryDict
@@ -28,10 +31,10 @@ from django.utils.encoding import force_text
 from utils.django.views_mixins import ContextTitleMixin
 from utils.python.utils import get_filename_with_datetime
 
-from .filters import DateTimeFilter
+from .filters import DateTimeRangeFilter, RelatedOnlyFieldListFilter
 from .forms_utils import BootstrapErrorList
 from .forms import LoginForm, AddChangeDisplayForm, ImportForm
-# from .utils import pretty_label_or_short_description
+from .utils import get_field_verbose_name_from_lookup
 # from .descriptors import SiteAdminStrictDescriptor, ModelAdminStrictDescriptor
 from .views_mixins import SiteAdminMixin, SiteModelAdminMixin, SiteAppAdminMixin
 
@@ -137,6 +140,7 @@ class ChangeListView(SiteModelAdminMixin, SiteAdminView):
         self.list_per_page = self.model_admin.list_per_page
 
         self.expected_parameters = set()
+        self.filters = list()
 
     def post(self, request, *args, **kwargs):
 
@@ -149,7 +153,7 @@ class ChangeListView(SiteModelAdminMixin, SiteAdminView):
                 request, messages.WARNING,
                 "Items must be selected in order to perform actions on them. No items have been changed.",
                 extra_tags='warning'
-                )
+            )
 
             return self.render_to_response(request)
 
@@ -167,15 +171,78 @@ class ChangeListView(SiteModelAdminMixin, SiteAdminView):
 
     def get(self, request, *args, **kwargs):
 
+        self.set_filters()
+
         return self.render_to_response(request)
 
-    def get_queryset(self, request):
+    def render_to_response(self, request):
 
-        # Queryset
-        qs = self.model_admin.get_queryset(request)
+        return TemplateResponse(
+            request,
+            template=self.get_template_names(),
+            context=self.get_context_data()
+            )
 
-        # Filtration
-        restrictions = {}
+    def get_template_names(self):
+
+        return [
+            '{}/admin/{}/admin/changelist.html'.format(self.model_meta.app_label, self.model_meta.model_name),
+            '{}/admin/admin/changelist.html'.format(self.model_meta.app_label),
+            'admin/admin/changelist.html',
+        ]
+
+    @staticmethod
+    def convert_search_field_to_lookup(search_field):
+
+        if search_field.startswith('^'):
+            return '{}__istartswith'.format(search_field.lstrip('^'))
+        if search_field.endswith('$'):
+            return '{}__iendswith'.format(search_field.rstrip('$'))
+        if search_field.startswith('='):
+            return '{}__iexact'.format(search_field.lstrip('='))
+        else:
+            return '{}__icontains'.format(search_field)
+
+    def get_search_details(self):
+
+        result = list()
+        for search_field in self.model_admin.get_search_fields():
+
+            if search_field.startswith('^'):
+                field_name = search_field.lstrip('^')
+                ignorecase = True
+                type_search = 'Start swith'
+
+            elif search_field.endswith('$'):
+                field_name = search_field.rstrip('$')
+                ignorecase = True
+                type_search = 'End swith'
+
+            elif search_field.startswith('='):
+                field_name = search_field.lstrip('=')
+                ignorecase = True
+                type_search = 'Exact'
+
+            else:
+                field_name = search_field
+                ignorecase = True
+                type_search = 'Contains'
+
+            field_name = get_field_verbose_name_from_lookup(field_name, self.model_admin.model)
+            result.append({
+                'ignorecase': ignorecase,
+                'field_name': field_name,
+                'type_search': type_search,
+            })
+        return result
+
+    def filter_by_filter_restrictions(self, request, qs):
+
+        for filter_ in self.filters:
+            qs = filter_.queryset(request, qs)
+        return qs
+
+    def filter_by_search_restrictions(self, request, qs):
 
         search_fields = self.model_admin.get_search_fields()
 
@@ -183,34 +250,25 @@ class ChangeListView(SiteModelAdminMixin, SiteAdminView):
 
             if self.q and search_fields:
 
-                if self.type_search not in ('contains', 'startswith', 'endswith'):
-                    raise ValueError('Not correct value of "type_search".')
-
-                # convert ignorecase to the Django`s lookup type
-                self.ignorecase = '' if self.ignorecase is None else 'i'
-
-                # make a lookup format for the search
-                lookup = '__{}{}'.format(self.ignorecase, self.type_search)
-
                 # make the same conditions for each field in the search_fields
-                search_restrictions = {'{}{}'.format(field, lookup): self.q for field in search_fields}
+                search_restrictions = {
+                    self.convert_search_field_to_lookup(search_field): self.q
+                    for search_field in search_fields
+                }
 
-                restrictions.update(search_restrictions)
+                search_restrictions = functools.reduce(
+                    operator.or_,
+                    (models.Q(**{k: v}) for k, v in search_restrictions.items())
+                )
 
-                # count = qs.count()
+                return qs.filter(search_restrictions)
+            return qs
 
-                # object_name = self.model_meta.verbose_name if count == 1 else self.model_meta.verbose_name_plural
-                # object_name = object_name.lower()
-
-                # msg = ungettext(
-                #     'By a condition "{}" found {} {}',
-                #     'By a condition "{}" found {} {}',
-                #     count
-                # ).format(self.q, count, object_name)
-
-                # self.model_admin.message_user(request, msg, extra_tags='info', level='INFO')
+    def get_date_hierarchy_restrictions(self, request):
 
         if self.model_admin.date_hierarchy:
+
+            restrictions = {}
             field_name = self.model_admin.date_hierarchy
 
             year_lookup = field_name + '__year'
@@ -230,21 +288,32 @@ class ChangeListView(SiteModelAdminMixin, SiteAdminView):
             if by_day is not None:
                 restrictions[day_lookup] = by_day
 
-        for param, value in self.request.GET.items():
+            return restrictions
 
-            if param in self.expected_parameters and value:
+        return {}
 
-                restrictions[param] = value
+    def get_queryset(self, request):
 
-        if restrictions:
+        # Queryset
+        qs = self.model_admin.get_queryset(request)
 
-            # filter by conditions on the all fields listed the search_fields
-            # as well as by date_hierarchy
-            qs = qs.filter(**restrictions)
+        qs = self.filter_by_filter_restrictions(request, qs)
+        qs = self.filter_by_search_restrictions(request, qs)
 
         # Ordering
         ordering = self.get_ordering()
         qs = qs.order_by(*ordering)
+
+        # send message
+        count = qs.count()
+        object_name = self.model_meta.verbose_name if count == 1 else self.model_meta.verbose_name_plural
+        object_name = object_name.lower()
+        msg = ungettext(
+            'Found {} {}',
+            'Found {} {}',
+            count
+        ).format(count, object_name)
+        self.model_admin.message_user(request, msg, extra_tags='info', level='INFO')
 
         return qs
 
@@ -267,15 +336,6 @@ class ChangeListView(SiteModelAdminMixin, SiteAdminView):
 
         self.q = self.request.GET.get('q', '')
         self.q = self.q.strip()
-        self.ignorecase = self.request.GET.get('ignorecase', '1')
-        self.type_search = self.request.GET.get('type_search', 'contains')
-
-        listing_search_fields = [
-            force_text(self.model_meta.get_field(field).verbose_name)
-            for field in self.model_admin.search_fields
-        ]
-
-        filters = self.get_filters()
 
         qs = self.get_queryset(self.request)
 
@@ -303,9 +363,6 @@ class ChangeListView(SiteModelAdminMixin, SiteAdminView):
             'model_meta': self.model_meta,
             'model_admin': self.model_admin,
             'q': self.q,
-            'ignorecase': self.ignorecase,
-            'type_search': self.type_search,
-            'listing_search_fields': ', '.join(listing_search_fields),
             'has_add_permission': self.model_admin.has_add_permission(self.request),
             'has_export_permission': self.model_admin.has_add_permission(self.request),
             'has_import_permission': self.model_admin.has_add_permission(self.request),
@@ -314,27 +371,11 @@ class ChangeListView(SiteModelAdminMixin, SiteAdminView):
             'actions': self.model_admin.get_actions(),
             'page_object_list': page_object_list,
             'ordering': self.get_ordering(),
-            'filters': filters,
-            'view': self,
+            'filters': self.filters,
+            'search_details': self.get_search_details(),
         })
 
         return context
-
-    def render_to_response(self, request):
-
-        return TemplateResponse(
-            request,
-            template=self.get_template_names(),
-            context=self.get_context_data()
-            )
-
-    def get_template_names(self):
-
-        return [
-            '{}/admin/{}/admin/changelist.html'.format(self.model_meta.app_label, self.model_meta.model_name),
-            '{}/admin/admin/changelist.html'.format(self.model_meta.app_label),
-            'admin/admin/changelist.html',
-            ]
 
     def determinate_dynamic_ordering(self, clickedColumn):
 
@@ -386,31 +427,39 @@ class ChangeListView(SiteModelAdminMixin, SiteAdminView):
 
         return ordering
 
-    def get_filters(self):
+    def set_filters(self):
 
-        filters = list()
         list_filter = self.model_admin.get_list_filter(self.request)
 
         for filter_ in list_filter:
             if isinstance(filter_, (tuple, list)):
                 field_name, type_filter = filter_
+
+                field = self.model_meta.get_field(field_name)
+
+                if issubclass(type_filter, django_filters.RelatedOnlyFieldListFilter):
+                    filter_ = RelatedOnlyFieldListFilter(field_name, field, self.model_meta.model)
+            elif callable(filter_):
+                if not issubclass(filter_, django_filters.SimpleListFilter):
+                    raise TypeError(
+                        'Own filter may be only an instance of the {}'.format(django_filters.SimpleListFilter)
+                    )
             else:
                 field_name, type_filter = filter_, None
 
-            field = self.model_meta.get_field(field_name)
+                field = self.model_meta.get_field(field_name)
 
-            if isinstance(field, (models.DateTimeField, models.DateField)):
+                if isinstance(field, (models.DateTimeField, models.DateField)):
 
-                filter_ = DateTimeFilter(field_name, field, self.model_meta.model)
+                    filter_ = DateTimeRangeFilter(field_name, field, self.model_meta.model)
 
-                filters.append(filter_)
+            self.filters.append(filter_)
 
-                expected_parameters = filter_.expected_parameters()
-
-                # ! resolve conficts parameters
-                self.expected_parameters.update(expected_parameters)
-
-        return filters
+            # ! resolve conficts parameters
+            if hasattr(filter_, 'parameter_name'):
+                self.expected_parameters.update(filter_.parameter_name)
+            else:
+                self.expected_parameters.update(filter_.expected_parameters)
 
     def get_querystring(self, **params):
 
@@ -428,7 +477,7 @@ class ChangeListView(SiteModelAdminMixin, SiteAdminView):
         return '?' + querystring
 
 
-class AddView(SiteModelAdminMixin, generic.View):
+class AddView(SiteModelAdminMixin, SiteAdminView):
 
     def dispatch(self, request, *args, **kwargs):
 
@@ -438,7 +487,7 @@ class AddView(SiteModelAdminMixin, generic.View):
         return AddChangeView.as_view(model_admin=self.model_admin, site_admin=self.site_admin)(request)
 
 
-class ChangeView(SiteModelAdminMixin, generic.View):
+class ChangeView(SiteModelAdminMixin, SiteAdminView):
 
     def dispatch(self, request, *args, **kwargs):
 
@@ -456,7 +505,7 @@ class ChangeView(SiteModelAdminMixin, generic.View):
         return AddChangeView.as_view(model_admin=self.model_admin, site_admin=self.site_admin)(request, obj)
 
 
-class AddChangeView(generic.FormView):
+class AddChangeView(SiteAdminView):
 
     model_admin = None
     site_admin = None
@@ -487,6 +536,8 @@ class AddChangeView(generic.FormView):
 
         context = super().get_context_data()
 
+        context.update(self.site_admin.each_context(self.request))
+
         context['title'] = self.get_title()
 
         context['object'] = self.obj
@@ -510,7 +561,19 @@ class AddChangeView(generic.FormView):
             '{}/admin/{}/addchange_form.html'.format(self.model_meta.app_label, self.model_meta.model_name),
             '{}/admin/addchange_form.html'.format(self.model_meta.app_label),
             'admin/admin/addchange_form.html',
-            ]
+        ]
+
+    def render_to_response(self, context):
+
+        return TemplateResponse(
+            self.request,
+            template=self.get_template_names(),
+            context=self.get_context_data(),
+        )
+
+    def get(self, request, *args, **kwargs):
+
+        return self.render_to_response(request)
 
     def post(self, request, *args, **kwargs):
 
@@ -546,7 +609,7 @@ class AddChangeView(generic.FormView):
             kwargs.update({
                 'data': self.request.POST,
                 'files': self.request.FILES,
-                })
+            })
 
         return kwargs
 
@@ -557,7 +620,7 @@ class AddChangeView(generic.FormView):
             fieldsets=self.model_admin.get_fieldsets(self.request, self.obj),
             readonly_fields=self.model_admin.get_readonly_fields(self.request, self.obj),
             model_admin=self.model_admin,
-            )
+        )
 
     def form_invalid(self, form):
 
@@ -709,7 +772,7 @@ class DeleteView(SiteModelAdminMixin, generic.DeleteView):
             '{}/admin/{}/confirm_delete.html'.format(self.model_meta.app_label, self.model_meta.model_name),
             '{}/admin/confirm_delete.html'.format(self.model_meta.app_label),
             'admin/admin/confirm_delete.html',
-            ]
+        ]
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -797,7 +860,7 @@ class ExportModelView(SiteAdminMixin, SiteAdminView):
 
         return [
             'admin/admin/export_model.html',
-            ]
+        ]
 
     def render_to_response(self, request):
 
@@ -890,7 +953,7 @@ class ImportView(SiteAdminMixin, SiteAdminView):
             self.request,
             template=self.get_template_names(),
             context=context,
-            )
+        )
 
     def get_context_data(self, **kwargs):
 
@@ -903,7 +966,7 @@ class ImportView(SiteAdminMixin, SiteAdminView):
 
         return (
             'admin/admin/import.html',
-            )
+        )
 
     def form_valid(self, form):
 
@@ -954,7 +1017,7 @@ class ImportView(SiteAdminMixin, SiteAdminView):
             count_exists_objects=qs.count(),
             count_inconsistent_objects=count_inconsistent_objects,
             count_consistent_objects=count_consistent_objects,
-            )
+        )
 
         return self.render_to_response(self.get_context_data(import_details=import_details))
 
@@ -974,7 +1037,7 @@ class ImportView(SiteAdminMixin, SiteAdminView):
             kwargs.update({
                 'data': self.request.POST,
                 'files': self.request.FILES,
-                })
+            })
 
         return kwargs
 

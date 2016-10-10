@@ -6,6 +6,9 @@ from django.db import models
 from django.core.urlresolvers import reverse
 from django import template
 
+from ..utils import convert_boolean_to_bootstrap_icon
+
+
 register = template.Library()
 logger = logging.getLogger('django.development')
 
@@ -24,6 +27,11 @@ def add_classes_to_label_tag(field, classes):
         return field.label_tag(attrs={'class': classes})
     except:
         return ''
+
+
+@register.filter
+def as_bootstrap_logic_icon(value):
+    return convert_boolean_to_bootstrap_icon(value)
 
 
 @register.filter

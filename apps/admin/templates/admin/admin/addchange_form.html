@@ -80,7 +80,7 @@
   <form action="" method="POST" {% if form.is_multipart %}enctype="multipart/form-data"{% endif %} class="form-horizontal" id="form_addchange">
     <div class="tab-content">
       {% for fieldset in form %}
-        <div class="tab-pane {% if forloop.revcounter == 1 %}active{% endif %}" id="fieldset{{ forloop.counter }}" role="tabpanel">
+        <div class="tab-pane {% if forloop.counter == 1 %}active{% endif %}" id="fieldset{{ forloop.counter }}" role="tabpanel">
             {% csrf_token %}
             <fieldset class="{{ fieldset.classes }}">
 

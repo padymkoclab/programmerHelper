@@ -104,8 +104,7 @@ class AddChangeModelForm(forms.ModelForm):
 
                 field.help_text = self._get_help_text_to_field(field)
 
-    @staticmethod
-    def _get_help_text_to_field(field):
+    def _get_help_text_to_field(self, field):
 
         help_text = field.help_text + '<br />' if field.help_text else ''
 

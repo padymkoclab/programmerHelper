@@ -12,7 +12,7 @@ from django.utils import formats
 
 from utils.django.datetime_utils import convert_date_to_django_date_format
 
-from ..utils import pretty_label_or_short_description
+from ..utils import pretty_label_or_short_description, convert_boolean_to_bootstrap_icon
 
 
 logger = logging.getLogger('django.development')
@@ -164,23 +164,6 @@ def display_object_list(model_admin, page_object_list):
             (column_name, columns_with_styles[column_name])
             for column_name in model_admin.list_display
         ]
-
-        def convert_boolean_to_bootstrap_icon(value):
-
-            if value is True:
-                bootstap_class = 'ok-sign'
-                color = 'rgb(0, 255, 0)'
-            elif value is False:
-                bootstap_class = 'remove-sign'
-                color = 'rgb(255, 0, 0)'
-            elif value is None:
-                bootstap_class = 'question-sign'
-                color = 'rgb(0, 0, 0)'
-
-            return format_html(
-                '<span class="glyphicon glyphicon-{}" style="color: {}"></span>',
-                bootstap_class, color
-            )
 
         for obj in object_list:
 
@@ -576,14 +559,13 @@ def display_fields(model_meta):
     }
 
 
-@register.simple_tag
-def display_admin_filter(changelist_view, filter_):
+@register.simple_tag(takes_context=True)
+def display_admin_filter(context, filter_):
 
+    request = context['request']
     template_ = template.loader.get_template(filter_.template)
-
-    choices = filter_.choices(changelist_view=changelist_view)
 
     return template_.render(context=template.Context({
         'filter_': filter_,
-        'choices': choices,
+        'details': filter_.get_details(request),
     }))

@@ -45,56 +45,39 @@
           <div class="row">
             <div class="col-xs-10">
                 <form action="" class="" method="GET" id="form_changelist">
-                  <div class="input-group">
-                      <span class="input-group-addon" id="menu_search_options">
-                        <span class="caret dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"></span>
-                        <ul class="dropdown-menu">
-                          <li>
-                            <a>
-                            <label for="type_search_radio_contains">
-                              <input type="radio" name="type_search" id="type_search_radio_contains" value="contains" {% if type_search == 'contains' %}checked="checked"{% endif %}>
-                              {% trans "Contains" %}
-                            </label>
-                            </a>
-                          </li>
-                          <li>
-                            <a>
-                            <label for="type_search_radio_startswith">
-                              <input type="radio" name="type_search" id="type_search_radio_startswith" value="startswith" {% if type_search == 'startswith' %}checked="checked"{% endif %}>
-                              {% trans "Startswith" %}
-                            </label>
-                            </a>
-                          </li>
-                          <li>
-                            <a>
-                            <label for="type_search_radio_endswith">
-                              <input type="radio" name="type_search" id="type_search_radio_endswith" value="endswith" {% if type_search == 'endswith' %}checked="checked"{% endif %}>
-                              {% trans "Endswith" %}
-                            </label>
-                            </a>
-                          </li>
-                          <li class="divider" role="separator"></li>
-                          <li>
-                            <a>
-                            <label for="checkbox_ignorecase">
-                              <input type="checkbox" name="ignorecase" id="checkbox_ignorecase" value="1" checked="true">
-                              {% trans "Ignorecase" %}
-                            </label>
-                            </a>
-                          </li>
-                        </ul>
-                      </span>
+
+                    <p class="help-block unselectable_text" id="toggle_search_details">
+                    {% blocktrans trimmed %}
+                        Click here for show/hide details of a search
+                    {% endblocktrans %}</p>
+
+                    <table class="table" id="table_search_details">
+                        <thead>
+                            <tr>
+                                <th>{% trans "Field" %}</th>
+                                <th>{% trans "Type search" %}</th>
+                                <th>{% trans "Ignorecase" %}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for search_detail in search_details %}
+                                <tr>
+                                    <td>{{ search_detail.field_name }}</td>
+                                    <td>{{ search_detail.type_search }}</td>
+                                    <td>{{ search_detail.ignorecase|as_bootstrap_logic_icon }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+
+                    <div class="input-group">
                       <input type="search" class="form-control" placeholder="{% trans 'Search for ...' %}" aria-describedby="#searchbox_span_icon" name="q" value="{{ q }}">
                       <span class="input-group-btn">
                         <button type="submit" class="btn btn-default">
                           <span class="glyphicon glyphicon-search"></span>
                         </button>
                       </span>
-                  </div>
-                    <p class="help-block">
-                    {% blocktrans trimmed %}
-                        Search will be made on next fields: {{ listing_search_fields  }}
-                    {% endblocktrans %}</p>
+                    </div>
                 </form>
             </div>
           </div>
@@ -115,7 +98,7 @@
 
                   {% for filter_ in filters %}
                   <div class="col-sm-12">
-                      {% display_admin_filter view filter_ %}
+                      {% display_admin_filter filter_ %}
                   </div>
                   {% endfor %}
                 </form>

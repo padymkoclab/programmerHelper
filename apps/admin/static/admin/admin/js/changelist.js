@@ -57,4 +57,11 @@ jQuery(function(){
        $('#hidden_filters').toggleClass('hidden');
    });
 
+   var $table_search_details = $('#table_search_details');
+   $('#toggle_search_details').bind({
+       click: function(e){
+           $table_search_details.stop().fadeToggle(500);
+       },
+   })
+
 });

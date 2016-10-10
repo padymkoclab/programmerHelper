@@ -127,7 +127,7 @@ class LatestActivityListFilter(admin.SimpleListFilter):
 
 class IsNewSimpleListFilter(admin.SimpleListFilter):
 
-    title = _('is new?')
+    title = _('Is new?')
     parameter_name = 'is_new'
 
     def lookups(self, request, model_admin):

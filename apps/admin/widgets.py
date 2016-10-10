@@ -1,4 +1,6 @@
 
+import copy
+
 from django import forms
 from django import template
 from django.forms.utils import flatatt
@@ -28,3 +30,33 @@ class BootstrapFileInput(forms.widgets.FileInput):
 
         fileinput = self.get_fileinput(name, value, attrs)
         return fileinput
+
+
+class RelatedFieldWidgetWrapper(forms.Widget):
+    """docstring for RelatedFieldWidgetWrapper."""
+
+    template = 'admin/admin/relatedfieldwidgetwrapper.html'
+
+    def __init__(self, widget, db_field, *args, **kwargs):
+        self.db_field = db_field
+        self.widget = widget
+        self.attrs = widget.attrs
+
+    def __deepcopy__(self, memo):
+        obj = copy.copy(self)
+        obj.widget = copy.deepcopy(self.widget, memo)
+        obj.attrs = self.widget.attrs
+        memo[id(self)] = obj
+        return obj
+
+    def render(self, name, value, attrs=None):
+
+        attrs = {
+            'class': 'form-control',
+        }
+
+        context = {
+            'rendered_widget': self.widget.render(name, value, attrs),
+        }
+
+        return template.loader.render_to_string(self.template, context)
