@@ -15,3 +15,19 @@ div[id^=fieldset]{
     margin-top: 10px;
     margin-bottom: 10px;
 }
+
+.object_panel a{
+    color: inherit;
+    display: block;
+}
+
+
+.object_panel a:hover{
+    text-decoration: none;
+}
+
+.object_panel .panel-heading span.pull-right label:first-child{
+    position: relative;
+    margin: 0;
+    top: -2px;
+}

@@ -1,0 +1,92 @@
+
+{% load i18n %}
+
+{% load utils_filters %}
+
+{% load admin_filters %}
+
+{{ formset.management_form }}
+{{ formset.non_form_errors }}
+
+<div class="row">
+    <div class="col-sm-12">
+        <button type="button" class="btn btn-primary pull-right open_all_panels">{% trans "Open all panels" %}</button>
+        <button type="button" class="btn btn-primary pull-right collapse_all_panels">{% trans "Collapse all panels" %}</button>
+    </div>
+</div>
+
+{% for form in formset %}
+    {% with forloop.counter|stringformat:'s' as forloop_count %}
+        {% with 'accordion'|add:number_inline|add:forloop_count as accordion_id %}
+
+        <div class="panel-group object_panel" id="{{ accordion_id }}" role="tablist" aria-multiselectable="true">
+            <div class="panel panel-default">
+                {% with accordion_id|add:'-panel'|add:forloop_count as panel_id %}
+                    <div class="panel-heading" role="tab" id="">
+
+                        <span class="pull-left">
+                            <a href="#{{ panel_id }}" role="button" data-toggle="collapse" data-parent="{{ accordion_id }}" aria-expanded="true" aria-controls="{{ panel_id }}">
+                            {% if form.instance|is_instance_exists %}
+                                <b>{{ form.instance }}</b>
+                            {% else %}
+                                {{ inline.verbose_name }} #{{ forloop.counter }}
+                            {% endif %}
+                            </a>
+                        </span>
+                        <span class="pull-right">
+                            {% if formset.can_delete %}
+
+                                {% for field in form %}
+                                    {% if field.name == 'DELETE' %}
+                                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                                        {{ field }}
+                                    {% endif %}
+
+                                {% endfor %}
+
+                            {% endif %}
+                        </span>
+                        <span class="clearfix"></span>
+                    </div>
+                    <div id="{{ panel_id }}" class="panel-collapse collapse" role="tabpanel" aria-labelledly="{{ panel_id }}">
+
+                    <div class="panel-body">
+
+                        {% if form.non_form_errors %}
+                            {% for error in form.non_form_errors %}
+                                <p class="text-danger">{{ error }}</p>
+                            {% endfor %}
+                        {% endif %}
+
+                        {% for field in form %}
+
+                            {% if field.is_hidden %}
+                                {{ field }}
+                            {% elif field.name != 'DELETE' %}
+
+                                <div class="form-group">
+                                    <label for="{{ field.id_for_label }}" class="col-sm-2 control-label">{{ field.label }}</label>
+                                    <div class="col-sm-10">
+                                        {% if field.errors %}
+                                          {% for error in field.errors %}
+                                            <p class="text-danger">{{ error }}</p>
+                                          {% endfor %}
+                                        {% endif %}
+                                        {{ field }}
+                                        <p class="help-block">{{ field.help_text }}</p>
+                                    </div>
+                                </div>
+
+
+                            {% endif %}
+
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endwith %}
+            </div>
+        </div>
+
+        {% endwith %}
+    {% endwith %}
+{% endfor %}

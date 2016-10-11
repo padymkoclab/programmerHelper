@@ -23,6 +23,9 @@ DATABASES = {
 }
 
 
+MIDDLEWARE += ['debug_toolbar.middleware.DebugToolbarMiddleware']
+
+
 INSTALLED_APPS += [
     'django_extensions',
     'debug_toolbar',

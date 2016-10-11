@@ -8,7 +8,7 @@ from django.contrib import admin
 
 from utils.django.listfilters import IsNewSimpleListFilter
 
-from apps.admin.admin import ModelAdmin
+from apps.admin.admin import ModelAdmin, StackedInline
 
 from apps.core.admin import AppAdmin, AdminSite
 from apps.opinions.admin import OpinionGenericInline
@@ -102,20 +102,19 @@ class UtilitiesAppAdmin(AppAdmin):
         return msg
 
 
-class UtilityInline(admin.StackedInline):
+class UtilityInline(StackedInline):
     """
     Stacked Inline View for Utility
     """
 
     form = UtilityAdminModelForm
     model = Utility
-    extra = 0
+    extra = 1
     fk_name = 'category'
     readonly_fields = ['get_rating', 'get_count_comments', 'get_count_opinions', 'updated', 'created']
     fields = [
         'name',
         'description',
-        'category',
         'web_link',
         'get_rating',
         'get_count_comments',
@@ -207,7 +206,7 @@ class CategoryAdmin(ModelAdmin):
 
         if obj is not None:
             fieldsets.append([
-                _('Additional information'), {
+                _('Summary'), {
                     'classes': ('collapse', ),
                     'fields': [
                         'get_total_mark',
@@ -226,7 +225,7 @@ class CategoryAdmin(ModelAdmin):
 
         if obj:
             inlines = [UtilityInline]
-            return [inline(self.model, self.admin_site) for inline in inlines]
+            return [inline(self.model, self.site_admin) for inline in inlines]
         return []
 
     def determinate_color_rows(self, obj):
@@ -327,5 +326,5 @@ class UtilityAdmin(OpinionsAdminMixin, ModelAdmin):
                 OpinionGenericInline,
                 CommentGenericInline,
             ]
-            return [inline(self.model, self.admin_site) for inline in inlines]
+            return [inline(self.model, self.site_admin) for inline in inlines]
         return []

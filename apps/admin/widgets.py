@@ -37,10 +37,12 @@ class RelatedFieldWidgetWrapper(forms.Widget):
 
     template = 'admin/admin/relatedfieldwidgetwrapper.html'
 
-    def __init__(self, widget, db_field, *args, **kwargs):
+    def __init__(self, widget, db_field, site_admin, *args, **kwargs):
         self.db_field = db_field
+        self.related_model = db_field.remote_field.model
         self.widget = widget
         self.attrs = widget.attrs
+        self.site_admin = site_admin
 
     def __deepcopy__(self, memo):
         obj = copy.copy(self)
@@ -55,8 +57,18 @@ class RelatedFieldWidgetWrapper(forms.Widget):
             'class': 'form-control',
         }
 
+        obj = self.related_model._default_manager.get(pk=value)
+
+        # Add permissions on actions
+        add_url = self.site_admin.get_url('add', self.related_model._meta)
+        update_url = self.site_admin.get_url('change', self.related_model._meta, kwargs={'pk': obj.pk})
+        delete_url = self.site_admin.get_url('delete', self.related_model._meta, kwargs={'pk': obj.pk})
+
         context = {
             'rendered_widget': self.widget.render(name, value, attrs),
+            'add_url': add_url,
+            'update_url': update_url,
+            'delete_url': delete_url,
         }
 
         return template.loader.render_to_string(self.template, context)

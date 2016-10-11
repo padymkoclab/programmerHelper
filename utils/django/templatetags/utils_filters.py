@@ -111,14 +111,14 @@ def DisplaySingNumber(number):
 
 
 @register.filter(name='ipdb')
-def ipdb(element):
+def ipdb(i):
     try:
         import ipdb
         ipdb.set_trace()
     except ImportError:
         warnings.warn('Module "ipdb" not found, then will be use module "pdb"', ImportWarning)
         pdb.set_trace()
-    return element
+    return i
 
 
 @register.filter(name='has_admin_url')

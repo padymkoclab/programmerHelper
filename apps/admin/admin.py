@@ -5,6 +5,7 @@ import collections
 
 from django.contrib import messages
 from django import forms
+from django.forms.models import BaseInlineFormSet, inlineformset_factory
 from django.db import models
 # from django.contrib.admin.checks import ModelAdminChecks
 from django.conf.urls import url
@@ -43,17 +44,69 @@ class CheckModelAdmin:
         return errors
 
 
-class ModelAdmin:
+class BaseAdmin(object):
 
-    # raw_id_fields = ()
-    # exclude = None
-    # filter_vertical = ()
-    # filter_horizontal = ()
-    # radio_fields = {}
-    # formfield_overrides = {}
+    raw_id_fields = ()
+    exclude = None
+    filter_vertical = ()
+    filter_horizontal = ()
+    radio_fields = {}
+    formfield_overrides = {}
     readonly_fields = ()
-    # view_on_site = True
-    # show_full_result_count = True
+    view_on_site = True
+    form = forms.ModelForm
+    ordering = ()
+    prepopulated_fields = {}
+    fields = ()
+    fieldsets = ()
+
+    def get_ordering(self):
+
+        return self.ordering
+
+    def get_prepopulated_fields(self):
+
+        return self.prepopulated_fields
+
+    def get_fields(self, request, obj=None):
+
+        return self.fields or ()
+
+    def get_readonly_fields(self, request, obj=None):
+
+        return self.readonly_fields
+
+    def get_queryset(self, request):
+
+        qs = self.model._default_manager.get_queryset()
+
+        ordering = self.get_ordering()
+
+        if ordering:
+            qs.order_by(*ordering)
+
+        return qs
+
+    def has_add_permission(self, request):
+
+        permission_codename = get_permission_codename('add', self.model._meta)
+        permission = '{}.{}'.format(self.model._meta.app_label, permission_codename)
+        return request.user.has_permission(permission)
+
+    def has_change_permission(self, request):
+
+        permission_codename = get_permission_codename('change', self.model._meta)
+        permission = '{}.{}'.format(self.model._meta.app_label, permission_codename)
+        return request.user.has_permission(permission)
+
+    def has_delete_permission(self, request):
+
+        permission_codename = get_permission_codename('delete', self.model._meta)
+        permission = '{}.{}'.format(self.model._meta.app_label, permission_codename)
+        return request.user.has_permission(permission)
+
+
+class ModelAdmin(BaseAdmin):
 
     form = AddChangeModelForm
     list_display = ('__str__', )
@@ -73,17 +126,9 @@ class ModelAdmin:
 
     list_display_links = ()
     list_filter = ()
-    # list_select_related = False
     list_per_page = 100
-    # list_max_show_all = 200
-    # list_editable = ()
     search_fields = ()
     date_hierarchy = None
-    # save_as = False
-    # save_as_continue = True
-    # save_on_top = False
-    # paginator = Paginator
-    # preserve_filters = True
     inlines = []
 
     # Custom templates (designed to be over-ridden in subclasses)
@@ -164,21 +209,6 @@ class ModelAdmin:
     def urls(self):
         return self.get_urls()
 
-    def get_queryset(self, request):
-
-        qs = self.model._default_manager.get_queryset()
-
-        ordering = self.get_ordering()
-
-        if ordering:
-            qs.order_by(*ordering)
-
-        return qs
-
-    def get_ordering(self):
-
-        return self.ordering
-
     def get_list_display(self):
 
         return self.list_display
@@ -197,24 +227,6 @@ class ModelAdmin:
             'delete': self.has_delete_permission(request),
         }
 
-    def has_add_permission(self, request):
-
-        permission_codename = get_permission_codename('add', self.model._meta)
-        permission = '{}.{}'.format(self.model._meta.app_label, permission_codename)
-        return request.user.has_permission(permission)
-
-    def has_change_permission(self, request):
-
-        permission_codename = get_permission_codename('change', self.model._meta)
-        permission = '{}.{}'.format(self.model._meta.app_label, permission_codename)
-        return request.user.has_permission(permission)
-
-    def has_delete_permission(self, request):
-
-        permission_codename = get_permission_codename('delete', self.model._meta)
-        permission = '{}.{}'.format(self.model._meta.app_label, permission_codename)
-        return request.user.has_permission(permission)
-
     def get_list_display_styles(self):
 
         return self.list_display_styles
@@ -222,14 +234,6 @@ class ModelAdmin:
     def get_colored_rows_by(self):
 
         return self.colored_rows_by
-
-    def get_prepopulated_fields(self):
-
-        return self.prepopulated_fields
-
-    def get_fields(self, request, obj=None):
-
-        return self.fields or ()
 
     def get_fieldsets(self, request, obj=None):
 
@@ -272,7 +276,7 @@ class ModelAdmin:
             elif isinstance(db_field, models.ManyToManyField):
                 formfield = self.formfield_for_manytomany(db_field, request, **kwargs)
 
-            formfield.widget = RelatedFieldWidgetWrapper(formfield.widget, db_field)
+            formfield.widget = RelatedFieldWidgetWrapper(formfield.widget, db_field, self.site_admin)
 
             return formfield
 
@@ -287,7 +291,8 @@ class ModelAdmin:
         return db_field.formfield(**kwargs)
 
     def formfield_for_manytomany(self, db_field, request, **kwargs):
-        return forms.ModelChoiceField(queryset=1)
+
+        return db_field.formfield(**kwargs)
 
     def get_search_fields(self):
 
@@ -330,10 +335,6 @@ class ModelAdmin:
 
         messages.add_message(request, level, msg, extra_tags, fail_silently)
 
-    def get_readonly_fields(self, request, obj=None):
-
-        return self.readonly_fields
-
     def get_list_filter(self, request):
 
         return self.list_filter
@@ -341,21 +342,139 @@ class ModelAdmin:
     def get_inline_instances(self, request, obj=None):
 
         # make premission check here
-        return [inline(self.model, self.admin_site) for inline in self.inlines]
+        return [inline(self.model, self.site_admin) for inline in self.inlines]
+
+    def get_inlines_formsets(self, request, obj):
+
+        inlines_formsets = list()
+        for inline in self.get_inline_instances(request, obj):
+            inline_formset = inline.get_formset(request, obj)
+
+            params = {
+                'instance': obj,
+                'queryset': inline.get_queryset(request),
+            }
+
+            if request.method == 'POST':
+                params.update({
+                    'data': request.POST,
+                    'files': request.FILES,
+                })
+
+            formset = inline_formset(**params)
+
+            inlines_formsets.append((inline, formset))
+
+        return inlines_formsets
+
+
+class AdminInline(BaseAdmin):
+
+    model = None
+    fk_name = None
+    template = None
+    verbose_name = None
+    verbose_name_plural = None
+    can_delete = True
+    show_change_link = True
+    min_num = None
+    max_num = None
+    formset = BaseInlineFormSet
+    extra = 3
+    classes = None
+    form = forms.ModelForm
+
+    def __init__(self, parent_model, site_admin, *args, **kwargs):
+        self.parent_model = parent_model
+        self.site_admin = site_admin
+        self.model_meta = self.model._meta
+        self.verbose_name = self.model_meta.verbose_name if self.verbose_name is None else self.verbose_name
+        self.verbose_name_plural = self.model_meta.verbose_name_plural\
+            if self.verbose_name_plural is None else self.verbose_name_plural
+
+    def get_extra(self, request, obj=None, **kwargs):
+
+        return self.extra
+
+    def get_min_num(self, request, obj=None, **kwargs):
+
+        return self.min_num
+
+    def get_max_num(self, request, obj=None, **kwargs):
+
+        return self.max_num
+
+    def get_formset(self, request, obj=None, **kwargs):
+
+        fields = self.get_fields(request, obj)
+
+        if self.exclude is None:
+            exclude = []
+        else:
+            exclude = list(self.exclude)
+
+        readonly_fields = self.get_readonly_fields(request, obj)
+        exclude.extend(readonly_fields)
+
+        params = {
+            'form': self.form,
+            'formset': self.formset,
+            'fields': fields,
+            'exclude': exclude,
+            'fk_name': self.fk_name,
+            'min_num': self.get_min_num(request, obj),
+            'max_num': self.get_max_num(request, obj),
+            'extra': self.get_extra(request, obj),
+        }
+        params.update(kwargs)
+
+        if not params['fields']:
+            params['fields'] = forms.ALL_FIELDS
+
+        return inlineformset_factory(self.parent_model, self.model, **params)
+
+    def get_queryset(self, request):
+
+        qs = super().get_queryset(request)
+
+        if self.has_change_permission(request):
+            return qs
+        return qs.none()
+
+    def has_add_permission(self, request):
+
+        if self.model_meta.auto_created:
+            # if is Intermediate model (ManyToManyField) verify only permission on change object
+            return self.has_change_permission(request)
+
+        return super().has_add_permission(request)
+
+    def has_change_permission(self, request):
+
+        if self.model_meta.auto_created:
+            for field in self.model_meta.fields:
+                # if field.remote_field
+                raise Exception
+
+        return super().has_change_permission(request)
+
+    def has_delete_permission(self, request):
+
+        if self.model_meta.auto_created:
+            # if is Intermediate model (ManyToManyField) verify only permission on change object
+            return self.has_change_permission(request)
+
+        return super().has_delete_permission(request)
+
+
+class StackedInline(AdminInline):
+    template = 'admin/admin/edit_inline/stacked.html'
+
+
+class TabularInline(AdminInline):
+    template = 'admin/admin/edit_inline/tabular.html'
 
 
 class OtherAdmin:
 
     pass
-
-
-class StackedInline:
-    template = 'admin/edit_inline/stacked.html'
-
-
-class TabularInline:
-    template = 'admin/edit_inline/tabular.html'
-
-
-class TableInline:
-    template = 'admin/edit_inline/table.html'

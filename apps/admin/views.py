@@ -14,7 +14,7 @@ from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.template.response import TemplateResponse
 from django.contrib import messages
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
-# from django import forms
+from django import forms
 # from django.utils.html import format_html, format_html_join
 # from django.shortcuts import render, get_object_or_404
 from django.db import models
@@ -536,22 +536,22 @@ class AddChangeView(SiteAdminView):
 
         context = super().get_context_data()
 
-        context.update(self.site_admin.each_context(self.request))
-
         context['title'] = self.get_title()
-
         context['object'] = self.obj
-
+        context['has_add_permission'] = self.model_admin.has_add_permission(self.request)
         context['has_delete_permission'] = self.model_admin.has_delete_permission(self.request)
-
+        context['model_admin'] = self.model_admin
         context['model_meta'] = self.model_meta
 
-        modelform = self.get_modelform()
-        form = self.get_form()
-        form.media = modelform.media
-        context['form'] = form
+        if 'form' not in kwargs:
+            modelform = self.get_modelform()
+            form = self.get_form()
+            form.media = modelform.media
+            context['form'] = form
+        else:
+            context['form'] = kwargs.pop('form')
 
-        context['model_admin'] = self.model_admin
+        context['inlines_formsets'] = kwargs.pop('inlines_formsets', self.get_inlines_formsets())
 
         return context
 
@@ -577,11 +577,14 @@ class AddChangeView(SiteAdminView):
 
     def post(self, request, *args, **kwargs):
 
-        form = self.get_modelform()
+        modelform = self.get_modelform()
+        inlines_formsets = self.get_inlines_formsets()
 
-        if form.is_valid():
-            return self.form_valid(form)
-        return self.form_invalid(form)
+        if modelform.is_valid():
+            formsets = [formset for inline, formset in inlines_formsets]
+            if forms.all_valid(formsets):
+                return self.form_valid(modelform, formsets)
+        return self.form_invalid(modelform, inlines_formsets)
 
     def get_form_class(self):
 
@@ -591,6 +594,10 @@ class AddChangeView(SiteAdminView):
 
         form = self.get_form_class()
         return form(instance=self.obj, **self.get_form_kwargs())
+
+    def get_inlines_formsets(self):
+
+        return self.model_admin.get_inlines_formsets(self.request, self.obj)
 
     def get_initial(self):
 
@@ -622,7 +629,7 @@ class AddChangeView(SiteAdminView):
             model_admin=self.model_admin,
         )
 
-    def form_invalid(self, form):
+    def form_invalid(self, form, inlines_formsets):
 
         object_name = self.model_meta.verbose_name.lower()
 
@@ -633,13 +640,16 @@ class AddChangeView(SiteAdminView):
 
         self.model_admin.message_user(self.request, msg, 'ERROR', 'error')
 
-        return self.render_to_response(context=self.get_context_data(form=form))
+        return self.render_to_response(context=self.get_context_data(form=form, inlines_formsets=inlines_formsets))
 
-    def form_valid(self, form):
+    def form_valid(self, form, formsets):
 
         self.object = form.save(commit=False)
 
         self.object.save()
+
+        for formset in formsets:
+            formset.save()
 
         object_name = self.model_meta.verbose_name.lower()
 

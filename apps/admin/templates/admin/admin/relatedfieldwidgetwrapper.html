@@ -2,8 +2,16 @@
 <div class="input-group">
     {{ rendered_widget }}
     <div class="input-group-btn">
-        <button class="btn btn-default"><span class="text-success glyphicon glyphicon-plus"></span></button>
-        <button class="btn btn-default"><span class="text-warning glyphicon glyphicon-edit"></span></button>
-        <button class="btn btn-default"><span class="text-danger glyphicon glyphicon-remove"></span></button>
+        {% if add_url %}
+        <span class="btn btn-default" onclick="window.open('{{ add_url }}', 'Name', 'width=800')">
+            <span class="text-success glyphicon glyphicon-plus"></span>
+        </span>
+        {% endif %}
+        {% if update_url %}
+        <span class="btn btn-default" onclick="window.open('{{ update_url }}', 'Name', 'width=800')"><span class="text-warning glyphicon glyphicon-edit"></span></span>
+        {% endif %}
+        {% if delete_url %}
+        <span class="btn btn-default" onclick="window.open('{{ delete_url }}', 'Name', 'width=800')"><span class="text-danger glyphicon glyphicon-remove"></span></span>
+        {% endif %}
     </div>
 </div>

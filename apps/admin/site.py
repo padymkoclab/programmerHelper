@@ -188,10 +188,17 @@ class SiteAdmin:
                 'admin:{}_{}_add'.format(model_meta.app_label, model_meta.model_name),
                 current_app=self.name
             )
+        elif key_name == 'change':
+            return reverse(
+                'admin:{}_{}_change'.format(model_meta.app_label, model_meta.model_name),
+                current_app=self.name,
+                **kwargs
+            )
         elif key_name == 'delete':
             return reverse(
                 'admin:{}_{}_delete'.format(model_meta.app_label, model_meta.model_name),
-                current_app=self.name
+                current_app=self.name,
+                **kwargs
             )
         elif key_name == 'history':
             return reverse(
@@ -202,12 +209,6 @@ class SiteAdmin:
             return reverse(
                 'admin:{}_index'.format(model_meta.app_label),
                 current_app=self.name
-            )
-        elif key_name == 'change':
-            return reverse(
-                'admin:{}_{}_change'.format(model_meta.app_label, model_meta.model_name),
-                current_app=self.name,
-                **kwargs
             )
         elif key_name == 'reports':
             return reverse(
