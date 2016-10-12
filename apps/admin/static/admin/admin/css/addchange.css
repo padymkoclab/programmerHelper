@@ -16,18 +16,36 @@ div[id^=fieldset]{
     margin-bottom: 10px;
 }
 
+
+.object_panel .div_delete_object{
+    float: right;
+    min-width: 50px;
+}
+
+
+.object_panel .div_delete_object{
+    float: right;
+    min-width: 50px;
+}
+
+.object_panel .div_delete_object span:first-child{
+    position: relative;
+    margin: 0;
+    top: -2px;
+}
+
+
 .object_panel a{
     color: inherit;
     display: block;
 }
 
 
-.object_panel a:hover{
+.object_panel a:link{
     text-decoration: none;
 }
 
-.object_panel .panel-heading span.pull-right label:first-child{
-    position: relative;
-    margin: 0;
-    top: -2px;
+
+.object_panel a:hover{
+    text-decoration: none;
 }

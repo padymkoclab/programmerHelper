@@ -58,7 +58,6 @@ class BaseAdmin(object):
     ordering = ()
     prepopulated_fields = {}
     fields = ()
-    fieldsets = ()
 
     def get_ordering(self):
 
@@ -118,10 +117,7 @@ class ModelAdmin(BaseAdmin):
         ),
     )
     colored_rows_by = ''
-    ordering = ()
     disabled_urls = ()
-    prepopulated_fields = {}
-    fields = ()
     fieldsets = ()
 
     list_display_links = ()

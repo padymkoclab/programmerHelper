@@ -5,6 +5,7 @@ from django import forms
 from django.utils.safestring import mark_safe
 
 from .forms_utils import FieldSet
+from .formsets_utils import InlineFormset
 from .widgets import BootstrapFileInput
 
 
@@ -137,6 +138,21 @@ class AddChangeDisplayForm:
 
         for name, options in self.fieldsets:
             yield FieldSet(self.form, name, self.readonly_fields, self.model_admin, **options)
+
+
+class InlinesFormsets:
+
+    def __init__(self, inlines_formsets, request):
+        self.inlines_formsets = inlines_formsets
+        self.request = request
+
+    def __iter__(self):
+        for inline, formset in self.inlines_formsets:
+            yield inline, InlineFormset(
+                inline,
+                formset,
+                self.request,
+            )
 
 
 class ImportForm(forms.Form):

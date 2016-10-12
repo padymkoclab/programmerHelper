@@ -109,19 +109,28 @@ class UtilityInline(StackedInline):
 
     form = UtilityAdminModelForm
     model = Utility
-    extra = 1
+    extra = 0
     fk_name = 'category'
     readonly_fields = ['get_rating', 'get_count_comments', 'get_count_opinions', 'updated', 'created']
-    fields = [
-        'name',
-        'description',
-        'web_link',
-        'get_rating',
-        'get_count_comments',
-        'get_count_opinions',
-        'updated',
-        'created',
-    ]
+
+    def get_fields(self, request, obj=None):
+
+        fields = [
+            'name',
+            'description',
+            'web_link',
+        ]
+
+        if obj._meta.model._default_manager.filter(pk=obj.pk).exists():
+            fields.extend((
+                'get_rating',
+                'get_count_comments',
+                'get_count_opinions',
+                'updated',
+                'created',
+            ))
+
+        return fields
 
 
 # @admin.register(Category, site=AdminSite)

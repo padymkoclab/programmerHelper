@@ -28,6 +28,10 @@ class FieldSet:
         for field_name in self.fields:
             yield FieldSetLine(self.form, field_name, self.readonly_fields, self.model_admin)
 
+    @property
+    def total_error_count(self):
+        return len(self.form.errors.values()) + len(self.form.non_field_errors())
+
 
 class FieldSetLine:
 
@@ -211,3 +215,6 @@ class BootstrapErrorList(ErrorList):
                 ((force_text(i), ) for i in self)
             )
         )
+
+
+# class InlineFieldset()

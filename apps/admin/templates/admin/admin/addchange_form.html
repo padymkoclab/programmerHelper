@@ -62,22 +62,46 @@
     <ul class="nav nav-tabs" role="tablist">
 
       {% for fieldset in form %}
-      <li role="presentation" class="{% if forloop.counter == 1 %}active____________________________{% endif %}">
-        <a href="#fieldset{{ forloop.counter }}_model" role="tab" data-toggle="tab">
-          {% if fieldset.name %}
-            {{ fieldset.name }}
-          {% else %}
-            {% blocktrans with forloop.counter as num %}
-                Fieldset # {{ num }}
-            {% endblocktrans %}
-          {% endif %}
-        </a>
-      </li>
+          <li role="presentation" class="{% if forloop.counter == 1 %}active____________________________{% endif %}">
+            <a href="#fieldset{{ forloop.counter }}_model" role="tab" data-toggle="tab">
+                <span class="{% if fieldset.total_error_count > 0 %}text-danger{% endif %}">
+                  {% if fieldset.name %}
+                    {{ fieldset.name }}
+                  {% else %}
+                    {% blocktrans with forloop.counter as num %}
+                        Fieldset # {{ num }}
+                    {% endblocktrans %}
+                  {% endif %}
+
+                    {% if fieldset.total_error_count > 0 %}
+                        {% blocktrans count counter=fieldset.total_error_count trimmed %}
+                            ({{ counter }} error)
+                        {% plural %}
+                            ({{ counter }} errors)
+                        {% endblocktrans %}
+                    {% endif %}
+
+                 </span>
+            </a>
+          </li>
       {% endfor %}
 
       {% for inline, formset in inlines_formsets %}
       <li role="presentation" class="active">
-        <a href="#fieldset{{ forloop.counter }}_inline" role="tab" data-toggle="tab">{{ inline.verbose_name_plural }}</a>
+        <a href="#fieldset{{ forloop.counter }}_inline" role="tab" data-toggle="tab">
+
+            <span class="{% if formset.total_error_count > 0 %}text-danger{% endif %}">
+                {{ inline.verbose_name_plural }}
+
+                {% if formset.total_error_count > 0 %}
+                    {% blocktrans count counter=formset.total_error_count trimmed %}
+                        ({{ counter }} error)
+                    {% plural %}
+                        ({{ counter }} errors)
+                    {% endblocktrans %}
+                {% endif %}
+        </span>
+        </a>
       </li>
       {% endfor %}
 

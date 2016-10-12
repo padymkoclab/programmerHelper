@@ -33,7 +33,7 @@ from utils.python.utils import get_filename_with_datetime
 
 from .filters import DateTimeRangeFilter, RelatedOnlyFieldListFilter
 from .forms_utils import BootstrapErrorList
-from .forms import LoginForm, AddChangeDisplayForm, ImportForm
+from .forms import LoginForm, AddChangeDisplayForm, ImportForm, InlinesFormsets
 from .utils import get_field_verbose_name_from_lookup
 # from .descriptors import SiteAdminStrictDescriptor, ModelAdminStrictDescriptor
 from .views_mixins import SiteAdminMixin, SiteModelAdminMixin, SiteAppAdminMixin
@@ -551,7 +551,9 @@ class AddChangeView(SiteAdminView):
         else:
             context['form'] = kwargs.pop('form')
 
-        context['inlines_formsets'] = kwargs.pop('inlines_formsets', self.get_inlines_formsets())
+        inlines_formsets = kwargs.pop('inlines_formsets', self.get_inlines_formsets())
+
+        context['inlines_formsets'] = InlinesFormsets(inlines_formsets, self.request)
 
         return context
 
@@ -640,7 +642,12 @@ class AddChangeView(SiteAdminView):
 
         self.model_admin.message_user(self.request, msg, 'ERROR', 'error')
 
-        return self.render_to_response(context=self.get_context_data(form=form, inlines_formsets=inlines_formsets))
+        return self.render_to_response(
+            context=self.get_context_data(
+                form=form,
+                inlines_formsets=inlines_formsets,
+            )
+        )
 
     def form_valid(self, form, formsets):
 
