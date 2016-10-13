@@ -35,17 +35,12 @@ div[id^=fieldset]{
 }
 
 
-.object_panel a{
+.object_panel a[data-toggle="collapse"]{
     color: inherit;
     display: block;
 }
 
 
-.object_panel a:link{
-    text-decoration: none;
-}
-
-
-.object_panel a:hover{
+.object_panel a[data-toggle="collapse"]:link{
     text-decoration: none;
 }

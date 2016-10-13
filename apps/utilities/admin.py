@@ -9,8 +9,9 @@ from django.contrib import admin
 from utils.django.listfilters import IsNewSimpleListFilter
 
 from apps.admin.admin import ModelAdmin, StackedInline
+from apps.admin.app import AppAdmin
 
-from apps.core.admin import AppAdmin, AdminSite
+# from apps.core.admin import AdminSite
 from apps.opinions.admin import OpinionGenericInline
 from apps.opinions.admin_mixins import OpinionsAdminMixin
 from apps.comments.admin import CommentGenericInline
@@ -24,9 +25,10 @@ logger = logging.getLogger('django.development')
 
 
 # @AdminSite.register_app_admin_class
-class UtilitiesAppAdmin(AppAdmin):
+class UtilityAppAdmin(AppAdmin):
 
-    label = UtilitiesConfig.label
+    app_config_class = UtilitiesConfig
+    app_icon = 'home'
 
     def get_context_for_tables_of_statistics(self):
         """ """

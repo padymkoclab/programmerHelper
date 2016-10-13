@@ -41,7 +41,7 @@
           <a class="btn btn-danger" href="{{ object|get_admin_url:'delete' }}" id="">{% trans "Delete" %}</a>
         {% endif %}
 
-        {% if object.get_absolute_url %}
+        {% if model_admin.view_on_site is True and object.get_absolute_url %}
           <a class="btn btn-info" href="{{ object.get_absolute_url }}" id="">{% trans "Preview" %}</a>
         {% endif %}
 
@@ -62,7 +62,7 @@
     <ul class="nav nav-tabs" role="tablist">
 
       {% for fieldset in form %}
-          <li role="presentation" class="{% if forloop.counter == 1 %}active____________________________{% endif %}">
+          <li role="presentation" class="{% if forloop.counter == 1 %}active{% endif %}">
             <a href="#fieldset{{ forloop.counter }}_model" role="tab" data-toggle="tab">
                 <span class="{% if fieldset.total_error_count > 0 %}text-danger{% endif %}">
                   {% if fieldset.name %}
@@ -87,7 +87,7 @@
       {% endfor %}
 
       {% for inline, formset in inlines_formsets %}
-      <li role="presentation" class="active">
+      <li role="presentation">
         <a href="#fieldset{{ forloop.counter }}_inline" role="tab" data-toggle="tab">
 
             <span class="{% if formset.total_error_count > 0 %}text-danger{% endif %}">
@@ -112,7 +112,7 @@
     {% csrf_token %}
     <div class="tab-content">
       {% for fieldset in form %}
-        <div class="tab-pane {% if forloop.counter == 1 %}active____________________________{% endif %}" id="fieldset{{ forloop.counter }}_model" role="tabpanel">
+        <div class="tab-pane {% if forloop.counter == 1 %}active{% endif %}" id="fieldset{{ forloop.counter }}_model" role="tabpanel">
 
             <fieldset class="{{ fieldset.classes }}">
 
@@ -168,8 +168,6 @@
                         <p class="form-control-static">{{ fieldline.field }}</p>
                       {% endif %}
 
-
-
                       {% if fieldline.field.help_text %}
                         <p class="help-block">{{ fieldline.field.help_text }}</p>
                       {% endif %}
@@ -182,7 +180,7 @@
       {% endfor %}
 
       {% for inline, formset in inlines_formsets %}
-        <div class="tab-pane active" id="fieldset{{ forloop.counter }}_inline" role="tabpanel">
+        <div class="tab-pane" id="fieldset{{ forloop.counter }}_inline" role="tabpanel">
           {% display_inline_formset inline formset %}
         </div>
       {% endfor %}
@@ -190,10 +188,11 @@
     </div>
   </form>
 
-<!--
+{% comment %}
+
 Made own templatetag for addons
-<p>Css_classes {{ field.css_classes }}</p>
--->
+<p>Css_classes --{{-- field.css_classes }}</p>
+{% endcomment %}
 
   {% prepopulated_fields_js %}
 
@@ -201,5 +200,5 @@ Made own templatetag for addons
 
 {% block extra_js %}
     {{ block.super }}
-    <script src="{% static 'admin/admin/js/addchange_form.js' %}" charset="utf-8"></script>
+    <script src="{% static 'admin/admin/js/addchange.js' %}" charset="utf-8"></script>
 {% endblock extra_js %}

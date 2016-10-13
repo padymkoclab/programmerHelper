@@ -560,9 +560,9 @@ class AddChangeView(SiteAdminView):
     def get_template_names(self):
 
         return [
-            '{}/admin/{}/addchange_form.html'.format(self.model_meta.app_label, self.model_meta.model_name),
-            '{}/admin/addchange_form.html'.format(self.model_meta.app_label),
-            'admin/admin/addchange_form.html',
+            '{}/admin/{}/addchange.html'.format(self.model_meta.app_label, self.model_meta.model_name),
+            '{}/admin/addchange.html'.format(self.model_meta.app_label),
+            'admin/admin/addchange.html',
         ]
 
     def render_to_response(self, context):
@@ -693,7 +693,7 @@ class AppIndexView(SiteAppAdminMixin, SiteAdminView):
 
         return (
             'admin/admin/app_index.html',
-            )
+        )
 
     def render_to_response(self, context):
 
@@ -701,7 +701,7 @@ class AppIndexView(SiteAppAdminMixin, SiteAdminView):
             self.request,
             template=self.get_template_names(),
             context=context,
-            )
+        )
 
     def get_context_data(self, **kwargs):
 
@@ -732,9 +732,25 @@ class AppIndexView(SiteAppAdminMixin, SiteAdminView):
         return info
 
 
-class AppReportView(SiteAppAdminMixin, generic.TemplateView):
+class AppReportView(SiteAppAdminMixin, SiteAdminView):
 
-    template_name = 'admin/admin/reports.html'
+    def get(self, request, *args, **kwargs):
+
+        return self.render_to_response(self.get_context_data())
+
+    def get_template_names(self):
+
+        return (
+            'admin/admin/reports.html',
+        )
+
+    def render_to_response(self, context):
+
+        return TemplateResponse(
+            self.request,
+            template=self.get_template_names(),
+            context=context,
+        )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -746,16 +762,32 @@ class AppReportView(SiteAppAdminMixin, generic.TemplateView):
         return context
 
 
-class AppStatisticsView(SiteAppAdminMixin, generic.TemplateView):
+class AppStatisticsView(SiteAppAdminMixin, SiteAdminView):
 
-    template_name = 'admin/admin/statistics.html'
+    def get(self, request, *args, **kwargs):
+
+        return self.render_to_response(self.get_context_data())
+
+    def get_template_names(self):
+
+        return (
+            'admin/admin/statistics.html',
+        )
+
+    def render_to_response(self, context):
+
+        return TemplateResponse(
+            self.request,
+            template=self.get_template_names(),
+            context=context,
+        )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
         context['title'] = _('{} - Statistics ').format(self.app_config.verbose_name)
 
-        context['app_name'] = self.app_config.verbose_name
+        context['app_config'] = self.app_config
 
         return context
 
@@ -823,7 +855,7 @@ class DeleteView(SiteModelAdminMixin, generic.DeleteView):
                 objects = related_model._base_manager.filter(
                     **{'{}__in'.format(
                         relationship.field.name): [self.object.pk]}
-                        )
+                    )
 
                 related_objects.append(
                     (related_model._meta, type_relationship, objects)

@@ -8,7 +8,7 @@ from django.conf import settings
 
 from utils.django.models import TimeStampedModel
 from utils.django.models_fields import ConfiguredAutoSlugField
-from utils.django.models_utils import get_admin_url, upload_image
+from utils.django.models_utils import get_admin_url
 
 from apps.comments.models import Comment
 from apps.comments.managers import CommentManager
@@ -130,8 +130,8 @@ class Utility(CommentsModelMixin, OpinionsModelMixin, TimeStampedModel):
     class Meta:
         verbose_name = _("Utility")
         verbose_name_plural = _("Utilities")
-        ordering = ['category', 'name']
-        unique_together = ['category', 'name']
+        ordering = ('category', 'name')
+        unique_together = (('category', 'name'), )
 
     objects = models.Manager()
     objects = UtilityManager()
@@ -141,3 +141,8 @@ class Utility(CommentsModelMixin, OpinionsModelMixin, TimeStampedModel):
 
     def __str__(self):
         return '{0.name}'.format(self)
+
+    def unique_error_message(self, model_class, unique_check):
+        if model_class == type(self) and unique_check == ('category', 'name'):
+            return _('Utility with this name already exists in this category')
+        return super().unique_error_message(model_class, unique_check)

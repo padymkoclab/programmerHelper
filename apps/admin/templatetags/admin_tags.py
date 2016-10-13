@@ -1,5 +1,4 @@
 
-import collections
 import json
 import datetime
 import logging
@@ -575,12 +574,9 @@ def display_admin_filter(context, filter_):
 def display_inline_formset(context, inline, formset):
 
     request = context['request']
-    number_inline = context['forloop']['counter']
     template_ = template.loader.get_template(inline.template)
 
     return template_.render(context=template.Context({
         'request': request,
-        'inline': inline,
         'formset': formset,
-        'number_inline': str(number_inline),
     }))

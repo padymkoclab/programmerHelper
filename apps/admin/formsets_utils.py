@@ -19,6 +19,8 @@ class InlineFormset(object):
         self.management_form = self.formset.management_form
         self.total_error_count = self.formset.total_error_count
         self.can_delete = self.formset.can_delete
+        self.empty_form = self.formset.empty_form
+        self.prefix = self.formset.prefix
 
     def __iter__(self):
         for form in self.formset:
@@ -49,6 +51,7 @@ class InlineFormsetForm(object):
         self.non_field_errors = self.form.non_field_errors
         self.errors = self.form.errors
         self.is_valid = self.form.is_valid
+        self.prefix = self.form.prefix
 
     def __iter__(self):
 
@@ -57,10 +60,6 @@ class InlineFormsetForm(object):
                 yield InlineFormsetFormReadonlyField(fieldname, self.form.instance, self.inline)
             else:
                 yield InlineFormsetFormEditableField(fieldname, self.form)
-
-    @property
-    def delete_field(self):
-        return self.form.fields.get('DELETE')
 
 
 class InlineFormsetFormEditableField(object):

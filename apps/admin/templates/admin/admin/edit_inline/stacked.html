@@ -5,38 +5,31 @@
 
 {% load admin_filters %}
 
-{{ formset.management_form }}
 
-<div class="row">
-    <div class="col-sm-12 text-right">
-        <button type="button" class="btn btn-primary open_all_panels">{% trans "Open all panels" %}</button>
-        <button type="button" class="btn btn-primary collapse_all_panels">{% trans "Collapse all panels" %}</button>
+<div class="row tab-inline">
+
+    {{ formset.management_form }}
+
+    <div class="col-sm-12">
+        <button type="button" class="btn btn-primary pull-left open_all_panels">{% trans "Open all panels" %}</button>
+        <button type="button" class="btn btn-primary pull-right collapse_all_panels">{% trans "Collapse all panels" %}</button>
     </div>
-</div>
 
-{% if formset.non_form_errors %}
-    {% for error in formset.non_form_errors %}
-        <p class="text-danger">{{ error }}</p>
-    {% endfor %}
-{% endif %}
+    <div class="col-sm-12">
+        {% if formset.non_form_errors %}
+            {% for error in formset.non_form_errors %}
+                <p class="text-danger">{{ error }}</p>
+            {% endfor %}
+        {% endif %}
+    </div>
 
+    <div class="col-sm-12">
+        <div class="panel-group object_panel" id="{{ formset.prefix }}" role="tablist" aria-multiselectable="true">
 
-{% for form in formset %}
+            {% for form in formset %}
 
-    {% if form.non_field_errors %}
-        {% for error in form.non_field_errors %}
-            <p class="text-danger">{{ error }}</p>
-        {% endfor %}
-    {% endif %}
-
-    {% with forloop.counter|stringformat:'s' as forloop_count %}
-        {% with 'accordion'|add:number_inline|add:forloop_count as accordion_id %}
-
-            <div class="panel-group object_panel" id="{{ accordion_id }}" role="tablist" aria-multiselectable="true">
-            <div class="panel panel-default">
-                {% with accordion_id|add:'-panel'|add:forloop_count as panel_id %}
+                <div class="panel panel-default">
                     <div class="panel-heading" role="tab" id="">
-
                         <div class="div_delete_object">
                             {% if formset.can_delete %}
                                 <span>{% trans "Delete" %}</span>
@@ -44,30 +37,99 @@
                             {% endif %}
                         </div>
                         <div class="{% if form.is_valid is False and form.errors %}text-danger{% endif %}">
-                            <a href="#{{ panel_id }}" role="button" data-toggle="collapse" data-parent="{{ accordion_id }}" aria-expanded="true" aria-controls="{{ panel_id }}">
+                            <a href="#{{ form.prefix }}" role="button" data-toggle="collapse" data-parent="{{ formset.prefix }}" aria-expanded="true" aria-controls="{{ form.prefix }}">
                             {% if form.instance|is_instance_exists %}
                                 <b>{{ form.instance }}</b>
                             {% else %}
-                                {{ inline.verbose_name }} #{{ forloop.counter }}
+                                {{ formset.inline.verbose_name }} #{{ forloop.counter }}
                             {% endif %}
                             </a>
                         </div>
 
                         <span class="clearfix"></span>
                     </div>
-                    <div id="{{ panel_id }}" class="panel-collapse collapse{% if form.is_valid is False and form.errors %} in{% endif %}" role="tabpanel" aria-labelledly="{{ panel_id }}">
+                    <div id="{{ form.prefix }}" class="panel-collapse collapse{% if form.is_valid is False and form.errors %} in{% endif %}" role="tabpanel">
+
+                        <div class="panel-body">
+
+                            <p>
+                                {% if formset.inline.view_on_site is True and form.instance.get_absolute_url %}
+                                    <span class="pull-right">
+                                        <a href="{{ form.instance.get_absolute_url }}">{% trans "View on site" %}</a>
+                                    </span>
+                                {% endif %}
+                                <span class="pull-left">
+                                    <a href="{{ form.instance|get_admin_url:'change' }}">{% trans "View on admin" %}</a>
+                                </span>
+                                <span class="clearfix"></span>
+                            </p>
+
+                            {% if form.non_field_errors %}
+                                {% for error in form.non_field_errors %}
+                                    <p class="text-danger">{{ error }}</p>
+                                {% endfor %}
+                            {% endif %}
+
+                            {% for field in form %}
+
+                                {% if field.is_readonly %}
+                                    <div class="form-group">
+                                        <label for="" class="col-sm-2 control-label">{{ field.label }}</label>
+                                        <div class="col-sm-10">
+                                            {{ field }}
+                                        </div>
+                                    </div>
+
+                                {% else %}
+
+                                    {% if field.is_hidden %}
+                                        {{ field }}
+                                    {% elif field.name != 'DELETE' %}
+
+                                        <div class="form-group">
+                                            <label for="{{ field.id_for_label }}" class="col-sm-2 control-label">{{ field.label }}</label>
+                                            <div class="col-sm-10">
+                                                {% if field.errors %}
+                                                  {% for error in field.errors %}
+                                                    <p class="text-danger">{{ error }}</p>
+                                                  {% endfor %}
+                                                {% endif %}
+                                                {{ field }}
+                                                <p class="help-block">{{ field.help_text }}</p>
+                                            </div>
+                                        </div>
+
+                                    {% endif %}
+                                {% endif %}
+
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+            {% endfor %}
+
+            <div class="panel panel-default hidden empty_form">
+                <div class="panel-heading" role="tab" id="">
+                    <div class="div_delete_object text-right">
+                        <i class="icon_close_inline_form text-danger fa fa-times fa-lg" aria-hidden="true"></i>
+                    </div>
+                    <div>
+                        <a href="#{{ formset.empty_form.prefix }}" role="button" data-toggle="collapse" data-parent="{{ formset.prefix }}" aria-expanded="true" aria-controls="{{ formset.empty_form.prefix }}">
+                            {% trans "New" %} {{ formset.inline.verbose_name.lower }}
+                        </a>
+                    </div>
+
+                    <span class="clearfix"></span>
+                </div>
+                <div id="{{ formset.empty_form.prefix }}" class="panel-collapse collapse in" role="tabpanel">
 
                     <div class="panel-body">
 
-                        {% if form.non_field_errors %}
-                            {% for error in form.non_field_errors %}
-                                <p class="text-danger">{{ error }}</p>
-                            {% endfor %}
-                        {% endif %}
-
-                        {% for field in form %}
+                        {% for field in formset.empty_form %}
 
                             {% if field.is_readonly %}
+
                                 <div class="form-group">
                                     <label for="" class="col-sm-2 control-label">{{ field.label }}</label>
                                     <div class="col-sm-10">
@@ -77,33 +139,32 @@
 
                             {% else %}
 
-                                {% if field.is_hidden %}
-                                    {{ field }}
-                                {% elif field.name != 'DELETE' %}
+                            {% if field.is_hidden %}
+                                {{ field }}
+                            {% elif field.name != 'DELETE' %}
 
-                                    <div class="form-group">
-                                        <label for="{{ field.id_for_label }}" class="col-sm-2 control-label">{{ field.label }}</label>
-                                        <div class="col-sm-10">
-                                            {% if field.errors %}
-                                              {% for error in field.errors %}
-                                                <p class="text-danger">{{ error }}</p>
-                                              {% endfor %}
-                                            {% endif %}
-                                            {{ field }}
-                                            <p class="help-block">{{ field.help_text }}</p>
-                                        </div>
+                                <div class="form-group">
+                                    <label for="{{ field.id_for_label }}" class="col-sm-2 control-label">{{ field.label }}</label>
+                                    <div class="col-sm-10">
+                                        {{ field }}
+                                        <p class="help-block">{{ field.help_text }}</p>
                                     </div>
+                                </div>
 
-                                {% endif %}
                             {% endif %}
+                        {% endif %}
 
                         {% endfor %}
                     </div>
                 </div>
-                {% endwith %}
             </div>
-        </div>
 
-        {% endwith %}
-    {% endwith %}
-{% endfor %}
+        </div>
+    </div>
+
+    <div class="col-sm-12">
+        <a href="" class="pull-right btn_add_another {% if formset.formset.total_form_count >= formset.formset.max_num %}hidden{% endif %}">
+            {% trans "Add another " %} {{ formset.inline.verbose_name.lower }}
+        </a>
+    </div>
+</div>

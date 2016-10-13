@@ -378,17 +378,11 @@ class UserAdmin(ModelAdmin):
 
 
 from apps.utilities.models import Utility, Category
-from apps.utilities.admin import UtilityAdmin, CategoryAdmin
-from apps.utilities.apps import UtilitiesConfig
+from apps.utilities.admin import UtilityAdmin, CategoryAdmin, UtilityAppAdmin
+# from apps.utilities.apps import UtilitiesConfig
 
 from apps.articles.models import Article
 from apps.articles.admin import ArticleAdmin, ArticlesAppAdmin
-
-
-class UtilityAppAdmin(AppAdmin):
-
-    app_config_class = UtilitiesConfig
-    app_icon = 'home'
 
 
 class UserAppAdmin(AppAdmin):

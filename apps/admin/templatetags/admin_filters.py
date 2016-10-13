@@ -5,6 +5,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.core.urlresolvers import reverse
 from django import template
+from django.apps import AppConfig
 
 from ..utils import convert_boolean_to_bootstrap_icon
 
@@ -50,6 +51,12 @@ def get_admin_url(object_, url_main_name):
             elif url_main_name == 'add':
                 return reverse('admin:{}_{}_add'.format(model_meta.app_label, model_meta.model_name))
 
+        elif isinstance(object_, AppConfig):
+
+            app_config = object_
+            if url_main_name == 'app':
+                return reverse('admin:{}_index'.format(app_config.label))
+
         elif isinstance(object_, models.Model):
 
             instance = object_
@@ -87,6 +94,8 @@ def get_admin_url(object_, url_main_name):
                         'listing_pks_objects': listing_pks_objects,
                     }
                 )
+        else:
+            raise Exception()
     except Exception as e:
         logger.error('Does not working: {}'.format(e))
 

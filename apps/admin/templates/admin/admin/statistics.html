@@ -3,10 +3,12 @@
 
 {% load i18n %}
 
+{% load admin_filters %}
+
 
 {% block breadcrumbs %}
   <li><a href="{{ index_url }}">{% trans "Home" %}</a></li>
-  <li><a href="{{ app_index_url }}">{{ app_name }}</a></li>
+  <li><a href="{{ app_config|get_admin_url:'app' }}">{{ app_config.verbose_name|capfirst }}</a></li>
   <li class="active">{% trans "Statistics" %}</li>
 {% endblock breadcrumbs %}
 

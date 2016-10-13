@@ -195,7 +195,6 @@ class ModelAdmin(BaseAdmin):
 
         urlpatterns = [url for url_name, url in urls.items() if url_name not in self.disabled_urls]
 
-        # url(r'^(.+)/preview/$', wrap(self.change_view), name='%s_%s_preview' % info),
         # url(r'^(.+)/statistics/$', wrap(self.change_view), name='%s_%s_statistics' % info),
         # url(r'^(.+)/reports/$', wrap(self.change_view), name='%s_%s_reports' % info),
 
