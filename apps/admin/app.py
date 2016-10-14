@@ -83,7 +83,7 @@ class AppAdmin:
 
         return urlpatterns
 
-    def get_context_for_tables_of_statistics(self):
+    def get_tables_of_statistics(self):
         """
         return (
             (_('Books'), (
@@ -98,7 +98,7 @@ class AppAdmin:
         )
         """
 
-        pass
+        raise NotImplementedError
 
     def get_context_for_charts_of_statistics(self):
         """
@@ -118,4 +118,5 @@ class AppAdmin:
             },
         )
         """
-        pass
+        
+        raise NotImplementedError

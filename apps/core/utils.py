@@ -58,9 +58,6 @@ def get_chart_count_objects_for_the_past_year(statistics_data):
     """ """
 
     config = pygal.Config(
-        width=800,
-        height=500,
-        explicit_size=True,
         fill=True,
         show_legend=False,
         x_label_rotation=-45,

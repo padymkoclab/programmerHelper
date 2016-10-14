@@ -2,40 +2,49 @@
 {% extends "admin/admin/index.html" %}
 
 {% load i18n %}
+{% load static %}
+
+{% load admin_filters %}
+
+
+{% block extra_css %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static 'admin/admin/css/reports.css' %}">
+{% endblock extra_css %}
 
 
 {% block breadcrumbs %}
   <li><a href="{{ index_url }}">{% trans "Home" %}</a></li>
-  <li><a href="{{ app_index_url }}">{{ app_name }}</a></li>
+  <li><a href="{{ app_config|get_admin_url:'app' }}">{{ app_config.verbose_name|capfirst }}</a></li>
   <li class="active">{% trans "Reports" %}</li>
 {% endblock breadcrumbs %}
 
 {% block content %}
 
-<div class="row">
-  <div class="col-xs-5 col-xs-offset-1">
-    <p class="well">
-    <label for="" class="">{% trans "Type of a report" %}</label>
-    <select name="" id="" class="form-control">
-      <option value="" selected>{% trans "Report in PDF" %}</option>
-      <option value="">{% trans "Report in Excel" %}</option>
-    </select>
-    </p>
-    <ul class="list-group">
-      <li class="list-group-item">
-        <input type="checkbox">
-        Example1
-      </li>
-      <li class="list-group-item">
-        <input type="checkbox">
-        Example2
-      </li>
-      <li class="list-group-item">
-        <input type="checkbox">
-        Example3
-      </li>
-    </ul>
+  <div class="center-block bg-info" id="div_reports">
+      <form class="" action="" method="POST">
+        {% csrf_token %}
+        <select name="report_type" id="" class="form-control">
+          <option value="pdf" selected>{% trans "Report in PDF" %}</option>
+          <option value="excel">{% trans "Report in Excel" %}</option>
+        </select>
+
+        {% if reports_details %}
+            <ul class="list-group">
+                {% for report_code, details in reports_details.items %}
+                <li class="list-group-item">
+                    <label>
+                        <input type="radio" name="report_code" value="{{ report_code }}" {% if forloop.first %}checked{% endif %}
+                        >
+                        {{ details.label }}
+                    </label>
+                </li>
+                {% endfor %}
+            </ul>
+            <button class="btn btn-success btn-block" type="submit">{% trans "Make" %}</button>
+        {% endif %}
+
+    </form>
   </div>
-</div>
 
 {% endblock content %}

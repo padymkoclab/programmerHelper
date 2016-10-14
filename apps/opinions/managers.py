@@ -65,14 +65,14 @@ class OpinionManager(models.Manager):
         supporters_opinions_for_objects = opinions_for_objects.filter(is_useful=True)
 
         statistics_for_all_opinions_for_objects = \
-            get_statistics_count_objects_for_the_past_year(opinions_for_objects, 'date_added')
+            get_statistics_count_objects_for_the_past_year(opinions_for_objects, 'created')
 
         dates, count_opinions_by_the_past_year = zip(*statistics_for_all_opinions_for_objects)
 
         statistics_for_critic_opinions_for_objects = \
-            get_statistics_count_objects_for_the_past_year(critic_opinions_for_objects, 'date_added')
+            get_statistics_count_objects_for_the_past_year(critic_opinions_for_objects, 'created')
         statistics_for_supporters_opinions_for_objects = \
-            get_statistics_count_objects_for_the_past_year(supporters_opinions_for_objects, 'date_added')
+            get_statistics_count_objects_for_the_past_year(supporters_opinions_for_objects, 'created')
 
         count_critic_opinions_for_objects_by_the_past_year = \
             tuple(zip(*statistics_for_critic_opinions_for_objects))[1]
@@ -91,9 +91,6 @@ class OpinionManager(models.Manager):
         """ """
 
         config = pygal.Config()
-        config.width = 800
-        config.height = 500
-        config.explicit_size = True
         config.fill = True
         config.show_legend = True
         config.legend_at_bottom = True

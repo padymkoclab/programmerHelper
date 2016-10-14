@@ -2,8 +2,19 @@
 {% extends "admin/admin/index.html" %}
 
 {% load i18n %}
+{% load static %}
 
 {% load admin_filters %}
+
+{% block extra_css %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static 'admin/admin/css/statistics.css' %}">
+{% endblock extra_css %}
+
+{% block extra_head %}
+    {{ block.super }}
+    <script src="{% static 'project/js/pygal-tooltips.min.js' %}" charset="utf-8"></script>
+{% endblock extra_head %}
 
 
 {% block breadcrumbs %}
@@ -14,19 +25,53 @@
 
 {% block content %}
 
-  <div class="row">
-    <div class="col-xs-6">
-      <p class="well">Truth</p>
+     <div class="row" id="div_statistics_tables">
+        {% for caption, rows in tables_of_statistics %}
+            <div class="col-xs-12 col-sm-6 col-md-3">
+                <table class="table bg-{% cycle 'success' 'danger' 'info' 'warning' as style %}">
+                    <caption class="text-center bg-{{ style }}"><strong>{{ caption }}</strong></caption>
+                    <tbody>
+                        {% for label, value in rows %}
+                            <tr>
+                                <td>{{ label }}</td>
+                                <td class="text-right">{{ value }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endfor %}
     </div>
-    <div class="col-xs-6">
-      <p class="well">Faith</p>
+
+    <div class="row" id="div_statistics_charts">
+        {% for chart_of_statistics in charts_of_statistics %}
+            <div class="row div_statistics_chart">
+                <h3>{{ chart_of_statistics.title }}</h3>
+                <div class="col-xs-4">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                {% for fieldname in chart_of_statistics.table.fields %}
+                                    <th class="text-center">{{ fieldname }}</th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row_data in chart_of_statistics.table.data %}
+                            <tr>
+                                {% for cell_data in row_data %}
+                                    <td class="{% if forloop.counter != 1 %}text-center{% endif %}">{{ cell_data }}</td>
+                                {% endfor %}
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="col-xs-8">
+                    {{ chart_of_statistics.chart|safe }}
+                </div>
+            </div>
+        {% endfor %}
     </div>
-    <div class="col-xs-6">
-      <p class="well">Courage</p>
-    </div>
-    <div class="col-xs-6">
-      <p class="well">Bravery</p>
-    </div>
-  </div>
 
 {% endblock content %}

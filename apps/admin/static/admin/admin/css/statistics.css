@@ -1,0 +1,12 @@
+
+#div_statistics_tables, #div_statistics_charts{
+    background-color: rgb(255, 255, 255);
+    padding: 15px 0;
+}
+
+
+.div_statistics_chart{
+    border: 3px solid rgb(241, 241, 241);
+    padding: 0 10px;
+    margin: 5px 15px;
+}

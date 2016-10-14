@@ -19,7 +19,7 @@ from django import forms
 # from django.shortcuts import render, get_object_or_404
 from django.db import models
 # from django.apps import apps
-from django.http import HttpResponseRedirect, Http404, HttpResponse
+from django.http import HttpResponseRedirect, Http404, HttpResponse, HttpResponseBadRequest
 # from django.db.models.fields.reverse_related import ManyToOneRel
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext_lazy as _, ungettext
@@ -734,9 +734,24 @@ class AppIndexView(SiteAppAdminMixin, SiteAdminView):
 
 class AppReportView(SiteAppAdminMixin, SiteAdminView):
 
+    def dispatch(self, request, *args, **kwargs):
+        self.app_admin = self.site_admin._registry_apps[self.app_config.label]
+
+        return super().dispatch(request, *args, **kwargs)
+
     def get(self, request, *args, **kwargs):
 
         return self.render_to_response(self.get_context_data())
+
+    def post(self, request, *args, **kwargs):
+
+        report_type = request.POST.get('report_type')
+        report_code = request.POST.get('report_code')
+
+        if report_type not in ['pdf', 'excel']:
+            return HttpResponseBadRequest('Incorrect input data')
+
+        return self.app_admin.get_report(report_type, report_code)
 
     def get_template_names(self):
 
@@ -757,7 +772,8 @@ class AppReportView(SiteAppAdminMixin, SiteAdminView):
 
         context['title'] = _('{} - Reports ').format(self.app_config.verbose_name)
 
-        context['app_name'] = self.app_config.verbose_name
+        context['app_config'] = self.app_config
+        context['reports_details'] = self.app_admin.reports
 
         return context
 
@@ -765,6 +781,8 @@ class AppReportView(SiteAppAdminMixin, SiteAdminView):
 class AppStatisticsView(SiteAppAdminMixin, SiteAdminView):
 
     def get(self, request, *args, **kwargs):
+
+        self.app_admin = self.site_admin._registry_apps[self.app_config.label]
 
         return self.render_to_response(self.get_context_data())
 
@@ -788,6 +806,8 @@ class AppStatisticsView(SiteAppAdminMixin, SiteAdminView):
         context['title'] = _('{} - Statistics ').format(self.app_config.verbose_name)
 
         context['app_config'] = self.app_config
+        context['tables_of_statistics'] = self.app_admin.get_tables_of_statistics()
+        context['charts_of_statistics'] = self.app_admin.get_charts_of_statistics()
 
         return context
 

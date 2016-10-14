@@ -1,0 +1,23 @@
+
+#div_reports{
+    width: 300px;
+    padding: 5px;
+}
+
+    #div_reports select{
+        margin-bottom: 5px;
+    }
+
+    #div_reports li.list-group-item{
+       padding: 0;
+    }
+
+        #div_reports li.list-group-item > label{
+            display: block;
+            margin: 0;
+            padding: 10px;
+        }
+
+        #div_reports li.list-group-item label:hover{
+            cursor: pointer;
+        }

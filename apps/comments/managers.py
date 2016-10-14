@@ -48,7 +48,7 @@ class CommentManager(models.Manager):
 
         comments_for_objects = comments.filter(content_type_id=ct_model_pk)
 
-        return get_statistics_count_objects_for_the_past_year(comments_for_objects, 'date_added')
+        return get_statistics_count_objects_for_the_past_year(comments_for_objects, 'created')
 
     def get_chart_count_comments_for_the_past_year(self):
         """ """

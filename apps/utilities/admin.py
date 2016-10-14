@@ -1,4 +1,5 @@
 
+import collections
 import logging
 
 from django.utils.text import force_text
@@ -19,6 +20,7 @@ from apps.comments.admin import CommentGenericInline
 from .apps import UtilitiesConfig
 from .models import Category, Utility
 from .forms import CategoryAdminModelForm, UtilityAdminModelForm
+from .reports import Report
 
 
 logger = logging.getLogger('django.development')
@@ -30,7 +32,14 @@ class UtilityAppAdmin(AppAdmin):
     app_config_class = UtilitiesConfig
     app_icon = 'home'
 
-    def get_context_for_tables_of_statistics(self):
+    reports = collections.OrderedDict({
+        app_config_class.label: dict(
+            label=_('Utilities'),
+            class_report=Report,
+        )
+    })
+
+    def get_tables_of_statistics(self):
         """ """
 
         return (
@@ -63,7 +72,7 @@ class UtilityAppAdmin(AppAdmin):
             ),
         )
 
-    def get_context_for_charts_of_statistics(self):
+    def get_charts_of_statistics(self):
         """ """
 
         return (
@@ -90,18 +99,26 @@ class UtilityAppAdmin(AppAdmin):
             },
         )
 
-    def add_context_to_report_page(self, context):
+    def get_reports_details(self):
 
-        # context with statictis data
-        context['themes_for_reports'] = {
-            Category._meta.verbose_name_plural: 'categories',
-            Utility._meta.verbose_name_plural: 'utilities',
-        }
+        collections.OrderedDict()
+        return (
+            # self.reportDetail('categories', Category._meta.verbose_name_plural),
+            # self.reportDetail('utilities', Utility._meta.verbose_name_plural),
+            self.reportDetail(
+                code='utilities',
+                label=_('Utilities'),
+                excel=1,
+                pdf=1,
+            ),
+        )
 
-    def get_report(self, output_report, themes):
+    def get_report(self, type_report, report_code):
 
-        msg = 'Report must generated in {0} on themes: {1}'.format(output_report.upper(), themes)
-        return msg
+        report = self.reports[report_code]
+        class_report = report['class_report']
+        report = class_report(type_report)
+        return report()
 
 
 class UtilityInline(StackedInline):
