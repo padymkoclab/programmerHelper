@@ -1,80 +1,52 @@
 
 #include <iostream>
-#include <iterator>
-#include <initializer_list>
-
-using namespace std;
+#include <vector>
 
 
-int len(const initializer_list<int>& array){
-
-    int len = 0;
-
-    for (auto x : array)
-        len ++;
-
-    return len;
+int len(std::vector<int> array){
+    return array.size();
 }
 
-
-int max(int *numbers){
-
-    int max = -99999;
-    int number;
-
-    for (int i = 0; i < 10; i++) {
-        number = numbers[i];
-        if (max == -99999){
-            max = number;
-        } else if (number > max) {
-            max = number;
+int max(std::vector<int> array){
+    int max = array.front();
+    for (int i = 0; i < len(array); i++) {
+        if (array[i] > max){
+            max = array[i];
         }
     }
-
     return max;
-
 }
 
 
-int min(int *numbers){
-
-    int min = -99999;
-    int number;
-
-    for (int i = 0; i < 10; i++) {
-        number = numbers[i];
-        if (min == -99999){
-            min = number;
-        } else if (number < min) {
-            min = number;
+int min(std::vector<int> array){
+    int min = array.front();
+    for (int i = 0; i < len(array); i++) {
+        if (array[i] < min){
+            min = array[i];
         }
     }
-
     return min;
-
 }
 
 
-int sum(int *numbers){
-
+int sum(std::vector<int> array){
     int sum = 0;
-
-    for (int i = 0; i < 10; i++) {
-        sum += numbers[i];
+    for (int i = 0; i < len(array); i++) {
+        sum += array[i];
     }
-
     return sum;
-
 }
+
+
 
 int main(){
 
-    int array [] = {2, 3, 0, 7, -7, -79, -14, 89, 0, 0};
+    std::vector<int> array = {2, 3, 0, 7, -7, -79, -14, 89, 0, 0, -8};
 
-    cout << "Length: " << len({2, 3, 0, 7, -7, -79, -14, 89, 0, 0}) << endl;
-    cout << "Max: "<< max(array) << endl;
-    cout << "Min: " << min(array) << endl;
-    cout << "Sum: " << sum(array) << endl;
+    std::cout << "Length: " << len(array) << std::endl;
+    std::cout << "Max: "<< max(array) << std::endl;
+    std::cout << "Min: " << min(array) << std::endl;
+    std::cout << "Sum: " << sum(array) << std::endl;
 
     return false;
 

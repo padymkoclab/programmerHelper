@@ -1,11 +1,12 @@
 
-from django.db import models
+import logging
 
-from utils.python.logging_utils import create_logger_by_filename
+from django.db import models
 
 from apps.opinions.utils import annotate_queryset_for_determinate_rating
 
-logger = create_logger_by_filename(__name__)
+
+logger = logging.getLogger('django.development')
 
 
 class CategoryQuerySet(models.QuerySet):
@@ -86,11 +87,11 @@ class UtilityQuerySet(models.QuerySet):
         self = self.prefetch_related('comments')
         return self.annotate(count_comments=models.Count('comments', distinct=True))
 
-    def utilities_with_marks(self):
+    def utilities_with_rating(self):
         """ """
 
         self = self.prefetch_related('opinions')
-        return self.annotate(mark=models.Sum(models.Case(
+        return self.annotate(rating=models.Sum(models.Case(
             models.When(opinions__is_useful=True, then=1),
             models.When(opinions__is_useful=False, then=-1),
             output_field=models.IntegerField()

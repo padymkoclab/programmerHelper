@@ -7,9 +7,8 @@ import re
 
 from django.utils import timezone
 from django import template
-from django.template.defaultfilters import mark_safe
+from django.utils.safestring import mark_safe
 
-from bs4 import BeautifulSoup
 
 register = template.Library()
 

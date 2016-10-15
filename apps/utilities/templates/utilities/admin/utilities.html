@@ -1,0 +1,90 @@
+
+{% load i18n %}
+
+<style>
+
+    div > h1{
+        text-align: center;
+    }
+
+    div > table{
+        border: 0.5px solid #222;
+        border-spacing: 0;
+    }
+
+    div > table th, div > table td{
+        border: 0.5px solid #222;
+        padding: 5px;
+    }
+
+    div > table td{
+        color: #222;
+    }
+
+    div > table th{
+        color: black;
+        text-align: center;
+    }
+
+
+    div > table td:nth-child(1){
+        width: 25px;
+        text-align: center;
+    }
+
+    div > table td:nth-child(2){
+        width: 525px;
+        text-align: left;
+    }
+
+    div > table td:nth-child(3){
+        width: 50px;
+        text-align: center;
+    }
+
+</style>
+
+
+<div id="div_categories">
+    <h1>{{ labels.categories }}</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>№</th>
+                <th>{{ labels.category }}</th>
+                <th>{{ labels.category_count_utilities }}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for category in categories %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ category }}</td>
+                <td>{{ category.count_utilities }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div id="div_utilities">
+    <h1>{{ labels.utilities }}</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>№</th>
+                <th>{{ labels.utility }}</th>
+                <th>{{ labels.utility_rating }}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for utility in utilities %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ utility }}</td>
+                <td>{{ utility.rating|default_if_none:empty_value_display }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

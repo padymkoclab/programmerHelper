@@ -1,4 +1,5 @@
 
+import logging
 import warnings
 import random
 from calendar import LocaleHTMLCalendar
@@ -13,17 +14,16 @@ from django import template
 from django.conf import settings
 from django.core.urlresolvers import reverse
 
-from bs4 import BeautifulSoup
+# from bs4 import BeautifulSoup
 from pygments import highlight
 from pygments import lexers
 from pygments.lexers import get_lexer_by_name
 from pygments.formatters import HtmlFormatter
 
-from ...python.logging_utils import create_logger_by_filename
 from ...python.constants import PRETTY_COLORS
 
 
-logger = create_logger_by_filename(__name__)
+logger = logging.getLogger('django.development')
 register = Library()
 
 
@@ -214,6 +214,8 @@ class CalendarNode(template.Node):
                 locale=(current_locale_name, charset)
             )
             weeks_current_month = calendar.formatmonth(self.year, self.month)
+
+            logger.critical('BeautifulSoup is not used here.')
             weeks_current_month = BeautifulSoup(weeks_current_month, 'html.parser')
             #
             weeks_current_month.find('table')['class'].append(self.theme)

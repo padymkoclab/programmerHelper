@@ -99,25 +99,11 @@ class UtilityAppAdmin(AppAdmin):
             },
         )
 
-    def get_reports_details(self):
-
-        collections.OrderedDict()
-        return (
-            # self.reportDetail('categories', Category._meta.verbose_name_plural),
-            # self.reportDetail('utilities', Utility._meta.verbose_name_plural),
-            self.reportDetail(
-                code='utilities',
-                label=_('Utilities'),
-                excel=1,
-                pdf=1,
-            ),
-        )
-
     def get_report(self, type_report, report_code):
 
         report = self.reports[report_code]
         class_report = report['class_report']
-        report = class_report(type_report)
+        report = class_report(type_report, filename=report['label'])
         return report()
 
 
