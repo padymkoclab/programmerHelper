@@ -3,88 +3,200 @@
 
 <style>
 
-    div > h1{
+    .text-center{
         text-align: center;
     }
 
-    div > table{
+    .text-right{
+        text-align: right;
+    }
+
+    .text-justify{
+        text-align: justify;
+    }
+
+    .page_break{
+        page-break-before:always;
+    }
+
+    #title{
+        margin-top: 50%;
+        font-size: 50px;
+    }
+
+    div#document_details{
+        position: absolute;;
+        bottom: 20px;
+        right: 0px;
+    }
+
+    ol#list_content_themes{
+        margin: 50px 30px;
+    }
+
+    ol#list_content_themes li{
+        padding: 5px;
+    }
+
+    ol#list_content_themes li a{
+        text-decoration: none;
+        color: #222;
+    }
+
+    @page {
+        size: A4;
+        background-color: rgb(255, 255, 255);
+
+        @top-left-corner{
+            content: "";
+            width: 75%;
+            border-bottom: 1px solid #222;
+        }
+        @top-left{
+            content: "";
+            width: 75%;
+            border-bottom: 1px solid #222;
+        }
+        @top-center{
+            content: "Report about utilities";
+            width: 75%;
+        }
+        @top-right{
+            content: "";
+            width: 75%;
+            border-bottom: 1px solid #222;
+        }
+        @top-right-corner{
+            content: "";
+            width: 75%;
+            border-bottom: 1px solid #222;
+        }
+
+        @bottom-center{
+            content: "Page " counter(page) " of " counter(pages);
+        }
+    }
+
+    @page:first{
+        @top-left-corner{
+            content: "";
+            width: 0;
+        }
+        @top-left{
+            content: "";
+            width: 0;
+        }
+        @top-center{
+            content: "";
+            width: 0;
+        }
+        @top-right{
+            content: "";
+            width: 0;
+        }
+        @top-right-corner{
+            content: "";
+            width: 0;
+        }
+        @bottom-center {
+            content: "";
+        }
+    }
+
+    table.table_objects{
         border: 0.5px solid #222;
         border-spacing: 0;
     }
 
-    div > table th, div > table td{
+    table.table_objects th, table.table_objects td{
         border: 0.5px solid #222;
         padding: 5px;
     }
 
-    div > table td{
+    table.table_objects td{
         color: #222;
     }
 
-    div > table th{
+    table.table_objects th{
         color: black;
         text-align: center;
     }
 
-
-    div > table td:nth-child(1){
+    table.table_objects td:nth-child(1){
         width: 25px;
         text-align: center;
     }
 
-    div > table td:nth-child(2){
+    table.table_objects td:nth-child(2){
         width: 525px;
         text-align: left;
     }
 
-    div > table td:nth-child(3){
+    table.table_objects td:nth-child(3){
         width: 50px;
         text-align: center;
     }
 
 </style>
 
+<h1 class="text-center" id="title">{% trans "Report" %}</h1>
+<h3 class="text-center">
+    {% blocktrans trimmed %}
+        on theme: "{{ theme }}"
+    {% endblocktrans %}
+</h3>
 
-<div id="div_categories">
-    <h1>{{ labels.categories }}</h1>
-    <table>
-        <thead>
-            <tr>
-                <th>№</th>
-                <th>{{ labels.category }}</th>
-                <th>{{ labels.category_count_utilities }}</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for category in categories %}
-            <tr>
-                <td>{{ forloop.counter }}</td>
-                <td>{{ category }}</td>
-                <td>{{ category.count_utilities }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<div id="document_details">
+    <p class="text-right">{% trans "Author" %}: {{ author }}</p>
+    <p class="text-right">{% trans "Location" %}: {{ location }}</p>timezone_natimezone_nametimezone_nameme
+    <p class="text-right">{% trans "Created" %}: {{ date_created }}</p>
+    <p class="text-right">{% trans "Timezone" %}: {{ timezone }}</p>
 </div>
 
-<div id="div_utilities">
-    <h1>{{ labels.utilities }}</h1>
-    <table>
-        <thead>
-            <tr>
-                <th>№</th>
-                <th>{{ labels.utility }}</th>
-                <th>{{ labels.utility_rating }}</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for utility in utilities %}
-            <tr>
-                <td>{{ forloop.counter }}</td>
-                <td>{{ utility }}</td>
-                <td>{{ utility.rating|default_if_none:empty_value_display }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
+<h2 class="text-center page_break">{% trans "Content" %}</h2>
+<ol id="list_content_themes">
+    <li><a href="#categories">{{ labels.categories  }}</a></li>
+    <li><a href="#utilities">{{ labels.utilities  }}</a></li>
+</ol>
+
+
+<h2 class="text-center page_break" id="categories">{{ labels.categories }}</h2>
+<table id="table_categories" class="table_objects">
+    <thead>
+        <tr>
+            <th>№</th>
+            <th>{{ labels.category }}</th>
+            <th>{{ labels.category_count_utilities }}</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for category in categories %}
+        <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ category }}</td>
+            <td>{{ category.count_utilities }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+
+<h2 class="text-center page_break" id="utilities">{{ labels.utilities }}</h2>
+<table id="table_utilities" class="table_objects">
+    <thead>
+        <tr>
+            <th>№</th>
+            <th>{{ labels.utility }}</th>
+            <th>{{ labels.utility_rating }}</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for utility in utilities %}
+        <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ utility }}</td>
+            <td>{{ utility.rating|default_if_none:empty_value_display }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>

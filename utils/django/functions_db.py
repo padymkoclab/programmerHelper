@@ -3,6 +3,14 @@ from django.db import models
 from django.db.models.expressions import Func
 
 
+class IsNullAsLast(models.Func):
+    """
+    Used for made entries with value Null (Pythonic is None) as last in queryset
+    """
+
+    template = '%(expressions)s IS NULL'
+
+
 class ArrayLength(models.Func):
     """Postgres specific function for annotation
 

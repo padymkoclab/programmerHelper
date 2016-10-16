@@ -751,7 +751,7 @@ class AppReportView(SiteAppAdminMixin, SiteAdminView):
         if report_type not in ['pdf', 'excel']:
             return HttpResponseBadRequest('Incorrect input data')
 
-        return self.app_admin.get_report(report_type, report_code)
+        return self.app_admin.get_report(request, report_type, report_code)
 
     def get_template_names(self):
 

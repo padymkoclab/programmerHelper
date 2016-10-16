@@ -99,11 +99,11 @@ class UtilityAppAdmin(AppAdmin):
             },
         )
 
-    def get_report(self, type_report, report_code):
+    def get_report(self, request, type_report, report_code):
 
         report = self.reports[report_code]
         class_report = report['class_report']
-        report = class_report(type_report, filename=report['label'])
+        report = class_report(request, type_report, filename=report['label'])
         return report()
 
 

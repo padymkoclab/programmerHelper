@@ -7,6 +7,7 @@ import pip
 import pathlib
 import time
 
+from django import template
 from django.utils import timezone
 from django.db import connection
 
@@ -15,6 +16,18 @@ from pygments import lexers
 
 
 __all__ = []
+
+
+def get_output_from_DTL(string, context=None):
+
+    context = {} if context is None else context
+
+    if not isinstance(context, dict):
+        raise TypeError('Context must be a Python dict')
+
+    template_ = template.Template(string)
+    output = template_.render(context=template.Context(context))
+    return output
 
 
 def display_last_sql_queries(count=1):
