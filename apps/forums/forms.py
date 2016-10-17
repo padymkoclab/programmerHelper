@@ -4,7 +4,7 @@ import logging
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 
-from suit.widgets import AutosizedTextarea
+# from suit.widgets import AutosizedTextarea
 
 from .models import Section, Forum, Topic, Post
 
@@ -48,10 +48,10 @@ class FormAdminModelForm(forms.ModelForm):
 
     class Meta:
         widgets = {
-            'description': AutosizedTextarea(attrs={
-                'placeholder': _('Enter description'),
-                'class': 'span12',
-            })
+            # 'description': AutosizedTextarea(attrs={
+            #     'placeholder': _('Enter description'),
+            #     'class': 'span12',
+            # })
         }
 
 

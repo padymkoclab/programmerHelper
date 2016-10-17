@@ -116,7 +116,7 @@ TEMPLATES = [
 
 MY_CONTEXT_PROCCESSORS = [
     # 'utils.context_processors.date_creating_website',
-    'apps.visits.context_processors.users_online',
+    # 'apps.visits.context_processors.users_online',
     # 'apps.sessions.context_processors.users_online',
 ]
 

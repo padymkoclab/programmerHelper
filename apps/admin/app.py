@@ -118,5 +118,5 @@ class AppAdmin:
             },
         )
         """
-        
+
         raise NotImplementedError

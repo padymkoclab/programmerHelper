@@ -6,7 +6,7 @@ from django.contrib import admin
 
 from utils.django.models_utils import get_admin_url
 
-from apps.core.admin import AdminSite, AppAdmin
+# from apps.core.admin import AdminSite, AppAdmin
 
 from .models import Tag
 from .apps import TagsConfig
@@ -14,8 +14,8 @@ from .forms import TagAdminModelForm
 from .actions import delete_unused_tags
 
 
-@AdminSite.register_app_admin_class
-class ThisAppAdmin(AppAdmin):
+# @AdminSite.register_app_admin_class
+class ThisAppAdmin():
 
     label = TagsConfig.label
 
@@ -86,7 +86,7 @@ for related_field_name in related_fields_names:
     inlines.append(InlineModel)
 
 
-@admin.register(Tag, site=AdminSite)
+# @admin.register(Tag, site=AdminSite)
 class TagAdmin(admin.ModelAdmin):
     '''
         Admin View for Tag

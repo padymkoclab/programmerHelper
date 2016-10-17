@@ -2,7 +2,7 @@
 from django.utils.translation import ugettext_lazy as _
 from django import forms
 
-from suit.widgets import AutosizedTextarea
+# from suit.widgets import AutosizedTextarea
 
 from utils.django.widgets import HorizontalRadioSelect
 
@@ -23,10 +23,10 @@ class ReplyAdminModelForm(forms.ModelForm):
             'mark_for_style': HorizontalRadioSelectMarks,
             'mark_for_content': HorizontalRadioSelectMarks,
             'mark_for_language': HorizontalRadioSelectMarks,
-            'text_reply': AutosizedTextarea(attrs={
-                'placeholder': _('Enter text'),
-                'class': 'span12',
-            }),
+            # 'text_reply': AutosizedTextarea(attrs={
+            #     'placeholder': _('Enter text'),
+            #     'class': 'span12',
+            # }),
         }
 
     def __init__(self, *args, **kwargs):

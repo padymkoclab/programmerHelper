@@ -2,15 +2,16 @@
 from django.utils.translation import ugettext_lazy as _
 from django.contrib import admin
 
-from apps.core.admin import AppAdmin, AdminSite
+# from apps.core.admin import AppAdmin, AdminSite
 
 from .models import Newsletter
 from .forms import NewsletterAdminModelForm
 from .apps import NewslettersConfig
 
 
-@AdminSite.register_app_admin_class
-class NewsletterAppAdmin(AppAdmin):
+# @AdminSite.register_app_admin_class
+# class NewsletterAppAdmin(AppAdmin):
+class NewsletterAppAdmin():
 
     label = NewslettersConfig.label
 
@@ -38,7 +39,7 @@ class NewsletterAppAdmin(AppAdmin):
         )
 
 
-@admin.register(Newsletter, site=AdminSite)
+# @admin.register(Newsletter, site=AdminSite)
 class NewsletterAdmin(admin.ModelAdmin):
     '''
     Admin View for News

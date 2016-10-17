@@ -2,12 +2,12 @@
 from django.utils.html import format_html
 from django.contrib import admin
 
-from apps.core.admin import AdminSite
+# from apps.core.admin import AdminSite
 
 from .models import Notification
 
 
-@admin.register(Notification, site=AdminSite)
+# @admin.register(Notification, site=AdminSite)
 class NotificationAdmin(admin.ModelAdmin):
     '''
     Admin view for notifications of accounts

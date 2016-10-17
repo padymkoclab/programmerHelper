@@ -6,7 +6,7 @@ from django.contrib import admin
 
 from utils.django.listfilters import AllValuesChoicesFieldListFilter
 
-from apps.core.admin import AdminSite, AppAdmin
+# from apps.core.admin import AdminSite, AppAdmin
 from apps.replies.admin import ReplyGenericInline
 
 from .models import Book, Writer, Publisher
@@ -19,8 +19,9 @@ from .listfilters import (
 from .apps import LibraryConfig
 
 
-@AdminSite.register_app_admin_class
-class ThisAppAdmin(AppAdmin):
+# @AdminSite.register_app_admin_class
+# class ThisAppAdmin(AppAdmin):
+class ThisAppAdmin():
 
     label = LibraryConfig.label
 
@@ -74,7 +75,7 @@ class ThisAppAdmin(AppAdmin):
         )
 
 
-@admin.register(Book, site=AdminSite)
+# @admin.register(Book, site=AdminSite)
 class BookAdmin(admin.ModelAdmin):
     '''
     Admin View for Book
@@ -258,7 +259,7 @@ class BookInlineForPublisher(admin.TabularInline):
     max_num = 0
 
 
-@admin.register(Writer, site=AdminSite)
+# @admin.register(Writer, site=AdminSite)
 class WriterAdmin(admin.ModelAdmin):
     '''
     Admin View for Writer
@@ -359,7 +360,7 @@ class WriterAdmin(admin.ModelAdmin):
         return {'class': '{}'.format(css_class)}
 
 
-@admin.register(Publisher, site=AdminSite)
+# @admin.register(Publisher, site=AdminSite)
 class PublisherAdmin(admin.ModelAdmin):
 
     form = PublisherAdminModelForm

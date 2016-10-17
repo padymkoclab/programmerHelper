@@ -9,7 +9,7 @@ from django.contrib import admin
 
 from utils.django.admin_utils import remove_url_from_admin_urls
 
-from apps.core.admin import AppAdmin, AdminSite
+# from apps.core.admin import AppAdmin, AdminSite
 
 from .models import Poll, Choice, Vote
 from .forms import PollAdminModelForm, ChoiceAdminInlineModelForm
@@ -23,8 +23,8 @@ from .listfilters import LatestVotingSimpleListFilter
 User = get_user_model()
 
 
-@AdminSite.register_app_admin_class
-class AppAdmin(AppAdmin):
+# @AdminSite.register_app_admin_class
+class AppAdmin():
 
     label = PollsConfig.label
 
@@ -102,7 +102,7 @@ class VoteInline(admin.TabularInline):
     readonly_fields = ['get_truncated_text_choice', 'user', 'created']
 
 
-@admin.register(Poll, site=AdminSite)
+# @admin.register(Poll, site=AdminSite)
 class PollAdmin(admin.ModelAdmin):
     '''
     Admin View for Poll
@@ -256,7 +256,7 @@ class PollAdmin(admin.ModelAdmin):
         raise NotImplementedError
 
 
-@admin.register(Choice, site=AdminSite)
+# @admin.register(Choice, site=AdminSite)
 class ChoiceAdmin(admin.ModelAdmin):
     '''
     Admin View for Choice
@@ -327,7 +327,7 @@ class ChoiceAdmin(admin.ModelAdmin):
     get_poll_admin_link_as_html.short_description = _('Poll')
 
 
-@admin.register(Vote, site=AdminSite)
+# @admin.register(Vote, site=AdminSite)
 class VoteAdmin(admin.ModelAdmin):
     '''
     Admin View for Vote

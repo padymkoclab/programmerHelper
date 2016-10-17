@@ -2,7 +2,7 @@
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 
-from suit_ckeditor.widgets import CKEditorWidget
+# from suit_ckeditor.widgets import CKEditorWidget
 
 from apps.tags.forms import clean_tags
 
@@ -29,7 +29,7 @@ class SolutionAdminModelForm(forms.ModelForm):
 
         self.fields['user'].widget.widget.attrs['class'] = 'span11'
 
-        self.fields['body'].widget = CKEditorWidget()
+        # self.fields['body'].widget = CKEditorWidget()
 
     def clean_tags(self):
         super().clean()

@@ -5,17 +5,10 @@
 
 # from utils.django.listfilters import IsNewSimpleListFilter
 
-from apps.admin.site import AdminSite
+# from apps.admin.site import AdminSite
 # from apps.admin.site import DefaultAdminSite, AdminSite
 # from apps.admin.decorators import register_model
 from apps.admin.admin import ModelAdmin
-
-
-class DefaultAdminSite(AdminSite):
-    pass
-
-
-DefaultAdminSite = DefaultAdminSite()
 
 # from apps.core.admin import AppAdmin, AdminSite
 # from apps.comments.admin import CommentGenericInline
@@ -247,12 +240,3 @@ from .models import Snippet
 #         """ """
 
 #         raise NotImplementedError
-
-
-# @register_model(Snippet, site=ThisAdminSite)
-class SnippetAdmin(ModelAdmin):
-
-    pass
-
-
-DefaultAdminSite.register(Snippet, SnippetAdmin)

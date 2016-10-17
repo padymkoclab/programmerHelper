@@ -1,7 +1,7 @@
 
 from django import forms
 
-from suit_ckeditor.widgets import CKEditorWidget
+# from suit_ckeditor.widgets import CKEditorWidget
 
 from utils.django.widgets import BooleanRadioSelect
 
@@ -22,7 +22,7 @@ class QuestionAdminModelForm(forms.ModelForm):
 
         self.fields['user'].widget.widget.attrs['class'] = 'span11'
 
-        self.fields['text_question'].widget = CKEditorWidget()
+        # self.fields['text_question'].widget = CKEditorWidget()
 
     class Meta:
         model = Question

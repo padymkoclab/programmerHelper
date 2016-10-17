@@ -6,7 +6,7 @@ from django.contrib import admin
 from utils.django.datetime_utils import convert_date_to_django_date_format
 from utils.django.listfilters import IsNewSimpleListFilter
 
-from apps.core.admin import AppAdmin, AdminSite
+# from apps.core.admin import AppAdmin, AdminSite
 from apps.comments.admin import CommentGenericInline
 from apps.opinions.admin import OpinionGenericInline
 from apps.opinions.admin_mixins import OpinionsAdminMixin
@@ -18,8 +18,8 @@ from .listfilters import HasAcceptedAnswerSimpleListFilter, LatestActivitySimple
 from .apps import QuestionsConfig
 
 
-@AdminSite.register_app_admin_class
-class AppAdmin(AppAdmin):
+# @AdminSite.register_app_admin_class
+class AppAdmin():
 
     label = QuestionsConfig.label
 
@@ -163,7 +163,7 @@ class AnswerInline(admin.StackedInline):
     )
 
 
-@admin.register(Question, site=AdminSite)
+# @admin.register(Question, site=AdminSite)
 class QuestionAdmin(OpinionsAdminMixin, admin.ModelAdmin):
     '''
     Admin View for Question
@@ -307,7 +307,7 @@ class QuestionAdmin(OpinionsAdminMixin, admin.ModelAdmin):
     get_date_latest_activity_for_admin_readonly.short_description = _('Date latest activity')
 
 
-@admin.register(Answer, site=AdminSite)
+# @admin.register(Answer, site=AdminSite)
 class AnswerAdmin(OpinionsAdminMixin, admin.ModelAdmin):
     '''
     Admin View for Answer

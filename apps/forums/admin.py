@@ -9,7 +9,7 @@ from django.db import models
 from utils.django.widgets import BooleanRadioSelect
 from utils.django.datetime_utils import convert_date_to_django_date_format
 
-from apps.core.admin import AdminSite, AppAdmin
+# from apps.core.admin import AdminSite, AppAdmin
 
 from .models import Section, Forum, Topic, Post
 from .forms import SectionAdminModelForm
@@ -22,8 +22,9 @@ from .forms import (
 )
 
 
-@AdminSite.register_app_admin_class
-class ThisAppAdmin(AppAdmin):
+# @AdminSite.register_app_admin_class
+# class ThisAppAdmin(AppAdmin):
+class ThisAppAdmin():
 
     label = ForumsConfig.label
 
@@ -84,7 +85,7 @@ class ForumInline(admin.TabularInline):
     truncated_name_with_admin_url.short_description = Forum._meta.get_field('name').verbose_name
 
 
-@admin.register(Section, site=AdminSite)
+# @admin.register(Section, site=AdminSite)
 class SectionAdmin(admin.ModelAdmin):
 
     form = SectionAdminModelForm
@@ -201,7 +202,7 @@ class TopicInline(admin.TabularInline):
     display_status.short_description = _('Status')
 
 
-@admin.register(Forum, site=AdminSite)
+# @admin.register(Forum, site=AdminSite)
 class ForumAdmin(admin.ModelAdmin):
     '''
     Admin View for Forum
@@ -317,7 +318,7 @@ class PostInline(admin.StackedInline):
     suit_classes = 'suit-tab suit-tab-posts'
 
 
-@admin.register(Topic, site=AdminSite)
+# @admin.register(Topic, site=AdminSite)
 class TopicAdmin(admin.ModelAdmin):
     '''
     Admin View for Topic
@@ -427,7 +428,7 @@ class TopicAdmin(admin.ModelAdmin):
     truncated_subject.admin_order_field = 'subject'
 
 
-@admin.register(Post, site=AdminSite)
+# @admin.register(Post, site=AdminSite)
 class PostAdmin(admin.ModelAdmin):
     '''
     Admin View for Post

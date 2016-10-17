@@ -2,7 +2,7 @@
 from django.utils.translation import ugettext_lazy as _
 from django import forms
 
-from suit.widgets import AutosizedTextarea
+# from suit.widgets import AutosizedTextarea
 
 from utils.django.widgets import AdminImageThumbnail, DurationWidget
 
@@ -32,10 +32,10 @@ class SuitAdminModelForm(forms.ModelForm):
 
         self.fields['complexity'].widget.attrs['class'] = 'span12'
 
-        self.fields['description'].widget = AutosizedTextarea(attrs={
-            'class': 'span12',
-            'placeholder': _('Enter description')
-        })
+        # self.fields['description'].widget = AutosizedTextarea(attrs={
+        #     'class': 'span12',
+        #     'placeholder': _('Enter description')
+        # })
 
 
 class QuestionAdminModelForm(forms.ModelForm):

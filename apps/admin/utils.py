@@ -47,3 +47,7 @@ def convert_boolean_to_bootstrap_icon(value):
         '<span class="glyphicon glyphicon-{}" style="color: {}"></span>',
         bootstap_class, color
     )
+
+
+def autodiscover_modules():
+    pass

@@ -7,7 +7,7 @@ from django.contrib import admin
 
 from utils.django.datetime_utils import convert_date_to_django_date_format
 
-from apps.core.admin import AdminSite
+# from apps.core.admin import AdminSite
 
 from .models import Diary, Partition
 from .forms import PartitionInlineAdminModelForm
@@ -56,7 +56,7 @@ class PartitionInline(admin.StackedInline):
     suit_classes = 'suit-tab suit-tab-partitions'
 
 
-@admin.register(Diary, site=AdminSite)
+# @admin.register(Diary, site=AdminSite)
 class DiaryAdmin(admin.ModelAdmin):
 
     readonly_fields = (

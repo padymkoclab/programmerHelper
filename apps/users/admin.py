@@ -27,6 +27,21 @@ from .apps import UsersConfig
 logger = logging.getLogger('django.development')
 
 
+def register_app(class_, site=SiteAdmin):
+
+    def wrapper(class_):
+        site.register_app(class_, site)
+
+    return wrapper
+
+
+@register_app
+class UserAppAdmin(AppAdmin):
+
+    app_config_class = UsersConfig
+    app_icon = 'users'
+
+
 # class ProfileInline(admin.StackedInline):
 
 #     template = 'users/admin/edit_inline/stacked_OneToOne.html'
@@ -377,20 +392,6 @@ class UserAdmin(ModelAdmin):
         return format_html('<span>{}</span><a href="{}">{}</a>', msg, link_url, link_text)
 
 
-from apps.utilities.models import Utility, Category
-from apps.utilities.admin import UtilityAdmin, CategoryAdmin, UtilityAppAdmin
-# from apps.utilities.apps import UtilitiesConfig
-
-from apps.articles.models import Article
-from apps.articles.admin import ArticleAdmin, ArticlesAppAdmin
-
-
-class UserAppAdmin(AppAdmin):
-
-    app_config_class = UsersConfig
-    app_icon = 'users'
-
-
 class ProfileAdmin(ModelAdmin):
 
     list_display = (
@@ -519,7 +520,7 @@ class LevelAdmin(ModelAdmin):
             },
         ),
     )
-    search_fields = ('name',)
+    search_fields = ('name', 'description')
     fieldsets = (
         (
             Level._meta.verbose_name, {
@@ -560,18 +561,3 @@ class LevelAdmin(ModelAdmin):
         )
     display_color.short_description = Level._meta.get_field('color').verbose_name
     display_color.admin_order_field = 'color'
-
-
-DefaultSiteAdmin = type('SiteAdmin', (SiteAdmin, ), dict())()
-
-
-DefaultSiteAdmin.register_app(UserAppAdmin)
-DefaultSiteAdmin.register_app(UtilityAppAdmin)
-DefaultSiteAdmin.register_app(ArticlesAppAdmin)
-
-DefaultSiteAdmin.register_model(Level, LevelAdmin)
-DefaultSiteAdmin.register_model(User, UserAdmin)
-DefaultSiteAdmin.register_model(Profile, ProfileAdmin)
-DefaultSiteAdmin.register_model(Utility, UtilityAdmin)
-DefaultSiteAdmin.register_model(Category, CategoryAdmin)
-DefaultSiteAdmin.register_model(Article, ArticleAdmin)

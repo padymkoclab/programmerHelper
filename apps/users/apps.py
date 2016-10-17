@@ -26,5 +26,4 @@ class UsersConfig(AppConfig):
         """ """
 
         # User = get_user_model()
-
         post_migrate.connect(signal_post_migrate_model_levels_of_users, sender=self)

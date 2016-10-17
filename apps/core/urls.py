@@ -8,9 +8,7 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 # from django_js_reverse.views import urls_js
 
-# from apps.admin.site import DefaultSiteAdmin
-from apps.users.admin import DefaultSiteAdmin
-# from django.contrib import admin
+from apps.admin.site import DefaultSiteAdmin
 from .views import IndexView, PlaceholderView
 
 js_info_dict = {

@@ -3,8 +3,6 @@ from django.utils.translation import ugettext_lazy as _
 from django.db.models import Count
 from django.contrib import admin
 
-from apps.core.admin import AdminSite
-
 from .models import Badge, GotBadge
 
 
@@ -16,7 +14,7 @@ from .models import Badge, GotBadge
 #     extra = 1
 
 
-@admin.register(Badge, site=AdminSite)
+# @admin.register(Badge, site=AdminSite)
 class BadgeAdmin(admin.ModelAdmin):
     """
     Admin View for Badge
@@ -48,7 +46,7 @@ class BadgeAdmin(admin.ModelAdmin):
     get_count_users_with_this_badge.short_description = _('Count users with this badge')
 
 
-@admin.register(GotBadge, site=AdminSite)
+# @admin.register(GotBadge, site=AdminSite)
 class GotBadgeAdmin(admin.ModelAdmin):
     '''
     Admin View for GettingBadge

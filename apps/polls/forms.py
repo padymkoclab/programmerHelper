@@ -2,7 +2,7 @@
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 
-from suit.widgets import AutosizedTextarea
+# from suit.widgets import AutosizedTextarea
 
 # from .models import Poll, Choice
 
@@ -30,7 +30,7 @@ class ChoiceAdminInlineModelForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.fields['text_choice'].widget = AutosizedTextarea(attrs={
-            'placeholder': _('Enter text of a choice'),
-            'class': 'span11',
-        })
+        # self.fields['text_choice'].widget = AutosizedTextarea(attrs={
+        #     'placeholder': _('Enter text of a choice'),
+        #     'class': 'span11',
+        # })

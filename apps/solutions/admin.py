@@ -4,7 +4,7 @@ from django.contrib import admin
 
 from utils.django.listfilters import IsNewSimpleListFilter
 
-from apps.core.admin import AppAdmin, AdminSite
+# from apps.core.admin import AppAdmin, AdminSite
 from apps.opinions.admin import OpinionGenericInline
 from apps.opinions.admin_mixins import OpinionsAdminMixin
 from apps.comments.admin import CommentGenericInline
@@ -14,8 +14,8 @@ from .forms import SolutionAdminModelForm
 from .models import Solution
 
 
-@AdminSite.register_app_admin_class
-class SolutionAppAdmin(AppAdmin):
+# @AdminSite.register_app_admin_class
+class SolutionAppAdmin():
 
     label = SolutionsConfig.label
 
@@ -96,7 +96,7 @@ class SolutionAppAdmin(AppAdmin):
         return msg
 
 
-@admin.register(Solution, site=AdminSite)
+# @admin.register(Solution, site=AdminSite)
 class SolutionAdmin(OpinionsAdminMixin, admin.ModelAdmin):
     """
     Admin View for Solution

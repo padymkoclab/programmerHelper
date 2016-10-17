@@ -6,7 +6,7 @@ from django.contrib import admin
 from utils.django.admin_utils import remove_url_from_admin_urls
 from utils.django.listfilters import IsNewSimpleListFilter
 
-from apps.core.admin import AppAdmin, AdminSite
+# from apps.core.admin import AppAdmin, AdminSite
 
 from .apps import TestingConfig
 from .models import Suit, Question, Variant, Passage
@@ -20,8 +20,8 @@ from .forms import (
 from .listfilters import IsCompletedSimpleListFilter
 
 
-@AdminSite.register_app_admin_class
-class TestingAppAdmin(AppAdmin):
+# @AdminSite.register_app_admin_class
+class TestingAppAdmin():
 
     label = TestingConfig.label
 
@@ -140,7 +140,7 @@ class PassageInline(admin.TabularInline):
     classes = ['collapse']
 
 
-@admin.register(Suit, site=AdminSite)
+# @admin.register(Suit, site=AdminSite)
 class SuitAdmin(admin.ModelAdmin):
     """
     Admin View for Suit
@@ -240,7 +240,7 @@ class SuitAdmin(admin.ModelAdmin):
     truncated_name.admin_order_field = 'name'
 
 
-@admin.register(Question, site=AdminSite)
+# @admin.register(Question, site=AdminSite)
 class QuestionAdmin(admin.ModelAdmin):
     """
     Admin View for Question
@@ -316,7 +316,7 @@ class QuestionAdmin(admin.ModelAdmin):
     truncated_text_question.admin_order_field = 'text_question'
 
 
-@admin.register(Variant, site=AdminSite)
+# @admin.register(Variant, site=AdminSite)
 class VariantAdmin(admin.ModelAdmin):
     '''
         Admin View for Variant
@@ -359,7 +359,7 @@ class VariantAdmin(admin.ModelAdmin):
     truncated_question.admin_order_field = 'question'
 
 
-@admin.register(Passage, site=AdminSite)
+# @admin.register(Passage, site=AdminSite)
 class PassageAdmin(admin.ModelAdmin):
     """
 

@@ -3,7 +3,7 @@ from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from django import forms
 
-from suit.widgets import AutosizedTextarea
+# from suit.widgets import AutosizedTextarea
 
 from utils.django.widgets import AdminImageThumbnail
 
@@ -25,7 +25,7 @@ class BookAdminModelForm(forms.ModelForm):
         self.fields['slug'].disabled = True
         self.fields['slug'].widget.attrs['class'] = 'span12'
 
-        self.fields['description'].widget = AutosizedTextarea(attrs={'rows': 3, 'class': 'span12'})
+        # self.fields['description'].widget = AutosizedTextarea(attrs={'rows': 3, 'class': 'span12'})
 
         self.fields['image'].widget = AdminImageThumbnail()
 
@@ -62,7 +62,7 @@ class WriterAdminModelForm(forms.ModelForm):
         self.fields['slug'].widget.attrs['class'] = 'span12'
         self.fields['slug'].disabled = True
 
-        self.fields['about'].widget = AutosizedTextarea(attrs={'rows': 3, 'class': 'span12'})
+        # self.fields['about'].widget = AutosizedTextarea(attrs={'rows': 3, 'class': 'span12'})
 
         self.fields['trends'].widget.attrs['class'] = 'span12'
 
