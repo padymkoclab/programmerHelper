@@ -933,7 +933,11 @@ class ExportModelView(SiteAdminMixin, SiteAdminView):
 
     def render_to_response(self, request):
 
-        return TemplateResponse(request, template=self.get_template_names(), context=self.get_context_data())
+        return TemplateResponse(
+            request,
+            template=self.get_template_names(),
+            context=self.get_context_data(),
+        )
 
     def get_model_content_type(self):
 

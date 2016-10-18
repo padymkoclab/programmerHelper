@@ -1,7 +1,7 @@
 
 {% for class_bg, pk, values in values_list %}
   <tr {% if bg_class is not None %}class="bg-{{ class_bg }}{% endif %}">
-      <td>
+      <td class="checkbox_column">
         <input type="checkbox" form="form_actions" name="selected_objects" value="{{ pk }}">
       </td>
         {% for value, class_align in values %}

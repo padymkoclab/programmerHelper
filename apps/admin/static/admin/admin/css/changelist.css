@@ -17,6 +17,7 @@
 }
 
 
+
 table thead th.is_sortable:hover{
     cursor: pointer;
 }
@@ -45,10 +46,24 @@ table thead th.is_sortable:hover{
     vertical-align: middle;
 }
 
-#changelist > table thead th:nth-child(1), #changelist > table tbody td:nth-child(1){
+.checkbox_column{
     width: 5px;
+    text-align: right;
+}
+
+
+.header_column_sortable_icon{
+    width: 30px;
+    text-align: center;
+    float: left;
+}
+
+
+.header_column_display_name{
+    overflow: hidden;
     text-align: center;
 }
+
 
 #navigation{
     border-top: 1px solid #337AB7;

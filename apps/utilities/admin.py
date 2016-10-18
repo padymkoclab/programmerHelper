@@ -11,6 +11,7 @@ from utils.django.listfilters import IsNewSimpleListFilter
 
 from apps.admin.admin import ModelAdmin, StackedInline
 from apps.admin.app import AppAdmin
+from apps.admin.site import DefaultSiteAdmin
 
 # from apps.core.admin import AdminSite
 from apps.opinions.admin import OpinionGenericInline
@@ -26,7 +27,6 @@ from .reports import Report
 logger = logging.getLogger('django.development')
 
 
-# @AdminSite.register_app_admin_class
 class UtilityAppAdmin(AppAdmin):
 
     app_config_class = UtilitiesConfig
@@ -138,7 +138,6 @@ class UtilityInline(StackedInline):
         return fields
 
 
-# @admin.register(Category, site=AdminSite)
 class CategoryAdmin(ModelAdmin):
     '''
     Admin View for Category
@@ -255,7 +254,6 @@ class CategoryAdmin(ModelAdmin):
         return row_color
 
 
-# @admin.register(Utility, site=AdminSite)
 class UtilityAdmin(OpinionsAdminMixin, ModelAdmin):
     '''
     Admin View for Utility
@@ -342,3 +340,9 @@ class UtilityAdmin(OpinionsAdminMixin, ModelAdmin):
             ]
             return [inline(self.model, self.site_admin) for inline in inlines]
         return []
+
+
+DefaultSiteAdmin.register_app(UtilityAppAdmin)
+
+DefaultSiteAdmin.register_model(Category, CategoryAdmin)
+DefaultSiteAdmin.register_model(Utility, UtilityAdmin)

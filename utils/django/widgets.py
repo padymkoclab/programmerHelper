@@ -1,6 +1,7 @@
 
 import logging
 
+from django import template
 from django.forms.utils import flatatt
 from django.utils.text import force_text
 from django.contrib import postgres
@@ -36,7 +37,7 @@ class DurationSplitWidget(forms.MultiWidget):
 
     class Media:
         css = {
-            'all': ('mylabour/css/durationsplitwidget.css', ),
+            'all': ('utils/css/durationsplitwidget.css', ),
         }
 
     def __init__(self):
@@ -120,9 +121,9 @@ class DurationWidget(forms.widgets.TextInput):
 
     class Media:
         css = {
-            'all': ('mylabour/css/durationwidget.css', ),
+            'all': ('utils/css/durationwidget.css', ),
         }
-        js = ('mylabour/js/durationwidget.js', )
+        js = ('utils/js/durationwidget.js', )
 
     def render(self, name, value, attrs=None):
 
@@ -217,19 +218,18 @@ class SplitInputsArrayWidget(postgres.forms.SplitArrayWidget):
 
 class ColorInput(forms.Widget):
     """
+    Bootstrap Color widget
     Base class for all <input> widgets (except type='checkbox' and
     type='radio', which are special).
     """
 
     class Media:
         css = {
-            'all': ('mylabour/css/colorwidget.css', ),
+            'all': ('utils/css/colorwidget.css', ),
         }
-        js = ('mylabour/js/colorwidget.js', )
+        js = ('utils/js/colorwidget.js', )
 
     def format_value(self, value):
-        # if self.is_localized:
-            # return formats.localize_input(value)
         return value
 
     def render(self, name, value, attrs=None):
@@ -237,22 +237,36 @@ class ColorInput(forms.Widget):
         if value is None:
             value = ''
 
-        final_attrs = self.build_attrs(attrs, type='color', name=name)
+        final_attrs = self.build_attrs(
+            attrs,
+            **{
+                'type': 'text',
+                'name': name,
+                'readonly': True,
+                'class': 'form-control',
+            }
+        )
 
         if value != '':
             # Only add the 'value' attribute if a value is non-empty.
             final_attrs['value'] = force_text(self.format_value(value))
 
-        return format_html(
-            '<div class="colorfield"><input type="text" disabled="disabled" /><input{} /></div>',
-            flatatt(final_attrs),
-        )
+        html_ = """
+        <div class="colorfield input-group">
+            <span class="input-group-addon">
+                <input type="color" name="color_input" value="{}" />
+            </span>
+            <input{} />
+        </div>
+        """
+
+        return format_html(html_, value, flatatt(final_attrs))
 
 
 class AutosizedTextarea(forms.Textarea):
 
     class Media:
-        js = ('mylabour/js/autoresize.js', )
+        js = ('utils/js/autoresize.js', )
 
     def render(self, name, value, attrs=None):
 

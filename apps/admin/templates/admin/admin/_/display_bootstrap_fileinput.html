@@ -1,6 +1,13 @@
 
 {% load i18n %}
 
+<style media="screen">
+    #display_id_file{
+        border-top-right-radius: 5px;
+        border-bottom-right-radius: 5px;
+    }
+</style>
+
 <div class="input-group {% if file.errors %}has-error{% endif %}">
   <label for="{{ file.id_for_label }}" class="input-group-btn">
     <span class="btn btn-primary">

@@ -100,7 +100,9 @@ class Level(models.Model):
     )
     color = ColorField(
         _('Color'), max_length=50,
-        help_text=_('Enter color name or hex code or rgba'),
+        help_text=_('Choice color in hex format'),
+        unique=True,
+        error_messages={'unique': _('Level with color already exists.')}
     )
 
     objects = models.Manager()

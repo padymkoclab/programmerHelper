@@ -1,0 +1,27 @@
+
+#table_import_preview{
+    background-color: #fff;
+    margin: 15px 0;
+}
+
+
+#table_import_preview thead th{
+    text-align: center;
+    background-color: #2A3F54;
+    color: #fff;
+}
+
+
+#table_import_preview #column_pk{
+    text-align: left;
+}
+
+
+#table_import_preview #column_object{
+    text-align: left;
+}
+
+
+#table_import_preview #column_is_consistent{
+    text-align: center;
+}

@@ -31,12 +31,11 @@ THIRD_PARTY_APPS = [
 
 COMMON_APPS = [
     'utils.django',
-    'apps.core.apps.CoreConfig',
-    'apps.export_import_models.apps.ExportImportModelsConfig',
     'apps.sessions.apps.SessionsConfig',
 ]
 
 CUSTOM_APPS = [
+    'apps.core.apps.CoreConfig',
     'apps.admin.apps.AdminConfig',
     'apps.articles.apps.ArticlesConfig',
     'apps.badges.apps.BadgesConfig',
@@ -337,4 +336,6 @@ GEOIP_PATH = str(BASE_DIR.child('static', 'project', 'files'))
 
 # SERIALIZERS
 
-SERIALIZATION_MODULES = {'csv': 'apps.export_import_models.serializers.csv'}
+SERIALIZATION_MODULES = {
+    'csv': 'apps.admin.serializers.csv'
+}

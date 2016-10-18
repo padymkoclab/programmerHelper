@@ -5,6 +5,12 @@
 {% load static %}
 
 {% load admin_tags %}
+{% load admin_filters %}
+
+{% block extra_css %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static 'admin/admin/css/import.css' %}">
+{% endblock extra_css %}
 
 
 {% block breadcrumbs %}
@@ -52,7 +58,7 @@
       </div>
 
       <div class="col-sm-12">
-        <table class="table">
+        <table class="table" id="table_import_preview">
           <thead>
             <tr>
               <th>{% trans "Primary key" %}</th>
@@ -63,9 +69,9 @@
           <tbody>
             {% for pk, object, is_consistent in import_details.objects %}
               <tr>
-                  <td>{{ pk }}</td>
-                  <td>{{ object }}</td>
-                  <td class="text-center">{{ is_consistent }}</td>
+                  <td id="column_pk">{{ pk }}</td>
+                  <td id="column_object">{{ object }}</td>
+                  <td id="column_is_consistent">{{ is_consistent|as_bootstrap_logic_icon }}</td>
               </tr>
             {% endfor %}
           </tbody>

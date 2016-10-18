@@ -8,7 +8,9 @@ from django.core.validators import validate_unicode_slug
 from django.db.models import NullBooleanField
 from django.utils.translation import ugettext as _
 from django.db import models
+from django.utils.encoding import smart_text
 
+import six
 from autoslug import AutoSlugField
 import markdown
 import textile
@@ -399,7 +401,6 @@ class AutoOneToOneField(models.OneToOneField):
 
 class ColorField(models.CharField):
     """
-
     Three widgets:
         HTML5 input color - OK
         jQuery Color Picker
@@ -428,3 +429,19 @@ class ColorField(models.CharField):
         kwargs['widget'] = ColorInput()
 
         return super().formfield(form_class=None, choices_form_class=None, **kwargs)
+
+    def clean(self, value, model_instance):
+        """
+        Convert the value's type and run validation. Validation errors
+        from to_python and validate are propagated. The correct value is
+        returned if no error is raised.
+        """
+        value = self.to_python(value)
+
+        if self.unique:
+            value = value.upper()
+
+        self.validate(value, model_instance)
+        self.run_validators(value)
+        # import ipdb; ipdb.set_trace()
+        return value

@@ -1,4 +1,7 @@
 
+from importlib import import_module
+
+from django.apps import apps
 from django.utils.text import capfirst
 from django.utils.html import format_html
 
@@ -49,5 +52,9 @@ def convert_boolean_to_bootstrap_icon(value):
     )
 
 
-def autodiscover_modules():
-    pass
+def autodiscover_modules(filename):
+    for app_config in apps.app_configs.values():
+        try:
+            import_module('{}.{}'.format(app_config.name, filename))
+        except ImportError:
+            pass

@@ -11,6 +11,13 @@
         click: function(event) {
             $(lookup_format_labels).removeClass(class_name);
             $(this).addClass(class_name);
+
+            var $btn_preview = $('#btn_preview');
+            if ($(this).hasClass('active_format_output') && $(this).attr('for') === 'radio_csv'){
+                $btn_preview.addClass('hidden');
+            } else {
+                $btn_preview.removeClass('hidden');
+            }
         },
 
     });

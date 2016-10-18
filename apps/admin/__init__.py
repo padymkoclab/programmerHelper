@@ -1,11 +1,12 @@
 
-
+# from .site import DefaultSiteAdmin
+# from .admin import ModelAdmin
+# from .app import AppAdmin
 from .utils import autodiscover_modules
 
 
-__all__ = []
+__all__ = ['DefaultSiteAdmin', 'AppAdmin', 'ModelAdmin']
 
 
 def autodiscover():
-    1
-    # autodiscover_modules('admin')
+    autodiscover_modules('admin')

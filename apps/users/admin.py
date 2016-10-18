@@ -8,6 +8,9 @@ from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
 from apps.polls.listfilters import IsActiveVoterListFilter
+from apps.admin.site import DefaultSiteAdmin
+from apps.admin.admin import ModelAdmin, StackedInline, TabularInline
+from apps.admin.app import AppAdmin
 
 from .actions import (
     make_users_as_non_superuser,
@@ -17,9 +20,6 @@ from .actions import (
 )
 from .forms import UserChangeForm, UserCreateAdminModelForm, LevelAdminModelForm, ProfileAdminModelForm
 from .models import User, Level, Profile
-from apps.admin.site import SiteAdmin
-from apps.admin.admin import ModelAdmin
-from apps.admin.app import AppAdmin
 from .listfilters import ListFilterLastLogin
 from .apps import UsersConfig
 
@@ -27,75 +27,66 @@ from .apps import UsersConfig
 logger = logging.getLogger('django.development')
 
 
-def register_app(class_, site=SiteAdmin):
-
-    def wrapper(class_):
-        site.register_app(class_, site)
-
-    return wrapper
-
-
-@register_app
 class UserAppAdmin(AppAdmin):
 
     app_config_class = UsersConfig
     app_icon = 'users'
 
 
-# class ProfileInline(admin.StackedInline):
+class ProfileInline(StackedInline):
 
-#     template = 'users/admin/edit_inline/stacked_OneToOne.html'
-#     model = Profile
-#     fields = (
-#         'views',
-#         'about',
-#         'signature',
-#         'presents_on_gmail',
-#         'presents_on_github',
-#         'presents_on_stackoverflow',
-#         'personal_website',
-#         'gender',
-#         'job',
-#         'location',
-#         'latitude',
-#         'longitude',
-#         'phone',
-#         'date_birthday',
-#         'real_name',
-#     )
-#     readonly_fields = (
-#         'views',
-#         'about',
-#         'signature',
-#         'presents_on_gmail',
-#         'presents_on_github',
-#         'presents_on_stackoverflow',
-#         'personal_website',
-#         'gender',
-#         'job',
-#         'location',
-#         'latitude',
-#         'longitude',
-#         'phone',
-#         'date_birthday',
-#         'real_name',
-#     )
-#     show_change_link = True
-#     verbose_name_plural = ''
+    template = 'users/admin/edit_inline/stacked_OneToOne.html'
+    model = Profile
+    fields = (
+        'views',
+        'about',
+        'signature',
+        'presents_on_gmail',
+        'presents_on_github',
+        'presents_on_stackoverflow',
+        'personal_website',
+        'gender',
+        'job',
+        'location',
+        'latitude',
+        'longitude',
+        'phone',
+        'date_birthday',
+        'real_name',
+    )
+    readonly_fields = (
+        'views',
+        'about',
+        'signature',
+        'presents_on_gmail',
+        'presents_on_github',
+        'presents_on_stackoverflow',
+        'personal_website',
+        'gender',
+        'job',
+        'location',
+        'latitude',
+        'longitude',
+        'phone',
+        'date_birthday',
+        'real_name',
+    )
+    show_change_link = True
+    verbose_name_plural = ''
 
-#     suit_classes = 'suit-tab suit-tab-profile'
+    suit_classes = 'suit-tab suit-tab-profile'
 
 
-# class UserInline(admin.TabularInline):
+class UserInline(TabularInline):
 
-#     model = User
-#     # fields = ('display_admin_change_link', 'reputation', 'date_joined')
-#     # readonly_fields = ('display_admin_change_link', 'reputation', 'date_joined')
-#     max_num = 0
-#     extra = 0
-#     can_delete = False
+    model = User
+    # fields = ('display_admin_change_link', 'reputation', 'date_joined')
+    # readonly_fields = ('display_admin_change_link', 'reputation', 'date_joined')
+    max_num = 0
+    extra = 0
+    can_delete = False
 
-#     suit_classes = 'suit-tab suit-tab-users'
+    suit_classes = 'suit-tab suit-tab-users'
 
 
 # class UserAdmin(BaseUserAdmin):
@@ -549,8 +540,15 @@ class LevelAdmin(ModelAdmin):
     def formfield_for_choice_field(self, db_field, request, **kwargs):
 
         if db_field.name == "name":
-            logger.warning('Do exclude used choices')
-        return super().formfield_for_choice_field(db_field, request, **kwargs)
+            kwargs['choices'] = (
+                ('accepted', 'Accepted'),
+                ('denied', 'Denied'),
+            )
+            if request.user.is_superuser:
+                kwargs['choices'] += (('ready', 'Ready for deployment'),)
+
+        a = super().formfield_for_choice_field(db_field, request, **kwargs)
+        return a
 
     def display_color(self, obj):
         """ """
@@ -561,3 +559,10 @@ class LevelAdmin(ModelAdmin):
         )
     display_color.short_description = Level._meta.get_field('color').verbose_name
     display_color.admin_order_field = 'color'
+
+
+DefaultSiteAdmin.register_app(UserAppAdmin)
+
+DefaultSiteAdmin.register_model(User, UserAdmin)
+DefaultSiteAdmin.register_model(Profile, ProfileAdmin)
+DefaultSiteAdmin.register_model(Level, LevelAdmin)

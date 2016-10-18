@@ -8,6 +8,7 @@ from apps.comments.admin import CommentGenericInline
 
 from apps.admin.admin import ModelAdmin
 from apps.admin.app import AppAdmin
+from apps.admin.site import DefaultSiteAdmin
 
 from .forms import ArticleAdminModelForm, SubsectionAdminModelForm
 from .formsets import SubsectionFormset
@@ -109,7 +110,6 @@ class SubsectionInline(admin.StackedInline):
     suit_classes = 'suit-tab suit-tab-subsections'
 
 
-# @admin.register(Article, site=AdminSite)
 class ArticleAdmin(ModelAdmin):
     '''
     Admin View for Article
@@ -239,3 +239,7 @@ class ArticleAdmin(ModelAdmin):
         return truncatechars(obj.name, 75)
     truncated_name.short_description = Article._meta.get_field('name').verbose_name
     truncated_name.admin_order_field = 'name'
+
+
+DefaultSiteAdmin.register_app(ArticlesAppAdmin)
+DefaultSiteAdmin.register_model(Article, ArticleAdmin)
