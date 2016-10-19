@@ -5,7 +5,7 @@ from django.conf import settings
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
 from django.contrib.auth import password_validation
 
-from utils.django.widgets import HorizontalRadioSelect, AutosizedTextarea
+from utils.django.widgets import HorizontalRadioSelect, AutosizedTextarea, DateTimeWidget, TextInputFixed
 
 from apps.admin.forms import AddChangeModelForm
 
@@ -115,47 +115,16 @@ class LevelAdminModelForm(AddChangeModelForm):
         }
 
 
-class ProfileAdminModelForm(forms.ModelForm):
+class ProfileAdminModelForm(AddChangeModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.fields['real_name'].widget.attrs['class'] = 'span12'
-        self.fields['real_name'].widget.attrs['placeholder'] = _('Enter real name')
+        # self.fields['date_birthday'].widget = forms.Textarea()
 
-        self.fields['signature'].widget.attrs['class'] = 'span12'
-        self.fields['signature'].widget.attrs['placeholder'] = _('Enter signature')
-
-        self.fields['presents_on_gmail'].widget.attrs['class'] = 'span12'
-        self.fields['presents_on_gmail'].widget.attrs['placeholder'] = _('Enter full URL')
-
-        self.fields['presents_on_github'].widget.attrs['class'] = 'span12'
-        self.fields['presents_on_github'].widget.attrs['placeholder'] = _('Enter full URL')
-
-        self.fields['presents_on_stackoverflow'].widget.attrs['class'] = 'span12'
-        self.fields['presents_on_stackoverflow'].widget.attrs['placeholder'] = _('Enter full URL')
-
-        self.fields['personal_website'].widget.attrs['class'] = 'span12'
-        self.fields['personal_website'].widget.attrs['placeholder'] = _('Enter full URL')
-
-        self.fields['location'].widget.attrs['class'] = 'span12'
-        self.fields['location'].widget.attrs['placeholder'] = _('Enter current location')
-
-        self.fields['latitude'].widget.attrs['class'] = 'span12'
-        self.fields['latitude'].widget.attrs['placeholder'] = _('Enter latitude')
-
-        self.fields['longitude'].widget.attrs['class'] = 'span12'
-        self.fields['longitude'].widget.attrs['placeholder'] = _('Enter longitude')
-
-        self.fields['job'].widget.attrs['class'] = 'span12'
-        self.fields['job'].widget.attrs['placeholder'] = _('Enter current job')
-
-        self.fields['phone'].widget.attrs['class'] = 'span6'
-        self.fields['phone'].widget.attrs['placeholder'] = _('Enter phone')
-
-    # class Meta:
-    #     widgets = {
+    class Meta:
+        widgets = {
     #         'about': CKEditorWidget(),
-    #         'date_birthday': SuitDateWidget(),
+            'date_birthday': DateTimeWidget(),
     #         'gender': HorizontalRadioSelect(),
-    #     }
+        }

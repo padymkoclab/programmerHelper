@@ -1,17 +1,25 @@
 
-<p class="lead">{{ filter_.title }}</p>
+<h3>{{ title }}</h3>
 
-{% for filter_detail in details %}
+<label for="{{ min_id }}">{{ min_label }}</label>
+<input type="text" name="{{ min_expected_parameter }}" id="{{ min_id }}" readonly="readonly" class="form-control" value="{{ min_value }}">
+<script type="text/javascript">
+    $('#{{ min_id }}').datepicker({
+        // show: true,
+        // altFormat: "yy-mm-dd",
+        dateFormat: "yy-mm-dd",
+        // altField: '[name="q"]'
+    });
+</script>
 
-    <label for="{{ filter_detail.id }}">{{ filter_detail.label }}</label>
-    <input type="text" name="{{ filter_detail.expected_parameter }}" id="{{ filter_detail.id }}" readonly="readonly" class="form-control" value="{{ filter_detail.value }}">
-    <script type="text/javascript">
-        $('#{{ filter_detail.id }}').datepicker({
-            // show: true,
-            // altFormat: "yy-mm-dd",
-            dateFormat: "yy-mm-dd",
-            // altField: '[name="q"]'
-        });
-    </script>
 
-{% endfor %}
+<label for="{{ max_id }}">{{ max_label }}</label>
+<input type="text" name="{{ max_expected_parameter }}" id="{{ max_id }}" readonly="readonly" class="form-control" value="{{ max_value }}">
+<script type="text/javascript">
+    $('#{{ max_id }}').datepicker({
+        // show: true,
+        // altFormat: "yy-mm-dd",
+        dateFormat: "yy-mm-dd",
+        // altField: '[name="q"]'
+    });
+</script>

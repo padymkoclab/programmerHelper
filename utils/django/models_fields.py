@@ -1,6 +1,8 @@
 
+import copy
 import datetime
 
+from django.core import checks
 from django import forms
 from django.utils.text import capfirst
 from django.core.exceptions import ValidationError
@@ -16,6 +18,7 @@ import markdown
 import textile
 from docutils.core import publish_parts
 
+from .forms_fields import CharFieldFixed
 from .widgets import ColorInput
 from .descriptors import ReverseOneToOneDescriptorWithAutoCreate
 
@@ -445,3 +448,44 @@ class ColorField(models.CharField):
         self.run_validators(value)
         # import ipdb; ipdb.set_trace()
         return value
+
+
+class FixedCharField(models.CharField):
+
+    description = 'CharField with fixed text'
+
+    def __init__(self, *args, **kwargs):
+        self.startswith = kwargs.pop('startswith', '')
+        super(FixedCharField, self).__init__(*args, **kwargs)
+
+    def check(self, **kwargs):
+        errors = super(FixedCharField, self).check(**kwargs)
+        errors.extend(self._check_startswith_attribute(**kwargs))
+        return errors
+
+    def _check_startswith_attribute(self, **kwargs):
+        if self.startswith is None or self.startswith == '':
+            return [
+                checks.Error(
+                    "FixedCharField must define a 'startswith' attribute.",
+                    obj=self,
+                    id='fields.E120',
+                )
+            ]
+        else:
+            return []
+
+    def deconstruct(self):
+
+        name, path, args, kwargs = super(FixedCharField, self).deconstruct()
+        kwargs.pop('startswith', None)
+        return name, path, args, kwargs
+
+    def formfield(self, **kwargs):
+
+        defaults = {
+            'form_class': CharFieldFixed,
+            'modelfield': self,
+        }
+        defaults.update(kwargs)
+        return super(FixedCharField, self).formfield(**defaults)

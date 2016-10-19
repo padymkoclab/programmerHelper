@@ -248,8 +248,11 @@ class ModelAdmin(BaseAdmin):
         fields = self.get_fields(request)
         fieldsets = self.get_fieldsets(request)
 
-        if not fields:
+        if not fields and fieldsets:
             fields = tuple(flatten([options['fields'] for label, options in fieldsets]))
+
+        readonly_fields = self.get_readonly_fields(request)
+        fields = [field for field in fields if field not in readonly_fields]
 
         if not fields:
             fields = forms.ALL_FIELDS
@@ -264,7 +267,7 @@ class ModelAdmin(BaseAdmin):
     def formfield_for_dbfield(self, db_field, request, **kwargs):
 
         if db_field.choices:
-            formfield = self.formfield_for_choice_field(db_field, request, **kwargs)
+            return self.formfield_for_choice_field(db_field, request, **kwargs)
 
         elif isinstance(db_field, (models.ForeignKey, models.ManyToManyField)):
 

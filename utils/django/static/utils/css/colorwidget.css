@@ -10,3 +10,7 @@ div.colorfield > span.input-group-addon:hover{
         padding: 0;
         margin: -5px -8px;
     }
+
+    div.colorfield > span.input-group-addon > input[type="color"]:focus{
+        visibility: hidden;
+    }

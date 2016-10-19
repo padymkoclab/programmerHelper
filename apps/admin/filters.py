@@ -127,24 +127,23 @@ class DateTimeRangeFilter(BaseFilter):
             self.lookup_until,
         )
 
-    def get_details(self, request):
+    def get_context(self, request):
 
-        return (
-            {
-                'label': _('Min'),
-                'lookup': self.lookup_since,
-                'id': '{}_{}'.format(self.field_name, self.lookup_since),
-                'expected_parameter': self.lookup_since,
-                'value': request.GET.get(self.lookup_since, ''),
-            },
-            {
-                'label': _('Max'),
-                'lookup': self.lookup_until,
-                'id': '{}_{}'.format(self.field_name, self.lookup_until),
-                'expected_parameter': self.lookup_until,
-                'value': request.GET.get(self.lookup_until, ''),
-            },
-        )
+        return {
+            'title': self.title,
+
+            'min_label': _('Min'),
+            'min_lookup': self.lookup_since,
+            'min_id': '{}_{}'.format(self.field_name, self.lookup_since),
+            'min_expected_parameter': self.lookup_since,
+            'min_value': request.GET.get(self.lookup_since, ''),
+
+            'max_label': _('Max'),
+            'max_lookup': self.lookup_until,
+            'max_id': '{}_{}'.format(self.field_name, self.lookup_until),
+            'max_expected_parameter': self.lookup_until,
+            'max_value': request.GET.get(self.lookup_until, ''),
+        }
 
 
 class RelatedOnlyFieldListFilter(BaseFilter):
@@ -160,10 +159,10 @@ class RelatedOnlyFieldListFilter(BaseFilter):
     def expected_parameters(self):
         return (self.lookup_related_field, )
 
-    def value(self, request):
+    def get_value(self, request):
         return request.GET.get(self.lookup_related_field, '')
 
-    def choices(self, request):
+    def get_choices(self, request):
 
         pks_related_objects = self.model._base_manager.values(self.field_name)
         choices = self.field.get_choices(
@@ -185,11 +184,34 @@ class RelatedOnlyFieldListFilter(BaseFilter):
             })
         return choices2
 
-    def get_details(self, request):
+    def get_context(self, request):
 
         return (
             {
                 'expected_parameter': self.lookup_related_field,
-                'choices': self.choices(request),
+                'choices': self.get_choices(request),
             }
         )
+
+
+class ChoiceFilter(BaseFilter):
+
+    template = 'admin/admin/filters/choicefilter.html'
+
+    @property
+    def expected_parameters(self):
+
+        return (self.field_name, )
+
+    def get_choices(self, request):
+
+        return self.field.get_choices()
+
+    def get_context(self, request):
+
+        return {
+            'expected_parameter': self.field_name,
+            'choices': self.get_choices(request),
+            'current_value': request.GET.get(self.field_name, ''),
+            'title': self.title,
+        }

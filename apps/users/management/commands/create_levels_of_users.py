@@ -3,8 +3,8 @@ import logging
 
 from django.core.management.base import BaseCommand
 
-from apps.users.factories import LevelFactory
-from apps.users.constants import USER_LEVEL_DATAS
+from ...constants import LEVELS
+from ...factories import LevelFactory
 
 
 logger = logging.getLogger('django.development')
@@ -18,8 +18,12 @@ class Command(BaseCommand):
 
         LevelModel = LevelFactory._meta.model
 
-        if not LevelModel.objects.count():
-            for obj in USER_LEVEL_DATAS:
-                LevelFactory(name=obj.name, color=obj.color, description=obj.description)
-            logger.info('Created levels for users.')
-        logger.debug('Levels of users already exists.')
+        for attrs in LEVELS:
+            LevelModel._default_manager.update_or_create(
+                name=attrs['name'],
+                defaults={
+                    'color': attrs['color'],
+                    'description': attrs['description'],
+                }
+            )
+        logger.info('Created/updated levels for users.')

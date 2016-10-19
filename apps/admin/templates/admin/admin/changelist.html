@@ -38,47 +38,45 @@
   {% endblock toolbox %}
 
   {% block searchbox %}
-
+<form action="" class="" method="GET" id="">
     {% if model_admin.get_search_fields %}
 
       <div id="div_model_searchbox">
           <div class="row">
             <div class="col-xs-10">
-                <form action="" class="" method="GET" id="form_changelist">
 
-                    <p class="help-block unselectable_text" id="toggle_search_details">
-                    {% blocktrans trimmed %}
-                        Click here for show/hide details of a search
-                    {% endblocktrans %}</p>
+                <p class="help-block unselectable_text" id="toggle_search_details">
+                {% blocktrans trimmed %}
+                    Click here for show/hide details of a search
+                {% endblocktrans %}</p>
 
-                    <table class="table" id="table_search_details">
-                        <thead>
+                <table class="table" id="table_search_details">
+                    <thead>
+                        <tr>
+                            <th>{% trans "Field" %}</th>
+                            <th>{% trans "Type search" %}</th>
+                            <th>{% trans "Ignorecase" %}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for search_detail in search_details %}
                             <tr>
-                                <th>{% trans "Field" %}</th>
-                                <th>{% trans "Type search" %}</th>
-                                <th>{% trans "Ignorecase" %}</th>
+                                <td>{{ search_detail.field_name }}</td>
+                                <td>{{ search_detail.type_search }}</td>
+                                <td>{{ search_detail.ignorecase|as_bootstrap_logic_icon }}</td>
                             </tr>
-                        </thead>
-                        <tbody>
-                            {% for search_detail in search_details %}
-                                <tr>
-                                    <td>{{ search_detail.field_name }}</td>
-                                    <td>{{ search_detail.type_search }}</td>
-                                    <td>{{ search_detail.ignorecase|as_bootstrap_logic_icon }}</td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+                        {% endfor %}
+                    </tbody>
+                </table>
 
-                    <div class="input-group">
-                      <input type="search" class="form-control" placeholder="{% trans 'Search for ...' %}" aria-describedby="#searchbox_span_icon" name="q" value="{{ q }}">
-                      <span class="input-group-btn">
-                        <button type="submit" class="btn btn-default">
-                          <span class="glyphicon glyphicon-search"></span>
-                        </button>
-                      </span>
-                    </div>
-                </form>
+                <div class="input-group">
+                  <input type="search" class="form-control" placeholder="{% trans 'Search for ...' %}" aria-describedby="#searchbox_span_icon" name="q" value="{{ q }}">
+                  <span class="input-group-btn">
+                    <button type="submit" class="btn btn-default">
+                      <span class="glyphicon glyphicon-search"></span>
+                    </button>
+                  </span>
+                </div>
             </div>
           </div>
       </div>
@@ -90,8 +88,7 @@
       <div id="div_filters">
          {% if filters %}
           <div class="row">
-              <div id="display_filters">
-                <form action="" method="GET">
+              <div id="display_filters" class="hidden">
                   <div class="col-sm-12 text-center">
                       <button id="btn_hide_filters" class="btn btn-info btn-block" type="button">{% trans "Hide filters" %}</button>
                       <button id="btn_apply_filters" class="btn btn-success btn-block" type="submit">{% trans "Apply filters" %}</button>
@@ -102,9 +99,8 @@
                       {% display_admin_filter filter_ %}
                   </div>
                   {% endfor %}
-                </form>
               </div>
-              <div id="hidden_filters" class="hidden">
+              <div id="hidden_filters">
                   <p id="btn_show_filters">
                       {% trans "Show filters" %}
                   </p>
@@ -120,7 +116,6 @@
       <div id="div_actions_and_display_control">
         <div class="row">
           <div class="col-xs-12 col-sm-8">
-            <form action="" method="POST" class="form-horizontal" id="form_actions">{% csrf_token %}
               <table>
                 <tbody>
                   <tr>
@@ -146,18 +141,15 @@
                   </tr>
                 </tbody>
               </table>
-            </form>
           </div>
           <div class="col-xs-12 col-sm-4">
-            <form action="" class="form-horizontal" method="GET">
               <div class="form-group">
                 <label class="control-label col-xs-4" for="list_per_page">{% trans "List per page" %}</label>
                 <div class="col-xs-4">
-                  <input type="number" name="list_per_page" id="list_per_page" value="{{ list_per_page }}" min="1" max="{{ page_object_list.paginator.count }}" class="form-control" form="form_changelist">
+                  <input type="number" name="list_per_page" id="list_per_page" value="{{ list_per_page }}" min="1" max="{{ page_object_list.paginator.count }}" class="form-control">
                 </div>
-                <input type="submit" form="form_changelist" value='{% trans "Change it" %}' class="btn btn-default">
+                <input type="submit" value='{% trans "Change it" %}' class="btn btn-default">
               </div>
-            </form>
           </div>
         </div>
       </div>
@@ -253,6 +245,8 @@
     </div>
   {% endif %}
 {% endblock content %}
+
+</form>
 
 {% block extra_js %}
   {{ block.super }}

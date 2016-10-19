@@ -65,7 +65,7 @@ class ActiveFormField:
 
 class ReadonlyField:
 
-    ATTR_ERROR_MSG = 'Intance or admin model class has not attribute "{}"'
+    ATTR_ERROR_MSG = 'Instance or admin model class has not attribute "{}"'
 
     def __init__(self, form, field_name, model_admin):
         self.field_name = field_name

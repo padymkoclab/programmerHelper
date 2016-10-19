@@ -1,6 +1,7 @@
 
 import logging
 
+from django.db.models.fields import BLANK_CHOICE_DASH
 from django.core.urlresolvers import reverse
 from django.conf.urls import url
 from django.utils.html import format_html
@@ -18,6 +19,7 @@ from .actions import (
     make_users_as_non_active,
     make_users_as_active,
 )
+from .constants import LEVELS
 from .forms import UserChangeForm, UserCreateAdminModelForm, LevelAdminModelForm, ProfileAdminModelForm
 from .models import User, Level, Profile
 from .listfilters import ListFilterLastLogin
@@ -41,9 +43,9 @@ class ProfileInline(StackedInline):
         'views',
         'about',
         'signature',
-        'presents_on_gmail',
-        'presents_on_github',
-        'presents_on_stackoverflow',
+        'on_gmail',
+        'on_github',
+        'on_stackoverflow',
         'personal_website',
         'gender',
         'job',
@@ -58,9 +60,9 @@ class ProfileInline(StackedInline):
         'views',
         'about',
         'signature',
-        'presents_on_gmail',
-        'presents_on_github',
-        'presents_on_stackoverflow',
+        'on_gmail',
+        'on_github',
+        'on_stackoverflow',
         'personal_website',
         'gender',
         'job',
@@ -75,18 +77,6 @@ class ProfileInline(StackedInline):
     verbose_name_plural = ''
 
     suit_classes = 'suit-tab suit-tab-profile'
-
-
-class UserInline(TabularInline):
-
-    model = User
-    # fields = ('display_admin_change_link', 'reputation', 'date_joined')
-    # readonly_fields = ('display_admin_change_link', 'reputation', 'date_joined')
-    max_num = 0
-    extra = 0
-    can_delete = False
-
-    suit_classes = 'suit-tab suit-tab-users'
 
 
 # class UserAdmin(BaseUserAdmin):
@@ -428,37 +418,37 @@ class ProfileAdmin(ModelAdmin):
     )
 
     form = ProfileAdminModelForm
-    fieldsets = (
-        (
-            None, {
-                'fields': (
-                    'get_user__display_avatar',
-                    # 'views',
-                    'signature',
-                    'presents_on_gmail',
-                    'presents_on_github',
-                    'presents_on_stackoverflow',
-                    'personal_website',
-                    'gender',
-                    'job',
-                    'location',
-                    ('longitude', 'latitude'),
-                    'date_birthday',
-                    'real_name',
-                    'phone',
-                    # 'updated',
-                ),
-            }
-        ),
-        (
-            None, {
-                'classes': ('full-width', ),
-                'fields': (
-                    'about',
-                )
-            }
+
+    def get_fieldsets(self, request, obj=None):
+
+        fieldsets = (
+            (
+                Profile._meta.verbose_name, {
+                    'fields': (
+                        'get_user__display_avatar',
+                        'about',
+                        # 'views',
+                        'signature',
+                        'on_gmail',
+                        'on_github',
+                        'on_stackoverflow',
+                        'personal_website',
+                        'gender',
+                        'job',
+                        'location',
+                        # ('longitude', 'latitude'),
+                        'longitude',
+                        'latitude',
+                        'date_birthday',
+                        'real_name',
+                        'phone',
+                        # 'updated',
+                    ),
+                }
+            ),
         )
-    )
+
+        return fieldsets
 
     def determinate_color_rows(self, obj):
         percentage_filling = obj.get_percentage_filling()
@@ -480,6 +470,21 @@ class ProfileAdmin(ModelAdmin):
     def get_user__get_full_name(self, obj):
         return obj.user.get_full_name()
     get_user__get_full_name.short_description = _('User')
+
+
+class UserInline(TabularInline):
+
+    model = User
+    fields = ('get_full_name', 'reputation', 'date_joined')
+    readonly_fields = ('get_full_name', 'reputation', 'date_joined')
+    readonly_fields_tabular_align = {
+        'get_full_name': 'left',
+        'reputation': 'center',
+        'date_joined': 'right',
+    }
+    max_num = 0
+    extra = 0
+    can_delete = False
 
 
 class LevelAdmin(ModelAdmin):
@@ -520,15 +525,8 @@ class LevelAdmin(ModelAdmin):
                     'color',
                     'description',
                 ),
-                'classes': ('suit-tab suit-tab-general', )
             },
         ),
-    )
-    # inlines = [UserInline]
-
-    suit_form_tabs = (
-        ('general', _('General')),
-        ('users', _('Users')),
     )
 
     def get_queryset(self, request):
@@ -540,15 +538,29 @@ class LevelAdmin(ModelAdmin):
     def formfield_for_choice_field(self, db_field, request, **kwargs):
 
         if db_field.name == "name":
-            kwargs['choices'] = (
-                ('accepted', 'Accepted'),
-                ('denied', 'Denied'),
-            )
-            if request.user.is_superuser:
-                kwargs['choices'] += (('ready', 'Ready for deployment'),)
+            qs = self.get_queryset(request)
+            pk = request.resolver_match.kwargs.get('pk')
+            if pk is not None:
+                qs = qs.exclude(pk=pk)
+            used_level_names = qs.values_list('name', flat=True)
+            unused_level_names = [
+                choice for choice in db_field.model.CHOICES_LEVEL
+                if choice[0] not in used_level_names
+            ]
 
-        a = super().formfield_for_choice_field(db_field, request, **kwargs)
-        return a
+            unused_level_names.insert(0, BLANK_CHOICE_DASH[0])
+
+            kwargs['choices'] = unused_level_names
+
+        return super().formfield_for_choice_field(db_field, request, **kwargs)
+
+    def get_inline_instances(self, request, obj=None):
+
+        if obj is None:
+            return []
+
+        inlines = [UserInline]
+        return [inline(self.model, self.site_admin) for inline in inlines]
 
     def display_color(self, obj):
         """ """

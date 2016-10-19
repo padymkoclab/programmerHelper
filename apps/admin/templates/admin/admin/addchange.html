@@ -100,7 +100,7 @@
                         ({{ counter }} errors)
                     {% endblocktrans %}
                 {% endif %}
-        </span>
+            </span>
         </a>
       </li>
       {% endfor %}
@@ -200,5 +200,6 @@ Made own templatetag for addons
 
 {% block extra_js %}
     {{ block.super }}
+    <script src="{% static 'admin/admin/js/checkboxes_selected.js' %}" charset="utf-8"></script>
     <script src="{% static 'admin/admin/js/addchange.js' %}" charset="utf-8"></script>
 {% endblock extra_js %}

@@ -44,3 +44,8 @@ div[id^=fieldset]{
 .object_panel a[data-toggle="collapse"]:link{
     text-decoration: none;
 }
+
+
+table.tabular_table{
+    background-color: #f7f7f7;
+}

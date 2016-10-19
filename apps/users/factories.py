@@ -1,6 +1,8 @@
 
+import uuid
 import random
 
+from django.utils.text import slugify
 from django.utils import timezone
 
 import factory
@@ -71,19 +73,22 @@ class ProfileFactory(factory.DjangoModelFactory):
     @factory.lazy_attribute
     def presents_on_gmail(self):
         if random.random() > .5:
-            return'https://google.com/' + factory.Faker('user_name').generate([]).lower()
+            return str(uuid.uuid1().int)[:21]
         return ''
 
     @factory.lazy_attribute
     def presents_on_github(self):
         if random.random() > .5:
-            return'https://github.com/' + factory.Faker('user_name').generate([]).lower()
+            return slugify(factory.Faker('name').generate([]))
         return ''
 
     @factory.lazy_attribute
     def presents_on_stackoverflow(self):
         if random.random() > .5:
-            return'https://stackoverflow.com/' + factory.Faker('user_name').generate([]).lower()
+            user_id = random.sample(str(uuid.uuid1().int), random.randint(5, 10))
+            user_id = ''.join(user_id)
+            user_name = slugify(factory.Faker('name').generate([]))
+            return '{}/{}'.format(user_id, user_name)
         return ''
 
     @factory.lazy_attribute

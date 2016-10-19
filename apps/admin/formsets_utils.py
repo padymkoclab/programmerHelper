@@ -1,4 +1,5 @@
 
+import uuid
 import datetime
 
 from django.db import models
@@ -22,6 +23,8 @@ class InlineFormset(object):
         self.empty_form = self.formset.empty_form
         self.prefix = self.formset.prefix
 
+        self.id = uuid.uuid1()
+
     def __iter__(self):
         for form in self.formset:
 
@@ -36,6 +39,31 @@ class InlineFormset(object):
                 readonly_fields,
             )
 
+    @property
+    def fieldnames(self):
+        editable_fields = self.inline.get_fields(self.request)
+        readonly_fields = self.inline.get_readonly_fields(self.request)
+        raw_fieldnames = editable_fields + tuple(field for field in readonly_fields if field not in editable_fields)
+
+        fieldnames = list()
+        model = self.inline.model
+        for fieldname in raw_fieldnames:
+
+            # field or method of a instance or method admin inline model
+            field = getattr(model, fieldname, None)
+
+            if callable(field):
+                label = pretty_label_or_short_description(field)
+            elif hasattr(field, 'field_name'):
+                label = model._meta.get_field(fieldname).verbose_name
+            else:
+                method = getattr(self.inline, fieldname)
+                label = pretty_label_or_short_description(method)
+
+            fieldnames.append(label)
+
+        return fieldnames
+
 
 class InlineFormsetForm(object):
 
@@ -45,7 +73,7 @@ class InlineFormsetForm(object):
         self.fields = fields
         self.readonly_fields = readonly_fields
 
-        self.all_fields = self.fields + [field.name for field in self.form.hidden_fields()]
+        self.all_fields = list(self.fields) + [field.name for field in self.form.hidden_fields()]
 
         self.instance = self.form.instance
         self.non_field_errors = self.form.non_field_errors

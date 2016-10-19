@@ -31,7 +31,7 @@ from django.utils.encoding import force_text
 from utils.django.views_mixins import ContextTitleMixin
 from utils.python.utils import get_filename_with_datetime
 
-from .filters import DateTimeRangeFilter, RelatedOnlyFieldListFilter
+from .filters import DateTimeRangeFilter, RelatedOnlyFieldListFilter, ChoiceFilter
 from .forms_utils import BootstrapErrorList
 from .forms import LoginForm, AddChangeDisplayForm, ImportForm, InlinesFormsets
 from .utils import get_field_verbose_name_from_lookup
@@ -87,17 +87,20 @@ class LoginView(ContextTitleMixin, generic.FormView):
     title = _('Login')
 
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+        context = super(LoginView, self).get_context_data(**kwargs)
         return context
 
     def form_valid(self, form):
 
         login(self.request, form.get_user())
 
-        return super().form_valid(form)
+        return super(LoginView, self).form_valid(form)
 
     def get_success_url(self):
-        return reverse('admin:index')
+
+        index_url = reverse('admin:index')
+        next_url = self.request.GET.get('next', index_url)
+        return next_url
 
 
 class LogoutView(generic.RedirectView):
@@ -304,16 +307,17 @@ class ChangeListView(SiteModelAdminMixin, SiteAdminView):
         ordering = self.get_ordering()
         qs = qs.order_by(*ordering)
 
-        # send message
-        count = qs.count()
-        object_name = self.model_meta.verbose_name if count == 1 else self.model_meta.verbose_name_plural
-        object_name = object_name.lower()
-        msg = ungettext(
-            'Found {} {}',
-            'Found {} {}',
-            count
-        ).format(count, object_name)
-        self.model_admin.message_user(request, msg, extra_tags='info', level='INFO')
+        # send message only if applyed a search or a filter or after delete
+        if request.GET:
+            count = qs.count()
+            object_name = self.model_meta.verbose_name if count == 1 else self.model_meta.verbose_name_plural
+            object_name = object_name.lower()
+            msg = ungettext(
+                'Found {} {}',
+                'Found {} {}',
+                count
+            ).format(count, object_name)
+            self.model_admin.message_user(request, msg, extra_tags='info', level='INFO')
 
         return qs
 
@@ -449,7 +453,11 @@ class ChangeListView(SiteModelAdminMixin, SiteAdminView):
 
                 field = self.model_meta.get_field(field_name)
 
-                if isinstance(field, (models.DateTimeField, models.DateField)):
+                if isinstance(field, (models.CharField)):
+
+                    filter_ = ChoiceFilter(field_name, field, self.model_meta.model)
+
+                elif isinstance(field, (models.DateTimeField, models.DateField)):
 
                     filter_ = DateTimeRangeFilter(field_name, field, self.model_meta.model)
 

@@ -281,3 +281,35 @@ class ReadOnlyWidget(forms.Widget):
 
     def render(self, name, value, attrs=None):
         return value
+
+
+class DateTimeWidget(forms.TextInput):
+
+    def render(self, name, value, attrs=None):
+        css_class = 'datetime_widget'
+        input_id = attrs['id']
+        attrs['class'] = 'form-control {}'.format(css_class)
+        output = super(DateTimeWidget, self).render(name, value, attrs)
+
+        output += "<script type='text/javascript'>$('input#{}.{}').datepicker();</script>".format(input_id, css_class)
+        return output
+
+
+class TextInputFixed(forms.TextInput):
+
+    def __init__(self, *args, **kwargs):
+        super(TextInputFixed, self).__init__(*args, **kwargs)
+
+    def render(self, name, value, attrs=None):
+
+        output = super(TextInputFixed, self).render(name, value, attrs)
+        startswith = self.modelfield.startswith
+
+        output = """
+        <div class="input-group">
+            <span class="input-group-addon">{}</span>
+             {}
+        </div>
+        """.format(startswith, output)
+
+        return mark_safe(output)

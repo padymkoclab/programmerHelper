@@ -1,0 +1,7 @@
+
+<h4>{{ title }}</h4>
+<select class="form-control" name="{{ expected_parameter }}">
+    {% for value, label in choices %}
+        <option value="{{ value }}" {% if current_value == value %}selected{% endif %}>{{ label }}</option>
+    {% endfor %}
+</select>

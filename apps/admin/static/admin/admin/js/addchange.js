@@ -134,4 +134,8 @@
         change_count_total_form($input_total_forms, 'deleted');
     });
 
+    /*
+    */
+    $('table.tabular_table input.switch_all_checkboxes').change_status_all_checkboxes();
+
 })(jQuery, _);

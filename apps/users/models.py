@@ -20,7 +20,7 @@ from django.conf import settings
 from django.core.cache import cache
 # from django.contrib.auth import password_validation
 
-from utils.django.models_fields import ConfiguredAutoSlugField, PhoneField, AutoOneToOneField, ColorField
+from utils.django import models_fields as utils_models_fields
 from utils.django.models_utils import get_admin_url
 
 from apps.tags.models import Tag
@@ -94,11 +94,11 @@ class Level(models.Model):
         choices=CHOICES_LEVEL, unique=True,
         error_messages={'unique': _('Level with name already exists.')}
     )
-    slug = ConfiguredAutoSlugField(populate_from='name', unique=True)
+    slug = utils_models_fields.ConfiguredAutoSlugField(populate_from='name', unique=True)
     description = models.TextField(
         _('Description'), validators=[MinLengthValidator(10)]
     )
-    color = ColorField(
+    color = utils_models_fields.ColorField(
         _('Color'), max_length=50,
         help_text=_('Choice color in hex format'),
         unique=True,
@@ -225,17 +225,11 @@ class User(AbstractBaseUser, PermissionsMixin):
     # def clean(self):
     #     pass
 
-    def display_admin_change_link(self):
-        """ """
-
-        return format_html('<a href="{}">{}</a>', self.get_admin_url(), self.get_full_name())
-    display_admin_change_link.short_description = _('User')
-
     def get_full_name(self):
         """ """
 
         return '{0} ({0.email})'.format(self)
-    get_full_name.short_description = _('Full name')
+    get_full_name.short_description = Meta.verbose_name
     # get_full_name.admin_order_field = 'username'
 
     def get_short_name(self):
@@ -594,7 +588,7 @@ class Profile(models.Model):
     )
 
     id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
-    user = AutoOneToOneField(
+    user = utils_models_fields.AutoOneToOneField(
         'User', related_name='profile',
         verbose_name=_('User'), on_delete=models.CASCADE
     )
@@ -607,9 +601,21 @@ class Profile(models.Model):
 
     about = models.TextField(_('About self'), default='', blank=True)
     signature = models.CharField(_('Signature'), max_length=50, default='', blank=True)
-    presents_on_gmail = models.URLField(_('Presents on google services'), default='', blank=True)
-    presents_on_github = models.URLField(_('Presents on GitHub'), default='', blank=True)
-    presents_on_stackoverflow = models.URLField(_('Presents on stackoverflow.com'), default='', blank=True)
+    on_gmail = utils_models_fields.FixedCharField(
+        _('Presents on google services'),
+        default='', blank=True, max_length=200,
+        startswith='https://plus.google.com/u/0/',
+    )
+    on_github = utils_models_fields.FixedCharField(
+        _('Presents on GitHub'),
+        default='', blank=True, max_length=200,
+        startswith='https://github.com/',
+    )
+    on_stackoverflow = utils_models_fields.FixedCharField(
+        _('Presents on stackoverflow.com'),
+        default='', blank=True, max_length=200,
+        startswith='https://stackoverflow.com/',
+    )
     personal_website = models.URLField(_('Personal website'), default='', blank=True)
     gender = models.CharField(
         _('Gender'), max_length=10, choices=CHOICES_GENDER,
@@ -630,9 +636,13 @@ class Profile(models.Model):
         _('Date birthday'), null=True, blank=True,
         help_text=_('Only used for displaying age'))
     real_name = models.CharField(_('Real name'), max_length=200, default='', blank=True)
-    phone = PhoneField(_('Phone'), default='', blank=True)
+    phone = utils_models_fields.PhoneField(_('Phone'), default='', blank=True)
 
     updated = models.DateTimeField(_('Updated'), auto_now=True)
+
+    class Meta:
+        verbose_name = _('Profile')
+        verbose_name_plural = _('Profiles')
 
     def __str__(self):
         return '{}'.format('Error')
@@ -644,7 +654,6 @@ class Profile(models.Model):
     def get_admin_url(self):
         return get_admin_url(self)
 
-    @property
     def last_seen(self):
 
         key = 'LastSeenUser{}'.format(self.user.pk)
@@ -653,6 +662,9 @@ class Profile(models.Model):
         if date_last_seen is not None:
             return date_last_seen
         return
+    last_seen.admin_order_field = 'last_seen'
+    last_seen.short_description = _('Last seen')
+    last_seen = property(last_seen)
 
     def get_percentage_filling(self):
         """Getting percent filled profile of user."""
@@ -663,9 +675,9 @@ class Profile(models.Model):
         considering_fields = (
             'about',
             'signature',
-            'presents_on_gmail',
-            'presents_on_github',
-            'presents_on_stackoverflow',
+            'on_gmail',
+            'on_github',
+            'on_stackoverflow',
             'personal_website',
             'job',
             'location',
