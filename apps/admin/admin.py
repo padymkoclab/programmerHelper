@@ -206,6 +206,7 @@ class ModelAdmin(BaseAdmin):
 
     def get_list_display(self):
 
+        # !Solutions for user model
         return self.list_display
 
     def has_module_permissions(self, request):
