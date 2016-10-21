@@ -7,7 +7,9 @@ import hashlib
 import random
 import uuid
 
+from django import template
 from django.utils.html import format_html
+from django.utils.safestring import mark_safe
 from django.core.validators import MinLengthValidator
 from django.utils import timezone
 from importlib import import_module
@@ -625,10 +627,10 @@ class Profile(models.Model):
         _('Job'), max_length=100, default='', blank=True,
     )
 
-    location = models.CharField(_('Location'), max_length=50, default='', blank=True)
-    latitude = models.FloatField(_('Latitude'), blank=True, null=True)
-    longitude = models.FloatField(_('Longitude'), blank=True, null=True)
+    latitude = models.FloatField(_('Latitude'), editable=False)
+    longitude = models.FloatField(_('Longitude'), editable=False)
 
+    show_location = models.BooleanField(_('Show location?'), default=False)
     # show_email = models.BooleanField(_('Show email'), default=True)
 
     # private info
@@ -666,6 +668,15 @@ class Profile(models.Model):
     last_seen.short_description = _('Last seen')
     last_seen = property(last_seen)
 
+    def display_location(self):
+
+        template_ = template.Template(" {% load users_tags %}{% display_user_location user %}")
+        context_ = template.Context({
+            'user': self,
+        })
+        return template_.render(context=context_)
+    display_location.short_description = _('Location')
+
     def get_percentage_filling(self):
         """Getting percent filled profile of user."""
 
@@ -680,7 +691,7 @@ class Profile(models.Model):
             'on_stackoverflow',
             'personal_website',
             'job',
-            'location',
+            # 'location',
             'latitude',
             'longitude',
             'date_birthday',

@@ -49,7 +49,7 @@ class ProfileInline(StackedInline):
         'personal_website',
         'gender',
         'job',
-        'location',
+        # 'location',
         'latitude',
         'longitude',
         'phone',
@@ -66,7 +66,7 @@ class ProfileInline(StackedInline):
         'personal_website',
         'gender',
         'job',
-        'location',
+        # 'location',
         'latitude',
         'longitude',
         'phone',
@@ -409,6 +409,10 @@ class ProfileAdmin(ModelAdmin):
     readonly_fields = (
         'get_user__display_avatar',
         'get_user__get_full_name',
+        'display_location',
+        'longitude',
+        'views',
+        'latitude',
     )
     search_fields = ('user', )
     date_hierarchy = 'updated'
@@ -427,7 +431,7 @@ class ProfileAdmin(ModelAdmin):
                     'fields': (
                         'get_user__display_avatar',
                         'about',
-                        # 'views',
+                        'views',
                         'signature',
                         'on_gmail',
                         'on_github',
@@ -435,7 +439,7 @@ class ProfileAdmin(ModelAdmin):
                         'personal_website',
                         'gender',
                         'job',
-                        'location',
+                        'display_location',
                         # ('longitude', 'latitude'),
                         'longitude',
                         'latitude',

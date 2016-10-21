@@ -71,19 +71,19 @@ class ProfileFactory(factory.DjangoModelFactory):
         return ''
 
     @factory.lazy_attribute
-    def presents_on_gmail(self):
+    def on_gmail(self):
         if random.random() > .5:
             return str(uuid.uuid1().int)[:21]
         return ''
 
     @factory.lazy_attribute
-    def presents_on_github(self):
+    def on_github(self):
         if random.random() > .5:
             return slugify(factory.Faker('name').generate([]))
         return ''
 
     @factory.lazy_attribute
-    def presents_on_stackoverflow(self):
+    def on_stackoverflow(self):
         if random.random() > .5:
             user_id = random.sample(str(uuid.uuid1().int), random.randint(5, 10))
             user_id = ''.join(user_id)
@@ -114,28 +114,16 @@ class ProfileFactory(factory.DjangoModelFactory):
 
     @factory.lazy_attribute
     def longitude(self):
-        if random.random() > .5:
-            return factory.Faker('longitude').generate([])
-        return
+        return factory.Faker('longitude').generate([])
 
     @factory.lazy_attribute
     def latitude(self):
-        if random.random() > .5:
-            return factory.Faker('latitude').generate([])
-        return
+        return factory.Faker('latitude').generate([])
 
     @factory.lazy_attribute
     def real_name(self):
         if random.random() > .5:
             return factory.Faker('name', 'ru').generate([])
-        return ''
-
-    @factory.lazy_attribute
-    def location(self):
-        if random.random() > .5:
-            city = factory.Faker('city').generate([])
-            country = factory.Faker('country').generate([])
-            return '{}, {}'.format(city, country)
         return ''
 
     @factory.lazy_attribute
