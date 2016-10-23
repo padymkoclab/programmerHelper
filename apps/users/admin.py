@@ -46,7 +46,7 @@ class ProfileInline(StackedInline):
         'on_gmail',
         'on_github',
         'on_stackoverflow',
-        'personal_website',
+        'website',
         'gender',
         'job',
         # 'location',
@@ -63,7 +63,7 @@ class ProfileInline(StackedInline):
         'on_gmail',
         'on_github',
         'on_stackoverflow',
-        'personal_website',
+        'website',
         'gender',
         'job',
         # 'location',
@@ -95,18 +95,26 @@ class UserAdmin(ModelAdmin):
     )
 
     # set it value in empty, since it should be change in following views
+    # list_display = (
+    #     'alias',
+    #     'username',
+    #     'email',
+    #     'level',
+    #     'reputation',
+    #     'is_active',
+    #     'is_superuser',
+    #     'last_login',
+    #     'date_joined',
+    # )
     list_display = (
-        'alias',
-        'username',
-        'email',
-        'level',
-        'reputation',
-        'is_active',
-        'is_superuser',
-        'last_login',
-        'date_joined',
+        (
+            None, (
+                '__str__',
+            )
+        ),
     )
 
+    list_display_links = ('alias', )
     list_display_styles = (
         (
             ('__all__', ), {
@@ -124,11 +132,11 @@ class UserAdmin(ModelAdmin):
         # ('level', admin.RelatedOnlyFieldListFilter),
         # ('is_active', admin.BooleanFieldListFilter),
         # ('is_superuser', admin.BooleanFieldListFilter),
-        ListFilterLastLogin,
+        # ListFilterLastLogin,
         # ('date_joined', admin.DateFieldListFilter),
     ]
     ordering = ('date_joined', )
-
+    list_per_page = 10
     search_fields = ('alias', 'email', 'username')
     date_hierarchy = 'date_joined'
 
@@ -384,8 +392,6 @@ class ProfileAdmin(ModelAdmin):
         'updated',
     )
 
-    # disabled_urls = ('add', 'delete')
-
     list_display_styles = (
         (
             ('updated', 'last_seen'), {
@@ -412,6 +418,7 @@ class ProfileAdmin(ModelAdmin):
         'display_location',
         'longitude',
         'views',
+        'updated',
         'latitude',
     )
     search_fields = ('user', )
@@ -427,26 +434,38 @@ class ProfileAdmin(ModelAdmin):
 
         fieldsets = (
             (
-                Profile._meta.verbose_name, {
+                _('Public information'), {
                     'fields': (
                         'get_user__display_avatar',
                         'about',
+                        'crafts',
                         'views',
                         'signature',
                         'on_gmail',
                         'on_github',
                         'on_stackoverflow',
-                        'personal_website',
+                        'website',
+                    ),
+                }
+            ),
+            (
+                _('Private information'), {
+                    'fields': (
+                        'display_location',
                         'gender',
                         'job',
-                        'display_location',
-                        # ('longitude', 'latitude'),
-                        'longitude',
-                        'latitude',
                         'date_birthday',
                         'real_name',
                         'phone',
-                        # 'updated',
+                        'updated',
+                    ),
+                }
+            ),
+            (
+                _('Preferences'), {
+                    'fields': (
+                        'show_email',
+                        'show_location',
                     ),
                 }
             ),

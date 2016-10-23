@@ -140,7 +140,6 @@ class ChangeListView(SiteModelAdminMixin, SiteAdminView):
         super().__init__(*args, **kwargs)
 
         self.model_meta = self.model_admin.model._meta
-        self.list_per_page = self.model_admin.list_per_page
 
         self.expected_parameters = set()
         self.filters = list()
@@ -174,7 +173,7 @@ class ChangeListView(SiteModelAdminMixin, SiteAdminView):
 
     def get(self, request, *args, **kwargs):
 
-        self.set_filters()
+        #self.set_filters()
 
         return self.render_to_response(request)
 
@@ -308,7 +307,7 @@ class ChangeListView(SiteModelAdminMixin, SiteAdminView):
         qs = qs.order_by(*ordering)
 
         # send message only if applyed a search or a filter or after delete
-        if request.GET:
+        if 'q' in request.GET:
             count = qs.count()
             object_name = self.model_meta.verbose_name if count == 1 else self.model_meta.verbose_name_plural
             object_name = object_name.lower()
@@ -343,6 +342,7 @@ class ChangeListView(SiteModelAdminMixin, SiteAdminView):
 
         qs = self.get_queryset(self.request)
 
+        self.list_per_page = self.model_admin.list_per_page
         list_per_page = self.request.GET.get('list_per_page', self.list_per_page)
         list_per_page = int(list_per_page)
 
@@ -377,6 +377,7 @@ class ChangeListView(SiteModelAdminMixin, SiteAdminView):
             'ordering': self.get_ordering(),
             'filters': self.filters,
             'search_details': self.get_search_details(),
+            'list_display': self.model_admin.get_list_display(),
         })
 
         return context

@@ -1,4 +1,7 @@
 
+import traceback
+import sys
+import inspect
 import time
 
 from django.db import connection
@@ -70,3 +73,23 @@ class CountQueriesMiddleware(object):
         # Add the header.
         # response["X-Page-Generation-Duration-ms"] = int(duration * 1000)
         return response
+
+
+class DebugMiddleware(object):
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+
+        response = self.get_response(request)
+
+        return response
+
+    def process_exception(self, request, exception):
+
+        tb = sys.exc_info()[2]
+
+        # only is 500 error
+        #exception.template_debug['name']
+        #exception.template_debug['line']

@@ -23,7 +23,10 @@ DATABASES = {
 }
 
 
-MIDDLEWARE += ['debug_toolbar.middleware.DebugToolbarMiddleware']
+MIDDLEWARE += [
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
+    'utils.django.middleware.DebugMiddleware',
+]
 
 
 INSTALLED_APPS += [

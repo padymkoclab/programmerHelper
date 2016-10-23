@@ -64,4 +64,4 @@ var show_usage_js_callback = function(){
 
 
 // show_usage_js_callback();
-show_usage_js_promises()
+// show_usage_js_promises()

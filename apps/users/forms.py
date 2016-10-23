@@ -1,11 +1,14 @@
 
+from django.utils.html import format_html
+from django.utils.text import force_text
+from django.contrib import postgres
 from django.utils.translation import ugettext_lazy as _
 from django import forms
 from django.conf import settings
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
 from django.contrib.auth import password_validation
 
-from utils.django.widgets import HorizontalRadioSelect, AutosizedTextarea, DateTimeWidget, TextInputFixed
+from utils.django import widgets as utils_widgets
 
 from apps.admin.forms import AddChangeModelForm
 
@@ -111,20 +114,30 @@ class LevelAdminModelForm(AddChangeModelForm):
 
     class Meta:
         widgets = {
-            'description': AutosizedTextarea(),
+            'description': utils_widgets.AutosizedTextarea(),
         }
 
 
 class ProfileAdminModelForm(AddChangeModelForm):
 
+    fields_without_classes = ('gender', 'crafts')
+
     def __init__(self, *args, **kwargs):
+
         super().__init__(*args, **kwargs)
 
-        # self.fields['date_birthday'].widget = forms.Textarea()
+        form_field_crafts = self.fields['crafts']
+        base_widget = form_field_crafts.widget
+        base_widget.attrs.update({'class': 'form-control'})
+
+        form_field_crafts.widget = utils_widgets.SplitInputsArrayWidget (
+            widget=base_widget, size=form_field_crafts.max_length
+        )
 
     class Meta:
         widgets = {
-    #         'about': CKEditorWidget(),
-            'date_birthday': DateTimeWidget(),
-    #         'gender': HorizontalRadioSelect(),
+            'about': utils_widgets.CKEditorWidget(),
+            'signature': utils_widgets.TinyMCEWidget(),
+            'date_birthday': utils_widgets.DateTimeWidget(),
+            'gender': utils_widgets.HorizontalRadioSelect(),
         }

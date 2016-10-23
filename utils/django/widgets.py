@@ -313,3 +313,49 @@ class TextInputFixed(forms.TextInput):
         """.format(startswith, output)
 
         return mark_safe(output)
+
+
+class CKEditorWidget(forms.Textarea):
+
+    class Media:
+        js = ('vendor/ckeditor/ckeditor.js', )
+
+    def render(self, name, value, attrs=None):
+
+        if value is None:
+            value = ''
+        final_attrs = self.build_attrs(attrs, name=name)
+        attrs = forms.utils.flatatt(final_attrs)
+
+        element_id = final_attrs['id']
+
+        return format_html(
+            '<textarea{}>\r\n{}</textarea><script>CKEDITOR.replace("{}")</script>',
+            attrs, force_text(value), element_id
+        )
+
+
+class TinyMCEWidget(forms.Textarea):
+
+    class Media:
+        js = ('vendor/tinymce/tinymce.min.js', )
+
+    def render(self, name, value, attrs=None):
+
+        if value is None:
+            value = ''
+        final_attrs = self.build_attrs(attrs, name=name)
+        attrs = forms.utils.flatatt(final_attrs)
+
+        element_id = final_attrs['id']
+
+        html_ = """
+        <textarea{}>\r\n{}</textarea>
+        <script>
+            var options = new Object;
+            options.selector = "#{}";
+            tinymce.init(options);
+        </script>""".format(
+            attrs, force_text(value), element_id
+        )
+        return mark_safe(html_)

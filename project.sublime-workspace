@@ -1,0 +1,2771 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"ut",
+				"utils\tmodule"
+			],
+			[
+				"selec",
+				"selector"
+			],
+			[
+				"set",
+				"set_trace"
+			],
+			[
+				"ipdb",
+				"ipdb\tmodule"
+			],
+			[
+				"__",
+				"__debug__\tinstance"
+			],
+			[
+				"form",
+				"format_html"
+			],
+			[
+				"fie",
+				"fields"
+			],
+			[
+				"cont",
+				"continue"
+			],
+			[
+				"templa",
+				"template\tmodule"
+			],
+			[
+				"lib",
+				"Library\tclass"
+			],
+			[
+				"cou",
+				"count_checked"
+			],
+			[
+				"remo",
+				"removeClass\t.removeClass()"
+			],
+			[
+				"verbos",
+				"verbose_name_plural"
+			],
+			[
+				"obj",
+				"objects\tstatement"
+			],
+			[
+				"mode",
+				"model_admin\tstatement"
+			],
+			[
+				"model",
+				"models\tmodule"
+			],
+			[
+				"conte",
+				"contenttypes\tmodule"
+			],
+			[
+				"url",
+				"urlencode"
+			],
+			[
+				"col",
+				"column_name\tstatement"
+			],
+			[
+				"value",
+				"values\tstatement"
+			],
+			[
+				"templ",
+				"template\timport"
+			],
+			[
+				"logg",
+				"logger\tstatement"
+			],
+			[
+				"inline",
+				"inline-block"
+			],
+			[
+				"colum",
+				"column_name\tparam"
+			],
+			[
+				"O",
+				"OrderedDict\tclass"
+			],
+			[
+				"pre",
+				"pretty_label_or_short_description\tfunction"
+			],
+			[
+				"ra",
+				"range\tfunction"
+			],
+			[
+				"Uti",
+				"UtilityQuerySet\tclass"
+			],
+			[
+				"date",
+				"date\tclass"
+			],
+			[
+				"ins",
+				"instance_method_or_field\tstatement"
+			],
+			[
+				"mdoel",
+				"model_admin\tstatement"
+			],
+			[
+				"prop",
+				"property\tclass"
+			],
+			[
+				"em",
+				"empty_value_display"
+			],
+			[
+				"get",
+				"get_label\tfunction"
+			],
+			[
+				"fiel",
+				"field"
+			],
+			[
+				"help",
+				"help_text"
+			],
+			[
+				"model_",
+				"model_admin\tstatement"
+			],
+			[
+				"nOn",
+				"None\tkeyword"
+			],
+			[
+				"verso",
+				"verbose_name"
+			],
+			[
+				"backgr",
+				"background-color"
+			],
+			[
+				"unge",
+				"ungettext\tfunction"
+			],
+			[
+				"add",
+				"add_message\tfunction"
+			],
+			[
+				"s",
+				"short_description"
+			],
+			[
+				"propert",
+				"property\tclass"
+			],
+			[
+				"mu",
+				"mutable\tparam"
+			],
+			[
+				"ta",
+				"takes_context\tparam"
+			],
+			[
+				"Pa",
+				"PageNotAnInteger\tclass"
+			],
+			[
+				"sear",
+				"search_fields"
+			],
+			[
+				"has",
+				"hasClass\t.hasClass()"
+			],
+			[
+				"tri",
+				"trigger\t.trigger()"
+			],
+			[
+				"render",
+				"render_to_response"
+			],
+			[
+				"rend",
+				"render_to_response"
+			],
+			[
+				"i",
+				"ipdb\tipdb debug tool"
+			],
+			[
+				"get_",
+				"get_url"
+			],
+			[
+				"ex",
+				"extra_tags\tparam"
+			],
+			[
+				"mess",
+				"messages\tmodule"
+			],
+			[
+				"sett",
+				"settings_utils\tmodule"
+			],
+			[
+				"ver",
+				"verbose_name"
+			],
+			[
+				"font-s",
+				"font-size"
+			],
+			[
+				"con",
+				"constants\tmodule"
+			],
+			[
+				"va",
+				"value\tAttr"
+			],
+			[
+				"Http",
+				"HttpResponseRedirect\tclass"
+			],
+			[
+				"get_fomr",
+				"get_form_kwargs\tfunction"
+			],
+			[
+				"get_form",
+				"get_form_class\tfunction"
+			],
+			[
+				"cha",
+				"chars"
+			],
+			[
+				"mark",
+				"mark_safe\tfunction"
+			],
+			[
+				"forma",
+				"format_html\tfunction"
+			],
+			[
+				"__i",
+				"__iter__"
+			],
+			[
+				"field",
+				"fieldsets\tstatement"
+			],
+			[
+				"get_fi",
+				"get_fields"
+			],
+			[
+				"min",
+				"min_length\tstatement"
+			],
+			[
+				"outer",
+				"outerHeight\t.outerHeight()"
+			],
+			[
+				"widget",
+				"widgets"
+			],
+			[
+				"sc",
+				"scrollTop\t.scrollTop()"
+			],
+			[
+				"dis",
+				"disabled_fields"
+			],
+			[
+				"dict",
+				"dictionary\tparam"
+			],
+			[
+				"exte",
+				"exceptions\tmodule"
+			],
+			[
+				"Model",
+				"ModelForm\tclass"
+			],
+			[
+				"ModelF",
+				"ModelForm\tclass"
+			],
+			[
+				"verbose",
+				"verbose_name"
+			],
+			[
+				"sele",
+				"selected\tAttr"
+			],
+			[
+				"list_dis",
+				"list_display_classes"
+			],
+			[
+				"Index",
+				"IndexError\tclass"
+			],
+			[
+				"re",
+				"reverse\tfunction"
+			],
+			[
+				"app_",
+				"app_label"
+			],
+			[
+				"app",
+				"app_config\tstatement"
+			],
+			[
+				"__init",
+				"__init__\tfunction"
+			],
+			[
+				"Site",
+				"SiteModelAdminMixin\tclass"
+			],
+			[
+				"view",
+				"views_mixins\tmodule"
+			],
+			[
+				"views",
+				"views_mixins\tmodule"
+			],
+			[
+				"IM",
+				"ImproperlyConfigured"
+			],
+			[
+				"De",
+				"DeleteView\tclass"
+			],
+			[
+				"_re",
+				"_registry_models\tstatement"
+			],
+			[
+				"_regis",
+				"_registry_apps"
+			],
+			[
+				"app_a",
+				"app_admin_class\tparam"
+			],
+			[
+				"Im",
+				"ImproperlyConfigured\tclass"
+			],
+			[
+				"Impo",
+				"ImportWarning\tclass"
+			],
+			[
+				"_regi",
+				"_registry_apps"
+			],
+			[
+				"User",
+				"UsersConfig\tclass"
+			],
+			[
+				"cla",
+				"classes"
+			],
+			[
+				"upda",
+				"update"
+			],
+			[
+				"defa",
+				"default_classes_on_value"
+			],
+			[
+				"for",
+				"for\tfor"
+			],
+			[
+				"ready",
+				"ready\tdocument.ready - $(function(){})"
+			],
+			[
+				"padd",
+				"padding"
+			],
+			[
+				"reve",
+				"reverse"
+			],
+			[
+				"Profi",
+				"ProfileAdmin\tclass"
+			],
+			[
+				"is",
+				"is_superuser\tstatement"
+			],
+			[
+				"Admin",
+				"AdminSiteStrictDescriptor\tclass"
+			],
+			[
+				"requ",
+				"request"
+			],
+			[
+				"verb",
+				"verbose_name"
+			],
+			[
+				"admin",
+				"admin_model"
+			],
+			[
+				"_registry_",
+				"_registry_models\tstatement"
+			],
+			[
+				"Lee",
+				"LevelAdmin"
+			],
+			[
+				"A",
+				"AdminSite\tclass"
+			],
+			[
+				"si",
+				"sites\tmodule"
+			],
+			[
+				"Sni",
+				"Snippet"
+			],
+			[
+				"slide",
+				"slideUp\t.slideUp()"
+			],
+			[
+				"css",
+				"css\t.css() - single"
+			],
+			[
+				"togg",
+				"toggleClass\t.toggleClass()"
+			],
+			[
+				"back",
+				"background-color"
+			],
+			[
+				"to",
+				"toggleClass\t.toggleClass()"
+			],
+			[
+				"wid",
+				"width"
+			],
+			[
+				"pos",
+				"position"
+			],
+			[
+				"paddin",
+				"padding-left"
+			],
+			[
+				"java",
+				"javascript"
+			],
+			[
+				"tra",
+				"transition"
+			],
+			[
+				"in",
+				"include\tfunction"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"file": "/media/wlysenko/66ABF2AC3D03BAAA/Web/A",
+			"settings":
+			{
+				"buffer_size": 90416,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "apps/users/admin.py",
+			"settings":
+			{
+				"buffer_size": 16852,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "apps/admin/templates/admin/admin/changelist.html",
+			"settings":
+			{
+				"buffer_size": 10003,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "apps/admin/templatetags/admin_tags.py",
+			"settings":
+			{
+				"buffer_size": 19012,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/home/wlysenko/.config/sublime-text-3/Packages/SublimeCodeIntel/SublimeCodeIntel.sublime-settings",
+			"settings":
+			{
+				"buffer_size": 5421,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/home/wlysenko/.config/sublime-text-3/Packages/SublimeCodeIntel/Default (Linux).sublime-keymap",
+			"settings":
+			{
+				"buffer_size": 225,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "apps/admin/views.py",
+			"settings":
+			{
+				"buffer_size": 34864,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "apps/admin/admin.py",
+			"settings":
+			{
+				"buffer_size": 15016,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		}
+	],
+	"build_system": "Packages/Python 3/Python3.sublime-build",
+	"build_system_choices":
+	[
+		[
+			[
+				[
+					"Anaconda Python Builder",
+					""
+				],
+				[
+					"Packages/Makefile/Make.sublime-build",
+					""
+				],
+				[
+					"Packages/Makefile/Make.sublime-build",
+					"Clean"
+				],
+				[
+					"Packages/Python/Python.sublime-build",
+					""
+				],
+				[
+					"Packages/Python/Python.sublime-build",
+					"Syntax Check"
+				],
+				[
+					"Packages/Python 3/Python3.sublime-build",
+					""
+				],
+				[
+					"Packages/SublimeREPL/sublimerepl_build_system_hack.sublime-build",
+					""
+				]
+			],
+			[
+				"Packages/Python 3/Python3.sublime-build",
+				""
+			]
+		],
+		[
+			[
+				[
+					"Anaconda Python Builder",
+					""
+				],
+				[
+					"Packages/Python/Python.sublime-build",
+					""
+				],
+				[
+					"Packages/Python/Python.sublime-build",
+					"Syntax Check"
+				],
+				[
+					"Packages/Python 3/Python3.sublime-build",
+					""
+				],
+				[
+					"Packages/SublimeREPL/sublimerepl_build_system_hack.sublime-build",
+					""
+				]
+			],
+			[
+				"Anaconda Python Builder",
+				""
+			]
+		],
+		[
+			[
+				[
+					"Anaconda Python Builder",
+					""
+				],
+				[
+					"Packages/Python/Python.sublime-build",
+					""
+				],
+				[
+					"Packages/Python/Python.sublime-build",
+					"Syntax Check"
+				],
+				[
+					"Packages/SublimeREPL/sublimerepl_build_system_hack.sublime-build",
+					""
+				]
+			],
+			[
+				"Packages/Python/Python.sublime-build",
+				""
+			]
+		],
+		[
+			[
+				[
+					"Packages/C++/C++ Single File.sublime-build",
+					""
+				],
+				[
+					"Packages/C++/C++ Single File.sublime-build",
+					"Run"
+				]
+			],
+			[
+				"Packages/C++/C++ Single File.sublime-build",
+				"Run"
+			]
+		],
+		[
+			[
+				[
+					"Packages/C++/C++ Single File.sublime-build",
+					""
+				],
+				[
+					"Packages/C++/C++ Single File.sublime-build",
+					"Run"
+				],
+				[
+					"Packages/SublimeREPL/sublimerepl_build_system_hack.sublime-build",
+					""
+				]
+			],
+			[
+				"Packages/C++/C++ Single File.sublime-build",
+				"Run"
+			]
+		],
+		[
+			[
+				[
+					"Packages/ESLint/ESLint.sublime-build",
+					""
+				],
+				[
+					"Packages/SublimeREPL/sublimerepl_build_system_hack.sublime-build",
+					""
+				],
+				[
+					"Packages/User/JavaScript.sublime-build",
+					""
+				]
+			],
+			[
+				"Packages/User/JavaScript.sublime-build",
+				""
+			]
+		],
+		[
+			[
+				[
+					"Packages/Makefile/Make.sublime-build",
+					""
+				],
+				[
+					"Packages/Makefile/Make.sublime-build",
+					"Clean"
+				],
+				[
+					"Packages/ESLint/ESLint.sublime-build",
+					""
+				],
+				[
+					"Packages/SublimeREPL/sublimerepl_build_system_hack.sublime-build",
+					""
+				],
+				[
+					"Packages/User/JavaScript.sublime-build",
+					""
+				]
+			],
+			[
+				"Packages/User/JavaScript.sublime-build",
+				""
+			]
+		],
+		[
+			[
+				[
+					"Packages/Ruby/Ruby.sublime-build",
+					""
+				],
+				[
+					"Packages/SublimeREPL/sublimerepl_build_system_hack.sublime-build",
+					""
+				]
+			],
+			[
+				"Packages/Ruby/Ruby.sublime-build",
+				""
+			]
+		],
+		[
+			[
+				[
+					"Packages/Rust/Rust.sublime-build",
+					""
+				],
+				[
+					"Packages/Rust/Rust.sublime-build",
+					"Run"
+				]
+			],
+			[
+				"Packages/Rust/Rust.sublime-build",
+				""
+			]
+		],
+		[
+			[
+				[
+					"Packages/SublimeREPL/sublimerepl_build_system_hack.sublime-build",
+					""
+				],
+				[
+					"Packages/User/JavaScript.sublime-build",
+					""
+				]
+			],
+			[
+				"Packages/User/JavaScript.sublime-build",
+				""
+			]
+		]
+	],
+	"build_varint": "",
+	"command_palette":
+	{
+		"height": 357.0,
+		"last_filter": "insta",
+		"selected_items":
+		[
+			[
+				"insta",
+				"Package Control: Install Package"
+			],
+			[
+				"list",
+				"Package Control: List Packages"
+			],
+			[
+				"remove",
+				"Package Control: Remove Package"
+			],
+			[
+				"python",
+				"Set Syntax: Python3"
+			],
+			[
+				"instal",
+				"Package Control: Install Package"
+			],
+			[
+				"checkbox",
+				"Snippet: bs3-input-checkbox"
+			],
+			[
+				"searc",
+				"Snippet: bs3-input-search"
+			],
+			[
+				"sear",
+				"Snippet: link - search"
+			],
+			[
+				"script",
+				"Snippet: <script>"
+			],
+			[
+				"install",
+				"Package Control: Install Package"
+			],
+			[
+				"remo",
+				"Package Control: Remove Package"
+			],
+			[
+				"Markd",
+				"Markdown HTML Preview"
+			],
+			[
+				"prety",
+				"HTMLPrettify"
+			],
+			[
+				"inst",
+				"Package Control: Install Package"
+			],
+			[
+				"rem",
+				"Package Control: Remove Package"
+			],
+			[
+				"html",
+				"HTMLBeautify"
+			],
+			[
+				"editcon",
+				"Set Syntax: EditorConfig"
+			],
+			[
+				"bea",
+				"HTMLBeautify"
+			],
+			[
+				"installl",
+				"Package Control: Install Local Dependency"
+			],
+			[
+				"set syntax: html",
+				"Set Syntax: HTML (Django)"
+			],
+			[
+				"emmt",
+				"Set Syntax: Emmet"
+			],
+			[
+				"input f",
+				"Snippet: input - file"
+			],
+			[
+				"templa",
+				"Snippet: TemplateView"
+			],
+			[
+				"hidde",
+				"Snippet: input - hidden"
+			],
+			[
+				"submi",
+				"Snippet: input - submit"
+			],
+			[
+				"style",
+				"Snippet: link - stylesheet"
+			],
+			[
+				"doc",
+				"DocBlockr: Reparse comment block"
+			],
+			[
+				"beau",
+				"HTMLBeautify"
+			],
+			[
+				"datet",
+				"Snippet: input - datetime"
+			],
+			[
+				"Bea",
+				"HTMLBeautify"
+			],
+			[
+				"ins",
+				"Package Control: Install Package"
+			],
+			[
+				"esli",
+				"ESLint"
+			],
+			[
+				"eslin",
+				"ESLint"
+			],
+			[
+				"js",
+				"Javascript Beautify"
+			],
+			[
+				"Repr",
+				"SublimeREPL: Python - virtualenv"
+			],
+			[
+				"ena",
+				"Package Control: Enable Package"
+			],
+			[
+				"lis",
+				"Package Control: List Packages"
+			],
+			[
+				"brac",
+				"BracketHighlighter: Match Brackets (ignore threshold)"
+			],
+			[
+				"tabel",
+				"Snippet: bs3-table-hover"
+			],
+			[
+				"radio",
+				"Snippet: input - radio"
+			],
+			[
+				"check",
+				"Snippet: input - checkbox"
+			],
+			[
+				"View",
+				"Snippet: TemplateView"
+			],
+			[
+				"range",
+				"Snippet: bs3-input-range"
+			],
+			[
+				"input-num",
+				"Snippet: input - number"
+			],
+			[
+				"datetime",
+				"Snippet: input - datetime"
+			],
+			[
+				"input",
+				"Snippet: input - datetime-local"
+			],
+			[
+				"ready",
+				"Snippet: $(document).ready"
+			],
+			[
+				"bs",
+				"Snippet: bs3-button-success"
+			],
+			[
+				"ul",
+				"Snippet: url"
+			],
+			[
+				"table",
+				"Snippet: bs3-table-bordered"
+			],
+			[
+				"beaut",
+				"HTMLBeautify"
+			],
+			[
+				"js b",
+				"Javascript Beautify"
+			],
+			[
+				"es",
+				"ESLint"
+			],
+			[
+				"enab",
+				"Package Control: Enable Package"
+			],
+			[
+				"tfoote",
+				"Snippet: <footer>"
+			],
+			[
+				"tabl",
+				"Snippet: bs3-table"
+			],
+			[
+				"detai",
+				"Snippet: DetailView"
+			],
+			[
+				"pep8",
+				"Anaconda: Autoformat PEP8 Errors"
+			],
+			[
+				"view",
+				"Snippet: ListView"
+			],
+			[
+				"dura",
+				"Snippet: DurationField (fduration)"
+			],
+			[
+				"defin",
+				"Snippet: DurationField (mduration)"
+			],
+			[
+				"func",
+				"Snippet: Function"
+			],
+			[
+				"DetailView",
+				"Snippet: DetailView"
+			],
+			[
+				"Te",
+				"Snippet: TemplateView"
+			],
+			[
+				"Form",
+				"Snippet: ModelForm"
+			],
+			[
+				"listv",
+				"Snippet: ListView"
+			],
+			[
+				"deta",
+				"Snippet: DetailView"
+			],
+			[
+				"De",
+				"Snippet: DetailView"
+			],
+			[
+				"de",
+				"Snippet: DetailView"
+			],
+			[
+				"admin",
+				"Snippet: Model Admin View"
+			],
+			[
+				"detail",
+				"Snippet: DetailView"
+			],
+			[
+				"Deta",
+				"Snippet: DetailView"
+			],
+			[
+				"Admi",
+				"Snippet: Model Admin View"
+			],
+			[
+				"amdin",
+				"Snippet: Model Admin View"
+			],
+			[
+				"remov",
+				"Package Control: Remove Package"
+			],
+			[
+				"isort",
+				"ImportSort: Sort imports"
+			],
+			[
+				"Tem",
+				"Snippet: TemplateView"
+			],
+			[
+				"Package Control: ",
+				"Package Control: List Packages"
+			],
+			[
+				"disa",
+				"Package Control: Disable Package"
+			],
+			[
+				"packe",
+				"Package Control: Disable Package"
+			],
+			[
+				"disabled",
+				"Snippet: bs3-sm-button-disabled"
+			],
+			[
+				"TemplateView",
+				"Snippet: TemplateView"
+			],
+			[
+				"jscs",
+				"JSCS Formatter: Format this file"
+			],
+			[
+				"bs3 link",
+				"Snippet: bs3-link-button"
+			],
+			[
+				"hidd",
+				"Snippet: bs3-input-hidden"
+			],
+			[
+				"bs3 btn",
+				"Snippet: bs3-button-primary"
+			],
+			[
+				"bs3 na",
+				"Snippet: bs3-navbar-responsive"
+			],
+			[
+				"scri",
+				"Snippet: <script>"
+			],
+			[
+				"pagin",
+				"Snippet: bs3-pagination"
+			],
+			[
+				"form",
+				"Snippet: bs3-form-label"
+			],
+			[
+				"bs3 form",
+				"Snippet: bs3-form-horizontal"
+			],
+			[
+				"bs3 gly",
+				"Snippet: bs3-icon-glyphicon"
+			],
+			[
+				"bs3 list",
+				"Snippet: bs3-list-group"
+			],
+			[
+				"input bt",
+				"Snippet: bs3-input-group-text-btn"
+			],
+			[
+				"bs3-btn",
+				"Snippet: bs3-button-info"
+			],
+			[
+				"bs3 che",
+				"Snippet: bs3-input-checkbox"
+			],
+			[
+				"table ",
+				"Snippet: bs3-table-responsive"
+			],
+			[
+				"input-g",
+				"Snippet: bs3-input-group-btn"
+			],
+			[
+				"bs3 input",
+				"Snippet: bs3-input-search"
+			],
+			[
+				"group",
+				"Snippet: bs3-input-group"
+			],
+			[
+				"addon",
+				"Snippet: bs3-input-group-addon"
+			],
+			[
+				"addo",
+				"Snippet: bs3-input-group-addon"
+			],
+			[
+				"form-",
+				"Snippet: bs3-form-inline"
+			],
+			[
+				"che",
+				"Snippet: input - checkbox"
+			],
+			[
+				"templ",
+				"Snippet: TemplateView"
+			],
+			[
+				"mod",
+				"Snippet: bs3-modal"
+			],
+			[
+				"pager",
+				"Snippet: bs3-pager"
+			],
+			[
+				"bs3 pagin",
+				"Snippet: bs3-pagination"
+			],
+			[
+				"footer",
+				"Snippet: <footer>"
+			],
+			[
+				"csrf",
+				"Snippet: csrf_token"
+			],
+			[
+				"anaconda",
+				"Anaconda: Autoformat PEP8 Errors"
+			],
+			[
+				"lorem",
+				"Snippet: Lorem ipsum"
+			],
+			[
+				"bs3 modal",
+				"Snippet: bs3-modal"
+			],
+			[
+				"bs3 btn g",
+				"Snippet: bs3-button-group-vertical"
+			],
+			[
+				"input-gr",
+				"Snippet: bs3-input-group-addon"
+			],
+			[
+				"progres",
+				"Snippet: <progress>"
+			],
+			[
+				"bs3 in",
+				"Snippet: bs3-input-number"
+			],
+			[
+				"bs3 input t",
+				"Snippet: bs3-input-text"
+			],
+			[
+				"bs3 tex",
+				"Snippet: bs3-textarea"
+			],
+			[
+				"inp",
+				"Snippet: input - text"
+			],
+			[
+				"bs3 but",
+				"Snippet: bs3-link-button"
+			],
+			[
+				"btn",
+				"Snippet: bs3-input-group-btn"
+			],
+			[
+				"bs3 butt",
+				"Snippet: bs3-button-group"
+			],
+			[
+				"bs3 te",
+				"Snippet: bs3-textarea"
+			],
+			[
+				"bs3 gr",
+				"Snippet: bs3-input-group"
+			],
+			[
+				"bs3-input g",
+				"Snippet: bs3-input-group"
+			],
+			[
+				"bs3 input g",
+				"Snippet: bs3-input-group-addon"
+			],
+			[
+				"bs3 bt",
+				"Snippet: bs3-input-group-btn"
+			]
+		],
+		"width": 575.0
+	},
+	"console":
+	{
+		"height": 556.0,
+		"history":
+		[
+			"import urllib.request,os,hashlib; h = 'df21e130d211cfc94d9b0905775a7c0f' + '1e3d39e33b79698005270310898eea76'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://packagecontrol.io/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by)",
+			"import urllib.request,os,hashlib; h = 'eb2297e1a458f27d836c04bb0cbaf282' + 'd0e7a3098092775ccb37ca9d6b2e4b7d'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://packagecontrol.io/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by)"
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"expanded_folders":
+	[
+		"/home/wlysenko/.virtualenvs/programmerHelper/project"
+	],
+	"file_history":
+	[
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/templates/admin/admin/templatetags/display_object_list.html",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/templates/admin/admin/templatetags/display_table_header.html",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/models.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/views.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/forms.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/factories.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/utils/django/middleware.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/utils/django/widgets.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/templates/users/templatetags/display_user_location.html",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/templatetags/users_tags.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/project.sublime-project",
+		"/home/wlysenko/.config/sublime-text-3/Packages/Anaconda/Anaconda.sublime-settings",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/__init__.py",
+		"/home/wlysenko/.config/sublime-text-3/Packages/User/Anaconda.sublime-settings",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/utils/__init__.py",
+		"/home/wlysenko/.config/sublime-text-3/Packages/User/JSON.sublime-settings",
+		"/home/wlysenko/.config/sublime-text-3/Packages/User/virtualenv.sublime-build",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/utils/javascript/callbacks.js",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/settings/development.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/templates/admin/admin/addchange.html",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/forms.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/static/vendor/ckeditor/ckeditor.js",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/static/vendor/ckeditor/bower.json",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/static/vendor/ckeditor/package.json",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/static/vendor/ckeditor/.bower.json",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/bower.json",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/migrations/0002_auto_20161022_1031.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/static/vendor/leaflet/dist/leaflet-src.js",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/static/vendor/leaflet/dist/leaflet.js",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/templatetags/__init__.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/utils/javascript/utils.js",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/.bowerrc",
+		"/home/wlysenko/.config/sublime-text-3/Packages/User/log.sublime-snippet",
+		"/home/wlysenko/.virtualenvs/geotest/project/closure.rb",
+		"/home/wlysenko/.virtualenvs/geotest/project/temp.c",
+		"/home/wlysenko/.virtualenvs/geotest/project/temp.py",
+		"/home/wlysenko/.virtualenvs/geotest/project/manage.py",
+		"/home/wlysenko/.config/flake8",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/static/admin/admin/js/checkboxes_selected.js",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/static/admin/admin/js/export_data.js",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/templates/admin/admin/_/display_fields.html",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/templatetags/admin_tags.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/static/admin/admin/css/export_data.css",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/site.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/static/admin/admin/css/export.css",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/static/admin/admin/css/changelist.css",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/templatetags/admin_filters.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/signals.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/admin.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/templates/admin/admin/changelist.html",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/templates/admin/admin/login.html",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/filters.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/utilities/admin.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/views.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/static/admin/admin/js/changelist.js",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/settings/base.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/templates/admin/admin/core.html",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/templates/admin/admin/_/display_table_header.html",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/comments/models_mixins.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/comments/models.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/utilities/models.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/templates/admin/admin/_/date_hierarchy.html",
+		"/home/wlysenko/.virtualenvs/programmerHelper/lib/python3.4/site-packages/django/utils/dateformat.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/templates/admin/admin/_/display_object_list.html",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/templates/admin/admin/index.html",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/templates/admin/admin/addchange_form.html",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/utilities/forms.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/utilities/querysets.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/utilities/managers.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/utils/django/datetime_utils.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/utils.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/lib/python3.4/site-packages/django/forms/models.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/lib/python3.4/site-packages/django/db/models/base.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/lib/python3.4/site-packages/django/db/models/fields/__init__.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/lib/python3.4/site-packages/django/db/models/__init__.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/lib/python3.4/site-packages/django/forms/boundfield.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/lib/python3.4/site-packages/django/forms/forms.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/lib/python3.4/site-packages/django/forms/fields.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/utils/django/utils.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/lib/python3.4/site-packages/django/views/generic/edit.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/lib/python3.4/site-packages/django/views/generic/base.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/views_mixins.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/descriptors.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/decorators.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/static/admin/admin/css/add_form.css",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/articles/admin.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/articles/actions.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/actions.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/articles/models.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/admin.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/articles/forms.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/tags/forms.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/lib/python3.4/site-packages/django/views/generic/list.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/templates/admin/admin/confirm_delete.html",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/utils/python/utils.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/static/admin/admin/css/confirm_delete.css",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/static/admin/admin/css/index.css",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/utils/django/settings_utils.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/settings/deployment.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/lib/python3.4/site-packages/django/db/models/deletion.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/utilities/factories.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/utils/django/factories_utils.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/lib/python3.4/site-packages/django/views/generic/detail.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/lib/python3.4/site-packages/django/__init__.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/static/admin/admin/js/prepopulated_fields.js",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/templates/admin/admin/app_index.html",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/templates/admin/admin/add_form.html",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/utils/django/static/mylabour/js/prepopulated_fields.js",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/utils/django/templatetags/utils_filters.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/utils/django/templatetags/gravatar_filters.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/utils/django/static/mylabour/js/autoresize.js",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/static/admin/admin/js/autoresize.js",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/comments/forms.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/comments/admin.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/utils/django/static/mylabour/js/colorwidget.js",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/utils/django/static/mylabour/css/colorwidget.css",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/templatetags/__init__.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/static/admin/admin/css/add_form.html",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/.coveragerc",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/.editorconfig",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/programmerHelper/apps/admin/views_mixins.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/templates/admin/admin/statistics.html",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/templates/admin/admin/reports.html",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/templates/admin/admin/import.html",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/templates/admin/admin/export.html",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/utils/django/views_mixins.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/app.py",
+		"/home/wlysenko/Documents/ruby.rb"
+	],
+	"find":
+	{
+		"height": 48.0
+	},
+	"find_in_files":
+	{
+		"height": 106.0,
+		"where_history":
+		[
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": true,
+		"find_history":
+		[
+			"model_admin.model._meta",
+			"column_name",
+			"ossible will be sortable",
+			"pk",
+			"list_display",
+			"object_list",
+			"object_lis",
+			"objec",
+			"_display",
+			"list_display",
+			"get_list_display",
+			"list_dis",
+			"list_per_page",
+			"set_filters",
+			"get_querystring",
+			"filter_by_filter_restrictions",
+			"set_filters",
+			"show_location",
+			"show_email",
+			"utils_widgets",
+			"SplitInputsArrayWidget",
+			"personal_website",
+			"website",
+			"\n ",
+			"personal_website",
+			"personal_",
+			"python_in",
+			"\"pep8_max_line_length\"",
+			"~/.virtualenvs/anaconda/bin/python",
+			"options",
+			"pdb",
+			"traceback",
+			"pass",
+			"get_response",
+			"TinyMCEWidget",
+			"utils_widgets",
+			"media",
+			"format_html",
+			"aaa",
+			"crafts",
+			"fields_without_classes",
+			"HorizontalRadioSelect",
+			"form_field_crafts",
+			"mark_safe",
+			"kwargs",
+			"base_widget",
+			"form_field_crafts_widget",
+			"form_field_crafts",
+			"crafts",
+			"postgres",
+			"form-con",
+			"form-c",
+			"show_email",
+			"ArrayField",
+			"height",
+			"updated",
+			"latitude",
+			"longitude",
+			"        '",
+			"return",
+			"context_",
+			"context",
+			"template_",
+			"template",
+			"templa",
+			"0, 0",
+			"format_html",
+			"mark_safe",
+			"display_location",
+			"show_location",
+			"location",
+			"def presents_on_",
+			"presents_on_gmail",
+			"location",
+			"pks_selected_objects_for_export",
+			"fields",
+			"leafl",
+			"var",
+			"length",
+			"count_checked",
+			"related_checkboxes",
+			"lookup_main_checkbox",
+			"is",
+			"count_checked",
+			"lookup_related_checkboxes",
+			"false",
+			"is_checked",
+			"change_",
+			"table_fields",
+			"check_uncheck_all_checkboxes",
+			"export_data",
+			"Deferred",
+			"is_iterable",
+			"PROGR",
+			"Dra",
+			"form_export_data",
+			"checked",
+			"pk_model_content_type",
+			"\">",
+			"\"",
+			"input",
+			"form_export_data",
+			"table_formats",
+			"name",
+			"radio_xml",
+			"id",
+			"XML",
+			"<td>",
+			"CSV",
+			"XML",
+			"td",
+			"\">...</",
+			"h3",
+			"field",
+			"export_data_div",
+			"name",
+			"data",
+			"filename",
+			"admin_tags",
+			"model_meta",
+			"display_fields",
+			"app_label",
+			"data",
+			"ExportDataView",
+			",\n",
+			"ExportDataView",
+			"td",
+			"table_object_list"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+			" 1 phrase",
+			"1 phrase",
+			"('drop', 'slow')",
+			"hide('drop')",
+			"</span></p>",
+			"<p><span class=\"glyphicon",
+			"",
+			"generate_data_for_great_search",
+			"ProgrammerDict",
+			"glossary",
+			"glossaries",
+			"GLOSSARY",
+			"GLOSSARIES",
+			"container_for_phrases_translator",
+			"container_for_phrases_traslator_and_pagination",
+			"sample_phrase_translator",
+			"()\n",
+			"is_superuser",
+			"abs_path_to_folder_with_test",
+			"Music.objects.all()",
+			".rsplit('.', 1)",
+			"return str(self.path).rpartition('.')[-1]",
+			"\"",
+			"\"\"\"",
+			"\"",
+			"title=",
+			"img title",
+			"\\ ",
+			"html",
+			"\\ ",
+			"\\",
+			"Document",
+			"знає",
+			"Якщо",
+			"о",
+			"е",
+			"н. е.",
+			"е",
+			"вѣкъ",
+			" ",
+			"рɣсь",
+			"Кто и зачем строил пирамиды? + Рисунки в пустыне Наска + Боги-архитекторы",
+			"Кто и зачем строил пирамиды? + Рисунки в пустыне Наска + Боги-архитекторы_files",
+			"є",
+			"title",
+			"-",
+			"цѣл",
+			"title",
+			"ч",
+			"вѣра",
+			"є",
+			"іѧ",
+			"ч",
+			"ѣлы",
+			"е",
+			"ʏ",
+			"ȥ",
+			"ψ",
+			"є",
+			"ψ",
+			"Ⱚ",
+			"-",
+			"є",
+			"ѱ",
+			"человѣк",
+			"є",
+			"ʏ",
+			"ȥ",
+			"є",
+			"е",
+			"ѱ",
+			"ѯ",
+			"чьрн",
+			"строй",
+			"|",
+			"",
+			"aaa1111",
+			"aaa111",
+			"aaa11",
+			"aaa1",
+			"aaa",
+			"",
+			"ɣ",
+			"ч",
+			"*",
+			" * ",
+			"/",
+			"ɣ",
+			"ѳ",
+			"ԑ",
+			"ɣ",
+			"ꙗ",
+			"U",
+			"Pl",
+			"щ",
+			"ч"
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"selected": 3,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "/media/wlysenko/66ABF2AC3D03BAAA/Web/A",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 90416,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								651,
+								651
+							]
+						],
+						"settings":
+						{
+							"bracket_highlighter.busy": false,
+							"bracket_highlighter.locations":
+							{
+								"close":
+								{
+								},
+								"icon":
+								{
+								},
+								"open":
+								{
+								},
+								"unmatched":
+								{
+								}
+							},
+							"bracket_highlighter.regions":
+							[
+								"bh_default",
+								"bh_default_center",
+								"bh_default_open",
+								"bh_default_close",
+								"bh_default_content",
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
+								"bh_regex_content",
+								"bh_double_quote",
+								"bh_double_quote_center",
+								"bh_double_quote_open",
+								"bh_double_quote_close",
+								"bh_double_quote_content",
+								"bh_angle",
+								"bh_angle_center",
+								"bh_angle_open",
+								"bh_angle_close",
+								"bh_angle_content",
+								"bh_single_quote",
+								"bh_single_quote_center",
+								"bh_single_quote_open",
+								"bh_single_quote_close",
+								"bh_single_quote_content",
+								"bh_round",
+								"bh_round_center",
+								"bh_round_open",
+								"bh_round_close",
+								"bh_round_content",
+								"bh_c_define",
+								"bh_c_define_center",
+								"bh_c_define_open",
+								"bh_c_define_close",
+								"bh_c_define_content",
+								"bh_curly",
+								"bh_curly_center",
+								"bh_curly_open",
+								"bh_curly_close",
+								"bh_curly_content",
+								"bh_square",
+								"bh_square_center",
+								"bh_square_open",
+								"bh_square_close",
+								"bh_square_content",
+								"bh_unmatched",
+								"bh_unmatched_center",
+								"bh_unmatched_open",
+								"bh_unmatched_close",
+								"bh_unmatched_content",
+								"bh_tag",
+								"bh_tag_center",
+								"bh_tag_open",
+								"bh_tag_close",
+								"bh_tag_content"
+							],
+							"color_scheme": "Packages/User/Color Highlighter/themes/Monokai Extended Bright (SL).tmTheme",
+							"syntax": "Packages/Text/Plain text.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 7,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "apps/users/admin.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 16852,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2621,
+								2621
+							]
+						],
+						"settings":
+						{
+							"bracket_highlighter.busy": false,
+							"bracket_highlighter.locations":
+							{
+								"close":
+								{
+									"1":
+									[
+										2691,
+										2692
+									]
+								},
+								"icon":
+								{
+									"1":
+									[
+										"Packages/BracketHighlighter/icons/round_bracket.png",
+										"brackethighlighter.default"
+									]
+								},
+								"open":
+								{
+									"1":
+									[
+										2620,
+										2621
+									]
+								},
+								"unmatched":
+								{
+								}
+							},
+							"bracket_highlighter.regions":
+							[
+								"bh_round",
+								"bh_round_center",
+								"bh_round_open",
+								"bh_round_close",
+								"bh_round_content",
+								"bh_single_quote",
+								"bh_single_quote_center",
+								"bh_single_quote_open",
+								"bh_single_quote_close",
+								"bh_single_quote_content",
+								"bh_unmatched",
+								"bh_unmatched_center",
+								"bh_unmatched_open",
+								"bh_unmatched_close",
+								"bh_unmatched_content",
+								"bh_square",
+								"bh_square_center",
+								"bh_square_open",
+								"bh_square_close",
+								"bh_square_content",
+								"bh_default",
+								"bh_default_center",
+								"bh_default_open",
+								"bh_default_close",
+								"bh_default_content",
+								"bh_angle",
+								"bh_angle_center",
+								"bh_angle_open",
+								"bh_angle_close",
+								"bh_angle_content",
+								"bh_c_define",
+								"bh_c_define_center",
+								"bh_c_define_open",
+								"bh_c_define_close",
+								"bh_c_define_content",
+								"bh_curly",
+								"bh_curly_center",
+								"bh_curly_open",
+								"bh_curly_close",
+								"bh_curly_content",
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
+								"bh_regex_content",
+								"bh_tag",
+								"bh_tag_center",
+								"bh_tag_open",
+								"bh_tag_close",
+								"bh_tag_content",
+								"bh_double_quote",
+								"bh_double_quote_center",
+								"bh_double_quote_open",
+								"bh_double_quote_close",
+								"bh_double_quote_content"
+							],
+							"color_scheme": "Packages/User/Color Highlighter/themes/Monokai Extended Bright (SL).tmTheme",
+							"editorconfig": true,
+							"ensure_newline_at_eof_on_save": true,
+							"spell_check": false,
+							"syntax": "Packages/Djaneiro/Syntaxes/Python Django.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true,
+							"trim_trailing_white_space_on_save": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 714.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 3,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "apps/admin/templates/admin/admin/changelist.html",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 10003,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								6686,
+								6686
+							]
+						],
+						"settings":
+						{
+							"bracket_highlighter.busy": false,
+							"bracket_highlighter.locations":
+							{
+								"close":
+								{
+									"1":
+									[
+										6688,
+										6689
+									]
+								},
+								"icon":
+								{
+									"1":
+									[
+										"Packages/BracketHighlighter/icons/curly_bracket.png",
+										"brackethighlighter.default"
+									]
+								},
+								"open":
+								{
+									"1":
+									[
+										6638,
+										6639
+									]
+								},
+								"unmatched":
+								{
+								}
+							},
+							"bracket_highlighter.regions":
+							[
+								"bh_round",
+								"bh_round_center",
+								"bh_round_open",
+								"bh_round_close",
+								"bh_round_content",
+								"bh_single_quote",
+								"bh_single_quote_center",
+								"bh_single_quote_open",
+								"bh_single_quote_close",
+								"bh_single_quote_content",
+								"bh_unmatched",
+								"bh_unmatched_center",
+								"bh_unmatched_open",
+								"bh_unmatched_close",
+								"bh_unmatched_content",
+								"bh_square",
+								"bh_square_center",
+								"bh_square_open",
+								"bh_square_close",
+								"bh_square_content",
+								"bh_default",
+								"bh_default_center",
+								"bh_default_open",
+								"bh_default_close",
+								"bh_default_content",
+								"bh_angle",
+								"bh_angle_center",
+								"bh_angle_open",
+								"bh_angle_close",
+								"bh_angle_content",
+								"bh_c_define",
+								"bh_c_define_center",
+								"bh_c_define_open",
+								"bh_c_define_close",
+								"bh_c_define_content",
+								"bh_curly",
+								"bh_curly_center",
+								"bh_curly_open",
+								"bh_curly_close",
+								"bh_curly_content",
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
+								"bh_regex_content",
+								"bh_tag",
+								"bh_tag_center",
+								"bh_tag_open",
+								"bh_tag_close",
+								"bh_tag_content",
+								"bh_double_quote",
+								"bh_double_quote_center",
+								"bh_double_quote_open",
+								"bh_double_quote_close",
+								"bh_double_quote_content"
+							],
+							"color_scheme": "Packages/User/Color Highlighter/themes/Monokai Extended Bright (SL).tmTheme",
+							"editorconfig": true,
+							"ensure_newline_at_eof_on_save": true,
+							"is_xml": false,
+							"syntax": "Packages/Djaneiro/Syntaxes/HTML (Django).tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true,
+							"trim_trailing_white_space_on_save": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 2136.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 6,
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "apps/admin/templatetags/admin_tags.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 19012,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								15179,
+								15179
+							]
+						],
+						"settings":
+						{
+							"auto_complete": false,
+							"bracket_highlighter.busy": false,
+							"bracket_highlighter.locations":
+							{
+								"close":
+								{
+								},
+								"icon":
+								{
+								},
+								"open":
+								{
+								},
+								"unmatched":
+								{
+								}
+							},
+							"bracket_highlighter.regions":
+							[
+								"bh_double_quote",
+								"bh_double_quote_center",
+								"bh_double_quote_open",
+								"bh_double_quote_close",
+								"bh_double_quote_content",
+								"bh_angle",
+								"bh_angle_center",
+								"bh_angle_open",
+								"bh_angle_close",
+								"bh_angle_content",
+								"bh_round",
+								"bh_round_center",
+								"bh_round_open",
+								"bh_round_close",
+								"bh_round_content",
+								"bh_default",
+								"bh_default_center",
+								"bh_default_open",
+								"bh_default_close",
+								"bh_default_content",
+								"bh_tag",
+								"bh_tag_center",
+								"bh_tag_open",
+								"bh_tag_close",
+								"bh_tag_content",
+								"bh_c_define",
+								"bh_c_define_center",
+								"bh_c_define_open",
+								"bh_c_define_close",
+								"bh_c_define_content",
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
+								"bh_regex_content",
+								"bh_single_quote",
+								"bh_single_quote_center",
+								"bh_single_quote_open",
+								"bh_single_quote_close",
+								"bh_single_quote_content",
+								"bh_curly",
+								"bh_curly_center",
+								"bh_curly_open",
+								"bh_curly_close",
+								"bh_curly_content",
+								"bh_square",
+								"bh_square_center",
+								"bh_square_open",
+								"bh_square_close",
+								"bh_square_content",
+								"bh_unmatched",
+								"bh_unmatched_center",
+								"bh_unmatched_open",
+								"bh_unmatched_close",
+								"bh_unmatched_content"
+							],
+							"color_scheme": "Packages/User/Color Highlighter/themes/Monokai Extended Bright (SL).tmTheme",
+							"editorconfig": true,
+							"ensure_newline_at_eof_on_save": true,
+							"syntax": "Packages/Python 3/Python3.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true,
+							"trim_trailing_white_space_on_save": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 6118.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "/home/wlysenko/.config/sublime-text-3/Packages/SublimeCodeIntel/SublimeCodeIntel.sublime-settings",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 5421,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"bracket_highlighter.busy": false,
+							"bracket_highlighter.locations":
+							{
+								"close":
+								{
+								},
+								"icon":
+								{
+								},
+								"open":
+								{
+								},
+								"unmatched":
+								{
+								}
+							},
+							"bracket_highlighter.regions":
+							[
+								"bh_angle",
+								"bh_angle_center",
+								"bh_angle_open",
+								"bh_angle_close",
+								"bh_angle_content",
+								"bh_c_define",
+								"bh_c_define_center",
+								"bh_c_define_open",
+								"bh_c_define_close",
+								"bh_c_define_content",
+								"bh_curly",
+								"bh_curly_center",
+								"bh_curly_open",
+								"bh_curly_close",
+								"bh_curly_content",
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
+								"bh_regex_content",
+								"bh_tag",
+								"bh_tag_center",
+								"bh_tag_open",
+								"bh_tag_close",
+								"bh_tag_content",
+								"bh_double_quote",
+								"bh_double_quote_center",
+								"bh_double_quote_open",
+								"bh_double_quote_close",
+								"bh_double_quote_content",
+								"bh_round",
+								"bh_round_center",
+								"bh_round_open",
+								"bh_round_close",
+								"bh_round_content",
+								"bh_single_quote",
+								"bh_single_quote_center",
+								"bh_single_quote_open",
+								"bh_single_quote_close",
+								"bh_single_quote_content",
+								"bh_unmatched",
+								"bh_unmatched_center",
+								"bh_unmatched_open",
+								"bh_unmatched_close",
+								"bh_unmatched_content",
+								"bh_default",
+								"bh_default_center",
+								"bh_default_open",
+								"bh_default_close",
+								"bh_default_content",
+								"bh_square",
+								"bh_square_center",
+								"bh_square_open",
+								"bh_square_close",
+								"bh_square_content"
+							],
+							"syntax": "Packages/JavaScript/JSON.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "/home/wlysenko/.config/sublime-text-3/Packages/SublimeCodeIntel/Default (Linux).sublime-keymap",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 225,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"bracket_highlighter.busy": false,
+							"bracket_highlighter.locations":
+							{
+								"close":
+								{
+									"1":
+									[
+										224,
+										225
+									]
+								},
+								"icon":
+								{
+									"1":
+									[
+										"Packages/BracketHighlighter/icons/square_bracket.png",
+										"brackethighlighter.default"
+									]
+								},
+								"open":
+								{
+									"1":
+									[
+										0,
+										1
+									]
+								},
+								"unmatched":
+								{
+								}
+							},
+							"bracket_highlighter.regions":
+							[
+								"bh_angle",
+								"bh_angle_center",
+								"bh_angle_open",
+								"bh_angle_close",
+								"bh_angle_content",
+								"bh_c_define",
+								"bh_c_define_center",
+								"bh_c_define_open",
+								"bh_c_define_close",
+								"bh_c_define_content",
+								"bh_curly",
+								"bh_curly_center",
+								"bh_curly_open",
+								"bh_curly_close",
+								"bh_curly_content",
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
+								"bh_regex_content",
+								"bh_tag",
+								"bh_tag_center",
+								"bh_tag_open",
+								"bh_tag_close",
+								"bh_tag_content",
+								"bh_double_quote",
+								"bh_double_quote_center",
+								"bh_double_quote_open",
+								"bh_double_quote_close",
+								"bh_double_quote_content",
+								"bh_round",
+								"bh_round_center",
+								"bh_round_open",
+								"bh_round_close",
+								"bh_round_content",
+								"bh_single_quote",
+								"bh_single_quote_center",
+								"bh_single_quote_open",
+								"bh_single_quote_close",
+								"bh_single_quote_content",
+								"bh_unmatched",
+								"bh_unmatched_center",
+								"bh_unmatched_open",
+								"bh_unmatched_close",
+								"bh_unmatched_content",
+								"bh_default",
+								"bh_default_center",
+								"bh_default_open",
+								"bh_default_close",
+								"bh_default_content",
+								"bh_square",
+								"bh_square_center",
+								"bh_square_open",
+								"bh_square_close",
+								"bh_square_content"
+							],
+							"syntax": "Packages/JavaScript/JSON.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 6,
+					"file": "apps/admin/views.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 34864,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								11997,
+								11997
+							]
+						],
+						"settings":
+						{
+							"bracket_highlighter.busy": false,
+							"bracket_highlighter.locations":
+							{
+								"close":
+								{
+								},
+								"icon":
+								{
+								},
+								"open":
+								{
+								},
+								"unmatched":
+								{
+								}
+							},
+							"bracket_highlighter.regions":
+							[
+								"bh_round",
+								"bh_round_center",
+								"bh_round_open",
+								"bh_round_close",
+								"bh_round_content",
+								"bh_single_quote",
+								"bh_single_quote_center",
+								"bh_single_quote_open",
+								"bh_single_quote_close",
+								"bh_single_quote_content",
+								"bh_unmatched",
+								"bh_unmatched_center",
+								"bh_unmatched_open",
+								"bh_unmatched_close",
+								"bh_unmatched_content",
+								"bh_square",
+								"bh_square_center",
+								"bh_square_open",
+								"bh_square_close",
+								"bh_square_content",
+								"bh_default",
+								"bh_default_center",
+								"bh_default_open",
+								"bh_default_close",
+								"bh_default_content",
+								"bh_angle",
+								"bh_angle_center",
+								"bh_angle_open",
+								"bh_angle_close",
+								"bh_angle_content",
+								"bh_c_define",
+								"bh_c_define_center",
+								"bh_c_define_open",
+								"bh_c_define_close",
+								"bh_c_define_content",
+								"bh_curly",
+								"bh_curly_center",
+								"bh_curly_open",
+								"bh_curly_close",
+								"bh_curly_content",
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
+								"bh_regex_content",
+								"bh_tag",
+								"bh_tag_center",
+								"bh_tag_open",
+								"bh_tag_close",
+								"bh_tag_content",
+								"bh_double_quote",
+								"bh_double_quote_center",
+								"bh_double_quote_open",
+								"bh_double_quote_close",
+								"bh_double_quote_content"
+							],
+							"color_scheme": "Packages/User/Color Highlighter/themes/Monokai Extended Bright (SL).tmTheme",
+							"editorconfig": true,
+							"ensure_newline_at_eof_on_save": true,
+							"syntax": "Packages/Python 3/Python3.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true,
+							"trim_trailing_white_space_on_save": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 2038.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 5,
+					"type": "text"
+				},
+				{
+					"buffer": 7,
+					"file": "apps/admin/admin.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 15016,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								3125,
+								3125
+							]
+						],
+						"settings":
+						{
+							"bracket_highlighter.busy": false,
+							"bracket_highlighter.locations":
+							{
+								"close":
+								{
+									"1":
+									[
+										3124,
+										3125
+									]
+								},
+								"icon":
+								{
+									"1":
+									[
+										"Packages/BracketHighlighter/icons/round_bracket.png",
+										"brackethighlighter.default"
+									]
+								},
+								"open":
+								{
+									"1":
+									[
+										3112,
+										3113
+									]
+								},
+								"unmatched":
+								{
+								}
+							},
+							"bracket_highlighter.regions":
+							[
+								"bh_round",
+								"bh_round_center",
+								"bh_round_open",
+								"bh_round_close",
+								"bh_round_content",
+								"bh_single_quote",
+								"bh_single_quote_center",
+								"bh_single_quote_open",
+								"bh_single_quote_close",
+								"bh_single_quote_content",
+								"bh_unmatched",
+								"bh_unmatched_center",
+								"bh_unmatched_open",
+								"bh_unmatched_close",
+								"bh_unmatched_content",
+								"bh_square",
+								"bh_square_center",
+								"bh_square_open",
+								"bh_square_close",
+								"bh_square_content",
+								"bh_default",
+								"bh_default_center",
+								"bh_default_open",
+								"bh_default_close",
+								"bh_default_content",
+								"bh_angle",
+								"bh_angle_center",
+								"bh_angle_open",
+								"bh_angle_close",
+								"bh_angle_content",
+								"bh_c_define",
+								"bh_c_define_center",
+								"bh_c_define_open",
+								"bh_c_define_close",
+								"bh_c_define_content",
+								"bh_curly",
+								"bh_curly_center",
+								"bh_curly_open",
+								"bh_curly_close",
+								"bh_curly_content",
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
+								"bh_regex_content",
+								"bh_tag",
+								"bh_tag_center",
+								"bh_tag_open",
+								"bh_tag_close",
+								"bh_tag_content",
+								"bh_double_quote",
+								"bh_double_quote_center",
+								"bh_double_quote_open",
+								"bh_double_quote_close",
+								"bh_double_quote_content"
+							],
+							"color_scheme": "Packages/User/Color Highlighter/themes/Monokai Extended Bright (SL).tmTheme",
+							"editorconfig": true,
+							"ensure_newline_at_eof_on_save": true,
+							"syntax": "Packages/Python 3/Python3.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true,
+							"trim_trailing_white_space_on_save": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 2262.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 4,
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 27.0
+	},
+	"input":
+	{
+		"height": 34.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.coffeecompile_output":
+	{
+		"height": 86.0
+	},
+	"output.exec":
+	{
+		"height": 165.0
+	},
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"output.git":
+	{
+		"height": 86.0
+	},
+	"output.unsaved_changes":
+	{
+		"height": 86.0
+	},
+	"pinned_build_system": "Project",
+	"project": "project.sublime-project",
+	"replace":
+	{
+		"height": 50.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"",
+				"project_brat/sitemaps.py"
+			]
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 500.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 380.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"selected_group": 0,
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": true,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 263.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}

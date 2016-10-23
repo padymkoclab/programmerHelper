@@ -167,9 +167,9 @@
         <div class="table-responsive">
           <table class="table table-bordered table-hover">
               <thead>
-                {% display_table_header model_admin %}
+                {% display_table_header model_admin list_display %}
               </thead>
-              <tbody>{% display_object_list model_admin page_object_list %}</tbody>
+              <tbody>{% display_object_list model_admin page_object_list list_display %}</tbody>
           </table>
         </div>
 

@@ -7,6 +7,7 @@ import hashlib
 import random
 import uuid
 
+from django.contrib.postgres.fields import ArrayField
 from django import template
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
@@ -589,18 +590,14 @@ class Profile(models.Model):
         (UNKNOWN, _('Unknown'))
     )
 
+    # main fields
     id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
     user = utils_models_fields.AutoOneToOneField(
         'User', related_name='profile',
         verbose_name=_('User'), on_delete=models.CASCADE
     )
 
-    # public info
-    views = models.IntegerField(_('Count views'), default=0, editable=False)
-
-    # crafts = models.CharField() ваши направления развития верстка, программирование
-    # theme of site
-
+    # public editable info
     about = models.TextField(_('About self'), default='', blank=True)
     signature = models.CharField(_('Signature'), max_length=50, default='', blank=True)
     on_gmail = utils_models_fields.FixedCharField(
@@ -618,28 +615,40 @@ class Profile(models.Model):
         default='', blank=True, max_length=200,
         startswith='https://stackoverflow.com/',
     )
-    personal_website = models.URLField(_('Personal website'), default='', blank=True)
+    website = models.URLField(_('Personal website'), default='', blank=True)
+    crafts = ArrayField(
+        models.CharField(max_length=100),
+        size=10, blank=True, null=True,
+        verbose_name=_('Directions of development')
+    )
+
+    # public noneditable info
+    views = models.IntegerField(_('Count views'), default=0, editable=False)
+
+    # private info
+    job = models.CharField(
+        _('Job'), max_length=100, default='', blank=True,
+    )
     gender = models.CharField(
         _('Gender'), max_length=10, choices=CHOICES_GENDER,
         default=UNKNOWN,
     )
-    job = models.CharField(
-        _('Job'), max_length=100, default='', blank=True,
-    )
-
-    latitude = models.FloatField(_('Latitude'), editable=False)
-    longitude = models.FloatField(_('Longitude'), editable=False)
-
-    show_location = models.BooleanField(_('Show location?'), default=False)
-    # show_email = models.BooleanField(_('Show email'), default=True)
-
-    # private info
     date_birthday = models.DateField(
         _('Date birthday'), null=True, blank=True,
         help_text=_('Only used for displaying age'))
     real_name = models.CharField(_('Real name'), max_length=200, default='', blank=True)
-    phone = utils_models_fields.PhoneField(_('Phone'), default='', blank=True)
+    phone = utils_models_fields.FixedCharField(
+        _('Phone'), default='', blank=True, max_length=50,
+        startswith='+',
+    )
 
+    # user preferences
+    show_location = models.BooleanField(_('Show location?'), default=False)
+    show_email = models.BooleanField(_('Show email'), default=True)
+
+    # non-editable and hidden information
+    latitude = models.FloatField(_('Latitude'), editable=False, null=True)
+    longitude = models.FloatField(_('Longitude'), editable=False, null=True)
     updated = models.DateTimeField(_('Updated'), auto_now=True)
 
     class Meta:
@@ -647,8 +656,7 @@ class Profile(models.Model):
         verbose_name_plural = _('Profiles')
 
     def __str__(self):
-        return '{}'.format('Error')
-        logger.error("return '{}'.format(self.user.get_short_name())")
+        return '{}'.format(self.user.get_short_name())
 
     def get_absolute_url(self):
         return self.user.get_absolute_url()
@@ -670,9 +678,10 @@ class Profile(models.Model):
 
     def display_location(self):
 
-        template_ = template.Template(" {% load users_tags %}{% display_user_location user %}")
+        template_ = template.Template(" {% load users_tags %}{% display_user_location user height %}")
         context_ = template.Context({
             'user': self,
+            'height': 350,
         })
         return template_.render(context=context_)
     display_location.short_description = _('Location')
@@ -680,20 +689,14 @@ class Profile(models.Model):
     def get_percentage_filling(self):
         """Getting percent filled profile of user."""
 
-        logger.error('Not correct and untested results')
-        logger.error('Does not work "admin_order_field"')
-
         considering_fields = (
             'about',
             'signature',
             'on_gmail',
             'on_github',
             'on_stackoverflow',
-            'personal_website',
+            'website',
             'job',
-            # 'location',
-            'latitude',
-            'longitude',
             'date_birthday',
             'real_name',
             'phone',

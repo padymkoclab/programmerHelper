@@ -114,19 +114,25 @@ def get_addons_for_field(fieldline_field):
 
 
 @register.inclusion_tag('admin/admin/templatetags/display_object_list.html')
-def display_object_list(model_admin, page_object_list):
+def display_object_list(model_admin, page_object_list, list_display):
     """
 
     """
+
+    if not list_display:
+        return {
+            'show': False,
+        }
 
     values_list = list()
+    model_meta = model_admin.model._meta
 
     default_styles = {
         'align': 'left',
     }
 
     object_list = page_object_list.object_list
-    fieldnames = [field.name for field in model_admin.model._meta.get_fields()]
+    fieldnames = [field.name for field in model_meta.get_fields()]
 
     columns_with_styles = {}
 
@@ -149,7 +155,7 @@ def display_object_list(model_admin, page_object_list):
 
     columns_with_styles = [
         (column_name, columns_with_styles[column_name])
-        for column_name in model_admin.list_display
+        for column_name in list_display
     ]
 
     for obj in object_list:
@@ -163,7 +169,7 @@ def display_object_list(model_admin, page_object_list):
 
         # url to add/chage page of thi object
         change_url = model_admin.site_admin.get_url(
-            'change', model_admin.model._meta, kwargs={'pk': obj.pk}
+            'change', model_meta, kwargs={'pk': obj.pk}
         )
 
         # keep all values with styles
@@ -174,7 +180,10 @@ def display_object_list(model_admin, page_object_list):
             column_name, styles = column_with_styles
 
             # try get value from method of the model admin class
-            if hasattr(model_admin, column_name):
+            if column_name == '__str__':
+                value = obj
+
+            elif hasattr(model_admin, column_name):
                 model_admin_method = getattr(model_admin, column_name)
                 value = model_admin_method(obj)
 
@@ -194,7 +203,7 @@ def display_object_list(model_admin, page_object_list):
                 # field of the model
                 elif column_name in fieldnames:
 
-                    field = model_admin.model._meta.get_field(column_name)
+                    field = model_meta.get_field(column_name)
 
                     # field with attribute 'choices'
                     if field.choices:
@@ -227,6 +236,7 @@ def display_object_list(model_admin, page_object_list):
         values_list.append((row_color, obj.pk, values))
 
     return {
+        'show': True,
         'values_list': values_list,
     }
 
@@ -430,7 +440,12 @@ def display_date_hierarchy(context, model_admin, object_list):
 
 
 @register.inclusion_tag('admin/admin/templatetags/display_table_header.html', takes_context=True)
-def display_table_header(context, model_admin):
+def display_table_header(context, model_admin, list_display):
+
+    if not list_display:
+        return {
+            'show': False,
+        }
 
     ordering = context['ordering']
 
@@ -457,25 +472,36 @@ def display_table_header(context, model_admin):
         }
 
     headers = list()
-    for column_name in model_admin.list_display:
+
+    import ipdb; ipdb.set_trace()
+
+    list_display
+
+    for column_name in list_display:
 
         # determination of display name of a column
-        if hasattr(model_admin.model, column_name):
-            attr = getattr(model_admin.model, column_name)
-        elif hasattr(model_admin, column_name):
-            attr = getattr(model_admin, column_name)
-
-        if callable(attr):
-            display_name = pretty_label_or_short_description(attr)
-        elif isinstance(attr, property):
-            attr = attr.fget
-            display_name = pretty_label_or_short_description(attr)
+        if column_name == '__str__':
+            display_name = model_meta.verbose_name
         else:
-            field = model_meta.get_field(column_name)
-            display_name = field.verbose_name
+            if hasattr(model_admin.model, column_name):
+                attr = getattr(model_admin.model, column_name)
+            elif hasattr(model_admin, column_name):
+                attr = getattr(model_admin, column_name)
+
+            if callable(attr):
+                display_name = pretty_label_or_short_description(attr)
+            elif isinstance(attr, property):
+                attr = attr.fget
+                display_name = pretty_label_or_short_description(attr)
+            else:
+                field = model_meta.get_field(column_name)
+                display_name = field.verbose_name
 
         # determination is sortable column
-        if column_name in concrete_fields:
+        if column_name == '__str__':
+            is_sortable = False
+            is_method = False
+        elif column_name in concrete_fields:
             is_sortable = True
             is_method = False
         else:
@@ -528,6 +554,7 @@ def display_table_header(context, model_admin):
         )
 
     return {
+        'show': True,
         'headers': headers,
     }
 

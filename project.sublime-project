@@ -1,0 +1,23 @@
+{
+	"build_systems":
+	[
+		{
+			"name": "Project",
+			"selector": "source.python",
+			"shell_cmd": "/home/wlysenko/.virtualenvs/programmerHelper/bin/python -u $file"
+		},
+		{
+			"file_regex": "^[ ]*File \"(...*?)\", line ([0-9]*)",
+			"name": "Anaconda Python Builder",
+			"selector": "source.python",
+			"shell_cmd": "\"python\" -u \"$file\""
+		}
+	],
+	"folders":
+	[
+		{
+			"follow_symlinks": true,
+			"path": "."
+		}
+	]
+}

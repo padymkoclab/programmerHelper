@@ -1,4 +1,5 @@
 
+from django.contrib import postgres
 from django.contrib.auth import authenticate
 from django.utils.translation import ugettext_lazy as _
 from django import forms
@@ -88,7 +89,9 @@ class AddChangeModelForm(forms.ModelForm):
 
             for name, field in self.fields.items():
 
-                if name in self.fields_without_classes:
+                field.help_text = self._get_help_text_to_field(field)
+
+                if name in self.fields_without_classes or isinstance(field.widget, forms.CheckboxInput):
                     continue
 
                 classes = getattr(field.widget.attrs, 'class', [])
@@ -102,8 +105,6 @@ class AddChangeModelForm(forms.ModelForm):
                 verbose_name = self.Meta.model._meta.get_field(name).verbose_name
 
                 field.widget.attrs['placeholder'] = 'Enter {}'.format(verbose_name.lower())
-
-                field.help_text = self._get_help_text_to_field(field)
 
     def _get_help_text_to_field(self, field):
 

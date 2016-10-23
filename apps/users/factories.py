@@ -63,6 +63,8 @@ class ProfileFactory(factory.DjangoModelFactory):
     user = factory.SubFactory(UserFactory, profile=None)
     views = fuzzy.FuzzyInteger(0, 1000)
     gender = fuzzy.FuzzyChoice([val for val, label in Profile.CHOICES_GENDER])
+    show_location = fuzzy.FuzzyChoice((True, False))
+    show_email = fuzzy.FuzzyChoice((True, False))
 
     @factory.lazy_attribute
     def about(self):
@@ -98,7 +100,7 @@ class ProfileFactory(factory.DjangoModelFactory):
         return ''
 
     @factory.lazy_attribute
-    def personal_website(self):
+    def website(self):
         if random.random() > .5:
             return factory.Faker('url').generate([])
         return ''
@@ -114,10 +116,14 @@ class ProfileFactory(factory.DjangoModelFactory):
 
     @factory.lazy_attribute
     def longitude(self):
+        if random.random() > 0.7:
+            return
         return factory.Faker('longitude').generate([])
 
     @factory.lazy_attribute
     def latitude(self):
+        if random.random() > 0.7:
+            return
         return factory.Faker('latitude').generate([])
 
     @factory.lazy_attribute
@@ -131,6 +137,28 @@ class ProfileFactory(factory.DjangoModelFactory):
         if random.random() > .5:
             return factory.Faker('phone_number').generate([])
         return ''
+
+    @factory.lazy_attribute
+    def crafts(self):
+
+        _max = self._LazyStub__model_class._meta.model._meta.get_field('crafts').size
+        array = list()
+
+        for i in range(_max):
+
+            _n = random.random()
+
+            if _n > .6:
+                el = factory.Faker('sentence', 'ru')
+            elif _n < .4:
+                el = factory.Faker('word', 'ru')
+            else:
+                break
+
+            el = el.generate(()).capitalize().rstrip('.')
+            array.append(el)
+
+        return array
 
     @factory.lazy_attribute
     def job(self):

@@ -1,13 +1,19 @@
 
-{% for class_bg, pk, values in values_list %}
-  <tr {% if bg_class is not None %}class="bg-{{ class_bg }}{% endif %}">
-      <td class="checkbox_column">
-        <input type="checkbox" form="form_actions" name="selected_objects" value="{{ pk }}">
-      </td>
-        {% for value, class_align in values %}
-        <td class="text-{{ class_align }}">
-            {{ value }}
-        </td>
-        {% endfor %}
+{% if show is True %}
+  {% for class_bg, pk, values in values_list %}
+      <tr {% if bg_class is not None %}class="bg-{{ class_bg }}{% endif %}">
+          <td class="checkbox_column">
+            <input type="checkbox" form="form_actions" name="selected_objects" value="{{ pk }}">
+          </td>
+            {% for value, class_align in values %}
+            <td class="text-{{ class_align }}">
+                {{ value }}
+            </td>
+            {% endfor %}
+      </tr>
+  {% endfor %}
+{% else %}
+  <tr>
+    <td>&nbsp;</td>
   </tr>
-{% endfor %}
+{% endif %}
