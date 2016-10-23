@@ -9,7 +9,7 @@
 
           {% if header.is_sortable is True %}
 
-            <input type="hidden" name="sortable_field" value="{{ header.sortable_data }}" form="form_changelist">
+            <input type="hidden" name="sortable_field" value="{{ header.sortable_data }}">
 
             {% if header.position is not None and header.order is not None %}
               {% if header.order == 'asc' %}

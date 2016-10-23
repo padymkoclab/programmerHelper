@@ -37,8 +37,19 @@
     </div>
   {% endblock toolbox %}
 
-  {% block searchbox %}
 <form action="" class="" method="GET" id="">
+
+  {% block switch_list_display %}
+    {% if all_list_display is not None %}
+      <select name="list_display" id="list_display" class="form-control">
+        {% for list_display_name, list_display_options in all_list_display.items %}
+          <option value="{{ list_display_name }}" {% if list_display_name == current_list_display_name %}selected{% endif %}  > {{ list_display_options.title }}</option>
+        {% endfor %}
+      </select>
+    {% endif %}
+  {% endblock switch_list_display %}
+
+  {% block searchbox %}
     {% if model_admin.get_search_fields %}
 
       <div id="div_model_searchbox">
@@ -84,33 +95,33 @@
     {% endif %}
   {% endblock searchbox %}
 
-    {% block filters %}
-      <div id="div_filters">
-         {% if filters %}
-          <div class="row">
-              <div id="display_filters" class="hidden">
-                  <div class="col-sm-12 text-center">
-                      <button id="btn_hide_filters" class="btn btn-info btn-block" type="button">{% trans "Hide filters" %}</button>
-                      <button id="btn_apply_filters" class="btn btn-success btn-block" type="submit">{% trans "Apply filters" %}</button>
-                  </div>
+  {% block filters %}
+    <div id="div_filters">
+       {% if filters %}
+        <div class="row">
+            <div id="display_filters" class="hidden">
+                <div class="col-sm-12 text-center">
+                    <button id="btn_hide_filters" class="btn btn-info btn-block" type="button">{% trans "Hide filters" %}</button>
+                    <button id="btn_apply_filters" class="btn btn-success btn-block" type="submit">{% trans "Apply filters" %}</button>
+                </div>
 
-                  {% for filter_ in filters %}
-                  <div class="col-sm-12">
-                      {% display_admin_filter filter_ %}
-                  </div>
-                  {% endfor %}
-              </div>
-              <div id="hidden_filters">
-                  <p id="btn_show_filters">
-                      {% trans "Show filters" %}
-                  </p>
-              </div>
-          </div>
-          {% endif %}
-      </div>
-    {% endblock filters %}
+                {% for filter_ in filters %}
+                <div class="col-sm-12">
+                    {% display_admin_filter filter_ %}
+                </div>
+                {% endfor %}
+            </div>
+            <div id="hidden_filters">
+                <p id="btn_show_filters">
+                    {% trans "Show filters" %}
+                </p>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+  {% endblock filters %}
 
-    {% if page_object_list.object_list %}
+  {% if page_object_list.object_list %}
 
     {% block actions_and_display_control %}
       <div id="div_actions_and_display_control">
@@ -167,9 +178,9 @@
         <div class="table-responsive">
           <table class="table table-bordered table-hover">
               <thead>
-                {% display_table_header model_admin list_display %}
+                {% display_table_header model_admin list_display_fields %}
               </thead>
-              <tbody>{% display_object_list model_admin page_object_list list_display %}</tbody>
+              <tbody>{% display_object_list model_admin page_object_list list_display_fields %}</tbody>
           </table>
         </div>
 
@@ -237,16 +248,19 @@
     {% endblock display_control %}
 
   {% else %}
+
     <div class="row">
       <div class="col-sm-12 bg-info">
         <p class="lead">{% trans "By passed conditions found nothing. Try change the conditions or add new objects." %}</p>
         <a href="{{ model_meta|get_admin_url:'changelist' }}">{% trans "Reset all filters and conditions" %}</a>
       </div>
     </div>
+
   {% endif %}
-{% endblock content %}
 
 </form>
+
+{% endblock content %}
 
 {% block extra_js %}
   {{ block.super }}

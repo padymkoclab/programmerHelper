@@ -4,8 +4,6 @@
 {% load l10n %}
 {% load humanize %}
 
-{% load gravatar %}
-
 {% load utils_filters %}
 {% load utils_tags %}
 
@@ -13,51 +11,41 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>{% block block_title %}{% trans "Index" %}{% endblock block_title %}</title>
+    <title>{% block block_title %}{{ title }}{% endblock block_title %}</title>
+
+    {% block extra_css %}
+
+    {% endblock extra_css %}
+
+    {% block extra_head %}
+
+    {% endblock extra_head %}
+
 </head>
 <body>
-{% get_current_language as LL %}
-<p>{{ LL }}</p>
-<h1>Fruits vs Calories</h1>
-{% block block_body %}
-    {% block block_header %}
-    <p>Hi {{ user }}.</p>
-    <p>Count visits this page: {{ count_visits_this_page }}</p>
 
-    {% endblock block_header %}
+    {% block header %}
+
+    {% endblock header %}
+
     {% block content %}
 
+        <p>Now is registers users: {{ ONLINE_AUTHENTICATED_USERS|length }}</p>
+        <p>Now is anonymous users: {{ ONLINE_ANONYMOUS_USERS|length }}</p>
+        <p>Online users: {{ ONLINE_AUTHENTICATED_USERS|join:', ' }}</p>
+        <p>Welcome: {{ request.user }}</p>
+        <p>Count visits this page: {{ COUNT_VISITS_PAGE }}</p>
+        <p>Website already exists: {{ SITE_CREATED|timesince }}</p>
+
     {% endblock content %}
+
     {% block footer %}
-    <p>
-        {% blocktrans count count_online_users=count_online_users trimmed %}
-            Now is one user is on-line:
-        {% plural %}
-            Now is {{ count_online_users }} users is on-line:
-        {% endblocktrans %}
-        {{ credentials_online_users }}
-    </p>
-    <h3 align="center">{% trans "Website already exists" %} {{ date_creating_website|timesince }}</h3>
+
     {% endblock footer %}
-    {% block block_js %}
 
-    {% endblock block_js %}
-{% endblock block_body %}
+    {% block extra_js %}
 
-{% gravatar_url user.email 150 %}
-# https://secure.gravatar.com/avatar/hash.jpg?size=150
-
-{% gravatar user.email 150 %}
-# <img class="gravatar" src="https://secure.gravatar.com/avatar/hash.jpg?size=150" width="150" height="150" alt="" />
-
-{% gravatar user.email 50 "user@example.com" %}
-{% gravatar user.email 50 "alice@example.com" %}
-{% gravatar user.email 50 "setivolkylany@gmail.com" %}
-# <img class="gravatar" src="https://secure.gravatar.com/avatar/hash.jpg?size=150" width="150" height="150" alt="user@example.com" />
-# <img class="gravatar" src="https://secure.gravatar.com/avatar/hash.jpg?size=150" width="150" height="150" alt="user@example.com" />
-
-{% gravatar_profile_url user.email %}
-# https://secure.gravatar.com/hash
+    {% endblock extra_js %}
 
 </body>
 </html>

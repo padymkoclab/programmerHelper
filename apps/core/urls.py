@@ -28,7 +28,6 @@ urlpatterns = [
     url(r'^image/(?P<height>\d+)x(?P<width>\d+)/$', PlaceholderView.as_view(), {}, 'placeholder'),
 
     # apps
-    # url(r'^courses/', include('apps.courses.urls')), # temporary is disabled
     #
     url(r'^admin/', DefaultSiteAdmin.urls),
     url(r'^articles/', include('apps.articles.urls')),

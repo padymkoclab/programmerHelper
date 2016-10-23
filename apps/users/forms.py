@@ -130,7 +130,7 @@ class ProfileAdminModelForm(AddChangeModelForm):
         base_widget = form_field_crafts.widget
         base_widget.attrs.update({'class': 'form-control'})
 
-        form_field_crafts.widget = utils_widgets.SplitInputsArrayWidget (
+        form_field_crafts.widget = utils_widgets.SplitInputsArrayWidget(
             widget=base_widget, size=form_field_crafts.max_length
         )
 

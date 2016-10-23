@@ -1,26 +1,39 @@
 
 from django.db import models
 
-
-class DayAttendanceQuerySet(models.QuerySet):
-    """
-
-    """
-
-    def objects_by_count_consecutive_days(self, consecutive_days):
-        """Return users satisfied consecutive days of attendances on website."""
-        return self.order_by('day_attendance').annotate()
+from .querysets import AttendanceQuerySet
 
 
-class VisitManager(models.Manager):
+class AttendanceManager(models.Manager):
+
+    pass
+
+
+class VisitPageManager(models.Manager):
     """
     Custom manager for working with visits of pages.
     """
 
-    def get_count_visits_by_url(self, url):
+    def get_count_visits(self, request):
         """Return count visits by certain url or 0."""
+
+        url_path = request.path_info
         try:
-            count = self.get(url=url).users.count()
+            obj = self.get(url=url_path)
         except self.model.DoesNotExist:
-            count = 0
-        return count
+            return 0
+        else:
+            return obj.count
+
+    def change_url_counter(self, request):
+
+        url_path = request.path_info
+
+        obj, is_created = self.get_or_create(url=url_path)
+
+        if not is_created:
+            obj.count += 1
+            obj.save()
+
+
+AttendanceManager = AttendanceManager.from_queryset(AttendanceQuerySet)

@@ -2,6 +2,7 @@
 from django.contrib.auth import login, authenticate, logout
 from django.http import HttpResponse
 from django.views.generic import TemplateView, View
+from django.utils.translation import ugettext_lazy as _
 
 from PIL import Image, ImageDraw
 
@@ -17,26 +18,15 @@ class IndexView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(IndexView, self).get_context_data(**kwargs)
+
+        context['title'] = _('Index')
+
         return context
 
     def get(self, request, *args, **kwargs):
 
         return super(IndexView, self).get(request, *args, **kwargs)
 
-        from django_gravatar.helpers import get_gravatar_url, has_gravatar, get_gravatar_profile_url, calculate_gravatar_hash
-
-        url = get_gravatar_url('alice@example.com', size=150)
-        gravatar_exists = has_gravatar('bob@example.com')
-        profile_url = get_gravatar_profile_url('alice@example.com')
-        email_hash = calculate_gravatar_hash('alice@example.com')
-
-        a = {'email': 'дроздоваплатон@yahoo.com', 'password': 'lv210493'}
-        a = {'email': 'pситников@дьячков-дьячкова.com', 'password': 'lv210493'}
-        a = {'email': 'setivolkylany@gmail.com', 'password': 'lv210493'}
-        account = authenticate(**a)
-        if account:
-            login(request, account)
-            logout(request)
         request.session.set_test_cookie()
         if request.session.test_cookie_worked():
             request.session.delete_test_cookie()

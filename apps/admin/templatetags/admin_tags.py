@@ -3,6 +3,7 @@ import json
 import datetime
 import logging
 
+from django.db.models.fields.reverse_related import OneToOneRel
 from django.db import models
 from django.utils.safestring import mark_safe
 from django.utils.html import format_html, format_html_join
@@ -114,12 +115,12 @@ def get_addons_for_field(fieldline_field):
 
 
 @register.inclusion_tag('admin/admin/templatetags/display_object_list.html')
-def display_object_list(model_admin, page_object_list, list_display):
+def display_object_list(model_admin, page_object_list, list_display_fields):
     """
 
     """
 
-    if not list_display:
+    if not list_display_fields:
         return {
             'show': False,
         }
@@ -143,19 +144,18 @@ def display_object_list(model_admin, page_object_list, list_display):
     }
 
     global_styles = styles_by_column.pop('__all__') if '__all__' in styles_by_column else dict()
-
-    list_display_dict = dict.fromkeys(model_admin.get_list_display(), {})
+    list_display_dict = dict.fromkeys(list_display_fields, {})
 
     for column, styles in list_display_dict.items():
 
-        value = default_styles.copy()
-        value.update(global_styles)
-        value.update(styles_by_column.get(column, {}))
-        columns_with_styles[column] = value
+        default_styles_copy = default_styles.copy()
+        default_styles_copy.update(global_styles)
+        default_styles_copy.update(styles_by_column.get(column, {}))
+        columns_with_styles[column] = default_styles_copy
 
     columns_with_styles = [
         (column_name, columns_with_styles[column_name])
-        for column_name in list_display
+        for column_name in list_display_fields
     ]
 
     for obj in object_list:
@@ -440,9 +440,9 @@ def display_date_hierarchy(context, model_admin, object_list):
 
 
 @register.inclusion_tag('admin/admin/templatetags/display_table_header.html', takes_context=True)
-def display_table_header(context, model_admin, list_display):
+def display_table_header(context, model_admin, list_display_fields):
 
-    if not list_display:
+    if not list_display_fields:
         return {
             'show': False,
         }
@@ -451,7 +451,7 @@ def display_table_header(context, model_admin, list_display):
 
     model_meta = model_admin.model._meta
 
-    concrete_fields = [field.name for field in model_meta.concrete_fields]
+    fieldnames = [field.name for field in model_meta.get_fields()]
 
     applyed_ordering = dict()
     for position in range(len(ordering)):
@@ -473,11 +473,7 @@ def display_table_header(context, model_admin, list_display):
 
     headers = list()
 
-    import ipdb; ipdb.set_trace()
-
-    list_display
-
-    for column_name in list_display:
+    for column_name in list_display_fields:
 
         # determination of display name of a column
         if column_name == '__str__':
@@ -488,20 +484,24 @@ def display_table_header(context, model_admin, list_display):
             elif hasattr(model_admin, column_name):
                 attr = getattr(model_admin, column_name)
 
-            if callable(attr):
+            if column_name in fieldnames:
+                field = model_meta.get_field(column_name)
+
+                if isinstance(field, OneToOneRel):
+                    field = field.field
+
+                display_name = field.verbose_name.capitalize()
+            elif callable(attr):
                 display_name = pretty_label_or_short_description(attr)
             elif isinstance(attr, property):
                 attr = attr.fget
                 display_name = pretty_label_or_short_description(attr)
-            else:
-                field = model_meta.get_field(column_name)
-                display_name = field.verbose_name
 
         # determination is sortable column
         if column_name == '__str__':
             is_sortable = False
             is_method = False
-        elif column_name in concrete_fields:
+        elif column_name in fieldnames:
             is_sortable = True
             is_method = False
         else:
@@ -518,10 +518,7 @@ def display_table_header(context, model_admin, list_display):
             else:
                 is_sortable = False
 
-            if not hasattr(method, 'admin_order_field'):
-                raise AttributeError('Method "{}" has not possible will be sortable'.format(column_name))
-
-            admin_order_field = method.admin_order_field
+            admin_order_field = getattr(method, 'admin_order_field', None)
             is_method = True
 
         if is_method and admin_order_field in applyed_ordering.keys():

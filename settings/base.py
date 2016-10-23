@@ -24,6 +24,7 @@ DJANGO_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.humanize',
     'django.contrib.postgres',
+    'django.contrib.sessions',
 ]
 
 THIRD_PARTY_APPS = [
@@ -31,7 +32,7 @@ THIRD_PARTY_APPS = [
 
 COMMON_APPS = [
     'utils.django',
-    'apps.sessions.apps.SessionsConfig',
+    # 'apps.sessions.apps.SessionsConfig',
 ]
 
 CUSTOM_APPS = [
@@ -80,8 +81,9 @@ DJANGO_MIDDLEWARE_CLASSES = [
 MY_MIDDLEWARE_CLASSES = [
     # 'utils.middleware.TimeLoadPageMiddleware',
     # 'utils.middleware.CountQueriesMiddleware',
-    # 'apps.visits.middleware.CountVisitsPageMiddleware',
-    'apps.visits.middleware.LastSeenUserMiddleware',
+    'apps.visits.middleware.UserVisitMiddleware',
+    'apps.visits.middleware.CounterVisitPageMiddleware',
+    'apps.visits.middleware.UsersOnlineMiddleware',
 ]
 
 MIDDLEWARE = DJANGO_MIDDLEWARE_CLASSES + MY_MIDDLEWARE_CLASSES
@@ -105,7 +107,6 @@ TEMPLATES = [
                 'django.template.context_processors.i18n',
                 'django.template.context_processors.media',
                 'django.template.context_processors.static',
-                # 'django.core.context_processors.request',
                 # 'django.template.context_processors.tz',
             ],
             'string_if_invalid': InvalidTemplateVariable('%s'),
@@ -114,9 +115,9 @@ TEMPLATES = [
 ]
 
 MY_CONTEXT_PROCCESSORS = [
-    # 'utils.context_processors.date_creating_website',
-    # 'apps.visits.context_processors.users_online',
-    # 'apps.sessions.context_processors.users_online',
+    'utils.django.context_processors.site_created',
+    'apps.visits.context_processors.count_visits_page',
+    'apps.visits.context_processors.online_users',
 ]
 
 TEMPLATES[0]['OPTIONS']['context_processors'].extend(MY_CONTEXT_PROCCESSORS)
@@ -291,11 +292,11 @@ MEDIA_ROOT = str(BASE_DIR.child('media'))
 # SESSIONS
 # ----------------------------------------
 
-SESSION_ENGINE = 'apps.sessions.backends.extended_session_store'
+# SESSION_ENGINE = 'apps.sessions.backends.extended_session_store'
 
 SESSION_COOKIE_AGE = 60 * 60 * 24 * 30
 
-SESSION_SERIALIZER = 'apps.sessions.serializers.ComprehensiveSessionJSONSerializer'
+# SESSION_SERIALIZER = 'apps.sessions.serializers.ComprehensiveSessionJSONSerializer'
 
 # ----------------------------------------
 # CACHE

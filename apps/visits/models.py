@@ -6,63 +6,80 @@ from django.db import models
 from django.conf import settings
 
 from .validators import validate_url_path
-from .managers import VisitManager, DayAttendanceQuerySet
+from .managers import VisitPageManager, AttendanceManager
 
 
-class Visit(models.Model):
+class VisitPage(models.Model):
     """
-    Model for working with visits users the pages.
+    Model for working with visits users of pages.
     Have features keeping users and url visited them.
     """
 
     id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
-    url = models.CharField(_('Path URL'), validators=[validate_url_path], max_length=1000, unique=True)
-    users = models.ManyToManyField(
-        settings.AUTH_USER_MODEL,
-        verbose_name=_('users'),
-        related_name='+',
-    )
+    url = models.CharField(_('URL'), validators=[], max_length=1000, unique=True)
+    count = models.IntegerField(_('count visits'), default=0)
 
     class Meta:
-        db_table = 'visits'
-        verbose_name = _('Visit')
-        verbose_name_plural = _('Visits')
+        verbose_name = _('Visit page')
+        verbose_name_plural = _('Visits page')
 
     objects = models.Manager()
-    objects = VisitManager()
+    objects = VisitPageManager()
 
     def __str__(self):
-        return 'URLPathPage(\'{0.url}\')'.format(self)
+        return '{0.url}'.format(self)
 
 
-class DayAttendance(models.Model):
+class VisitSite(models.Model):
     """
-
+    Model for keep days of attendance of website whole
     """
 
     id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
-    user = models.ForeignKey(
+    users = models.ManyToManyField(
         settings.AUTH_USER_MODEL,
-        related_name='days_attendances',
+        related_name='attendances',
         verbose_name=_('User'),
-        on_delete=models.CASCADE,
         editable=False,
     )
-    day_attendance = models.DateField(_('Day attendance'), editable=False)
+    date = models.DateField(_('date'), editable=False, auto_now_add=True, unique=True, error_messages={
+        'unique': _('Attendance on this day already exists')
+    })
 
     objects = models.Manager()
-    objects = DayAttendanceQuerySet.as_manager()
+    objects = AttendanceManager()
 
     class Meta:
-        db_table = 'days_attendances'
-        verbose_name = _('Day attendance')
-        verbose_name_plural = _('Days attendances')
-        get_latest_by = 'day_attendance'
-        ordering = ['day_attendance']
-        unique_together = ['user', 'day_attendance']
-
-    objects = models.Manager()
-    objects = DayAttendanceQuerySet.as_manager()
+        verbose_name = _('Visit site')
+        verbose_name_plural = _('Visits site')
+        get_latest_by = 'date'
+        ordering = ('-date', )
 
     def __str__(self):
-        return 'Attendance of user "{0.user}" from {0.day_attendance}'.format(self)
+        return '{0.date}'.format(self)
+
+
+class Visit(models.Model):
+    """
+    Model for keep latest visit of the site
+    """
+
+    id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        related_name='last_seen',
+        verbose_name=_('User'),
+        editable=False,
+    )
+    date = models.DateTimeField(_('date'), editable=False)
+
+    objects = models.Manager()
+
+    class Meta:
+        verbose_name = _('Visit')
+        verbose_name_plural = _('Visits')
+        get_latest_by = 'date'
+        ordering = ('-date', )
+
+    def __str__(self):
+        return '{0.user}'.format(self)

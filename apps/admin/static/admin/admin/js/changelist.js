@@ -39,14 +39,14 @@ jQuery(function(){
 
         var name_clicked_column = Object.keys(object)[0];
 
-        var $form_changelist = $('form#form_changelist');
+        var $form = $(this).parents('form');
 
         var $hidden_input = $('<input />').
             attr('name', '__clickedColumn').
             attr('value', name_clicked_column).
             attr('type', 'hidden');
-        $form_changelist.append($hidden_input);
-        $form_changelist.submit();
+        $form.append($hidden_input);
+        $form.submit();
    });
 
    /*
@@ -62,6 +62,15 @@ jQuery(function(){
        click: function(e){
            $table_search_details.stop().fadeToggle(500);
        },
-   })
+   });
+
+   /*
+
+    */
+   $('select#list_display').bind({
+        change: function(){
+            $(this).parents('form').submit();
+        },
+    });
 
 });

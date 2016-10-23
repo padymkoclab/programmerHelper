@@ -1,4 +1,5 @@
 
+import collections
 import logging
 
 from django.db.models.fields import BLANK_CHOICE_DASH
@@ -94,25 +95,75 @@ class UserAdmin(ModelAdmin):
         make_users_as_active,
     )
 
-    # set it value in empty, since it should be change in following views
-    # list_display = (
-    #     'alias',
-    #     'username',
-    #     'email',
-    #     'level',
-    #     'reputation',
-    #     'is_active',
-    #     'is_superuser',
-    #     'last_login',
-    #     'date_joined',
-    # )
-    list_display = (
-        (
-            None, (
-                '__str__',
-            )
-        ),
-    )
+    list_display = [
+        ('users_main_info', {
+            'title': _('Users (main information)'),
+            'fields': (
+                'alias',
+                'username',
+                'email',
+                'is_active',
+                'is_superuser',
+                'date_joined',
+            ),
+        }),
+        ('users_additional_info', {
+            'title': _('Users (additional information)'),
+            'fields': (
+                'alias',
+                'username',
+                'email',
+                'level',
+                'reputation',
+                'get_last_seen',
+                'last_login',
+            ),
+        }),
+        ('voters', {
+            'title': _('Users with details about votes in polls'),
+            'fields': ('__str__', ),
+        }),
+        ('quetiones_anwerer', {
+            'title': _('Users with details about questions and answers'),
+            'fields': ('__str__', ),
+        }),
+        ('publicist', {
+            'title': _('Users with details about articles'),
+            'fields': ('__str__', ),
+        }),
+        ('snippetolog', {
+            'title': _('Users with details about snippets'),
+            'fields': ('__str__', ),
+        }),
+        ('commentator', {
+            'title': _('Users with details about comments'),
+            'fields': ('__str__', ),
+        }),
+        ('opinioniolog', {
+            'title': _('Users with details about opinions'),
+            'fields': ('__str__', ),
+        }),
+        ('flavourer', {
+            'title': _('Users with details about flavour'),
+            'fields': ('__str__', ),
+        }),
+        ('replier', {
+            'title': _('Users with details about replies'),
+            'fields': ('__str__', ),
+        }),
+        ('badger', {
+            'title': _('Users with details about badges'),
+            'fields': ('__str__', ),
+        }),
+        ('forumer', {
+            'title': _('Users with details activity on forum'),
+            'fields': ('__str__', ),
+        }),
+        ('marker', {
+            'title': _('Users with details marks'),
+            'fields': ('__str__', ),
+        }),
+    ]
 
     list_display_links = ('alias', )
     list_display_styles = (
@@ -387,14 +438,13 @@ class ProfileAdmin(ModelAdmin):
         'user',
         'gender',
         'views',
-        'last_seen',
         'get_percentage_filling',
         'updated',
     )
 
     list_display_styles = (
         (
-            ('updated', 'last_seen'), {
+            ('updated', ), {
                 'align': 'right',
             }
         ),

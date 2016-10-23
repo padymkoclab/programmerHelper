@@ -4,7 +4,7 @@ import functools
 import logging
 # import io
 import json
-# import collections
+import collections
 
 from django.contrib.admin import filters as django_filters
 from django.core import serializers
@@ -173,7 +173,7 @@ class ChangeListView(SiteModelAdminMixin, SiteAdminView):
 
     def get(self, request, *args, **kwargs):
 
-        #self.set_filters()
+        # self.set_filters()
 
         return self.render_to_response(request)
 
@@ -183,7 +183,7 @@ class ChangeListView(SiteModelAdminMixin, SiteAdminView):
             request,
             template=self.get_template_names(),
             context=self.get_context_data()
-            )
+        )
 
     def get_template_names(self):
 
@@ -303,11 +303,12 @@ class ChangeListView(SiteModelAdminMixin, SiteAdminView):
         qs = self.filter_by_search_restrictions(request, qs)
 
         # Ordering
+        #
         ordering = self.get_ordering()
         qs = qs.order_by(*ordering)
 
         # send message only if applyed a search or a filter or after delete
-        if 'q' in request.GET:
+        if request.GET.get('q'):
             count = qs.count()
             object_name = self.model_meta.verbose_name if count == 1 else self.model_meta.verbose_name_plural
             object_name = object_name.lower()
@@ -362,6 +363,9 @@ class ChangeListView(SiteModelAdminMixin, SiteAdminView):
 
         list_per_page = total_count_objects if total_count_objects < list_per_page else list_per_page
 
+        all_list_display, current_list_display_name, list_display_title, list_display_fields =\
+            self.determinate_list_display_title_and_fields(self.request)
+
         context.update({
             'title': _('Select {} to change').format(self.model_meta.verbose_name_plural.lower()),
             'model_meta': self.model_meta,
@@ -377,7 +381,10 @@ class ChangeListView(SiteModelAdminMixin, SiteAdminView):
             'ordering': self.get_ordering(),
             'filters': self.filters,
             'search_details': self.get_search_details(),
-            'list_display': self.model_admin.get_list_display(),
+            'list_display_title': list_display_title,
+            'list_display_fields': list_display_fields,
+            'current_list_display_name': current_list_display_name,
+            'all_list_display': all_list_display,
         })
 
         return context
@@ -485,6 +492,35 @@ class ChangeListView(SiteModelAdminMixin, SiteAdminView):
 
         return '?' + querystring
 
+    def determinate_list_display_title_and_fields(self, request):
+
+        all_list_display = self.model_admin.get_list_display()
+
+        if not isinstance(all_list_display[0], (tuple, list)):
+
+            return (None, None, None, all_list_display)
+
+        all_list_display = collections.OrderedDict(all_list_display)
+        current_list_display_name = request.GET.get('list_display')
+
+        if current_list_display_name is None:
+
+            # first list_display now is active
+            current_list_display = next(iter(all_list_display.items()))
+
+            current_list_display_name = current_list_display[0]
+            current_list_display_options = current_list_display[1]
+
+        else:
+            current_list_display_options = all_list_display[current_list_display_name]
+
+        return (
+            all_list_display,
+            current_list_display_name,
+            current_list_display_options['title'],
+            current_list_display_options['fields'],
+        )
+
 
 class AddView(SiteModelAdminMixin, SiteAdminView):
 
@@ -538,7 +574,7 @@ class AddChangeView(SiteAdminView):
         if self.obj is not None:
             return _('Change {} "{}"').format(
                 self.model_meta.verbose_name.lower(), self.obj
-                )
+            )
         return _('Add {}').format(self.model_meta.verbose_name.lower())
 
     def get_context_data(self, **kwargs):

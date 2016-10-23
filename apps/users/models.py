@@ -146,13 +146,13 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     email = models.EmailField(
-        _('Email'), unique=True,
+        _('email'), unique=True,
         error_messages={
             'unique': _('User with this email already exists.')
         }
     )
     username = models.CharField(
-        _('Username'), max_length=40, unique=True,
+        _('username'), max_length=40, unique=True,
         error_messages={
             'unique': _('User with this username already exists.')
         },
@@ -163,19 +163,19 @@ class User(AbstractBaseUser, PermissionsMixin):
         help_text=UsernameValidator.help_text,
     )
     alias = models.CharField(
-        _('Alias'), max_length=200,
+        _('alias'), max_length=200,
         help_text=_('Name for public display'),
     )
-    reputation = models.IntegerField(_('Reputation'), default=0, editable=False)
-    is_active = models.BooleanField(_('Is active'), default=True)
+    reputation = models.IntegerField(_('reputation'), default=0, editable=False)
+    is_active = models.BooleanField(_('is active?'), default=True)
     level = models.ForeignKey(
-        'Level',
+        'level',
         verbose_name='Level',
         related_name='users',
         default=Level.REGULAR,
         to_field='name',
     )
-    date_joined = models.DateTimeField(_('Date joined'), auto_now_add=True)
+    date_joined = models.DateTimeField(_('date joined'), auto_now_add=True)
 
     # managers
     objects = models.Manager()
@@ -186,7 +186,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     class Meta:
         verbose_name = _("User")
         verbose_name_plural = _("Users")
-        ordering = ['-date_joined']
+        ordering = ('-date_joined', )
         get_latest_by = 'date_joined'
 
     def __str__(self):
@@ -264,15 +264,6 @@ class User(AbstractBaseUser, PermissionsMixin):
 
         return False
 
-    # def last_seen(self):
-    #     last_session_of_user = ExpandedSession.objects.filter(user_pk=self.pk).order_by('expire_date').last()
-    #     if last_session_of_user:
-    #         SessionStore = import_module(settings.SESSION_ENGINE).SessionStore
-    #         session = SessionStore(session_key=last_session_of_user.session_key)
-    #         last_seen = session['last_seen']
-    #         return last_seen
-    #     return None
-
     # REQUIRED FOR ALL PROJECTS
     def get_avatar_path(self, size=100, default='identicon'):
         """ """
@@ -290,11 +281,13 @@ class User(AbstractBaseUser, PermissionsMixin):
         return format_html('<img src="{}" />', self.get_avatar_path(size))
     display_avatar.short_description = _('Avatar')
 
-    @property
-    def last_seen(self):
-        """ """
+    def get_last_seen(self):
 
-        return 'ERROR'
+        if hasattr(self, 'last_seen'):
+            return self.last_seen.date
+        return
+    get_last_seen.short_description = _('Last seen')
+    get_last_seen.admin_order_field = 'last_seen'
 
     def get_count_comments(self):
         """ """
@@ -663,18 +656,6 @@ class Profile(models.Model):
 
     def get_admin_url(self):
         return get_admin_url(self)
-
-    def last_seen(self):
-
-        key = 'LastSeenUser{}'.format(self.user.pk)
-        date_last_seen = cache.get(key)
-
-        if date_last_seen is not None:
-            return date_last_seen
-        return
-    last_seen.admin_order_field = 'last_seen'
-    last_seen.short_description = _('Last seen')
-    last_seen = property(last_seen)
 
     def display_location(self):
 

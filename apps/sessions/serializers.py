@@ -1,4 +1,17 @@
 
+"""
+import json
+import uuid
+from utils.django.serializers import ComprehensiveSessionJSONDecoder, ComprehensiveSessionJSONEncoder
+from decimal import Decimal
+import datetime
+data = json.dumps(
+    [timezone.now(), datetime.datetime.now(), Decimal(3213.2132123), datetime.date.today(), uuid.uuid4()],
+    cls=ComprehensiveSessionJSONEncoder
+)
+json.loads(data, cls=ComprehensiveSessionJSONDecoder)
+"""
+
 import re
 import uuid
 import datetime
@@ -81,13 +94,3 @@ class ComprehensiveSessionJSONSerializer(JSONSerializer):
 
     def loads(self, data):
         return json.loads(data.decode('utf-8'), cls=ComprehensiveSessionJSONDecoder)
-
-"""
-import json
-import uuid
-from utils.django.serializers import ComprehensiveSessionJSONDecoder, ComprehensiveSessionJSONEncoder
-from decimal import Decimal
-import datetime
-data = json.dumps([timezone.now(), datetime.datetime.now(), Decimal(3213.2132123), datetime.date.today(), uuid.uuid4()], cls=ComprehensiveSessionJSONEncoder)
-json.loads(data, cls=ComprehensiveSessionJSONDecoder)
-"""
