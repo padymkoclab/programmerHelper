@@ -194,7 +194,7 @@ def display_object_list(model_admin, page_object_list, list_display_fields):
                 # method of the model
                 if callable(value):
 
-                    if hasattr(value, 'boolean'):
+                    if getattr(value, 'boolean', False) is True:
                         value = value()
                         value = convert_boolean_to_bootstrap_icon(value)
                     else:
@@ -212,6 +212,16 @@ def display_object_list(model_admin, page_object_list, list_display_fields):
                     # logical field will be returned as corresponding icon
                     if isinstance(field, (models.NullBooleanField, models.BooleanField)):
                         value = convert_boolean_to_bootstrap_icon(value)
+
+            else:
+                raise Exception('Unknow attribute "{}"'.format(column_name))
+
+            if isinstance(value, models.QuerySet):
+
+                if value.exists():
+                    value = ', '.join(map(str, value))
+                else:
+                    value = None
 
             # if values is not end it is not models.NullBooleanField
             if value is None:
@@ -478,24 +488,29 @@ def display_table_header(context, model_admin, list_display_fields):
         # determination of display name of a column
         if column_name == '__str__':
             display_name = model_meta.verbose_name
-        else:
+        elif column_name in fieldnames:
+            field = model_meta.get_field(column_name)
+
+            if isinstance(field, OneToOneRel):
+                field = field.field
+
+            display_name = field.verbose_name.capitalize()
+
+        elif hasattr(model_admin.model, column_name) or hasattr(model_admin, column_name):
+
             if hasattr(model_admin.model, column_name):
                 attr = getattr(model_admin.model, column_name)
-            elif hasattr(model_admin, column_name):
+            else:
                 attr = getattr(model_admin, column_name)
 
-            if column_name in fieldnames:
-                field = model_meta.get_field(column_name)
-
-                if isinstance(field, OneToOneRel):
-                    field = field.field
-
-                display_name = field.verbose_name.capitalize()
-            elif callable(attr):
+            if callable(attr):
                 display_name = pretty_label_or_short_description(attr)
             elif isinstance(attr, property):
                 attr = attr.fget
                 display_name = pretty_label_or_short_description(attr)
+
+        else:
+            raise Exception('Unknow attribute "{}"'.format(column_name))
 
         # determination is sortable column
         if column_name == '__str__':

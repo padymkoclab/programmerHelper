@@ -25,6 +25,7 @@ from django.core.cache import cache
 
 from utils.django import models_fields as utils_models_fields
 from utils.django.models_utils import get_admin_url
+from utils.django.functions_db import Round
 
 from apps.tags.models import Tag
 from apps.badges.models import BadgeManager
@@ -35,6 +36,7 @@ from apps.badges.models import BadgeManager
 # from apps.forum.models import Topic
 # from apps.sessions.models import ExpandedSession
 # from utils.django.models_fields import PhoneField
+from apps.polls.models import Poll
 
 from .managers import UserManager, LevelManager
 from .exceptions import ProtectDeleteUser
@@ -52,6 +54,23 @@ logger.info('get_silver_badges')
 logger.info('get_bronze_badges')
 logger.info('get_chart_visits')
 logger.info('get_chart_activity')
+
+
+def get_favorite_tags(qs_tags_pks):
+
+    if not qs_tags_pks.exists():
+        return Tag.objects.none()
+
+    counter_pks_tags = collections.Counter(qs_tags_pks)
+
+    max_counter_pks_tags = max(counter_pks_tags.values())
+
+    filter_max_pks_tags = filter(lambda x: x[1] == max_counter_pks_tags, counter_pks_tags.items())
+    pks_tags = dict(filter_max_pks_tags).keys()
+
+    tags = Tag.objects.filter(pk__in=pks_tags)
+
+    return tags
 
 
 class Level(models.Model):
@@ -339,6 +358,28 @@ class User(AbstractBaseUser, PermissionsMixin):
     get_count_questions.admin_order_field = 'count_questions'
     get_count_questions.short_description = _('Count questions')
 
+    def get_favorite_tag_of_questions(self):
+        """ """
+
+        qs_tags_pks = self.questions.values_list('tags__pk', flat=True)
+        favorite_tags = get_favorite_tags(qs_tags_pks)
+
+        return favorite_tags[:3]
+    get_favorite_tag_of_questions.short_description = _('Favorite tag')
+
+    def get_date_latest_question(self):
+        """ """
+
+        # if hasattr(self, 'count_questions'):
+        #     return self.count_questions
+
+        try:
+            return self.questions.latest().created
+        except self.questions.model.DoesNotExist:
+            return
+    get_date_latest_question.admin_order_field = 'date_latest_question'
+    get_date_latest_question.short_description = _('Latest question')
+
     def get_count_snippets(self):
         """ """
 
@@ -359,6 +400,39 @@ class User(AbstractBaseUser, PermissionsMixin):
     get_count_articles.admin_order_field = 'count_articles'
     get_count_articles.short_description = _('Count article')
 
+    def get_favorite_tag_of_articles(self):
+        """ """
+
+        qs_tags_pks = self.articles.values_list('tags__pk', flat=True)
+        favorite_tags = get_favorite_tags(qs_tags_pks)
+
+        return favorite_tags[:3]
+    get_favorite_tag_of_articles.short_description = _('Favorite tag')
+
+    def get_total_rating_for_articles(self):
+        """ """
+
+        return self.articles.annotate(
+            rating=models.Avg('marks__mark')
+        ).aggregate(
+            total_rating=Round(models.Avg('rating'))
+        )['total_rating']
+    get_total_rating_for_articles.admin_order_field = 'total_rating'
+    get_total_rating_for_articles.short_description = _('Total rating')
+
+    def get_date_latest_article(self):
+        """ """
+
+        # if hasattr(self, 'count_articles'):
+        #     return self.count_articles
+
+        try:
+            return self.articles.latest().created
+        except self.articles.model.DoesNotExist:
+            return
+    get_date_latest_article.admin_order_field = 'date_latest_article'
+    get_date_latest_article.short_description = _('Latest article')
+
     def get_count_answers(self):
         """ """
 
@@ -368,6 +442,36 @@ class User(AbstractBaseUser, PermissionsMixin):
         return self.answers.count()
     get_count_answers.admin_order_field = 'count_answers'
     get_count_answers.short_description = _('Count answers')
+
+    def get_favorite_tag_of_answers(self):
+        """ """
+
+        qs_tags_pks = self.answers.values_list('question__tags', flat=True)
+        favorite_tags = get_favorite_tags(qs_tags_pks)
+
+        return favorite_tags[:3]
+    get_favorite_tag_of_answers.short_description = _('Favorite tag')
+
+    def get_date_latest_answer(self):
+        """ """
+
+        # if hasattr(self, 'count_answers'):
+        #     return self.count_answers
+
+        try:
+            return self.answers.latest().created
+        except self.answers.model.DoesNotExist:
+            return
+    get_date_latest_answer.admin_order_field = 'date_latest_answer'
+    get_date_latest_answer.short_description = _('Latest answer')
+
+    def get_total_rating_for_answers(self):
+
+        raise NotImplementedError
+
+    def get_total_rating_for_questions(self):
+
+        raise NotImplementedError
 
     def get_count_solutions(self):
         """ """
@@ -399,26 +503,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     get_count_topics.admin_order_field = 'count_topics'
     get_count_topics.short_description = _('Count topics')
 
-    def get_count_test_suits(self):
-        """ """
-
-        if hasattr(self, 'count_test_suits'):
-            return self.count_test_suits
-
-        return self.test_suits.count()
-    get_count_test_suits.admin_order_field = 'count_test_suits'
-    get_count_test_suits.short_description = _('Count test suits')
-
-    def get_count_passages(self):
-        """ """
-
-        if hasattr(self, 'count_passages'):
-            return self.count_passages
-
-        return self.passages.count()
-    get_count_passages.admin_order_field = 'count_passages'
-    get_count_passages.short_description = _('Count passages')
-
     def get_count_votes(self):
         """ """
 
@@ -429,17 +513,24 @@ class User(AbstractBaseUser, PermissionsMixin):
     get_count_votes.admin_order_field = 'count_votes'
     get_count_votes.short_description = _('Count votes')
 
-    def get_date_latest_voting(self, obj):
+    def get_date_latest_vote(self):
         """ """
 
-        return obj.date_latest_voting
-    get_date_latest_voting.admin_order_field = 'date_latest_voting'
-    get_date_latest_voting.short_description = _('Date of latest voting')
+        try:
+            return self.votes.latest().created
+        except self.votes.model.DoesNotExist:
+            return
+    get_date_latest_vote.admin_order_field = 'date_latest_voting'
+    get_date_latest_vote.short_description = _('Date of latest voting')
 
-    def is_active_voter(self, obj):
+    def is_active_voter(self):
         """ """
 
-        return obj.is_active_voter
+        count_polls = Poll._default_manager.count()
+
+        half_count_polls = count_polls // 2
+
+        return self.get_count_votes() > half_count_polls
     is_active_voter.admin_order_field = 'is_active_voter'
     is_active_voter.short_description = _('Is active\nvoter?')
     is_active_voter.boolean = True
@@ -470,61 +561,6 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def have_certain_count_consecutive_days(self, count_consecutive_days):
         pass
-
-    def get_total_mark_for_answers(self):
-        """Getting total mark for answers of user."""
-        # getting instance as queryset
-        queryset = self.__class__.objects.filter(email=self.email)
-        # pass single queryset for execution once iteration in method of manager
-        user_with_total_mark_for_answers = self.__class__.objects.users_with_total_mark_for_answers(queryset=queryset)
-        # getting back instance after processing
-        user_with_total_mark_for_answers = user_with_total_mark_for_answers.get()
-        # return total_mark_for_answers of instance
-        return user_with_total_mark_for_answers.total_mark_for_answers
-
-    def get_total_mark_for_questions(self):
-        """Getting total mark for questions of user."""
-        # getting instance as queryset
-        queryset = self.__class__.objects.filter(email=self.email)
-        # pass single queryset for execution once iteration in method of manager
-        user_with_total_mark_for_questions = self.__class__.objects.users_with_total_mark_for_questions(queryset=queryset)
-        # getting back instance after processing
-        user_with_total_mark_for_questions = user_with_total_mark_for_questions.get()
-        # return total_mark_for_questions of instance
-        return user_with_total_mark_for_questions.total_mark_for_questions
-
-    def get_total_mark_for_solutions(self):
-        """Getting total mark for solutions of user."""
-        # getting instance as queryset
-        queryset = self.__class__.objects.filter(email=self.email)
-        # pass single queryset for execution once iteration in method of manager
-        user_with_total_mark_for_solutions = self.__class__.objects.users_with_total_mark_for_solutions(queryset=queryset)
-        # getting back instance after processing
-        user_with_total_mark_for_solutions = user_with_total_mark_for_solutions.get()
-        # return total_mark_for_solutions of instance
-        return user_with_total_mark_for_solutions.total_mark_for_solutions
-
-    def get_total_mark_for_snippets(self):
-        """Getting total mark for snippets of user."""
-        # getting instance as queryset
-        queryset = self.__class__.objects.filter(email=self.email)
-        # pass single queryset for execution once iteration in method of manager
-        user_with_total_mark_for_snippets = self.__class__.objects.users_with_total_mark_for_snippets(queryset=queryset)
-        # getting back instance after processing
-        user_with_total_mark_for_snippets = user_with_total_mark_for_snippets.get()
-        # return total_mark_for_snippets of instance
-        return user_with_total_mark_for_snippets.total_mark_for_snippets
-
-    def get_total_rating_for_articles(self):
-        """Getting total ratings of all articles of user."""
-        evaluation_total_rating_for_articles_of_user = Article.objects.articles_with_rating().filter(author=self).aggregate(
-            total_rating_for_articles=models.Sum('rating')
-        )
-        # return 0 if user not have articles
-        total_rating_for_articles = evaluation_total_rating_for_articles_of_user['total_rating_for_articles'] or 0
-        return total_rating_for_articles
-        # 3.8
-        # фотийодинцова@hotmail.com
 
     def get_count_popular_topics(self):
         """Getting count popular topics of user."""

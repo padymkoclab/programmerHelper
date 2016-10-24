@@ -1,5 +1,8 @@
 
 from django.db import models
+from django.utils.translation import ugettext as _
+
+import pygal
 
 from .querysets import AttendanceQuerySet
 
@@ -34,6 +37,50 @@ class VisitPageManager(models.Manager):
         if not is_created:
             obj.count += 1
             obj.save()
+
+
+class VisitUserBrowserManager(models.Manager):
+    """
+
+    """
+
+    def get_chart_browsers_of_visitors(self):
+
+        config = pygal.Config(
+            pie_half=True,
+        )
+
+        chart = pygal.Pie(config)
+        chart.title = _('Browsers of visitors')
+        for name, user_pks in self.values_list('name', 'user_pks'):
+            if user_pks == '':
+                count = 0
+            else:
+                count = len(user_pks.split(','))
+            chart.add(name, count)
+        return chart.render()
+
+
+class VisitUserSystemManager(models.Manager):
+    """
+
+    """
+
+    def get_chart_systems_of_visitors(self):
+
+        config = pygal.Config(
+            pie_half=True,
+        )
+
+        chart = pygal.Pie(config)
+        chart.title = _('Operation systems of visitors')
+        for name, user_pks in self.values_list('name', 'user_pks'):
+            if user_pks == '':
+                count = 0
+            else:
+                count = len(user_pks.split(','))
+            chart.add(name, count)
+        return chart.render()
 
 
 AttendanceManager = AttendanceManager.from_queryset(AttendanceQuerySet)

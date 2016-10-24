@@ -10,7 +10,7 @@
 			"file_regex": "^[ ]*File \"(...*?)\", line ([0-9]*)",
 			"name": "Anaconda Python Builder",
 			"selector": "source.python",
-			"shell_cmd": "\"python\" -u \"$file\""
+			"shell_cmd": "\"/home/wlysenko/.virtualenvs/programmerHelper/bin/python\" -u \"$file\""
 		}
 	],
 	"folders":
@@ -18,6 +18,21 @@
 		{
 			"follow_symlinks": true,
 			"path": "."
+		},
+		{
+			"file_include_patterns":
+			[
+				"A"
+			],
+			"folder_exclude_patterns":
+			[
+				"*"
+			],
+			"path": "/media/wlysenko/66ABF2AC3D03BAAA/Web/"
 		}
-	]
+	],
+	"settings":
+	{
+		"python_interpreter": "~/.virtualenvs/programmerHelper/bin/python"
+	}
 }

@@ -4,6 +4,30 @@
 		"selected_items":
 		[
 			[
+				"conte",
+				"context_processors.py"
+			],
+			[
+				"COU",
+				"COUNT_ANONYMOUS_USERS_KEY\tstatement"
+			],
+			[
+				"min",
+				"mint\tIntegerField (mint)"
+			],
+			[
+				"Visi",
+				"VisitPage\tclass"
+			],
+			[
+				"get",
+				"getattr〔function〕"
+			],
+			[
+				"a",
+				"admin"
+			],
+			[
 				"f",
 				"for\tFor Loop"
 			],
@@ -96,10 +120,6 @@
 				"model_admin\tstatement"
 			],
 			[
-				"conte",
-				"contenttypes\tmodule"
-			],
-			[
 				"url",
 				"urlencode"
 			],
@@ -162,10 +182,6 @@
 			[
 				"em",
 				"empty_value_display"
-			],
-			[
-				"get",
-				"get_label\tfunction"
 			],
 			[
 				"fiel",
@@ -306,10 +322,6 @@
 			[
 				"get_fi",
 				"get_fields"
-			],
-			[
-				"min",
-				"min_length\tstatement"
 			],
 			[
 				"outer",
@@ -502,46 +514,16 @@
 			[
 				"togg",
 				"toggleClass\t.toggleClass()"
-			],
-			[
-				"back",
-				"background-color"
-			],
-			[
-				"to",
-				"toggleClass\t.toggleClass()"
-			],
-			[
-				"wid",
-				"width"
 			]
 		]
 	},
 	"buffers":
 	[
 		{
-			"file": "/media/wlysenko/66ABF2AC3D03BAAA/Web/A",
+			"file": "project.sublime-project",
 			"settings":
 			{
-				"buffer_size": 90439,
-				"encoding": "UTF-8",
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "apps/admin/templatetags/admin_tags.py",
-			"settings":
-			{
-				"buffer_size": 19410,
-				"encoding": "UTF-8",
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "settings/base.py",
-			"settings":
-			{
-				"buffer_size": 8791,
+				"buffer_size": 244,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
@@ -550,231 +532,11 @@
 	"build_system": "Packages/Python 3/Python3.sublime-build",
 	"build_system_choices":
 	[
-		[
-			[
-				[
-					"Anaconda Python Builder",
-					""
-				],
-				[
-					"Packages/Makefile/Make.sublime-build",
-					""
-				],
-				[
-					"Packages/Makefile/Make.sublime-build",
-					"Clean"
-				],
-				[
-					"Packages/Python/Python.sublime-build",
-					""
-				],
-				[
-					"Packages/Python/Python.sublime-build",
-					"Syntax Check"
-				],
-				[
-					"Packages/Python 3/Python3.sublime-build",
-					""
-				],
-				[
-					"Packages/SublimeREPL/sublimerepl_build_system_hack.sublime-build",
-					""
-				]
-			],
-			[
-				"Packages/Python 3/Python3.sublime-build",
-				""
-			]
-		],
-		[
-			[
-				[
-					"Anaconda Python Builder",
-					""
-				],
-				[
-					"Packages/Python/Python.sublime-build",
-					""
-				],
-				[
-					"Packages/Python/Python.sublime-build",
-					"Syntax Check"
-				],
-				[
-					"Packages/Python 3/Python3.sublime-build",
-					""
-				],
-				[
-					"Packages/SublimeREPL/sublimerepl_build_system_hack.sublime-build",
-					""
-				]
-			],
-			[
-				"Anaconda Python Builder",
-				""
-			]
-		],
-		[
-			[
-				[
-					"Anaconda Python Builder",
-					""
-				],
-				[
-					"Packages/Python/Python.sublime-build",
-					""
-				],
-				[
-					"Packages/Python/Python.sublime-build",
-					"Syntax Check"
-				],
-				[
-					"Packages/SublimeREPL/sublimerepl_build_system_hack.sublime-build",
-					""
-				]
-			],
-			[
-				"Packages/Python/Python.sublime-build",
-				""
-			]
-		],
-		[
-			[
-				[
-					"Packages/C++/C++ Single File.sublime-build",
-					""
-				],
-				[
-					"Packages/C++/C++ Single File.sublime-build",
-					"Run"
-				]
-			],
-			[
-				"Packages/C++/C++ Single File.sublime-build",
-				"Run"
-			]
-		],
-		[
-			[
-				[
-					"Packages/C++/C++ Single File.sublime-build",
-					""
-				],
-				[
-					"Packages/C++/C++ Single File.sublime-build",
-					"Run"
-				],
-				[
-					"Packages/SublimeREPL/sublimerepl_build_system_hack.sublime-build",
-					""
-				]
-			],
-			[
-				"Packages/C++/C++ Single File.sublime-build",
-				"Run"
-			]
-		],
-		[
-			[
-				[
-					"Packages/ESLint/ESLint.sublime-build",
-					""
-				],
-				[
-					"Packages/SublimeREPL/sublimerepl_build_system_hack.sublime-build",
-					""
-				],
-				[
-					"Packages/User/JavaScript.sublime-build",
-					""
-				]
-			],
-			[
-				"Packages/User/JavaScript.sublime-build",
-				""
-			]
-		],
-		[
-			[
-				[
-					"Packages/Makefile/Make.sublime-build",
-					""
-				],
-				[
-					"Packages/Makefile/Make.sublime-build",
-					"Clean"
-				],
-				[
-					"Packages/ESLint/ESLint.sublime-build",
-					""
-				],
-				[
-					"Packages/SublimeREPL/sublimerepl_build_system_hack.sublime-build",
-					""
-				],
-				[
-					"Packages/User/JavaScript.sublime-build",
-					""
-				]
-			],
-			[
-				"Packages/User/JavaScript.sublime-build",
-				""
-			]
-		],
-		[
-			[
-				[
-					"Packages/Ruby/Ruby.sublime-build",
-					""
-				],
-				[
-					"Packages/SublimeREPL/sublimerepl_build_system_hack.sublime-build",
-					""
-				]
-			],
-			[
-				"Packages/Ruby/Ruby.sublime-build",
-				""
-			]
-		],
-		[
-			[
-				[
-					"Packages/Rust/Rust.sublime-build",
-					""
-				],
-				[
-					"Packages/Rust/Rust.sublime-build",
-					"Run"
-				]
-			],
-			[
-				"Packages/Rust/Rust.sublime-build",
-				""
-			]
-		],
-		[
-			[
-				[
-					"Packages/SublimeREPL/sublimerepl_build_system_hack.sublime-build",
-					""
-				],
-				[
-					"Packages/User/JavaScript.sublime-build",
-					""
-				]
-			],
-			[
-				"Packages/User/JavaScript.sublime-build",
-				""
-			]
-		]
 	],
 	"build_varint": "",
 	"command_palette":
 	{
-		"height": 357.0,
+		"height": 117.0,
 		"last_filter": "remo",
 		"selected_items":
 		[
@@ -783,36 +545,68 @@
 				"Package Control: Remove Package"
 			],
 			[
-				"enab",
-				"Package Control: Enable Package"
-			],
-			[
-				"dis",
-				"Package Control: Disable Package"
-			],
-			[
-				"ena",
-				"Package Control: Enable Package"
-			],
-			[
-				"remove",
-				"Package Control: Remove Package"
+				"list",
+				"Package Control: List Packages"
 			],
 			[
 				"insta",
 				"Package Control: Install Package"
 			],
 			[
-				"list",
-				"Package Control: List Packages"
-			],
-			[
-				"python",
-				"Set Syntax: Python3"
+				"remove",
+				"Package Control: Remove Package"
 			],
 			[
 				"instal",
 				"Package Control: Install Package"
+			],
+			[
+				"set sy dja",
+				"Set Syntax: HTML (Django)"
+			],
+			[
+				"html",
+				"Set Syntax: HTML"
+			],
+			[
+				"inst",
+				"Package Control: Install Package"
+			],
+			[
+				"set syntax: dja",
+				"Set Syntax: HTML (Django)"
+			],
+			[
+				"emmet",
+				"Set Syntax: Emmet"
+			],
+			[
+				"in",
+				"Package Control: Install Package"
+			],
+			[
+				"ena",
+				"Package Control: Enable Package"
+			],
+			[
+				"packe",
+				"Package Control: List Packages"
+			],
+			[
+				"install",
+				"Package Control: Install Package"
+			],
+			[
+				"dis",
+				"Package Control: Disable Package"
+			],
+			[
+				"enab",
+				"Package Control: Enable Package"
+			],
+			[
+				"python",
+				"Set Syntax: Python3"
 			],
 			[
 				"checkbox",
@@ -831,10 +625,6 @@
 				"Snippet: <script>"
 			],
 			[
-				"install",
-				"Package Control: Install Package"
-			],
-			[
 				"Markd",
 				"Markdown HTML Preview"
 			],
@@ -843,16 +633,8 @@
 				"HTMLPrettify"
 			],
 			[
-				"inst",
-				"Package Control: Install Package"
-			],
-			[
 				"rem",
 				"Package Control: Remove Package"
-			],
-			[
-				"html",
-				"HTMLBeautify"
 			],
 			[
 				"editcon",
@@ -1099,10 +881,6 @@
 				"Package Control: Disable Package"
 			],
 			[
-				"packe",
-				"Package Control: Disable Package"
-			],
-			[
 				"disabled",
 				"Snippet: bs3-sm-button-disabled"
 			],
@@ -1273,31 +1051,20 @@
 			[
 				"bs3 butt",
 				"Snippet: bs3-button-group"
-			],
-			[
-				"bs3 te",
-				"Snippet: bs3-textarea"
-			],
-			[
-				"bs3 gr",
-				"Snippet: bs3-input-group"
-			],
-			[
-				"bs3-input g",
-				"Snippet: bs3-input-group"
-			],
-			[
-				"bs3 input g",
-				"Snippet: bs3-input-group-addon"
 			]
 		],
-		"width": 575.0
+		"width": 449.0
 	},
 	"console":
 	{
 		"height": 556.0,
 		"history":
 		[
+			"1 + 1",
+			"reload",
+			"import urllib.request,os,hashlib; h = 'df21e130d211cfc94d9b0905775a7c0f' + '1e3d39e33b79698005270310898eea76'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://packagecontrol.io/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by)",
+			"import socket; socket.socket(socket.AF_INET, socket.SOCK_STREAM).connect('/home/wlysenko/.local/share/anaconda/run/project/anaconda.sock')",
+			"import socket; socket.socket(socket.AF_INET, socket.SOCK_STREAM).connect(/home/wlysenko/.local/share/anaconda/run/project/anaconda.sock)",
 			"import urllib.request,os,hashlib; h = 'df21e130d211cfc94d9b0905775a7c0f' + '1e3d39e33b79698005270310898eea76'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://packagecontrol.io/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by)",
 			"import urllib.request,os,hashlib; h = 'eb2297e1a458f27d836c04bb0cbaf282' + 'd0e7a3098092775ccb37ca9d6b2e4b7d'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://packagecontrol.io/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by)"
 		]
@@ -1313,35 +1080,51 @@
 	},
 	"expanded_folders":
 	[
-		"/home/wlysenko/.virtualenvs/programmerHelper/project",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/static",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/static/admin",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/static/admin/admin",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/static/admin/admin/js",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/templatetags",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/visits",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/utils"
+		"/home/wlysenko/.virtualenvs/programmerHelper/project"
 	],
 	"file_history":
 	[
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/Makefile",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/project.sublime-workspace",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/project.sublime-project",
+		"/media/wlysenko/66ABF2AC3D03BAAA/Web/A",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/templates/admin/admin/core.html",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/admin.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/templatetags/admin_tags.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/visits/middleware.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/visits/context_processors.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/templates/index.html",
+		"/home/wlysenko/.config/sublime-text-3/Packages/User/Emmet.sublime-settings",
+		"/home/wlysenko/.config/sublime-text-3/Packages/Emmet/Emmet.sublime-settings",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/templates/admin/admin/logout.html",
+		"/home/wlysenko/.config/sublime-text-3/Installed Packages/Emmet.sublime-package",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/Packages/Emmet.sublime-package/emmet/pyv8loader.py",
+		"/home/wlysenko/.config/sublime-text-3/Installed",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/home/wlysenko/.config/sublime-text-3/Installed",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/visits/constants.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/visits/models.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/core/views.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/models.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/settings/base.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/settings/custom.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/views.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/visits/managers.py",
+		"/home/wlysenko/.config/sublime-text-3/Packages/User/Anaconda.sublime-settings",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/utils/django/context_processors.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/utils/django/contextmanagers.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/utils/django/middleware.py",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/templates/content.html",
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/core/urls.py",
+		"/home/wlysenko/.config/sublime-text-3/Packages/User/SublimeCodeIntel.sublime-settings",
+		"/home/wlysenko/.config/sublime-text-3/Packages/Package Control/Package Control.sublime-settings",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/templatetags/__init__.py",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/views.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/admin.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/visits/middleware.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/visits/models.py",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/templates/admin/admin/changelist.html",
 		"/home/wlysenko/.config/sublime-text-3/Packages/DocBlockr_Python/DocblockrPython.sublime-settings",
 		"/home/wlysenko/.config/sublime-text-3/Packages/Djaneiro/Settings/Python (Django).sublime-settings",
 		"/home/wlysenko/.config/sublime-text-3/Packages/Djaneiro/Settings/HTML (Django).sublime-settings",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/models.py",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/admin.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/templatetags/admin_tags.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/visits/managers.py",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/visits/querysets.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/settings/base.py",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/sessions/serializers.py",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/sessions/backends/extended_session_store.py",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/utils/django/backends/extended_session_store.py",
@@ -1351,16 +1134,12 @@
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/forms.py",
 		"/home/wlysenko/.config/sublime-text-3/Packages/SublimeCodeIntel/SublimeCodeIntel.sublime-settings",
 		"/home/wlysenko/.config/sublime-text-3/Packages/SublimeCodeIntel/Default (Linux).sublime-keymap",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/views.py",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/factories.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/utils/django/middleware.py",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/utils/django/widgets.py",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/templates/users/templatetags/display_user_location.html",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/templatetags/users_tags.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/project.sublime-project",
 		"/home/wlysenko/.config/sublime-text-3/Packages/Anaconda/Anaconda.sublime-settings",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/users/__init__.py",
-		"/home/wlysenko/.config/sublime-text-3/Packages/User/Anaconda.sublime-settings",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/utils/__init__.py",
 		"/home/wlysenko/.config/sublime-text-3/Packages/User/JSON.sublime-settings",
 		"/home/wlysenko/.config/sublime-text-3/Packages/User/virtualenv.sublime-build",
@@ -1397,7 +1176,6 @@
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/templates/admin/admin/login.html",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/filters.py",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/utilities/admin.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/templates/admin/admin/core.html",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/templates/admin/admin/_/display_table_header.html",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/comments/models_mixins.py",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/comments/models.py",
@@ -1433,32 +1211,11 @@
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/articles/forms.py",
 		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/tags/forms.py",
 		"/home/wlysenko/.virtualenvs/programmerHelper/lib/python3.4/site-packages/django/views/generic/list.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/templates/admin/admin/confirm_delete.html",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/utils/python/utils.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/static/admin/admin/css/confirm_delete.css",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/static/admin/admin/css/index.css",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/utils/django/settings_utils.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/settings/deployment.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/lib/python3.4/site-packages/django/db/models/deletion.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/utilities/factories.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/utils/django/factories_utils.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/lib/python3.4/site-packages/django/views/generic/detail.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/lib/python3.4/site-packages/django/__init__.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/static/admin/admin/js/prepopulated_fields.js",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/templates/admin/admin/app_index.html",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/templates/admin/admin/add_form.html",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/utils/django/static/mylabour/js/prepopulated_fields.js",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/utils/django/templatetags/utils_filters.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/utils/django/templatetags/gravatar_filters.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/utils/django/static/mylabour/js/autoresize.js",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/static/admin/admin/js/autoresize.js",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/comments/forms.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/comments/admin.py",
-		"/home/wlysenko/.virtualenvs/programmerHelper/project/utils/django/static/mylabour/js/colorwidget.js"
+		"/home/wlysenko/.virtualenvs/programmerHelper/project/apps/admin/templates/admin/admin/confirm_delete.html"
 	],
 	"find":
 	{
-		"height": 48.0
+		"height": 35.0
 	},
 	"find_in_files":
 	{
@@ -1472,6 +1229,99 @@
 		"case_sensitive": true,
 		"find_history":
 		[
+			"the",
+			"  \n",
+			"8",
+			"щите",
+			"себя",
+			"disable_pyv8_update",
+			"    \n",
+			"1584",
+			"%}\n",
+			"tab",
+			"///////////////////////////////",
+			"//////////////////////////////",
+			"/////////////////////////////",
+			"////////////////////////////",
+			"///////////////////////////",
+			"//////////////////////////",
+			"/////////////////////////",
+			"////////////////////////",
+			"///////////////////////",
+			"//////////////////////",
+			"/////////////////////",
+			"////////////////////",
+			"///////////////////",
+			"//////////////////",
+			"/////////////////",
+			"////////////////",
+			"///////////////",
+			"//////////////",
+			"/////////////",
+			"////////////",
+			"///////////",
+			"//////////",
+			"/////////",
+			"////////",
+			"///////",
+			"//////",
+			"/////",
+			"////",
+			"///",
+			"//",
+			"ONLINE_USERS",
+			"online_anonymous_users",
+			"online_authenticated_users",
+			"COUNT_ANONYMOUS_USERS_KEY",
+			"ANONYMOUS_USERS_KEY",
+			"ONLINE_ANONYMOUS_USERS",
+			"COUNT_ANONYMOUS_USERS_KEY",
+			"ANONYMOUS_USERS_KEY",
+			"count_anonymous_users",
+			"session_id",
+			"apps.sessions",
+			"CHECK_USERS_ONLINE_TIMEOUT",
+			"ONLINE_USERS",
+			"count_anonymous_users",
+			"cache",
+			"COUNT_ANONYMOUS_USERS_KEY",
+			"COUNT_ONLINE_ANONYMOUS_USERS",
+			"authenticated_users",
+			"authenticated_users_pks",
+			"online_authenticated_users_pks",
+			"COUNT_ONLINE_ANONYMOUS_USERS",
+			"CHECK_USERS_ONLINE_TIMEOUT",
+			"is_created",
+			"VisitPage",
+			"url_path",
+			"count_visits_page",
+			"VisitManager",
+			"VisitPageManager",
+			"VisitPage",
+			"SITE_CREATED",
+			"WEBSITE",
+			"DATE_CREATING_WEBSITE",
+			"SITE_CREATED",
+			"DATE_CREATING_SITE",
+			"settings",
+			"DATE_CREATING_SITE",
+			"site_created",
+			"count_visits_page",
+			"users_online",
+			"online_users",
+			"block_header",
+			"js_scripts",
+			"css_styles",
+			"block_js",
+			"block_body",
+			"get_last_seen",
+			"last_seen",
+			"get_last_seen",
+			"value",
+			"default_styles_copy",
+			"styles",
+			"default_styles",
+			"styles",
 			"values",
 			"fieldnames",
 			"relation",
@@ -1506,100 +1356,7 @@
 			"current_list_display_name",
 			"current_list_display",
 			"request",
-			"voters4",
-			"voters3",
-			"users10",
-			"list_display",
-			"all_list_display_name",
-			"list_display_name",
-			",\n",
-			"list_display_name",
-			"import ipdb; ipdb.set_trace()",
-			"get_list_display_title_and_fields",
-			"list_display_name = ",
-			"list_display_title",
-			"first_list_display",
-			"list_display",
-			"fields",
-			"collections",
-			"model_admin.model._meta",
-			"column_name",
-			"ossible will be sortable",
-			"pk",
-			"list_display",
-			"object_list",
-			"object_lis",
-			"objec",
-			"_display",
-			"list_display",
-			"get_list_display",
-			"list_dis",
-			"list_per_page",
-			"set_filters",
-			"get_querystring",
-			"filter_by_filter_restrictions",
-			"set_filters",
-			"show_location",
-			"show_email",
-			"utils_widgets",
-			"SplitInputsArrayWidget",
-			"personal_website",
-			"website",
-			"\n ",
-			"personal_website",
-			"personal_",
-			"python_in",
-			"\"pep8_max_line_length\"",
-			"~/.virtualenvs/anaconda/bin/python",
-			"options",
-			"pdb",
-			"traceback",
-			"pass",
-			"get_response",
-			"TinyMCEWidget",
-			"utils_widgets",
-			"media",
-			"format_html",
-			"aaa",
-			"crafts",
-			"fields_without_classes",
-			"HorizontalRadioSelect",
-			"form_field_crafts",
-			"mark_safe",
-			"kwargs",
-			"base_widget",
-			"form_field_crafts_widget",
-			"form_field_crafts",
-			"crafts",
-			"postgres",
-			"form-con",
-			"form-c",
-			"show_email",
-			"ArrayField",
-			"height",
-			"updated",
-			"latitude",
-			"longitude",
-			"        '",
-			"return",
-			"context_",
-			"context",
-			"template_",
-			"template",
-			"templa",
-			"0, 0",
-			"format_html",
-			"mark_safe",
-			"display_location",
-			"show_location",
-			"location",
-			"def presents_on_",
-			"presents_on_gmail",
-			"location",
-			"pks_selected_objects_for_export",
-			"fields",
-			"leafl",
-			"var"
+			"voters4"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -1713,345 +1470,36 @@
 	"groups":
 	[
 		{
-			"selected": 1,
+			"selected": 0,
 			"sheets":
 			[
 				{
 					"buffer": 0,
-					"file": "/media/wlysenko/66ABF2AC3D03BAAA/Web/A",
+					"file": "project.sublime-project",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 90439,
+						"buffer_size": 244,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								3329,
-								3329
+								238,
+								238
 							]
 						],
 						"settings":
 						{
-							"bracket_highlighter.busy": false,
-							"bracket_highlighter.locations":
-							{
-								"close":
-								{
-								},
-								"icon":
-								{
-								},
-								"open":
-								{
-								},
-								"unmatched":
-								{
-								}
-							},
-							"bracket_highlighter.regions":
-							[
-								"bh_single_quote",
-								"bh_single_quote_center",
-								"bh_single_quote_open",
-								"bh_single_quote_close",
-								"bh_single_quote_content",
-								"bh_angle",
-								"bh_angle_center",
-								"bh_angle_open",
-								"bh_angle_close",
-								"bh_angle_content",
-								"bh_round",
-								"bh_round_center",
-								"bh_round_open",
-								"bh_round_close",
-								"bh_round_content",
-								"bh_double_quote",
-								"bh_double_quote_center",
-								"bh_double_quote_open",
-								"bh_double_quote_close",
-								"bh_double_quote_content",
-								"bh_default",
-								"bh_default_center",
-								"bh_default_open",
-								"bh_default_close",
-								"bh_default_content",
-								"bh_curly",
-								"bh_curly_center",
-								"bh_curly_open",
-								"bh_curly_close",
-								"bh_curly_content",
-								"bh_tag",
-								"bh_tag_center",
-								"bh_tag_open",
-								"bh_tag_close",
-								"bh_tag_content",
-								"bh_regex",
-								"bh_regex_center",
-								"bh_regex_open",
-								"bh_regex_close",
-								"bh_regex_content",
-								"bh_square",
-								"bh_square_center",
-								"bh_square_open",
-								"bh_square_close",
-								"bh_square_content",
-								"bh_unmatched",
-								"bh_unmatched_center",
-								"bh_unmatched_open",
-								"bh_unmatched_close",
-								"bh_unmatched_content",
-								"bh_c_define",
-								"bh_c_define_center",
-								"bh_c_define_open",
-								"bh_c_define_close",
-								"bh_c_define_content"
-							],
-							"color_scheme": "Packages/User/Color Highlighter/themes/Monokai Extended Bright (SL).tmTheme",
-							"syntax": "Packages/Text/Plain text.tmLanguage",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
+							"syntax": "Packages/JavaScript/JSON.sublime-syntax",
+							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 1620.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 2,
-					"type": "text"
-				},
-				{
-					"buffer": 1,
-					"file": "apps/admin/templatetags/admin_tags.py",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 19410,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								6061,
-								6061
-							]
-						],
-						"settings":
-						{
-							"auto_complete": false,
-							"bracket_highlighter.busy": false,
-							"bracket_highlighter.locations":
-							{
-								"close":
-								{
-								},
-								"icon":
-								{
-								},
-								"open":
-								{
-								},
-								"unmatched":
-								{
-								}
-							},
-							"bracket_highlighter.regions":
-							[
-								"bh_curly",
-								"bh_curly_center",
-								"bh_curly_open",
-								"bh_curly_close",
-								"bh_curly_content",
-								"bh_single_quote",
-								"bh_single_quote_center",
-								"bh_single_quote_open",
-								"bh_single_quote_close",
-								"bh_single_quote_content",
-								"bh_double_quote",
-								"bh_double_quote_center",
-								"bh_double_quote_open",
-								"bh_double_quote_close",
-								"bh_double_quote_content",
-								"bh_c_define",
-								"bh_c_define_center",
-								"bh_c_define_open",
-								"bh_c_define_close",
-								"bh_c_define_content",
-								"bh_regex",
-								"bh_regex_center",
-								"bh_regex_open",
-								"bh_regex_close",
-								"bh_regex_content",
-								"bh_default",
-								"bh_default_center",
-								"bh_default_open",
-								"bh_default_close",
-								"bh_default_content",
-								"bh_square",
-								"bh_square_center",
-								"bh_square_open",
-								"bh_square_close",
-								"bh_square_content",
-								"bh_unmatched",
-								"bh_unmatched_center",
-								"bh_unmatched_open",
-								"bh_unmatched_close",
-								"bh_unmatched_content",
-								"bh_round",
-								"bh_round_center",
-								"bh_round_open",
-								"bh_round_close",
-								"bh_round_content",
-								"bh_tag",
-								"bh_tag_center",
-								"bh_tag_open",
-								"bh_tag_close",
-								"bh_tag_content",
-								"bh_angle",
-								"bh_angle_center",
-								"bh_angle_open",
-								"bh_angle_close",
-								"bh_angle_content"
-							],
-							"color_scheme": "Packages/User/Color Highlighter/themes/Monokai Extended Bright (SL).tmTheme",
-							"editorconfig": true,
-							"ensure_newline_at_eof_on_save": true,
-							"syntax": "Packages/Python 3/Python3.tmLanguage",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true,
-							"trim_trailing_white_space_on_save": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 2812.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 0,
-					"type": "text"
-				},
-				{
-					"buffer": 2,
-					"file": "settings/base.py",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 8791,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								2458,
-								2458
-							]
-						],
-						"settings":
-						{
-							"auto_complete": false,
-							"bracket_highlighter.busy": false,
-							"bracket_highlighter.locations":
-							{
-								"close":
-								{
-									"1":
-									[
-										2562,
-										2563
-									]
-								},
-								"icon":
-								{
-									"1":
-									[
-										"Packages/BracketHighlighter/icons/square_bracket.png",
-										"brackethighlighter.default"
-									]
-								},
-								"open":
-								{
-									"1":
-									[
-										2359,
-										2360
-									]
-								},
-								"unmatched":
-								{
-								}
-							},
-							"bracket_highlighter.regions":
-							[
-								"bh_tag",
-								"bh_tag_center",
-								"bh_tag_open",
-								"bh_tag_close",
-								"bh_tag_content",
-								"bh_double_quote",
-								"bh_double_quote_center",
-								"bh_double_quote_open",
-								"bh_double_quote_close",
-								"bh_double_quote_content",
-								"bh_curly",
-								"bh_curly_center",
-								"bh_curly_open",
-								"bh_curly_close",
-								"bh_curly_content",
-								"bh_single_quote",
-								"bh_single_quote_center",
-								"bh_single_quote_open",
-								"bh_single_quote_close",
-								"bh_single_quote_content",
-								"bh_default",
-								"bh_default_center",
-								"bh_default_open",
-								"bh_default_close",
-								"bh_default_content",
-								"bh_c_define",
-								"bh_c_define_center",
-								"bh_c_define_open",
-								"bh_c_define_close",
-								"bh_c_define_content",
-								"bh_unmatched",
-								"bh_unmatched_center",
-								"bh_unmatched_open",
-								"bh_unmatched_close",
-								"bh_unmatched_content",
-								"bh_square",
-								"bh_square_center",
-								"bh_square_open",
-								"bh_square_close",
-								"bh_square_content",
-								"bh_regex",
-								"bh_regex_center",
-								"bh_regex_open",
-								"bh_regex_close",
-								"bh_regex_content",
-								"bh_angle",
-								"bh_angle_center",
-								"bh_angle_open",
-								"bh_angle_close",
-								"bh_angle_content",
-								"bh_round",
-								"bh_round_center",
-								"bh_round_open",
-								"bh_round_close",
-								"bh_round_content"
-							],
-							"color_scheme": "Packages/User/Color Highlighter/themes/Monokai Extended Bright (SL).tmTheme",
-							"editorconfig": true,
-							"ensure_newline_at_eof_on_save": true,
-							"syntax": "Packages/Python 3/Python3.tmLanguage",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true,
-							"trim_trailing_white_space_on_save": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 820.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 1,
 					"type": "text"
 				}
 			]
@@ -2059,7 +1507,7 @@
 	],
 	"incremental_find":
 	{
-		"height": 27.0
+		"height": 25.0
 	},
 	"input":
 	{
@@ -2088,31 +1536,15 @@
 		]
 	},
 	"menu_visible": true,
-	"output.coffeecompile_output":
-	{
-		"height": 86.0
-	},
-	"output.exec":
-	{
-		"height": 165.0
-	},
 	"output.find_results":
 	{
 		"height": 0.0
-	},
-	"output.git":
-	{
-		"height": 86.0
-	},
-	"output.unsaved_changes":
-	{
-		"height": 86.0
 	},
 	"pinned_build_system": "Project",
 	"project": "project.sublime-project",
 	"replace":
 	{
-		"height": 50.0
+		"height": 46.0
 	},
 	"save_all_on_build": true,
 	"select_file":
@@ -2154,7 +1586,7 @@
 	"show_open_files": true,
 	"show_tabs": true,
 	"side_bar_visible": true,
-	"side_bar_width": 263.0,
+	"side_bar_width": 297.0,
 	"status_bar_visible": true,
 	"template_settings":
 	{

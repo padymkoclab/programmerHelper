@@ -5,8 +5,8 @@ from django.utils.translation import ugettext_lazy as _
 from django.db import models
 from django.conf import settings
 
-from .validators import validate_url_path
-from .managers import VisitPageManager, AttendanceManager
+from .validators import validate_comma_separated_objects_list
+from .managers import VisitPageManager, AttendanceManager, VisitUserBrowserManager, VisitUserSystemManager
 
 
 class VisitPage(models.Model):
@@ -20,8 +20,8 @@ class VisitPage(models.Model):
     count = models.IntegerField(_('count visits'), default=0)
 
     class Meta:
-        verbose_name = _('Visit page')
-        verbose_name_plural = _('Visits page')
+        verbose_name = _('visit page')
+        verbose_name_plural = _('visits page')
 
     objects = models.Manager()
     objects = VisitPageManager()
@@ -39,7 +39,7 @@ class VisitSite(models.Model):
     users = models.ManyToManyField(
         settings.AUTH_USER_MODEL,
         related_name='attendances',
-        verbose_name=_('User'),
+        verbose_name=_('user'),
         editable=False,
     )
     date = models.DateField(_('date'), editable=False, auto_now_add=True, unique=True, error_messages={
@@ -50,8 +50,8 @@ class VisitSite(models.Model):
     objects = AttendanceManager()
 
     class Meta:
-        verbose_name = _('Visit site')
-        verbose_name_plural = _('Visits site')
+        verbose_name = _('visit site')
+        verbose_name_plural = _('visits site')
         get_latest_by = 'date'
         ordering = ('-date', )
 
@@ -68,7 +68,7 @@ class Visit(models.Model):
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
         related_name='last_seen',
-        verbose_name=_('User'),
+        verbose_name=_('user'),
         editable=False,
     )
     date = models.DateTimeField(_('date'), editable=False)
@@ -76,10 +76,58 @@ class Visit(models.Model):
     objects = models.Manager()
 
     class Meta:
-        verbose_name = _('Visit')
-        verbose_name_plural = _('Visits')
+        verbose_name = _('visit')
+        verbose_name_plural = _('visits')
         get_latest_by = 'date'
         ordering = ('-date', )
 
     def __str__(self):
         return '{0.user}'.format(self)
+
+
+class VisitUserBrowser(models.Model):
+    """
+    For only registered users
+    """
+
+    id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
+    name = models.CharField(_('name'), max_length=100, unique=True)
+    user_pks = models.TextField(
+        _('primary key of users'), validators=[validate_comma_separated_objects_list],
+        default='', blank=True
+    )
+
+    objects = models.Manager()
+    objects = VisitUserBrowserManager()
+
+    class Meta:
+        verbose_name = _('browser')
+        verbose_name_plural = _('browsers')
+        ordering = ('-name', )
+
+    def __str__(self):
+        return '{0.name}'.format(self)
+
+
+class VisitUserSystem(models.Model):
+    """
+    For only registered users
+    """
+
+    id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
+    name = models.CharField(_('name'), max_length=50, unique=True)
+    user_pks = models.TextField(
+        _('primary key of users'), validators=[validate_comma_separated_objects_list],
+        default='', blank=True
+    )
+
+    objects = models.Manager()
+    objects = VisitUserSystemManager()
+
+    class Meta:
+        verbose_name = _('operation system')
+        verbose_name_plural = _('operation systems')
+        ordering = ('-name', )
+
+    def __str__(self):
+        return '{0.name}'.format(self)

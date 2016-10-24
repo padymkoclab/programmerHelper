@@ -19,7 +19,6 @@ js_info_dict = {
 urlpatterns = [
 
     # django
-    # url(r'^admin/export_import/', include('apps.export_import_models.urls')),
     url(r'^jsi18n/$', javascript_catalog, js_info_dict, 'javascript-catalog'),
     url(r'^i18n/', include('django.conf.urls.i18n')),
 
@@ -28,7 +27,6 @@ urlpatterns = [
     url(r'^image/(?P<height>\d+)x(?P<width>\d+)/$', PlaceholderView.as_view(), {}, 'placeholder'),
 
     # apps
-    #
     url(r'^admin/', DefaultSiteAdmin.urls),
     url(r'^articles/', include('apps.articles.urls')),
     url(r'^badges/', include('apps.badges.urls')),
@@ -41,7 +39,6 @@ urlpatterns = [
     url(r'^snippets/', include('apps.snippets.urls')),
     url(r'^solutions/', include('apps.solutions.urls')),
     url(r'^tags/', include('apps.tags.urls')),
-    url(r'^testing/', include('apps.testing.urls')),
     url(r'^users/', include('apps.users.urls')),
     url(r'^utilities/', include('apps.utilities.urls')),
 ]

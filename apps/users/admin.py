@@ -120,48 +120,89 @@ class UserAdmin(ModelAdmin):
             ),
         }),
         ('voters', {
-            'title': _('Users with details about votes in polls'),
-            'fields': ('__str__', ),
+            'title': _('Users as voters'),
+            'fields': (
+                '__str__',
+                'get_count_votes',
+                'is_active_voter',
+                'get_date_latest_vote',
+            ),
         }),
-        ('quetiones_anwerer', {
-            'title': _('Users with details about questions and answers'),
-            'fields': ('__str__', ),
+        ('queriest', {
+            'title': _('Users as queriests'),
+            'fields': (
+                '__str__',
+                'get_favorite_tag_of_questions',
+                'get_count_questions',
+                'get_date_latest_question',
+            ),
+        }),
+        ('respondent', {
+            'title': _('Users as respondents'),
+            'fields': (
+                '__str__',
+                'get_favorite_tag_of_answers',
+                'get_count_answers',
+                'get_date_latest_answer',
+            ),
         }),
         ('publicist', {
-            'title': _('Users with details about articles'),
-            'fields': ('__str__', ),
+            'title': _('Users as publicists'),
+            'fields': (
+                '__str__',
+                'get_favorite_tag_of_articles',
+                'get_count_articles',
+                'get_total_rating_for_articles',
+                'get_date_latest_article',
+            ),
         }),
         ('snippetolog', {
-            'title': _('Users with details about snippets'),
-            'fields': ('__str__', ),
+            'title': _('Users as snippetologs'),
+            'fields': (
+                '__str__',
+            ),
         }),
         ('commentator', {
-            'title': _('Users with details about comments'),
-            'fields': ('__str__', ),
+            'title': _('Users as commentators'),
+            'fields': (
+                '__str__',
+            ),
         }),
         ('opinioniolog', {
             'title': _('Users with details about opinions'),
-            'fields': ('__str__', ),
+            'fields': (
+                '__str__',
+            ),
         }),
         ('flavourer', {
             'title': _('Users with details about flavour'),
-            'fields': ('__str__', ),
+            'fields': (
+                '__str__',
+            ),
         }),
         ('replier', {
             'title': _('Users with details about replies'),
-            'fields': ('__str__', ),
+            'fields': (
+                '__str__',
+            ),
         }),
         ('badger', {
             'title': _('Users with details about badges'),
-            'fields': ('__str__', ),
+            'fields': (
+                '__str__',
+            ),
         }),
         ('forumer', {
-            'title': _('Users with details activity on forum'),
-            'fields': ('__str__', ),
+            'title': _('Users as forumers'),
+            'fields': (
+                '__str__',
+            ),
         }),
         ('marker', {
             'title': _('Users with details marks'),
-            'fields': ('__str__', ),
+            'fields': (
+                '__str__',
+            ),
         }),
     ]
 

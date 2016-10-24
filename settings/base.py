@@ -42,7 +42,6 @@ CUSTOM_APPS = [
     'apps.badges.apps.BadgesConfig',
     'apps.library.apps.LibraryConfig',
     'apps.comments.apps.CommentsConfig',
-    # 'apps.courses.apps.CoursesConfig',  # temporary is disabled
     'apps.flavours.apps.FlavoursConfig',
     'apps.forums.apps.ForumsConfig',
     'apps.marks.apps.MarksConfig',
@@ -56,7 +55,6 @@ CUSTOM_APPS = [
     'apps.snippets.apps.SnippetsConfig',
     'apps.solutions.apps.SolutionsConfig',
     'apps.tags.apps.TagsConfig',
-    'apps.testing.apps.TestingConfig',
     'apps.users.apps.UsersConfig',
     'apps.utilities.apps.UtilitiesConfig',
     'apps.visits.apps.VisitsConfig',
@@ -84,6 +82,7 @@ MY_MIDDLEWARE_CLASSES = [
     'apps.visits.middleware.UserVisitMiddleware',
     'apps.visits.middleware.CounterVisitPageMiddleware',
     'apps.visits.middleware.UsersOnlineMiddleware',
+    'apps.visits.middleware.UserAgentUsageMiddleware',
 ]
 
 MIDDLEWARE = DJANGO_MIDDLEWARE_CLASSES + MY_MIDDLEWARE_CLASSES
