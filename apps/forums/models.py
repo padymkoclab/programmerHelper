@@ -239,7 +239,7 @@ class Topic(TimeStampedModel):
         settings.AUTH_USER_MODEL, verbose_name=_('User'),
         related_name='topics', on_delete=models.CASCADE,
     )
-    views = models.IntegerField(_('Count views'), default=0, editable=False)
+    views = models.PositiveIntegerField(_('count views'), editable=False, default=0)
     is_sticky = models.BooleanField(_('Is sticky'), default=False)
     is_opened = models.BooleanField(_('Is opened?'), default=True)
 

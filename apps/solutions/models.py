@@ -52,7 +52,7 @@ class Solution(CommentsModelMixin, OpinionsModelMixin, TagsModelMixin, TimeStamp
         related_name='solutions',
         verbose_name=_('Tags'),
     )
-    views = models.PositiveIntegerField(_('Count views'), editable=False, default=0)
+    views = models.PositiveIntegerField(_('count views'), editable=False, default=0)
 
     comments = GenericRelation(Comment, related_query_name='solutions')
     opinions = GenericRelation(Opinion, related_query_name='solutions')

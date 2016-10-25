@@ -3,6 +3,8 @@
 # Project
 
 *.ipynb
+.ipynb_checkpoints/
+.cache/
 
 static/vendor/
 assets/

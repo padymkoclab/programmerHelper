@@ -17,7 +17,13 @@
 	[
 		{
 			"follow_symlinks": true,
-			"path": "."
+			"path": ".",
+			"folder_exclude_patterns":
+			[
+				"__pycache__",
+				".cache",
+				".ipynb_checkpoints"
+			],
 		},
 		{
 			"file_include_patterns":

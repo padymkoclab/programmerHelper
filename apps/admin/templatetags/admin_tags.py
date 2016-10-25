@@ -219,6 +219,9 @@ def display_object_list(model_admin, page_object_list, list_display_fields):
             if isinstance(value, models.QuerySet):
 
                 if value.exists():
+
+                    if model_admin.max_count_display_queryset:
+                        value = value[:model_admin.max_count_display_queryset]
                     value = ', '.join(map(str, value))
                 else:
                     value = None

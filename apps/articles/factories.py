@@ -10,7 +10,6 @@ from factory import fuzzy
 
 from apps.tags.models import Tag
 from apps.comments.factories import CommentFactory
-from apps.marks.factories import MarkFactory
 
 from utils.django.factories_utils import (
     generate_text_random_length_for_field_of_model,
@@ -18,21 +17,7 @@ from utils.django.factories_utils import (
     generate_image,
 )
 
-from .models import Article, Subsection
-
-
-class SubsectionFactory(factory.DjangoModelFactory):
-
-    class Meta:
-        model = Subsection
-
-    @factory.lazy_attribute
-    def name(self):
-        return generate_text_random_length_for_field_of_model(self, 'name')
-
-    @factory.lazy_attribute
-    def content(self):
-        return generate_text_random_length_for_field_of_model(self, 'content')
+from .models import Article, Subsection, Mark
 
 
 class ArticleFactory(AbstractTimeStampedFactory):
@@ -99,11 +84,11 @@ class ArticleFactory(AbstractTimeStampedFactory):
     @factory.post_generation
     def marks(self, created, extracted, **kwargs):
         for i in range(random.randint(0, 10)):
-            MarkFactory(content_object=self)
+            MarkFactory(article=self)
 
     @factory.post_generation
-    def date_added(self, created, extracted, **kwargs):
-        self.date_added = fuzzy.FuzzyDateTime(self.user.date_joined).fuzz()
+    def created(self, created, extracted, **kwargs):
+        self.created = fuzzy.FuzzyDateTime(self.user.date_joined).fuzz()
         self.save()
 
     @factory.post_generation
@@ -111,3 +96,34 @@ class ArticleFactory(AbstractTimeStampedFactory):
 
         for i in range(random.randint(1, Article.MAX_COUNT_SUBSECTIONS)):
             SubsectionFactory(article=self)
+
+
+class SubsectionFactory(factory.django.DjangoModelFactory):
+
+    class Meta:
+        model = Subsection
+
+    @factory.lazy_attribute
+    def name(self):
+        return generate_text_random_length_for_field_of_model(self, 'name')
+
+    @factory.lazy_attribute
+    def content(self):
+        return generate_text_random_length_for_field_of_model(self, 'content')
+
+
+class MarkFactory(AbstractTimeStampedFactory):
+
+    class Meta:
+        model = Mark
+
+    mark = fuzzy.FuzzyInteger(Mark.MIN_MARK, Mark.MAX_MARK, step=1)
+
+    @factory.lazy_attribute
+    def user(self):
+
+        model = self._LazyStub__model_class._meta.model
+        users_already_given_their_marks = model._default_manager.filter(article=self.article).values('user')
+        users_given_not_mark_yet = get_user_model().objects.exclude(pk__in=users_already_given_their_marks)
+        users_given_not_mark_yet_and_no_author = users_given_not_mark_yet.exclude(pk=self.article.user.pk)
+        return users_given_not_mark_yet_and_no_author.first()

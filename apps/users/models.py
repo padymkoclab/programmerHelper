@@ -7,6 +7,7 @@ import hashlib
 import random
 import uuid
 
+from django.contrib.contenttypes.models import ContentType
 from django.contrib.postgres.fields import ArrayField
 from django import template
 from django.utils.html import format_html
@@ -28,15 +29,20 @@ from utils.django.models_utils import get_admin_url
 from utils.django.functions_db import Round
 
 from apps.tags.models import Tag
-from apps.badges.models import BadgeManager
+from apps.badges.managers import BadgeManager
+from apps.badges.models import Badge
 # from apps.polls.managers import PollsManager
 # from apps.polls.querysets import UserPollQuerySet
-# from apps.articles.models import Article
 # from apps.activity.models import Activity
 # from apps.forum.models import Topic
 # from apps.sessions.models import ExpandedSession
 # from utils.django.models_fields import PhoneField
 from apps.polls.models import Poll
+from apps.articles.models import Article
+from apps.solutions.models import Solution
+from apps.utilities.models import Utility
+from apps.snippets.models import Snippet
+from apps.questions.models import Answer, Question
 
 from .managers import UserManager, LevelManager
 from .exceptions import ProtectDeleteUser
@@ -47,11 +53,6 @@ logger = logging.getLogger('django.development')
 
 
 logger.info('Example user page https://www.digitalocean.com/community/users/jellingwood?primary_filter=upvotes_given')
-logger.info('get_earned_badges')
-logger.info('get_unearned_badges')
-logger.info('get_gold_badges')
-logger.info('get_silver_badges')
-logger.info('get_bronze_badges')
 logger.info('get_chart_visits')
 logger.info('get_chart_activity')
 
@@ -209,6 +210,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         get_latest_by = 'date_joined'
 
     def __str__(self):
+
         return self.get_short_name()
 
     def save(self, *args, **kwargs):
@@ -308,35 +310,169 @@ class User(AbstractBaseUser, PermissionsMixin):
     get_last_seen.short_description = _('Last seen')
     get_last_seen.admin_order_field = 'last_seen'
 
-    def get_count_comments(self):
+    def get_count_days_attendances(self):
+
+        return self.attendances.count()
+    get_count_days_attendances.short_description = _('Count days attendance')
+    get_count_days_attendances.admin_order_field = 'count_days_attendance'
+
+    def get_total_count_comments(self):
         """ """
 
-        if hasattr(self, 'count_comments'):
-            return self.count_comments
+        if hasattr(self, 'total_count_comments'):
+            return self.total_count_comments
 
         return self.comments.count()
-    get_count_comments.admin_order_field = 'count_comments'
-    get_count_comments.short_description = _('Count comments')
+    get_total_count_comments.short_description = _('Total count comments')
+    get_total_count_comments.admin_order_field = 'total_count_comments'
 
-    def get_count_opinions(self):
+    def get_count_comments_of_articles(self):
         """ """
 
-        if hasattr(self, 'count_opinions'):
-            return self.count_opinions
+        if hasattr(self, 'count_comments_articles'):
+            return self.count_comments_articles
+
+        ct_model = ContentType.objects.get_for_model(Article)
+        return self.comments.filter(content_type=ct_model).count()
+    get_count_comments_of_articles.short_description = _('Count comments of articles')
+    get_count_comments_of_articles.admin_order_field = 'count_comments_articles'
+
+    def get_count_comments_of_solutions(self):
+        """ """
+
+        if hasattr(self, 'count_comments_solutions'):
+            return self.count_comments_solutions
+
+        ct_model = ContentType.objects.get_for_model(Solution)
+        return self.comments.filter(content_type=ct_model).count()
+    get_count_comments_of_solutions.short_description = _('Count comments of solutions')
+    get_count_comments_of_solutions.admin_order_field = 'count_comments_solutions'
+
+    def get_count_comments_of_snippets(self):
+        """ """
+
+        if hasattr(self, 'count_comments_snippets'):
+            return self.count_comments_snippets
+
+        ct_model = ContentType.objects.get_for_model(Snippet)
+        return self.comments.filter(content_type=ct_model).count()
+    get_count_comments_of_snippets.short_description = _('Count comments of snippets')
+    get_count_comments_of_snippets.admin_order_field = 'count_comments_snippets'
+
+    def get_count_comments_of_answers(self):
+        """ """
+
+        if hasattr(self, 'count_comments_answers'):
+            return self.count_comments_answers
+
+        ct_model = ContentType.objects.get_for_model(Answer)
+        return self.comments.filter(content_type=ct_model).count()
+    get_count_comments_of_answers.short_description = _('Count comments of answers')
+    get_count_comments_of_answers.admin_order_field = 'count_comments_answers'
+
+    def get_count_comments_of_utilities(self):
+        """ """
+
+        if hasattr(self, 'count_comments_utilities'):
+            return self.count_comments_utilities
+
+        ct_model = ContentType.objects.get_for_model(Utility)
+        return self.comments.filter(content_type=ct_model).count()
+    get_count_comments_of_utilities.short_description = _('Count comments of utilities')
+    get_count_comments_of_utilities.admin_order_field = 'count_comments_utilities'
+
+    def get_date_latest_comment(self):
+        """ """
+
+        # if hasattr(self, 'count_comments'):
+        #     return self.count_comments
+
+        try:
+            return self.comments.latest().created
+        except self.comments.model.DoesNotExist:
+            return
+    get_date_latest_comment.short_description = _('Latest comment')
+    get_date_latest_comment.admin_order_field = 'date_latest_comment'
+
+    def get_rating_comments(self):
+
+        logger.critical('Not implemented error')
+
+        return
+    get_rating_comments.short_description = _('Rating')
+    get_rating_comments.admin_order_field = 'rating'
+
+    def get_date_latest_reply(self):
+        """ """
+
+        try:
+            return self.replies.latest().created
+        except self.replies.model.DoesNotExist:
+            return
+    get_date_latest_reply.admin_order_field = 'date_latest_reply'
+    get_date_latest_reply.short_description = _('Latest reply')
+
+    def get_count_replies(self):
+        """ """
+
+        return self.replies.count()
+    get_count_replies.admin_order_field = 'count_replies'
+    get_count_replies.short_description = _('Count replies')
+
+    def get_total_count_opinions(self):
+        """ """
+
+        if hasattr(self, 'total_count_opinions'):
+            return self.total_count_opinions
 
         return self.opinions.count()
-    get_count_opinions.admin_order_field = 'count_opinions'
-    get_count_opinions.short_description = _('Count opinions')
+    get_total_count_opinions.admin_order_field = 'total_count_opinions'
+    get_total_count_opinions.short_description = _('Total count opinions')
 
-    def get_count_likes(self):
+    def get_count_opinions_of_solutions(self):
+
+        ct_model = ContentType.objects.get_for_model(Solution)
+        return self.opinions.filter(content_type=ct_model).count()
+    get_count_opinions_of_solutions.short_description = _('Count opinions of solutions')
+    get_count_opinions_of_solutions.admin_order_field = 'count_opinions_solutions'
+
+    def get_count_opinions_of_questions(self):
+
+        ct_model = ContentType.objects.get_for_model(Question)
+        return self.opinions.filter(content_type=ct_model).count()
+    get_count_opinions_of_questions.short_description = _('Count opinions of questions')
+    get_count_opinions_of_questions.admin_order_field = 'count_opinions_questions'
+
+    def get_count_opinions_of_snippets(self):
+
+        ct_model = ContentType.objects.get_for_model(Snippet)
+        return self.opinions.filter(content_type=ct_model).count()
+    get_count_opinions_of_snippets.short_description = _('Count opinions of snippets')
+    get_count_opinions_of_snippets.admin_order_field = 'count_opinions_snippets'
+
+    def get_count_opinions_of_utilities(self):
+
+        ct_model = ContentType.objects.get_for_model(Utility)
+        return self.opinions.filter(content_type=ct_model).count()
+    get_count_opinions_of_utilities.short_description = _('Count opinions of utilities')
+    get_count_opinions_of_utilities.admin_order_field = 'count_opinions_utilities'
+
+    def get_count_opinions_of_answers(self):
+
+        ct_model = ContentType.objects.get_for_model(Answer)
+        return self.opinions.filter(content_type=ct_model).count()
+    get_count_opinions_of_answers.short_description = _('Count opinions of answers')
+    get_count_opinions_of_answers.admin_order_field = 'count_opinions_answers'
+
+    def get_date_latest_opinion(self):
         """ """
 
-        if hasattr(self, 'count_likes'):
-            return self.count_likes
-
-        return self.likes.count()
-    get_count_likes.admin_order_field = 'count_likes'
-    get_count_likes.short_description = _('Count likes')
+        try:
+            return self.opinions.latest().created
+        except self.opinions.model.DoesNotExist:
+            return
+    get_date_latest_opinion.admin_order_field = 'date_latest_opinion'
+    get_date_latest_opinion.short_description = _('Latest opinion')
 
     def get_count_marks(self):
         """ """
@@ -348,6 +484,16 @@ class User(AbstractBaseUser, PermissionsMixin):
     get_count_marks.admin_order_field = 'count_marks'
     get_count_marks.short_description = _('Count marks')
 
+    def get_date_latest_mark(self):
+        """ """
+
+        try:
+            return self.marks.latest().created
+        except self.marks.model.DoesNotExist:
+            return
+    get_date_latest_mark.admin_order_field = 'date_latest_mark'
+    get_date_latest_mark.short_description = _('Latest mark')
+
     def get_count_questions(self):
         """ """
 
@@ -358,14 +504,14 @@ class User(AbstractBaseUser, PermissionsMixin):
     get_count_questions.admin_order_field = 'count_questions'
     get_count_questions.short_description = _('Count questions')
 
-    def get_favorite_tag_of_questions(self):
+    def get_favorite_tags_of_questions(self):
         """ """
 
         qs_tags_pks = self.questions.values_list('tags__pk', flat=True)
         favorite_tags = get_favorite_tags(qs_tags_pks)
 
-        return favorite_tags[:3]
-    get_favorite_tag_of_questions.short_description = _('Favorite tag')
+        return favorite_tags
+    get_favorite_tags_of_questions.short_description = _('Favorite tag')
 
     def get_date_latest_question(self):
         """ """
@@ -390,6 +536,88 @@ class User(AbstractBaseUser, PermissionsMixin):
     get_count_snippets.admin_order_field = 'count_snippets'
     get_count_snippets.short_description = _('Count snippets')
 
+    def get_favorite_tags_of_snippets(self):
+        """ """
+
+        qs_tags_pks = self.snippets.values_list('tags__pk', flat=True)
+        favorite_tags = get_favorite_tags(qs_tags_pks)
+
+        return favorite_tags
+    get_favorite_tags_of_snippets.short_description = _('Favorite tag')
+
+    def get_total_rating_for_snippets(self):
+        """ """
+
+        snippets = self.snippets.annotate(rating=models.Sum(models.Case(
+            models.When(opinions__is_useful=True, then=1),
+            models.When(opinions__is_useful=False, then=-1),
+            output_field=models.IntegerField()
+        )))
+
+        total_rating = snippets.aggregate(total_rating=Round(models.Avg('rating')))['total_rating']
+        return total_rating
+    get_total_rating_for_snippets.admin_order_field = 'total_rating'
+    get_total_rating_for_snippets.short_description = _('Total rating')
+
+    def get_date_latest_snippet(self):
+        """ """
+
+        # if hasattr(self, 'count_snippets'):
+        #     return self.count_snippets
+
+        try:
+            return self.snippets.latest().created
+        except self.snippets.model.DoesNotExist:
+            return
+    get_date_latest_snippet.admin_order_field = 'date_latest_snippet'
+    get_date_latest_snippet.short_description = _('Latest snippet')
+
+    def get_count_solutions(self):
+        """ """
+
+        if hasattr(self, 'count_solutions'):
+            return self.count_solutions
+
+        return self.solutions.count()
+    get_count_solutions.admin_order_field = 'count_solutions'
+    get_count_solutions.short_description = _('Count solutions')
+
+    def get_favorite_tags_of_solutions(self):
+        """ """
+
+        qs_tags_pks = self.solutions.values_list('tags__pk', flat=True)
+        favorite_tags = get_favorite_tags(qs_tags_pks)
+
+        return favorite_tags
+    get_favorite_tags_of_solutions.short_description = _('Favorite tag')
+
+    def get_total_rating_for_solutions(self):
+        """ """
+
+        solutions = self.solutions.annotate(rating=models.Sum(models.Case(
+            models.When(opinions__is_useful=True, then=1),
+            models.When(opinions__is_useful=False, then=-1),
+            output_field=models.IntegerField()
+        )))
+
+        total_rating = solutions.aggregate(total_rating=Round(models.Avg('rating')))['total_rating']
+        return total_rating
+    get_total_rating_for_solutions.admin_order_field = 'total_rating'
+    get_total_rating_for_solutions.short_description = _('Total rating')
+
+    def get_date_latest_solution(self):
+        """ """
+
+        # if hasattr(self, 'count_solutions'):
+        #     return self.count_solutions
+
+        try:
+            return self.solutions.latest().created
+        except self.solutions.model.DoesNotExist:
+            return
+    get_date_latest_solution.admin_order_field = 'date_latest_solution'
+    get_date_latest_solution.short_description = _('Latest solution')
+
     def get_count_articles(self):
         """ """
 
@@ -400,14 +628,14 @@ class User(AbstractBaseUser, PermissionsMixin):
     get_count_articles.admin_order_field = 'count_articles'
     get_count_articles.short_description = _('Count article')
 
-    def get_favorite_tag_of_articles(self):
+    def get_favorite_tags_of_articles(self):
         """ """
 
         qs_tags_pks = self.articles.values_list('tags__pk', flat=True)
         favorite_tags = get_favorite_tags(qs_tags_pks)
 
-        return favorite_tags[:3]
-    get_favorite_tag_of_articles.short_description = _('Favorite tag')
+        return favorite_tags
+    get_favorite_tags_of_articles.short_description = _('Favorite tag')
 
     def get_total_rating_for_articles(self):
         """ """
@@ -443,14 +671,14 @@ class User(AbstractBaseUser, PermissionsMixin):
     get_count_answers.admin_order_field = 'count_answers'
     get_count_answers.short_description = _('Count answers')
 
-    def get_favorite_tag_of_answers(self):
+    def get_favorite_tags_of_answers(self):
         """ """
 
         qs_tags_pks = self.answers.values_list('question__tags', flat=True)
         favorite_tags = get_favorite_tags(qs_tags_pks)
 
-        return favorite_tags[:3]
-    get_favorite_tag_of_answers.short_description = _('Favorite tag')
+        return favorite_tags
+    get_favorite_tags_of_answers.short_description = _('Favorite tag')
 
     def get_date_latest_answer(self):
         """ """
@@ -467,11 +695,29 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def get_total_rating_for_answers(self):
 
-        raise NotImplementedError
+        answers = self.answers.annotate(rating=models.Sum(models.Case(
+            models.When(opinions__is_useful=True, then=1),
+            models.When(opinions__is_useful=False, then=-1),
+            output_field=models.IntegerField()
+        )))
+
+        total_rating = answers.aggregate(total_rating=Round(models.Avg('rating')))['total_rating']
+        return total_rating
+    get_total_rating_for_answers.short_description = _('Total rating')
+    get_total_rating_for_answers.admin_order_field = 'total_rating'
 
     def get_total_rating_for_questions(self):
 
-        raise NotImplementedError
+        questions = self.questions.annotate(rating=models.Sum(models.Case(
+            models.When(opinions__is_useful=True, then=1),
+            models.When(opinions__is_useful=False, then=-1),
+            output_field=models.IntegerField()
+        )))
+
+        total_rating = questions.aggregate(total_rating=Round(models.Avg('rating')))['total_rating']
+        return total_rating
+    get_total_rating_for_questions.short_description = _('Total rating')
+    get_total_rating_for_questions.admin_order_field = 'total_rating'
 
     def get_count_solutions(self):
         """ """
@@ -502,6 +748,23 @@ class User(AbstractBaseUser, PermissionsMixin):
         return self.topics.count()
     get_count_topics.admin_order_field = 'count_topics'
     get_count_topics.short_description = _('Count topics')
+
+    def get_date_latest_activity_on_forums(self):
+        """ """
+
+        date_latest_update_post = self.posts.aggregate(date=models.Max('updated'))['date']
+        date_latest_update_topic = self.topics.aggregate(date=models.Max('updated'))['date']
+
+        if date_latest_update_topic is None and date_latest_update_post is None:
+            return
+        elif date_latest_update_topic is None and date_latest_update_post is not None:
+            return date_latest_update_post
+        elif date_latest_update_topic is not None and date_latest_update_post is None:
+            return date_latest_update_topic
+        else:
+            return max(date_latest_update_post, date_latest_update_topic)
+    get_date_latest_activity_on_forums.admin_order_field = 'date_latest_activity'
+    get_date_latest_activity_on_forums.short_description = _('Latest activity')
 
     def get_count_votes(self):
         """ """
@@ -538,6 +801,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     def get_statistics_usage_tags(self, count=None):
         """ """
 
+        raise NotImplementedError
+
         tags = itertools.chain.from_iterable((
             self.solutions.values_list('tags', flat=True),
             self.snippets.values_list('tags', flat=True),
@@ -553,19 +818,56 @@ class User(AbstractBaseUser, PermissionsMixin):
 
         return tags
 
-    def get_top_tag(self):
+    def _get_couter_pks_usage_tags(self):
+
+        all_tags_pks = itertools.chain.from_iterable((
+            self.questions.values_list('tags', flat=True),
+            self.snippets.values_list('tags', flat=True),
+            self.solutions.values_list('tags', flat=True),
+            self.articles.values_list('tags', flat=True),
+        ))
+
+        counter = collections.Counter(all_tags_pks)
+
+        return counter
+
+    def get_count_usaged_unique_tags(self):
         """ """
 
-        first_element = self.get_statistics_usage_tags(1)[0]
-        return first_element[0]
+        counter = self._get_couter_pks_usage_tags()
+        return len(counter)
+    get_count_usaged_unique_tags.short_description = _('Count usaged unique tags')
+    get_count_usaged_unique_tags.admin_order_field = 'count_usaged_unique_tags'
+
+    def get_total_count_usaged_tags(self):
+        """ """
+
+        counter = self._get_couter_pks_usage_tags()
+        return sum(counter.values())
+    get_total_count_usaged_tags.short_description = _('Total count usaged tags')
+    get_total_count_usaged_tags.admin_order_field = 'total_count_usaged_tags'
+
+    def get_favorite_tags(self):
+        """ """
+
+        counter = self._get_couter_pks_usage_tags()
+
+        max_count = counter.most_common(1)[0][1]
+
+        tag_pks = [tag_pk for tag_pk, count in counter.items() if count == max_count]
+
+        return Tag._default_manager.filter(pk__in=tag_pks)
+    get_favorite_tags.short_description = _('Favorite tags')
 
     def have_certain_count_consecutive_days(self, count_consecutive_days):
-        pass
+
+        raise NotImplementedError
 
     def get_count_popular_topics(self):
         """Getting count popular topics of user."""
         # popular_topics_of_user = Topic.objects.popular_topics().filter(author=self)
 
+        raise NotImplementedError
         return self.popular_topics_of_user.count()
 
     def get_reputation(self):
@@ -602,6 +904,68 @@ class User(AbstractBaseUser, PermissionsMixin):
     def has_badge(self, badge):
 
         return self.badges.filter(badge=badge).exists()
+
+    def get_count_badges(self):
+
+        return self.badges.count()
+    get_count_badges.short_description = _('Count badges')
+    get_count_badges.admin_order_field = 'count_badges'
+
+    def get_count_gold_badges(self):
+
+        return self.get_gold_badges().count()
+    get_count_gold_badges.short_description = _('Count gold badges')
+    get_count_gold_badges.admin_order_field = 'count_gold_badges'
+
+    def get_count_silver_badges(self):
+
+        return self.get_silver_badges().count()
+    get_count_silver_badges.short_description = _('Count silver badges')
+    get_count_silver_badges.admin_order_field = 'count_silver_badges'
+
+    def get_count_bronze_badges(self):
+
+        return self.get_bronze_badges().count()
+    get_count_bronze_badges.short_description = _('Count bronze badges')
+    get_count_bronze_badges.admin_order_field = 'count_bronze_badges'
+
+    def get_latest_badge(self):
+
+        try:
+            return self.badges.latest()
+        except self.badges.model.DoesNotExist:
+            return
+    get_latest_badge.short_description = _('Latest badge')
+    get_latest_badge.admin_order_field = 'latest_badge'
+
+    def get_date_getting_latest_badge(self):
+
+        try:
+            return self.badges.latest().date
+        except self.badges.model.DoesNotExist:
+            return
+    get_date_getting_latest_badge.short_description = _('Date getting latest badge')
+    get_date_getting_latest_badge.admin_order_field = 'date_latest_badge'
+
+    def get_earned_badges(self):
+
+        return self.badges.all()
+
+    def get_unearned_badges(self):
+
+        return Badge._default_manager.exclude(pk__in=self.badges.all())
+
+    def get_gold_badges(self):
+
+        return self.badges.filter(badge__kind=Badge.GOLD)
+
+    def get_silver_badges(self):
+
+        return self.badges.filter(badge__kind=Badge.SILVER)
+
+    def get_bronze_badges(self):
+
+        return self.badges.filter(badge__kind=Badge.BRONZE)
 
 
 class Profile(models.Model):

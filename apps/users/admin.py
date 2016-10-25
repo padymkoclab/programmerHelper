@@ -9,10 +9,10 @@ from django.utils.html import format_html
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
-from apps.polls.listfilters import IsActiveVoterListFilter
 from apps.admin.site import DefaultSiteAdmin
 from apps.admin.admin import ModelAdmin, StackedInline, TabularInline
 from apps.admin.app import AppAdmin
+from apps.polls.listfilters import IsActiveVoterListFilter
 
 from .actions import (
     make_users_as_non_superuser,
@@ -86,6 +86,7 @@ class UserAdmin(ModelAdmin):
     Admin configuration for model User
     """
 
+    max_count_display_queryset = 3
     form = UserChangeForm
     add_form = UserCreateAdminModelForm
     actions = (
@@ -107,20 +108,27 @@ class UserAdmin(ModelAdmin):
                 'date_joined',
             ),
         }),
-        ('users_additional_info', {
-            'title': _('Users (additional information)'),
+        ('users_extra_info', {
+            'title': _('Users (extra information)'),
             'fields': (
                 'alias',
                 'username',
                 'email',
                 'level',
                 'reputation',
-                'get_last_seen',
                 'last_login',
             ),
         }),
-        ('voters', {
-            'title': _('Users as voters'),
+        ('users_visits', {
+            'title': _('Users and visits'),
+            'fields': (
+                'alias',
+                'get_last_seen',
+                'get_count_days_attendances',
+            ),
+        }),
+        ('users_polls', {
+            'title': _('Users and polls'),
             'fields': (
                 '__str__',
                 'get_count_votes',
@@ -128,82 +136,142 @@ class UserAdmin(ModelAdmin):
                 'get_date_latest_vote',
             ),
         }),
-        ('queriest', {
-            'title': _('Users as queriests'),
+        ('users_questions', {
+            'title': _('Users and questions'),
             'fields': (
                 '__str__',
-                'get_favorite_tag_of_questions',
+                'get_favorite_tags_of_questions',
                 'get_count_questions',
+                'get_total_rating_for_questions',
                 'get_date_latest_question',
             ),
         }),
-        ('respondent', {
-            'title': _('Users as respondents'),
+        ('users_answers', {
+            'title': _('Users and answers'),
             'fields': (
                 '__str__',
-                'get_favorite_tag_of_answers',
+                'get_favorite_tags_of_answers',
                 'get_count_answers',
+                'get_total_rating_for_answers',
                 'get_date_latest_answer',
             ),
         }),
-        ('publicist', {
-            'title': _('Users as publicists'),
+        ('users_articles', {
+            'title': _('Users and articles'),
             'fields': (
                 '__str__',
-                'get_favorite_tag_of_articles',
+                'get_favorite_tags_of_articles',
                 'get_count_articles',
                 'get_total_rating_for_articles',
                 'get_date_latest_article',
             ),
         }),
-        ('snippetolog', {
-            'title': _('Users as snippetologs'),
+        ('users_solutions', {
+            'title': _('Users and solutions'),
             'fields': (
                 '__str__',
+                'get_favorite_tags_of_solutions',
+                'get_count_solutions',
+                'get_total_rating_for_solutions',
+                'get_date_latest_solution',
             ),
         }),
-        ('commentator', {
-            'title': _('Users as commentators'),
+        ('users_snippets', {
+            'title': _('Users and snippets'),
             'fields': (
                 '__str__',
+                'get_favorite_tags_of_snippets',
+                'get_count_snippets',
+                'get_total_rating_for_snippets',
+                'get_date_latest_snippet',
             ),
         }),
-        ('opinioniolog', {
-            'title': _('Users with details about opinions'),
+        ('users_comments', {
+            'title': _('Users and comments'),
             'fields': (
                 '__str__',
+                'get_count_comments_of_articles',
+                'get_count_comments_of_solutions',
+                'get_count_comments_of_snippets',
+                'get_count_comments_of_answers',
+                'get_count_comments_of_utilities',
+                'get_total_count_comments',
+                'get_rating_comments',
+                'get_date_latest_comment',
             ),
         }),
-        ('flavourer', {
-            'title': _('Users with details about flavour'),
+
+        # Library
+        ('users_library', {
+            'title': _('Users and library'),
             'fields': (
                 '__str__',
+                'get_count_replies',
+                'get_date_latest_reply',
             ),
         }),
-        ('replier', {
-            'title': _('Users with details about replies'),
+
+        # Opinions
+        ('users_opinions', {
+            'title': _('Users and opinions'),
             'fields': (
                 '__str__',
+                'get_count_opinions_of_solutions',
+                'get_count_opinions_of_questions',
+                'get_count_opinions_of_snippets',
+                'get_count_opinions_of_utilities',
+                'get_count_opinions_of_answers',
+                'get_total_count_opinions',
+                'get_date_latest_opinion',
             ),
         }),
-        ('badger', {
-            'title': _('Users with details about badges'),
+
+        # Marks
+        ('users_marks', {
+            'title': _('Users and marks'),
             'fields': (
                 '__str__',
+                'get_count_marks',
+                'get_date_latest_mark',
             ),
         }),
-        ('forumer', {
-            'title': _('Users as forumers'),
+
+        # Badge
+        ('users_badges', {
+            'title': _('Users and badges'),
             'fields': (
                 '__str__',
+                'get_count_badges',
+                'get_count_gold_badges',
+                'get_count_silver_badges',
+                'get_count_bronze_badges',
+                'get_latest_badge',
+                'get_date_getting_latest_badge',
             ),
         }),
-        ('marker', {
-            'title': _('Users with details marks'),
+
+        # Forum
+        ('users_forums', {
+            'title': _('Users and forums'),
             'fields': (
                 '__str__',
+                'get_count_topics',
+                'get_count_posts',
+                'get_date_latest_activity_on_forums',
             ),
         }),
+
+        # Tags
+        ('users_tags', {
+            'title': _('Users and tags '),
+            'fields': (
+                '__str__',
+                'get_favorite_tags',
+                'get_count_usaged_unique_tags',
+                'get_total_count_usaged_tags',
+            ),
+        }),
+
     ]
 
     list_display_links = ('alias', )

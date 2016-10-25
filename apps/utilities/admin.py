@@ -334,9 +334,10 @@ class UtilityAdmin(OpinionsAdminMixin, ModelAdmin):
     def get_inline_instances(self, request, obj=None):
 
         if obj:
+            logger.warning('Disabled inlines for Utility')
             inlines = [
-                OpinionGenericInline,
-                CommentGenericInline,
+                # OpinionGenericInline,
+                # CommentGenericInline,
             ]
             return [inline(self.model, self.site_admin) for inline in inlines]
         return []

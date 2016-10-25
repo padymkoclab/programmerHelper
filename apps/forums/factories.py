@@ -1,6 +1,7 @@
 
 import random
 
+from django.utils import timezone
 from django.contrib.auth.models import Group
 from django.contrib.auth import get_user_model
 
@@ -9,11 +10,13 @@ from factory import fuzzy
 
 from utils.django.factories_utils import (
     generate_text_random_length_for_field_of_model,
-    generate_image,
     AbstractTimeStampedFactory,
 )
 
 from .models import Section, Forum, Topic, Post
+
+
+NOW = timezone.now()
 
 
 class SectionFactory(factory.DjangoModelFactory):
@@ -26,10 +29,6 @@ class SectionFactory(factory.DjangoModelFactory):
     @factory.lazy_attribute
     def name(self):
         return generate_text_random_length_for_field_of_model(self, 'name')
-
-    @factory.lazy_attribute
-    def image(self):
-        return generate_image(filename='forum_section_test.png')
 
     @factory.post_generation
     def groups(self, created, extracted, **kwargs):
@@ -71,6 +70,11 @@ class ForumFactory(AbstractTimeStampedFactory):
             random.randint(0, User._default_manager.count())
         )
 
+    @factory.post_generation
+    def created(self, created, extracted, **kwargs):
+        self.created = fuzzy.FuzzyDateTime(NOW - timezone.timedelta(days=500)).fuzz()
+        self.save()
+
 
 class TopicFactory(AbstractTimeStampedFactory):
 
@@ -90,8 +94,10 @@ class TopicFactory(AbstractTimeStampedFactory):
         return fuzzy.FuzzyChoice(get_user_model()._default_manager.all()).fuzz()
 
     @factory.post_generation
-    def date_added(self, created, extracted, **kwargs):
-        self.date_added = fuzzy.FuzzyDateTime(self.user.date_joined).fuzz()
+    def created(self, created, extracted, **kwargs):
+
+        min_created = max(self.user.date_joined, self.forum.created)
+        self.created = fuzzy.FuzzyDateTime(min_created).fuzz()
         self.save()
 
 
@@ -117,12 +123,8 @@ class PostFactory(AbstractTimeStampedFactory):
         return factory.Faker('ipv4').generate([])
 
     @factory.post_generation
-    def date_added(self, created, extracted, **kwargs):
+    def created(self, created, extracted, **kwargs):
 
-        count_posts = self.topic.posts.count()
-
-        # if is not a head of the topic
-        if count_posts != 1:
-            self.date_added = fuzzy.FuzzyDateTime(self.topic.date_added).fuzz()
-
+        min_created = max(self.user.date_joined, self.topic.created)
+        self.created = fuzzy.FuzzyDateTime(min_created).fuzz()
         self.save()

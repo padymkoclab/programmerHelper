@@ -26,17 +26,17 @@ class Command(FactoryCountBaseCommand):
         for i in range(count):
             section = SectionFactory()
 
-            count_forums = random.randint(0, 30)
+            count_forums = random.randint(0, 5)
 
             for j in range(count_forums):
                 forum = ForumFactory(section=section)
 
-                count_topics = random.randint(0, 30)
+                count_topics = random.randint(0, 10)
 
                 for k in range(count_topics):
                     topic = TopicFactory(forum=forum)
 
-                    count_posts = random.randint(0, 30)
+                    count_posts = random.randint(0, 20)
 
                     for l in range(count_posts):
                         PostFactory(topic=topic)

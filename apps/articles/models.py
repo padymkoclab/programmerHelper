@@ -1,14 +1,15 @@
 
-# from django.core.exceptions import ValidationError
+from django.core.exceptions import ValidationError
 from django.contrib.contenttypes.fields import GenericRelation
 from django.core.urlresolvers import reverse
-from django.core.validators import MinLengthValidator
+from django.core.validators import MinLengthValidator, MinValueValidator, MaxValueValidator
 from django.utils.translation import ugettext_lazy as _
 from django.db import models
 from django.conf import settings
 from django.contrib.postgres.fields import ArrayField
 
 from utils.django.models_fields import ConfiguredAutoSlugField
+from utils.django.functions_db import Round
 from utils.django.models_utils import upload_image, get_admin_url
 from utils.django.models import TimeStampedModel
 from utils.django.validators import MinCountWordsValidator
@@ -16,18 +17,14 @@ from utils.django.validators import MinCountWordsValidator
 from apps.comments.models import Comment
 from apps.comments.models_mixins import CommentsModelMixin
 from apps.comments.managers import CommentManager
-from apps.marks.models import Mark
-from apps.marks.models_mixins import MarksModelMixin
-from apps.marks.managers import MarkManager
 from apps.tags.models import Tag
 from apps.tags.models_mixins import TagsModelMixin
 from apps.tags.managers import TagManager
 
-from .managers import ArticleManager
-from .querysets import ArticleQuerySet, SubsectionQuerySet
+from .managers import ArticleManager, SubsectionManager, MarkManager
 
 
-class Article(CommentsModelMixin, TagsModelMixin, MarksModelMixin, TimeStampedModel):
+class Article(CommentsModelMixin, TagsModelMixin, TimeStampedModel):
     """
     Model for article
     """
@@ -58,7 +55,7 @@ class Article(CommentsModelMixin, TagsModelMixin, MarksModelMixin, TimeStampedMo
     heading = models.TextField(_('Heading'), validators=[MinCountWordsValidator(10)])
     conclusion = models.TextField(_('Conclusion'), validators=[MinCountWordsValidator(10)])
     status = models.CharField(_('Status'), max_length=10, choices=STATUS_ARTICLE, default=DRAFT)
-    views = models.PositiveIntegerField(_('Count views'), editable=False, default=0)
+    views = models.PositiveIntegerField(_('count views'), editable=False, default=0)
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, verbose_name=_('User'),
         related_name='articles', on_delete=models.CASCADE,
@@ -78,14 +75,11 @@ class Article(CommentsModelMixin, TagsModelMixin, MarksModelMixin, TimeStampedMo
         help_text=_('Useful links'),
     )
     comments = GenericRelation(Comment, related_query_name='articles')
-    marks = GenericRelation(Mark, related_query_name='articles')
 
     # managers
     objects = models.Manager()
-    objects = ArticleManager.from_queryset(ArticleQuerySet)()
-
+    objects = ArticleManager()
     comments_manager = CommentManager()
-    marks_manager = MarkManager()
     tags_manager = TagManager()
 
     class Meta:
@@ -146,6 +140,26 @@ class Article(CommentsModelMixin, TagsModelMixin, MarksModelMixin, TimeStampedMo
     get_count_links.admin_order_field = 'count_links'
     get_count_links.short_description = _('Count links')
 
+    def get_count_marks(self):
+        """ """
+
+        if hasattr(self, 'count_marks'):
+            return self.count_marks
+
+        return self.marks.count()
+    get_count_marks.admin_order_field = 'count_marks'
+    get_count_marks.short_description = _('Count marks')
+
+    def get_rating(self):
+        """ """
+
+        if hasattr(self, 'rating'):
+            return self.rating
+
+        return self.marks.aggregate(rating=Round(models.Avg('mark')))['rating']
+    get_rating.admin_order_field = 'rating'
+    get_rating.short_description = _('Rating')
+
 
 class Subsection(TimeStampedModel):
 
@@ -172,7 +186,7 @@ class Subsection(TimeStampedModel):
         unique_together = ['article', 'name']
 
     objects = models.Manager()
-    objects = SubsectionQuerySet.as_manager()
+    objects = SubsectionManager()
 
     def __str__(self):
         return '{0.name}'.format(self)
@@ -181,3 +195,45 @@ class Subsection(TimeStampedModel):
         if isinstance(self, model_class) and unique_check == ('article', 'name'):
             return self.ERROR_MSG_UNIQUE_TOGETHER_ARTICLE_AND_TITLE
         return super().unique_error_message(model_class, unique_check)
+
+
+class Mark(TimeStampedModel):
+    """
+    Model for keeping mark of other objects.
+    """
+
+    MIN_MARK = 1
+    MAX_MARK = 5
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
+        related_name='marks', verbose_name=_('User'),
+    )
+    article = models.ForeignKey(
+        Article, verbose_name=_('article'),
+        on_delete=models.CASCADE, related_name='marks'
+    )
+    mark = models.SmallIntegerField(
+        _('Mark'), default=MIN_MARK,
+        validators=[MinValueValidator(MIN_MARK), MaxValueValidator(MAX_MARK)]
+    )
+
+    objects = models.Manager()
+    objects = MarkManager()
+
+    class Meta:
+        verbose_name = _('mark')
+        verbose_name_plural = _('marks')
+        permissions = (('can_view_marks', _('Can view marks')),)
+        unique_together = (('user', 'article'), )
+        get_latest_by = 'updated'
+        ordering = ('created', )
+
+    def __str__(self):
+        return _('{0.mark}').format(self)
+
+    def unique_error_message(self, model_class, unique_check):
+
+        if model_class == type(self) and unique_check == ('user', 'article'):
+            return _('User not allowed give mark about itself labour.')
+        return super(Mark, self).unique_error_message(model_class, unique_check)

@@ -1,5 +1,4 @@
 
-from django.utils.text import force_text
 from django.utils import timezone
 from django.core.validators import MaxLengthValidator
 from django.utils.translation import ugettext_lazy as _
@@ -8,12 +7,13 @@ from django.conf import settings
 
 from utils.django.models import BaseGenericModel
 
+from .constants import MAX_LENGTH_COMMENT
+
 # comment design from website
 
 
 class Comment(BaseGenericModel):
-
-    MAX_LENGTH_COMMENT = 200
+    """ """
 
     text_comment = models.TextField(
         _('Text comment'),
@@ -25,25 +25,19 @@ class Comment(BaseGenericModel):
         ]
     )
     user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-        related_name='comments',
+        settings.AUTH_USER_MODEL, null=True,
+        on_delete=models.CASCADE, related_name='comments',
         verbose_name=_('User'),
     )
-    rating = models.SmallIntegerField(_('Rating'), default=0, editable=False)
 
     class Meta:
-        db_table = 'comments'
-        verbose_name = _('Comment')
-        verbose_name_plural = _('Comments')
+        verbose_name = _('comment')
+        verbose_name_plural = _('comments')
         get_latest_by = 'created'
-        ordering = ['created']
+        ordering = ('created', )
 
     def __str__(self):
-        return _('On {0} "{1.content_object}"').format(
-            self.content_object._meta.verbose_name.lower(),
-            self
-        )
+        return _('{0.text_comment}').format(self)
 
     def is_new(self):
         """ """

@@ -9,7 +9,7 @@ from utils.django.widgets import AdminImageThumbnail, SplitInputsArrayWidget
 
 from apps.tags.forms import clean_tags
 
-# from .models import Article, Subsection
+from .models import Article, Subsection, Mark
 
 
 class ArticleAdminModelForm(forms.ModelForm):
@@ -74,3 +74,21 @@ class SubsectionAdminModelForm(forms.ModelForm):
     #     widgets = {
     #         'content': CKEditorAdminWidget(),
     #     }
+
+
+class MarkAdminModelForm(forms.ModelForm):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields['user'].widget.widget.attrs['class'] = 'span10'
+
+        mark_field = self.fields['mark']
+        mark_choices = [(i, i) for i in range(Mark.MIN_MARK, Mark.MAX_MARK + 1)]
+        mark_field.widget = forms.Select(
+            choices=mark_choices, attrs={'class': 'span9'}
+        )
+
+    class Meta:
+        model = Mark
+        fields = ('user', 'mark')

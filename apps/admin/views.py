@@ -31,6 +31,7 @@ from django.utils.encoding import force_text
 from utils.django.views_mixins import ContextTitleMixin
 from utils.python.utils import get_filename_with_datetime
 
+from .models import LogEntry
 from .filters import DateTimeRangeFilter, RelatedOnlyFieldListFilter, ChoiceFilter
 from .forms_utils import BootstrapErrorList
 from .forms import LoginForm, AddChangeDisplayForm, ImportForm, InlinesFormsets
@@ -857,9 +858,62 @@ class AppStatisticsView(SiteAppAdminMixin, SiteAdminView):
         return context
 
 
-class HistoryView(SiteModelAdminMixin, generic.DetailView):
+class HistoryView(SiteModelAdminMixin, SiteAdminView):
+    """
 
-    pass
+    """
+
+    def get(self, request, *args, **kwargs):
+
+        context = self.get_context_data(**kwargs)
+
+        return self.render_to_response(context)
+
+    def render_to_response(self, context):
+
+        return TemplateResponse(
+            self.request,
+            template=self.get_template_names(),
+            context=context,
+        )
+
+    def get_context_data(self, **kwargs):
+
+        context = super(HistoryView, self).get_context_data(**kwargs)
+
+        context['title'] = ('History')
+        context['model_meta'] = self.model_admin.model._meta
+
+        obj = self.get_object(**kwargs)
+        context['object'] = obj
+
+        context['log_entry_headers'] = (
+            LogEntry._meta.get_field('user').verbose_name,
+            LogEntry._meta.get_field('action_time').verbose_name,
+            LogEntry._meta.get_field('action').verbose_name,
+        )
+
+        context['log_entries'] = self.get_log_entries(obj)
+
+        return context
+
+    def get_log_entries(self, obj):
+
+        return LogEntry.objects.filter(
+            content_type=ContentType.objects.get_for_model(obj.__class__),
+            object_id=obj.pk
+        )
+
+    def get_object(self, **kwargs):
+
+        obj_pk = kwargs['pk']
+        return self.model_admin.model._default_manager.get(pk=obj_pk)
+
+    def get_template_names(self):
+
+        return [
+            'admin/admin/history.html',
+        ]
 
 
 class DeleteView(SiteModelAdminMixin, generic.DeleteView):
@@ -895,7 +949,7 @@ class DeleteView(SiteModelAdminMixin, generic.DeleteView):
         context['related_objects'] = self.get_related_objects()
         context['title'] = _('Delete {}').format(
             self.model_meta.verbose_name.lower()
-            )
+        )
 
         return context
 
@@ -910,7 +964,7 @@ class DeleteView(SiteModelAdminMixin, generic.DeleteView):
         candidate_relations_to_delete = [
             i for i in self.object._meta.get_fields(include_hidden=True)
             if i.auto_created and not i.concrete and (i.one_to_one or i.one_to_many)
-            ]
+        ]
 
         for relationship in candidate_relations_to_delete:
             if relationship.on_delete != models.DO_NOTHING:
@@ -920,11 +974,11 @@ class DeleteView(SiteModelAdminMixin, generic.DeleteView):
                 objects = related_model._base_manager.filter(
                     **{'{}__in'.format(
                         relationship.field.name): [self.object.pk]}
-                    )
+                )
 
                 related_objects.append(
                     (related_model._meta, type_relationship, objects)
-                    )
+                )
 
         return related_objects
 
@@ -940,7 +994,7 @@ class DeleteView(SiteModelAdminMixin, generic.DeleteView):
             _('Successfully deleted {} "{}"').format(self.model_meta.verbose_name.lower(), self.object),
             extra_tags='deleted',
 
-            )
+        )
 
         return HttpResponseRedirect(success_url)
 
@@ -1161,7 +1215,33 @@ class ImportView(SiteAdminMixin, SiteAdminView):
 
 
 class SettingsView(SiteAdminMixin, SiteAdminView):
+    """
+    """
 
-    template_name = ''
+    def get(self, request, *args, **kwargs):
 
-    # constants
+        context = self.get_context_data(**kwargs)
+
+        return self.render_to_response(context)
+
+    def render_to_response(self, context):
+
+        return TemplateResponse(
+            self.request,
+            template=self.get_template_names(),
+            context=context,
+        )
+
+    def get_context_data(self, **kwargs):
+
+        context = super(HistoryView, self).get_context_data(**kwargs)
+
+        context['title'] = ('Settings')
+
+        return context
+
+    def get_template_names(self):
+
+        return [
+            'admin/admin/history.html',
+        ]

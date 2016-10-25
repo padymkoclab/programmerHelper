@@ -3,7 +3,17 @@ from django.utils.translation import ugettext_lazy as _
 from django.db.models import Count
 from django.contrib import admin
 
+from apps.admin.site import DefaultSiteAdmin
+from apps.admin.admin import ModelAdmin, StackedInline, TabularInline
+from apps.admin.app import AppAdmin
+
 from .models import Badge, GotBadge
+from .apps import BadgesConfig
+
+
+class BadgesAppAdmin(AppAdmin):
+
+    app_config_class = BadgesConfig
 
 
 # class UserInline(admin.TabularInline):
@@ -15,12 +25,12 @@ from .models import Badge, GotBadge
 
 
 # @admin.register(Badge, site=AdminSite)
-class BadgeAdmin(admin.ModelAdmin):
+class BadgeAdmin(ModelAdmin):
     """
     Admin View for Badge
     """
 
-    list_display = ('name', 'description', 'get_count_users_with_this_badge')
+    list_display = ('name', 'category', 'kind', 'description', 'get_count_users_with_this_badge')
     list_filter = []
     search_fields = ('name', 'description')
     fieldsets = (
@@ -43,11 +53,11 @@ class BadgeAdmin(admin.ModelAdmin):
     def get_count_users_with_this_badge(self, obj):
         return obj.count_user_with_this_badge
     get_count_users_with_this_badge.admin_order_field = 'count_user_with_this_badge'
-    get_count_users_with_this_badge.short_description = _('Count users with this badge')
+    get_count_users_with_this_badge.short_description = _('Count users')
 
 
 # @admin.register(GotBadge, site=AdminSite)
-class GotBadgeAdmin(admin.ModelAdmin):
+class GotBadgeAdmin(ModelAdmin):
     '''
     Admin View for GettingBadge
     '''
@@ -67,3 +77,8 @@ class GotBadgeAdmin(admin.ModelAdmin):
             }
         ]
     ]
+
+
+DefaultSiteAdmin.register_app(BadgesAppAdmin)
+DefaultSiteAdmin.register_model(Badge, BadgeAdmin)
+DefaultSiteAdmin.register_model(GotBadge, GotBadgeAdmin)

@@ -14,9 +14,15 @@ BADGES = (
         'category': Badge.COMMENTS,
     },
     {
-        'name': 'Pundit',
-        'description': 'Has 10 comments with rating more 10',
+        'name': 'Commentator',
+        'description': 'Has 50 comments',
         'kind': Badge.SILVER,
+        'category': Badge.COMMENTS,
+    },
+    {
+        'name': 'Commentator',
+        'description': 'Has 100 comments',
+        'kind': Badge.GOLD,
         'category': Badge.COMMENTS,
     },
 
@@ -43,103 +49,79 @@ BADGES = (
     # Articles
     {
         'name': 'Good publicist',
-        'description': 'Has article with rating more 0',
+        'description': 'Has article with rating more 0 and views more 100',
         'kind': Badge.BRONZE,
         'category': Badge.ARTICLES,
     },
     {
         'name': 'Big publicist',
-        'description': 'Has article with rating more 10',
+        'description': 'Has article with rating more 10 and and views more 500',
         'kind': Badge.SILVER,
         'category': Badge.ARTICLES,
     },
     {
         'name': 'Great publicist',
-        'description': 'Has article with rating more 50',
+        'description': 'Has article with rating more 50 and views more 1000',
         'kind': Badge.GOLD,
-        'category': Badge.ARTICLES,
-    },
-    {
-        'name': 'Popular article',
-        'description': 'Article with 100 views',
-        'kind': Badge.BRONZE,
         'category': Badge.ARTICLES,
     },
 
     # Snippets
     {
         'name': 'Good coder',
-        'description': 'Has snippet with rating more 0',
+        'description': 'Has snippet with rating more 0 and more 100 views',
         'kind': Badge.BRONZE,
         'category': Badge.SNIPPETS,
     },
     {
         'name': 'Big coder',
-        'description': 'Has snippet with rating more 10',
+        'description': 'Has snippet with rating more 10 and more 500 views',
         'kind': Badge.SILVER,
         'category': Badge.SNIPPETS,
     },
     {
         'name': 'Great coder',
-        'description': 'Has snippet with rating more 50',
+        'description': 'Has snippet with rating more 50 and more 1000 views',
         'kind': Badge.GOLD,
-        'category': Badge.SNIPPETS,
-    },
-    {
-        'name': 'Popular snippet',
-        'description': 'Snippet with 100 views',
-        'kind': Badge.BRONZE,
         'category': Badge.SNIPPETS,
     },
 
     # Solutions
     {
         'name': 'Good inventor',
-        'description': 'Has solutions with rating more 0',
+        'description': 'Has solutions with rating more 0 and more 100 views',
         'kind': Badge.BRONZE,
         'category': Badge.SOLUTIONS,
     },
     {
         'name': 'Big inventor',
-        'description': 'Has solutions with rating more 0',
+        'description': 'Has solutions with rating more 10 and more 500 views',
         'kind': Badge.SILVER,
         'category': Badge.SOLUTIONS,
     },
     {
         'name': 'Great inventor',
-        'description': 'Has solutions with rating more 0',
+        'description': 'Has solutions with rating more 50 and more 1000 views',
         'kind': Badge.GOLD,
-        'category': Badge.SOLUTIONS,
-    },
-    {
-        'name': 'Popular solution',
-        'description': 'Solution with 100 views',
-        'kind': Badge.BRONZE,
         'category': Badge.SOLUTIONS,
     },
 
     # Questions
     {
-        'name': 'Popular question',
-        'description': 'Question with 100 views',
-        'kind': Badge.BRONZE,
-        'category': Badge.QUESTIONS,
-    },
-    {
         'name': 'Good question',
-        'description': 'Has question with rating more 0',
+        'description': 'Has question with rating more 0 and more 100 views',
         'kind': Badge.BRONZE,
         'category': Badge.QUESTIONS,
     },
     {
         'name': 'Big question',
-        'description': 'Has question with rating more 10',
+        'description': 'Has question with rating more 10 and more 500 views',
         'kind': Badge.SILVER,
         'category': Badge.QUESTIONS,
     },
     {
         'name': 'Great question',
-        'description': 'Has question with rating more 50',
+        'description': 'Has question with rating more 50 and more 1000 views',
         'kind': Badge.GOLD,
         'category': Badge.QUESTIONS,
     },
@@ -198,12 +180,6 @@ BADGES = (
         'category': Badge.OTHER,
     },
     {
-        'name': 'Editor',
-        'description': 'First edit',
-        'kind': Badge.BRONZE,
-        'category': Badge.OTHER,
-    },
-    {
         'name': 'Frequent recorder',
         'description': 'Has at least 250000 characters in a diary',
         'kind': Badge.BRONZE,
@@ -254,56 +230,6 @@ BADGES = (
         'description': 'First up vote',
         'kind': Badge.BRONZE,
         'category': Badge.PROFILE,
-    },
-
-    # Testing
-    {
-        'name': 'Tester',
-        'description': 'Has more 10 passages of tests',
-        'kind': Badge.BRONZE,
-        'category': Badge.TESTING,
-    },
-    {
-        'name': 'Love tests',
-        'description': 'Has more 100 passages of tests',
-        'kind': Badge.SILVER,
-        'category': Badge.TESTING,
-    },
-
-    # Flavors
-    {
-        'name': 'Popularic flavour',
-        'description': 'Has snippet or article or solutions or question favorited more 25 users',
-        'kind': Badge.BRONZE,
-        'category': Badge.FLAVOURS,
-    },
-    {
-        'name': 'Famous flavour',
-        'description': 'Has snippet or article or solutions or question favorited more 50 users',
-        'kind': Badge.SILVER,
-        'category': Badge.FLAVOURS,
-    },
-
-    # Marks
-    {
-        'name': 'Made an assessment',
-        'description': 'Give mark',
-        'kind': Badge.BRONZE,
-        'category': Badge.MARKS,
-    },
-
-    # Replies
-    {
-        'name': 'Reading',
-        'description': 'Has reply about any book',
-        'kind': Badge.BRONZE,
-        'category': Badge.REPLIES,
-    },
-    {
-        'name': 'More reading',
-        'description': 'Has more 10 replies about books',
-        'kind': Badge.SILVER,
-        'category': Badge.REPLIES,
     },
 
     # Planning

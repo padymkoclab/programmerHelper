@@ -11,7 +11,6 @@ from utils.django.factories_utils import generate_text_random_length_for_field_o
 from apps.tags.models import Tag
 from apps.opinions.factories import OpinionFactory
 from apps.comments.factories import CommentFactory
-from apps.flavours.factories import FlavourFactory
 
 from .models import Question, Answer
 
@@ -49,13 +48,8 @@ class QuestionFactory(AbstractTimeStampedFactory):
             OpinionFactory(content_object=self)
 
     @factory.post_generation
-    def flavours(self, create, extracted, **kwargs):
-        for i in range(random.randint(0, 5)):
-            FlavourFactory(content_object=self)
-
-    @factory.post_generation
-    def date_added(self, create, extracted, **kwargs):
-        self.date_added = fuzzy.FuzzyDateTime(self.user.date_joined).fuzz()
+    def created(self, create, extracted, **kwargs):
+        self.created = fuzzy.FuzzyDateTime(self.user.date_joined).fuzz()
         self.save()
 
 
@@ -90,6 +84,6 @@ class AnswerFactory(AbstractTimeStampedFactory):
             CommentFactory(content_object=self)
 
     @factory.post_generation
-    def date_added(self, create, extracted, **kwargs):
-        self.date_added = fuzzy.FuzzyDateTime(self.user.date_joined).fuzz()
+    def created(self, create, extracted, **kwargs):
+        self.created = fuzzy.FuzzyDateTime(self.user.date_joined).fuzz()
         self.save()

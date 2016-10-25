@@ -15,5 +15,5 @@ def validate_url_path(url_path):
 def validate_comma_separated_objects_list(value):
 
     if value != '':
-        if not all(i.isalnum() for i in value.split(',')):
+        if not all(j.isalnum() for i in value.split(',') for j in i.split('-')):
             raise ValidationError(_('Enter alpha-numeric charapters separated by commas.'))

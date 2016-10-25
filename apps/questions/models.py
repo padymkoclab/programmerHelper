@@ -18,9 +18,6 @@ from apps.comments.models_mixins import CommentsModelMixin
 from apps.opinions.models import Opinion
 from apps.opinions.managers import OpinionManager
 from apps.opinions.models_mixins import OpinionsModelMixin
-from apps.flavours.models import Flavour
-from apps.flavours.managers import FlavourManager
-from apps.flavours.models_mixins import FlavourModelMixin
 from apps.tags.models import Tag
 from apps.tags.managers import TagManager
 from apps.tags.models_mixins import TagsModelMixin
@@ -34,7 +31,7 @@ logger = logging.getLogger('django.development')
 logger.warning('scrapy data question from StackOverFlow or MailList Google Groups by tags Django, JS as latest')
 
 
-class Question(TagsModelMixin, OpinionsModelMixin, FlavourModelMixin, TimeStampedModel):
+class Question(TagsModelMixin, OpinionsModelMixin, TimeStampedModel):
     """
 
     """
@@ -58,12 +55,11 @@ class Question(TagsModelMixin, OpinionsModelMixin, FlavourModelMixin, TimeStampe
         settings.AUTH_USER_MODEL, verbose_name=_('User'),
         related_name='questions', on_delete=models.CASCADE,
     )
-    views = models.PositiveIntegerField(_('Count views'), editable=False, default=0)
+    views = models.PositiveIntegerField(_('count views'), editable=False, default=0)
     tags = models.ManyToManyField(
         Tag, related_name='questions', verbose_name=_('Tags'),
     )
     opinions = GenericRelation(Opinion, related_query_name='questions')
-    flavours = GenericRelation(Flavour, related_query_name='questions')
 
     # managers
     objects = models.Manager()
@@ -71,7 +67,6 @@ class Question(TagsModelMixin, OpinionsModelMixin, FlavourModelMixin, TimeStampe
 
     opinions_manager = OpinionManager()
     tags_manager = TagManager()
-    flavours_manager = FlavourManager()
 
     class Meta:
         verbose_name = _("Question")

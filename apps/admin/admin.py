@@ -107,6 +107,7 @@ class BaseAdmin(object):
 
 class ModelAdmin(BaseAdmin):
 
+    max_count_display_queryset = None
     form = AddChangeModelForm
     list_display = ('__str__', )
     list_display_styles = (

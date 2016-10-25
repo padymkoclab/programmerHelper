@@ -8,35 +8,8 @@ def save_user_agent(request):
 
     os_name, browser_name = parse_user_agent_string(user_agent)
 
-    user_pk = str(request.user.pk)
-
-    o_system = VisitUserSystem.objects.get_or_create(name=os_name)[0]
-
-    user_pks = o_system.user_pks.split(',')
-    if user_pk not in user_pks:
-
-        if user_pks == ['']:
-            user_pks = [user_pk]
-        else:
-            user_pks.append(user_pk)
-
-        o_system.user_pks = ','.join(user_pks)
-        o_system.full_clean()
-        o_system.save()
-
-    browser = VisitUserBrowser.objects.get_or_create(name=browser_name)[0]
-
-    user_pks = browser.user_pks.split(',')
-    if user_pk not in user_pks:
-
-        if user_pks == ['']:
-            user_pks = [user_pk]
-        else:
-            user_pks.append(user_pk)
-
-        browser.user_pks = ','.join(user_pks)
-        browser.full_clean()
-        browser.save()
+    update_user_pks(VisitUserSystem, os_name, request.user)
+    update_user_pks(VisitUserBrowser, browser_name, request.user)
 
 
 def parse_user_agent_string(user_agent_string):
@@ -74,3 +47,22 @@ def parse_user_agent_string(user_agent_string):
         browser_name = 'Internet Explover'
 
     return os_name, browser_name
+
+
+def update_user_pks(model, obj_name, user):
+
+    obj = model._default_manager.get_or_create(name=obj_name)[0]
+
+    user_pks = obj.user_pks.split(',')
+    user_pk = str(user.pk)
+
+    if user_pk not in user_pks:
+
+        if user_pks == ['']:
+            user_pks = user_pk
+        else:
+            user_pks.append(user_pk)
+            user_pks = ','.join(user_pks)
+        obj.user_pks = user_pks
+        obj.full_clean()
+        obj.save()

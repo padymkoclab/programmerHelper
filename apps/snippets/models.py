@@ -49,7 +49,7 @@ class Snippet(CommentsModelMixin, OpinionsModelMixin, TagsModelMixin, TimeStampe
         settings.AUTH_USER_MODEL, verbose_name=_('User'),
         related_name='snippets', on_delete=models.CASCADE,
     )
-    views = models.PositiveIntegerField(_('Count views'), editable=False, default=0)
+    views = models.PositiveIntegerField(_('count views'), editable=False, default=0)
     description = models.TextField(_('Decription'), validators=[MinLengthValidator(50)])
     code = models.TextField(_('Code'), validators=[MinLengthValidator(5)])
     tags = models.ManyToManyField(

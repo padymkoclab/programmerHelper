@@ -7,6 +7,8 @@ import pygal
 
 from utils.django.functions_db import Round
 
+from .querysets import BookQuerySet, PublisherQuerySet, WriterQuerySet
+
 
 class BookManager(models.Manager):
 
@@ -93,3 +95,8 @@ class PublisherManager(models.Manager):
         return self.aggregate(avg=Round(
             models.functions.Coalesce(models.Avg('count_books'), 0)
         ))['avg']
+
+
+BookManager = BookManager.from_queryset(BookQuerySet)
+WriterManager = WriterManager.from_queryset(PublisherQuerySet)
+PublisherManager = PublisherManager.from_queryset(WriterQuerySet)

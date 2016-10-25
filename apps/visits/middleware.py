@@ -7,7 +7,7 @@ from django.conf import settings
 from django.core.cache import cache
 from django.utils.encoding import uri_to_iri
 
-from .models import Visit, VisitSite, VisitPage
+from .models import Visit, Attendance, VisitPage
 from .constants import AUTHENTICATED_USERS_KEY, ANONYMOUS_USERS_KEY
 from .utils import save_user_agent
 
@@ -26,18 +26,22 @@ class UserVisitMiddleware(object):
 
     def __call__(self, request):
 
+        if request.user.is_authenticated():
+
+            now = timezone.now()
+            today = now.date()
+            if not Attendance.objects.filter(date=today).exists():
+                attendance = Attendance.objects.create()
+            else:
+                attendance = Attendance.objects.get(date=today)
+            attendance.users.add(request.user)
+
+            Visit.objects.update_or_create(user=request.user)
+
         response = self.get_response(request)
 
         if response.status_code == 200:
-            if request.user.is_authenticated():
-
-                now = timezone.now()
-                today = now.date()
-                if not VisitSite.objects.filter(date=today, users=request.user).exists():
-                    attendance = VisitSite.objects.get_or_create(date=today)[0]
-                    attendance.users.add(request.user)
-
-                Visit.objects.get_or_create(user=request.user, defaults={'date': now})
+            pass
 
         return response
 

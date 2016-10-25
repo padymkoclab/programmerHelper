@@ -30,21 +30,22 @@ class VisitPage(models.Model):
         return '{0.url}'.format(self)
 
 
-class VisitSite(models.Model):
+class Attendance(models.Model):
     """
     Model for keep days of attendance of website whole
     """
 
     id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
     users = models.ManyToManyField(
-        settings.AUTH_USER_MODEL,
-        related_name='attendances',
-        verbose_name=_('user'),
-        editable=False,
+        settings.AUTH_USER_MODEL, related_name='attendances',
+        verbose_name=_('user'), editable=False,
     )
-    date = models.DateField(_('date'), editable=False, auto_now_add=True, unique=True, error_messages={
-        'unique': _('Attendance on this day already exists')
-    })
+    date = models.DateField(
+        _('date'), editable=False, auto_now_add=True,
+        unique=True, error_messages={
+            'unique': _('Attendance on this day already exists')
+        }
+    )
 
     objects = models.Manager()
     objects = AttendanceManager()
@@ -71,7 +72,7 @@ class Visit(models.Model):
         verbose_name=_('user'),
         editable=False,
     )
-    date = models.DateTimeField(_('date'), editable=False)
+    date = models.DateTimeField(_('date'), editable=False, auto_now=True)
 
     objects = models.Manager()
 

@@ -35,12 +35,8 @@ class Badge(TimeStampedModel):
     SNIPPETS = 'snippets'
     POLLS = 'polls'
     FORUMS = 'forums'
-    MARKS = 'marks'
-    FLAVOURS = 'flavours'
     OPINIONS = 'opinions'
     COMMENTS = 'comments'
-    TESTING = 'testing'
-    REPLIES = 'replies'
     PROFILE = 'profile'
     OTHER = 'other'
 
@@ -52,12 +48,8 @@ class Badge(TimeStampedModel):
         (SNIPPETS, _('Snippets')),
         (POLLS, _('Polls')),
         (FORUMS, _('Forums')),
-        (MARKS, _('Marks')),
-        (FLAVOURS, _('Flavours')),
         (OPINIONS, _('Opinions')),
         (COMMENTS, _('Comments')),
-        (TESTING, _('Testing')),
-        (REPLIES, _('Replies')),
         (PROFILE, _('Profile')),
         (OTHER, _('Other')),
     )
@@ -69,8 +61,8 @@ class Badge(TimeStampedModel):
     )
 
     id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
-    name = models.CharField(_('Name'), max_length=30, unique=True)
-    slug = ConfiguredAutoSlugField(populate_from='name', unique=True)
+    name = models.CharField(_('Name'), max_length=30)
+    slug = ConfiguredAutoSlugField(populate_from='name', unique_with=['kind'])
     description = models.CharField(_('Short description'), max_length=200)
     category = models.CharField(_('Category'), max_length=30, choices=CHOICES_CATEGORY)
     kind = models.CharField(_('Kind'), max_length=20, choices=CHOICES_KIND)
@@ -85,10 +77,11 @@ class Badge(TimeStampedModel):
     objects = BadgeManager()
 
     class Meta:
-        verbose_name = _("Badge")
-        verbose_name_plural = _("Badges")
+        verbose_name = _("badge")
+        verbose_name_plural = _("badges")
         ordering = ('name', )
         get_latest_by = 'created'
+        unique_together = (('name', 'kind'), )
 
     def __str__(self):
         return '{0.name}'.format(self)
@@ -135,7 +128,7 @@ class GotBadge(models.Model):
         verbose_name = "Got badge"
         verbose_name_plural = "Got badges"
         ordering = ('-created', )
-        get_latest_by = ('created', )
+        get_latest_by = 'created'
         unique_together = (('user', 'badge'), )
 
     def __str__(self):
