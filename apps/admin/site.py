@@ -147,7 +147,7 @@ class SiteAdmin:
                 r'^export/(?P<pk_model>\d+)/(?P<listing_pks_objects>[\,\-\w]+)/$',
                 admin_staff_member_required(ExportModelView.as_view(site_admin=self)),
                 {}, 'export_model'),
-            url(r'^settings/$', SettingsView.as_view(), {}, 'settings'),
+            url(r'^settings/$', SettingsView.as_view(site_admin=self), {}, 'settings'),
             # url(r'^jsi18n/$', wrap(self.i18n_javascript, cacheable=True), name='jsi18n'),
         ]
 

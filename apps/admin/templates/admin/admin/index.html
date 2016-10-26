@@ -207,6 +207,13 @@
       <div id="content_results">
       {% block content %}
 
+        <p>Notifications: {{ notifications|length }}</p>
+        <ul>
+          {% for notification in notifications %}
+            <li>{{ notification }}</li>
+          {% endfor %}
+        </ul>
+
       {% endblock content %}
       </div>
 

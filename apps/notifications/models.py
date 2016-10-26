@@ -1,63 +1,64 @@
 
 import uuid
 
-from django.contrib.postgres.fields import HStoreField
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes.fields import GenericForeignKey
 from django.utils.translation import ugettext_lazy as _
 from django.db import models
 from django.conf import settings
 
-from utils.python.utils import classproperty
+from utils.django.datetime_utils import convert_date_to_django_date_format
 
 from .managers import NotificationManager
-from .utils import get_contents
 
 
 class Notification(models.Model):
     """ """
 
-    NEW_MESSAGE = 'NEW_MESSAGE'
-    NEW_COMMENT = 'NEW_COMMENT'
-    CHANGING_REPUTATION = 'CHANGING_REPUTATION'
-    CREATED_OBJECT = 'CREATED_OBJECT'
-    UPDATED_OBJECT = 'UPDATED_OBJECT'
-    DELETED_OBJECT = 'DELETED_OBJECT'
-    CREATED_USER = 'CREATED_USER'
-    UPDATED_USER = 'UPDATED_USER'
-    UPDATED_PROFILE = 'UPDATED_PROFILE'
-    UPDATED_DIARY = 'UPDATED_DIARY'
-    DELETED_USER = 'DELETED_USER'
-    EARNED_BADGE = 'EARNED_BADGE'
-    LOST_BADGE = 'LOST_BADGE'
+    SUCCESS = 'success'
+    INFO = 'info'
+    ERROR = 'error'
+    WARNING = 'warning'
 
-    CHOICES_ACTIONS = (
-        (NEW_MESSAGE, _('New message')),
-        (NEW_COMMENT, _('New comment')),
-        (CHANGING_REPUTATION, _('Changing reputation')),
-        (CREATED_OBJECT, _('Created object')),
-        (UPDATED_OBJECT, _('Updated object')),
-        (DELETED_OBJECT, _('Deleted object')),
-        (CREATED_USER, _('Created user')),
-        (UPDATED_USER, _('Updated user')),
-        (UPDATED_PROFILE, _('Updated profile')),
-        (UPDATED_DIARY, _('Updated diary')),
-        (DELETED_USER, _('Deleted user')),
-        (EARNED_BADGE, _('Earned badge')),
-        (LOST_BADGE, _('Lost badge')),
+    CHOICES_LEVEL = (
+        (SUCCESS, _('Success')),
+        (INFO, _('Info')),
+        (ERROR, _('Error')),
+        (WARNING, _('Warning')),
     )
 
-    @classproperty
-    def CONTENTS(cls):
-        return get_contents(cls)
+    is_real_object = None
 
     id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL, related_name='notifications',
-        verbose_name=_('User'), on_delete=models.CASCADE
+
+    level = models.CharField(_('level'), default=INFO, choices=CHOICES_LEVEL, max_length=10)
+    action = models.CharField(_('action'), max_length=200)
+
+    is_read = models.BooleanField(_('is read?'), default=False)
+    is_deleted = models.BooleanField(_('is deleted?'), default=False)
+    is_public = models.BooleanField(_('is public?'), default=True)
+    is_emailed = models.BooleanField(_('is emailed?'), default=True)
+
+    created = models.DateTimeField(_('created'), auto_now_add=True)
+
+    # recipient = models.ForeignKey(
+    #     settings.AUTH_USER_MODEL, related_name='notifications',
+    #     verbose_name=_('recipient'), on_delete=models.CASCADE
+    # )
+
+    actor_content_type = models.ForeignKey(
+        ContentType, on_delete=models.CASCADE,
+        related_name='notifications_actors',
     )
-    is_read = models.BooleanField(_('Is read'), default=False, editable=False)
-    content = models.CharField(_('Content'), max_length=1000)
-    action = models.CharField(_('Action'), max_length=50, choices=CHOICES_ACTIONS)
-    created = models.DateTimeField(_('Created'), auto_now_add=True)
+    actor_object_id = models.CharField(max_length=200, null=True, blank=True)
+    actor = GenericForeignKey(ct_field='actor_content_type', fk_field='actor_object_id')
+
+    target_content_type = models.ForeignKey(
+        ContentType, on_delete=models.SET_NULL,
+        null=True, blank=True, related_name='notifications_targets',
+    )
+    target_object_id = models.CharField(max_length=200, null=True, blank=True)
+    target = GenericForeignKey(ct_field='target_content_type', fk_field='target_object_id')
 
     objects = models.Manager()
     objects = NotificationManager()
@@ -69,14 +70,92 @@ class Notification(models.Model):
         ordering = ('-created', )
 
     def __str__(self):
-        return self.get_action_display()
+        return self.get_short_message()
 
-    @property
-    def full_message(self):
-        return self.determination_message()
+    def save(self, *args, **kwargs):
 
-    def send_full_message(self):
+        if self.is_real_object is None:
+            self.is_real_object = False if self.target is None else True
+
+        super(Notification, self).save(*args, **kwargs)
+
+    def get_full_message(self):
         pass
 
-    def checkup_reputation(self):
+    def get_short_message(self):
+
+        created = convert_date_to_django_date_format(self.created)
+
+        if self.actor is None and self.target is None:
+            return 'Anybody made {} on {}'.format(
+                self.action,
+                created,
+            )
+
+        elif self.target is None:
+
+            return '{} "{}" {} "(deleted object)" on {}'.format(
+                self.actor._meta.verbose_name,
+                self.actor,
+                self.action,
+                created,
+            )
+
+        elif self.actor is None:
+
+            return 'Anybody made {} {} "{}" on {}'.format(
+                self.action,
+                self.target._meta.verbose_name.lower(),
+                self.target,
+                created,
+            )
+
+        return '{} "{}" {} {} "{}" on {}'.format(
+            self.actor._meta.verbose_name,
+            self.actor,
+            self.action,
+            self.target._meta.verbose_name.lower(),
+            self.target,
+            created,
+        )
+
+    def mark_as_read(self):
         pass
+
+    def mark_as_unread(self):
+        pass
+
+    def mark_as_deleted(self):
+        pass
+
+    def mark_as_undeleted(self):
+        pass
+
+
+class Follow(models.Model):
+    """
+
+    """
+
+    models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
+    11
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, db_index=True)
+    content_type = models.ForeignKey(
+        ContentType, on_delete=models.CASCADE,
+        related_name='follow', db_index=True
+    )
+    object_id = models.TextField(db_index=True)
+    content_object = GenericForeignKey(
+        ct_field='content_type', fk_field='object_id'
+    )
+    started = models.DateTimeField(_('started'))
+
+    class Meta:
+        verbose_name = "Follow"
+        verbose_name_plural = "Follows"
+        unique_together = ('user', 'content_type', 'object_id')
+
+    def __str__(self):
+
+        return '{0.user} --> {0.content_object}'.format(self)

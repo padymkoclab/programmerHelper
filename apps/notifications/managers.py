@@ -87,4 +87,11 @@ class NotificationManager(models.Manager):
         )
 
 
+    def mark_all_as_read(self, user=None):
+        pass
+
+    def mark_all_as_unread(self, user=None):
+        pass
+
+
 NotificationManager = NotificationManager.from_queryset(NotificationQuerySet)

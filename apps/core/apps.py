@@ -8,4 +8,5 @@ class CoreConfig(AppConfig):
     verbose_name = _("Core")
 
     def ready(self):
-        pass
+
+        from .signals import added_update_object, deleted_object

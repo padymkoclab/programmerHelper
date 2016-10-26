@@ -46,7 +46,7 @@ class Snippet(CommentsModelMixin, OpinionsModelMixin, TagsModelMixin, TimeStampe
     slug = ConfiguredAutoSlugField(populate_from='name', unique=True)
     lexer = models.CharField(_('Lexer'), max_length=50, choices=CHOICES_LEXERS)
     user = models.ForeignKey(
-        settings.AUTH_USER_MODEL, verbose_name=_('User'),
+        settings.AUTH_USER_MODEL, verbose_name=_('user'),
         related_name='snippets', on_delete=models.CASCADE,
     )
     views = models.PositiveIntegerField(_('count views'), editable=False, default=0)

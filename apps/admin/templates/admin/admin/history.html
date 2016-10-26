@@ -10,30 +10,34 @@
     <li><a href="{{ index_url }}">{% trans "Home" %}</a></li>
     <li><a href="{{ model_meta|get_admin_url:'app' }}">{{ model_meta.app_config.verbose_name|capfirst }}</a></li>
     <li><a href="{{ model_meta|get_admin_url:'changelist' }}">{{ model_meta.verbose_name_plural|capfirst }}</a></li>
-    <li class="active">{% trans "History of" %} "{{ object }}"</li>
+    <li class="active">{% trans "History " %} {{ model_meta.verbose_name|lower }}</li>
 {% endblock breadcrumbs %}
 
 
 {% block content %}
 
     <div class="table-responsive">
-        <table class="table table-hover">
+        <table class="table table-hover table-bordered">
             <thead>
                 <tr>
+                    <th class="text-center bg-danger">№</th>
                     {% for header in log_entry_headers %}
-                        <th class="text-center">
+                        <th class="text-center bg-danger">
                             {{ header|capfirst }}
                         </th>
                     {% endfor %}
                 </tr>
             </thead>
             <tbody>
+
                 {% for log_entry in log_entries %}
-                    <tr>
+                    <tr class="bg-warning">
+                        <td class="text-center">{{ forloop.revcounter }}</td>
                         <td class="text-center">{{ log_entry.user.get_full_name }}</td>
                         <td class="text-center">
-                            <span class="pull-left">{{ log_entry.get_action_display }}</span>
-                            <span class="glyphicon glyphicon-{% if log_entry.action == 1 %}plus{% elif log_entry.action == 2 %}edit{% endif %} pull-rigth"></span>
+                            <span class="glyphicon glyphicon-{% if log_entry.action == 1 %}plus{% elif log_entry.action == 2 %}edit{% endif %} pull-left"></span>
+                            <span class="pull-">{{ log_entry.get_action_display }}</span>
+                            <span class="clearfix"></span>
                         </td>
                         <td class="text-right">{{ log_entry.action_time }}</td>
                     </tr>

@@ -17,13 +17,13 @@ class Command(FactoryCountBaseCommand):
 
         UserModel = UserFactory._meta.model
 
-        UserModel.objects.filter().delete()
+        UserModel._default_manager.filter().delete()
 
         count = kwargs['count'][0]
 
         for i in range(count):
             UserFactory()
 
-        logger.debug('Made factory {} users.'.format(
+        logger.info('Made factory {} users.'.format(
             UserModel.objects.count()
         ))

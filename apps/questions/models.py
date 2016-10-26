@@ -142,6 +142,7 @@ class Answer(OpinionsModelMixin, CommentsModelMixin, TimeStampedModel):
         on_delete=models.CASCADE, related_name='answers',
     )
     is_accepted = models.BooleanField(_('Is accepted answer?'), default=False)
+
     comments = GenericRelation(Comment, related_query_name='answers')
     opinions = GenericRelation(Opinion, related_query_name='answers')
 

@@ -4,7 +4,7 @@ from django.contrib import admin
 
 # from apps.core.admin import AdminSite
 
-from .models import Notification
+# from .models import Notification
 
 
 # @admin.register(Notification, site=AdminSite)
@@ -45,4 +45,4 @@ class NotificationAdmin(admin.ModelAdmin):
 
     def display_user_with_admin_url(self, obj):
         return format_html('<a href="{}">{}</a>', obj.user.get_admin_url(), obj.user)
-    display_user_with_admin_url.short_description = Notification._meta.get_field('user').verbose_name
+    # display_user_with_admin_url.short_description = Notification._meta.get_field('user').verbose_name

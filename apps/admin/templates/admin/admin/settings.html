@@ -1,0 +1,31 @@
+
+{% extends "admin/admin/index.html" %}
+
+{% load i18n %}
+
+{% load admin_filters %}
+
+
+{% block breadcrumbs %}
+    <li><a href="{{ index_url }}">{% trans "Home" %}</a></li>
+    <li class="active">{% trans "Settings" %}</li>
+{% endblock breadcrumbs %}
+
+
+{% block content %}
+
+    {% for app_verbose_name, constants in settings.items %}
+        <table class="table">
+            <caption class="text-muted">{{ app_verbose_name }}</caption>
+            <tbody>
+                {% for constant in constants %}
+                    <tr>
+                        <td>{{ constant.0 }}</td>
+                        <td>{{ constant.1|pprint }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endfor %}
+
+{% endblock content %}

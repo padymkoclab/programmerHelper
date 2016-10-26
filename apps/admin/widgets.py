@@ -57,18 +57,23 @@ class RelatedFieldWidgetWrapper(forms.Widget):
             'class': 'form-control',
         }
 
-        obj = self.related_model._default_manager.get(pk=value)
-
         # Add permissions on actions
         add_url = self.site_admin.get_url('add', self.related_model._meta)
-        update_url = self.site_admin.get_url('change', self.related_model._meta, kwargs={'pk': obj.pk})
-        delete_url = self.site_admin.get_url('delete', self.related_model._meta, kwargs={'pk': obj.pk})
 
         context = {
             'rendered_widget': self.widget.render(name, value, attrs),
             'add_url': add_url,
-            'update_url': update_url,
-            'delete_url': delete_url,
         }
+
+        if value:
+            obj = self.related_model._default_manager.get(pk=value)
+
+            update_url = self.site_admin.get_url('change', self.related_model._meta, kwargs={'pk': obj.pk})
+            delete_url = self.site_admin.get_url('delete', self.related_model._meta, kwargs={'pk': obj.pk})
+
+            context.update({
+                'update_url': update_url,
+                'delete_url': delete_url,
+            })
 
         return template.loader.render_to_string(self.template, context)

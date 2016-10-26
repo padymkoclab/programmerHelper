@@ -250,6 +250,15 @@ class UserAdmin(ModelAdmin):
             ),
         }),
 
+        # Notification
+        ('users_notifications', {
+            'title': _('Users and notifications'),
+            'fields': (
+                '__str__',
+                'get_count_notifications',
+            ),
+        }),
+
         # Forum
         ('users_forums', {
             'title': _('Users and forums'),

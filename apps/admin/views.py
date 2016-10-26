@@ -1,4 +1,5 @@
 
+import importlib
 import operator
 import functools
 import logging
@@ -6,6 +7,8 @@ import logging
 import json
 import collections
 
+from django import apps
+# from django.conf import settings
 from django.contrib.admin import filters as django_filters
 from django.core import serializers
 from django.contrib.contenttypes.models import ContentType
@@ -30,6 +33,8 @@ from django.utils.encoding import force_text
 
 from utils.django.views_mixins import ContextTitleMixin
 from utils.python.utils import get_filename_with_datetime
+
+# from apps.notifications.models import Notification
 
 from .models import LogEntry
 from .filters import DateTimeRangeFilter, RelatedOnlyFieldListFilter, ChoiceFilter
@@ -68,10 +73,14 @@ class IndexView(SiteAdminMixin, SiteAdminView):
             self.request,
             template=self.get_template_names(),
             context=context,
-            )
+        )
 
     def get_context_data(self, **kwargs):
+
         context = super().get_context_data(**kwargs)
+
+        context['notifications'] = self.get_notifications()
+
         return context
 
     def get_template_names(self):
@@ -79,6 +88,12 @@ class IndexView(SiteAdminMixin, SiteAdminView):
         return (
             'admin/admin/index.html',
             )
+
+    def get_notifications(self):
+
+        notifications = Notification.objects.all()
+
+        return notifications
 
 
 class LoginView(ContextTitleMixin, generic.FormView):
@@ -709,11 +724,26 @@ class AddChangeView(SiteAdminView):
         if self.obj is None:
             extra_tags = 'created'
             msg = _('Succefully created new {} "{}"').format(object_name, self.object)
+
+            log_entry_action = 1
         else:
             extra_tags = 'updated'
             msg = _('Succefully updated {} "{}"').format(object_name, self.object)
 
+            log_entry_action = 2
+
         self.model_admin.message_user(self.request, msg, 'SUCCESS', extra_tags)
+
+        log_entry = LogEntry(
+            action=log_entry_action,
+            user=self.request.user,
+            content_type=ContentType.objects.get_for_model(self.object),
+            object_id=self.object.pk
+        )
+        log_entry.full_clean()
+        log_entry.save()
+
+        logger.error('LogEntry Only for single object. Made for related objects (OneToOne and ForeignKey and M2M)')
 
         return HttpResponseRedirect(redirect_to=self.get_success_url())
 
@@ -885,7 +915,6 @@ class HistoryView(SiteModelAdminMixin, SiteAdminView):
         context['model_meta'] = self.model_admin.model._meta
 
         obj = self.get_object(**kwargs)
-        context['object'] = obj
 
         context['log_entry_headers'] = (
             LogEntry._meta.get_field('user').verbose_name,
@@ -900,7 +929,7 @@ class HistoryView(SiteModelAdminMixin, SiteAdminView):
     def get_log_entries(self, obj):
 
         return LogEntry.objects.filter(
-            content_type=ContentType.objects.get_for_model(obj.__class__),
+            content_type=ContentType.objects.get_for_model(obj),
             object_id=obj.pk
         )
 
@@ -1218,6 +1247,8 @@ class SettingsView(SiteAdminMixin, SiteAdminView):
     """
     """
 
+    title = _('Settings')
+
     def get(self, request, *args, **kwargs):
 
         context = self.get_context_data(**kwargs)
@@ -1234,14 +1265,41 @@ class SettingsView(SiteAdminMixin, SiteAdminView):
 
     def get_context_data(self, **kwargs):
 
-        context = super(HistoryView, self).get_context_data(**kwargs)
+        context = super(SettingsView, self).get_context_data(**kwargs)
 
-        context['title'] = ('Settings')
+        context['settings'] = self.get_settings()
 
         return context
 
     def get_template_names(self):
 
         return [
-            'admin/admin/history.html',
+            'admin/admin/settings.html',
         ]
+
+    def get_settings(self):
+
+        constants = collections.OrderedDict()
+
+        for app_config in apps.apps.app_configs.values():
+
+            file_path = '{}.constants'.format(app_config.name)
+            try:
+                file_ = importlib.import_module(file_path)
+            except ImportError:
+                continue
+            else:
+
+                file_constants = [i for i in dir(file_) if i.isupper()]
+
+                if len(file_constants):
+
+                    app_name = app_config.verbose_name
+                    for file_constant_name in file_constants:
+                        file_constants = getattr(file_, file_constant_name)
+
+                        values = constants.get(app_name, [])
+                        values.append((file_constant_name, file_constants))
+                        constants[app_name] = values
+
+        return constants

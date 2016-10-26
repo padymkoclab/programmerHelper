@@ -16,7 +16,7 @@ class Comment(BaseGenericModel):
     """ """
 
     text_comment = models.TextField(
-        _('Text comment'),
+        _('text comment'),
         validators=[
             MaxLengthValidator(
                 MAX_LENGTH_COMMENT,
@@ -25,9 +25,8 @@ class Comment(BaseGenericModel):
         ]
     )
     user = models.ForeignKey(
-        settings.AUTH_USER_MODEL, null=True,
+        settings.AUTH_USER_MODEL, verbose_name=_('user'),
         on_delete=models.CASCADE, related_name='comments',
-        verbose_name=_('User'),
     )
 
     class Meta:

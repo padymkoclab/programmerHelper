@@ -6,8 +6,6 @@ from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from django.db import models
 
-from apps.notifications.models import Notification
-
 from .utils import BADGES_CHECKERS
 
 

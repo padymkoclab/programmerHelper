@@ -5,6 +5,7 @@
 *.ipynb
 .ipynb_checkpoints/
 .cache/
+project.sublime-workspace
 
 static/vendor/
 assets/

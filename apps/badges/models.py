@@ -10,8 +10,6 @@ from utils.django.models_fields import ConfiguredAutoSlugField
 from utils.django.models import TimeStampedModel
 from utils.django.models_utils import get_admin_url
 
-from apps.notifications.models import Notification
-
 from .managers import BadgeManager
 
 

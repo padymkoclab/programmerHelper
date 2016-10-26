@@ -11,9 +11,4 @@ class NotificationsConfig(AppConfig):
 
     def ready(self):
 
-        from .signals import (
-            created_updated_user,
-            updated_profile,
-            updated_diary,
-            lost_vote_in_poll,
-        )
+        from .signals import notify
