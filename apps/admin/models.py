@@ -15,9 +15,9 @@ from django.conf import settings
 
 class LogEntry(models.Model):
 
-    ADDED = 1
-    CHANGED = 2
-    DELETED = 3
+    ADDED = 'A'
+    CHANGED = 'C'
+    DELETED = 'D'
 
     CHOISES_ACTION = (
         (ADDED, _('Added')),
@@ -40,7 +40,8 @@ class LogEntry(models.Model):
         verbose_name=_('content type'), blank=True,
     )
     object_id = models.TextField(_('object ID'))
-    action = models.PositiveIntegerField(_('Action'), choices=CHOISES_ACTION)
+    object_name = models.TextField(_('object'), max_length=200)
+    action = models.CharField(_('action'), choices=CHOISES_ACTION, max_length=1)
 
     objects = models.Manager()
 
@@ -51,6 +52,9 @@ class LogEntry(models.Model):
         ordering = ('-action_time', )
 
     def __str__(self):
+
+        # if deleted
+        # else exists
 
         return 'LogEntry object'
 

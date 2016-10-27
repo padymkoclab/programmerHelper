@@ -4,7 +4,7 @@ import datetime
 
 SITE_NAME = 'ProgrammerHelper.com'
 
-CAN_DELETE_USER = False
+CAN_DELETE_USER = True
 
 COUNT_DAYS_FOR_NEW_ELEMENTS = 7
 

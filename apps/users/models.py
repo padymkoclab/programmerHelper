@@ -225,20 +225,20 @@ class User(AbstractBaseUser, PermissionsMixin):
 
         # Protect a user from removal, if web application has this restriction
         #
-        if settings.DEBUG is False:
-            if not settings.CAN_DELETE_USER:
-                raise ProtectDeleteUser(
-                    _(
-                        """
-                        Sorry, but features our the site not allow removal profile of user.
-                        If you want, you can made user as non-active.
-                        """
-                    )
+        if not settings.CAN_DELETE_USER:
+            raise ProtectDeleteUser(
+                _(
+                    """
+                    Sorry, but features our the site not allow removal profile of user.
+                    If you want, you can made user as non-active.
+                    """
                 )
+            )
 
         super(User, self).delete(*args, **kwargs)
 
     def get_absolute_url(self):
+
         return reverse('users:detail', kwargs={'email': self.email})
 
     def get_admin_url(self):
@@ -252,7 +252,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     def get_full_name(self):
         """ """
 
-        return '{0} ({0.email})'.format(self)
+        return '{0.username} ({0.email})'.format(self)
     get_full_name.short_description = Meta.verbose_name
     # get_full_name.admin_order_field = 'username'
 

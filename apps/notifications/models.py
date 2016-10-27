@@ -6,10 +6,13 @@ from django.contrib.contenttypes.fields import GenericForeignKey
 from django.utils.translation import ugettext_lazy as _
 from django.db import models
 from django.conf import settings
+from django.contrib.auth import get_user_model
 
+from utils.python.utils import classproperty
 from utils.django.datetime_utils import convert_date_to_django_date_format
 
 from .managers import NotificationManager
+from .constants import Action
 
 
 class Notification(models.Model):
@@ -27,11 +30,9 @@ class Notification(models.Model):
         (WARNING, _('Warning')),
     )
 
-    is_real_object = None
-
     id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
 
-    level = models.CharField(_('level'), default=INFO, choices=CHOICES_LEVEL, max_length=10)
+    level = models.CharField(_('level'), default=SUCCESS, choices=CHOICES_LEVEL, max_length=10)
     action = models.CharField(_('action'), max_length=200)
 
     is_read = models.BooleanField(_('is read?'), default=False)
@@ -46,12 +47,11 @@ class Notification(models.Model):
     #     verbose_name=_('recipient'), on_delete=models.CASCADE
     # )
 
-    actor_content_type = models.ForeignKey(
-        ContentType, on_delete=models.CASCADE,
-        related_name='notifications_actors',
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, verbose_name=_('user'),
+        related_name='+', on_delete=models.SET_NULL, null=True, blank=True
     )
-    actor_object_id = models.CharField(max_length=200, null=True, blank=True)
-    actor = GenericForeignKey(ct_field='actor_content_type', fk_field='actor_object_id')
+    user_display_text = models.CharField(_('user_display_text'), max_length=100, blank=True)
 
     target_content_type = models.ForeignKey(
         ContentType, on_delete=models.SET_NULL,
@@ -59,77 +59,142 @@ class Notification(models.Model):
     )
     target_object_id = models.CharField(max_length=200, null=True, blank=True)
     target = GenericForeignKey(ct_field='target_content_type', fk_field='target_object_id')
+    target_str = models.CharField(_('target'), max_length=200, null=True, blank=True)
+
+    action_target_content_type = models.ForeignKey(
+        ContentType, on_delete=models.SET_NULL,
+        null=True, blank=True, related_name='notifications_action_targets',
+    )
+    action_target_object_id = models.CharField(max_length=200, null=True, blank=True)
+    action_target = GenericForeignKey(ct_field='action_target_content_type', fk_field='action_target_object_id')
 
     objects = models.Manager()
     objects = NotificationManager()
 
     class Meta:
-        verbose_name = _('Notification')
-        verbose_name_plural = _('Notifications')
+        verbose_name = _('notification')
+        verbose_name_plural = _('notifications')
         get_latest_by = 'created'
         ordering = ('-created', )
 
     def __str__(self):
-        return self.get_short_message()
+
+        action = self.get_action_display()
+        user_display_text = self.get_user_display_text()
+        created = convert_date_to_django_date_format(self.created)
+
+        if self.has_target():
+
+            target_content_type_name, target_display_text = self.get_target_info()
+
+            return '{} "{}" {} {} "{}" on {}'.format(
+                self.user_verbose_name,
+                user_display_text,
+                action,
+                self.target_type_verbose_name,
+                self.target_str,
+                created,
+            )
+
+        return '{} "{}" {} on {}'.format(
+            self.user_verbose_name, user_display_text, action, created
+        )
 
     def save(self, *args, **kwargs):
 
-        if self.is_real_object is None:
-            self.is_real_object = False if self.target is None else True
+        target = kwargs.pop('target', None)
+        if target is not None:
+            self.target_str = str(target)
+            self.full_clean()
+
+        user = kwargs.pop('user', None)
+        if user is not None:
+            self.user_display_text = user.get_full_name()
+            self.full_clean()
 
         super(Notification, self).save(*args, **kwargs)
 
-    def get_full_message(self):
-        pass
-
-    def get_short_message(self):
-
-        created = convert_date_to_django_date_format(self.created)
-
-        if self.actor is None and self.target is None:
-            return 'Anybody made {} on {}'.format(
-                self.action,
-                created,
-            )
-
-        elif self.target is None:
-
-            return '{} "{}" {} "(deleted object)" on {}'.format(
-                self.actor._meta.verbose_name,
-                self.actor,
-                self.action,
-                created,
-            )
-
-        elif self.actor is None:
-
-            return 'Anybody made {} {} "{}" on {}'.format(
-                self.action,
-                self.target._meta.verbose_name.lower(),
-                self.target,
-                created,
-            )
-
-        return '{} "{}" {} {} "{}" on {}'.format(
-            self.actor._meta.verbose_name,
-            self.actor,
-            self.action,
-            self.target._meta.verbose_name.lower(),
-            self.target,
-            created,
-        )
-
     def mark_as_read(self):
-        pass
+
+        if self.is_read is False:
+            self.is_read = True
+            self.full_clean()
+            self.save()
 
     def mark_as_unread(self):
-        pass
+
+        if self.is_read is True:
+            self.is_read = False
+            self.full_clean()
+            self.save()
 
     def mark_as_deleted(self):
-        pass
+
+        if self.is_deleted is False:
+            self.is_deleted = True
+            self.full_clean()
+            self.save()
 
     def mark_as_undeleted(self):
-        pass
+
+        if self.is_deleted is True:
+            self.is_deleted = False
+            self.full_clean()
+            self.save()
+
+    def get_target_info(self):
+
+        if self.target is None:
+            target_content_type_name = self.target_content_type.model_class()._meta.verbose_name.lower()
+            target_display_text = self.target_str
+        else:
+            target_content_type_name = self.target._meta.verbose_name.lower()
+            target_display_text = str(self.target)
+
+        return target_content_type_name, target_display_text
+
+    def get_user_display_text(self):
+
+        if self.user is None:
+            return self.user_display_text
+        return self.user.get_full_name()
+
+    @classproperty
+    def user_verbose_name(self):
+
+        return get_user_model()._meta.verbose_name
+
+    def has_target(self):
+
+        return self.target is not None or self.target_content_type is not None
+
+    @property
+    def target_type_verbose_name(self):
+
+        if self.has_target():
+
+            target_model = self.target_content_type.model_class()
+            return target_model._meta.verbose_name
+
+        return self.user_verbose_name
+
+    @property
+    def action_target_type_verbose_name(self):
+
+        if self.action_target_content_type is not None:
+
+            action_target_model = self.action_target_content_type.model_class()
+            return action_target_model._meta.verbose_name
+
+        return self.target_type_verbose_name
+
+    def get_action_display(self):
+
+        return Action.get_action_display(self.action)
+
+    def get_type_action_title(self):
+
+        return Action.get_type_action_title(self.action)
 
 
 class Follow(models.Model):
@@ -137,9 +202,8 @@ class Follow(models.Model):
 
     """
 
-    models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
-    11
     user = models.ForeignKey(settings.AUTH_USER_MODEL, db_index=True)
     content_type = models.ForeignKey(
         ContentType, on_delete=models.CASCADE,

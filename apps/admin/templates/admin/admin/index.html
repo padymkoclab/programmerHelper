@@ -6,6 +6,8 @@
 
 {% load utils_filters %}
 
+{% load admin_filters %}
+
 
 {% block extra_css %}
   {{ block.super }}
@@ -205,18 +207,77 @@
       </div>
 
       <div id="content_results">
+
+
       {% block content %}
 
-        <p>Notifications: {{ notifications|length }}</p>
-        <ul>
-          {% for notification in notifications %}
-            <li>{{ notification }}</li>
-          {% endfor %}
-        </ul>
+        <div class="col-sm-4">
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <p class="panel-title">
+
+                {% trans "Recent activity" %}
+
+                <button type="button" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <button type="button" class="close" aria-label="Close"><span aria-hidden="true">&and;</span></button>
+                <button type="button" class="close" aria-label="Close"><span aria-hidden="true">&or;</span></button>
+              </p>
+            </div>
+            <div class="panel-body">
+
+              {% for notification in notifications %}
+                <div class="panel panel-{% if notification.level == 'error' %}danger{% else %}{{ notification.level }}{% endif %}">
+                  <div class="panel-heading">
+                    <div class="panel-title">
+
+                      {{ notification.get_type_action_title }} {{ notification.action_target_type_verbose_name|lower }}
+
+                    </div>
+                  </div>
+                  <div class="panel-body text-justify">
+
+                    {{ notification.user_verbose_name }}
+
+                    {% if notification.user is None %}
+                      {{ notification.get_user_display_text }}
+                    {% else %}
+                      <a href="{{ notification.user|get_admin_url:'change' }}">{{ notification.get_user_display_text }}</a>
+                    {% endif %}
+
+                    {{ notification.get_action_display }}
+
+                    {% if notification.has_target is True %}
+                      {{ notification.target_type_verbose_name|lower }}
+
+                      {% if notification.target is None %}
+                        "{{ notification.target_str }}"
+                      {% else %}
+                        <a href="{{ notification.target|get_admin_url:'change' }}">"{{ notification.target }}"</a>
+                      {% endif %}
+
+                    {% endif %}
+
+                    {# Important. Text ending point #}.
+
+                  </div>
+                  <div class="panel-footer">
+                    <span class="pull-right"><i>{{ notification.created|timesince }} {% trans "ago" %}</i></span>
+                    <span class="clearfix"></span>
+                  </div>
+                </div>
+              {% endfor %}
+
+            </div>
+            <div class="panel-footer">
+              <a href="" class="pull-right"><i>{% trans "Show all" %}</i></a>
+              <span class="clearfix"></span>
+            </div>
+          </div>
+        </div>
 
       {% endblock content %}
-      </div>
 
+      </div>
     </div>
   </div>
 

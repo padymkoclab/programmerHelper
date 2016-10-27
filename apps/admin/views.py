@@ -34,7 +34,7 @@ from django.utils.encoding import force_text
 from utils.django.views_mixins import ContextTitleMixin
 from utils.python.utils import get_filename_with_datetime
 
-# from apps.notifications.models import Notification
+from apps.notifications.models import Notification
 
 from .models import LogEntry
 from .filters import DateTimeRangeFilter, RelatedOnlyFieldListFilter, ChoiceFilter
@@ -81,17 +81,19 @@ class IndexView(SiteAdminMixin, SiteAdminView):
 
         context['notifications'] = self.get_notifications()
 
+        context['site_admin'] = self.site_admin
+
         return context
 
     def get_template_names(self):
 
         return (
             'admin/admin/index.html',
-            )
+        )
 
     def get_notifications(self):
 
-        notifications = Notification.objects.all()
+        notifications = Notification.objects.all()[:50]
 
         return notifications
 

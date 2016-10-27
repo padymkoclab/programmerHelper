@@ -1,31 +1,36 @@
 
 import uuid
 
+from django.core.exceptions import ValidationError
 from django.dispatch import Signal, receiver
 
 from .models import Notification
 
 
 notify = Signal(providing_args=[
-    'actor', 'target', 'action', 'is_public', 'is_emailed'
+    'user', 'target', 'action', 'is_public', 'is_emailed', 'level', 'action_target'
 ])
 
 
 @receiver(notify, dispatch_uid=uuid.uuid4)
 def handle_notify(sender, **kwargs):
 
-    actor = kwargs.get('actor')
+    user = kwargs.get('user')
     target = kwargs.get('target')
     action = kwargs.get('action')
     is_public = kwargs.get('is_public')
     is_emailed = kwargs.get('is_emailed')
     is_deleted = kwargs.get('is_deleted')
+    level = kwargs.get('level')
+    action_target = kwargs.get('action_target')
     # recipient = kwargs.get('recipient')
 
     options = dict(
-        actor=actor,
+        user=user,
         target=target,
         action=action,
+        level=level,
+        action_target=action_target,
     )
 
     if is_public is not None:
@@ -38,5 +43,10 @@ def handle_notify(sender, **kwargs):
         options['is_deleted'] = is_deleted
 
     notification = Notification(**options)
-    notification.full_clean()
-    notification.save()
+    try:
+        notification.full_clean()
+    except ValidationError:
+        notification.user = None
+        notification.full_clean()
+    finally:
+        notification.save(user=user, target=target)

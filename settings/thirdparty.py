@@ -11,6 +11,7 @@ SHELL_PLUS = 'ipython'
 SHELL_PLUS_PRE_IMPORTS = (
     ('django.template', ('Template', 'Context')),
     ('django.contrib', 'admin'),
+    ('django.core.management', 'call_command'),
     ('django.apps', 'apps'),
     ('utils', 'django'),
 )
