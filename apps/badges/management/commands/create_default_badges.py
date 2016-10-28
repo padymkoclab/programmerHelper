@@ -1,10 +1,9 @@
 
 import logging
-import collections
 
 from django.core.management.base import BaseCommand
 
-from ...constants import BADGES
+from ...constants import Badges
 from ...models import Badge
 
 
@@ -15,21 +14,28 @@ class Command(BaseCommand):
 
     def handle(self, *args, **kwargs):
 
-        lst_statuses_created = list()
+        count_created = 0
+        count_updated = 0
 
-        for badge in BADGES:
+        # import ipdb; ipdb.set_trace()
+        for badge_data in Badges._DEFAULT_BADGES:
 
-            #
-            was_created = Badge.objects.get_or_create(
-                name=badge['name'],
-                description=badge['description'],
-                kind=badge['kind'],
-                category=badge['category'],
-            )[1]
+            obj, was_created = Badge.objects.update_or_create(
+                name=badge_data['name'],
+                kind=badge_data['kind'],
+                defaults=dict(
+                    description=badge_data['description'],
+                    category=badge_data['category'],
+                ),
+            )
 
-            lst_statuses_created.append(was_created)
+            if was_created:
+                count_created += 1
+                action = 'was created'
+            else:
+                count_updated += 1
+                action = 'was updated'
 
-        count_created = collections.Counter(lst_statuses_created)[True]
-        count_exists = collections.Counter(lst_statuses_created)[False]
+            print('{} {}.'.format(obj, action))
 
-        logger.info('Created {} badges. Already exists {} badges.'.format(count_created, count_exists))
+        logger.info('Were created {} badges. Were updated {} badges.'.format(count_created, count_updated))

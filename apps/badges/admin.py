@@ -7,7 +7,7 @@ from apps.admin.site import DefaultSiteAdmin
 from apps.admin.admin import ModelAdmin, StackedInline, TabularInline
 from apps.admin.app import AppAdmin
 
-from .models import Badge, GotBadge
+from .models import Badge, EarnedBadge
 from .apps import BadgesConfig
 
 
@@ -30,7 +30,9 @@ class BadgeAdmin(ModelAdmin):
     Admin View for Badge
     """
 
-    list_display = ('name', 'category', 'kind', 'description', 'get_count_users_with_this_badge')
+    list_display = (
+        'name', 'category', 'kind', 'description', 'get_count_users', 'date_latest_awarded', 'lastest_awarded_user'
+    )
     list_filter = []
     search_fields = ('name', 'description')
     fieldsets = (
@@ -56,29 +58,29 @@ class BadgeAdmin(ModelAdmin):
     get_count_users_with_this_badge.short_description = _('Count users')
 
 
-# @admin.register(GotBadge, site=AdminSite)
-class GotBadgeAdmin(ModelAdmin):
+# @admin.register(EarnedBadge, site=AdminSite)
+class EarnedBadgeAdmin(ModelAdmin):
     '''
     Admin View for GettingBadge
     '''
 
     list_display = ('badge', 'user', 'created')
-    list_filter = (
-        ('user', admin.RelatedOnlyFieldListFilter),
-        ('badge', admin.RelatedOnlyFieldListFilter),
-        'created',
-    )
-    date_hierarchy = 'created'
-    readonly_fields = ('badge', 'user')
-    fieldsets = [
-        [
-            GotBadge._meta.verbose_name, {
-                'fields': ('badge', 'user',),
-            }
-        ]
-    ]
+    # list_filter = (
+    #     ('user', admin.RelatedOnlyFieldListFilter),
+    #     ('badge', admin.RelatedOnlyFieldListFilter),
+    #     'created',
+    # )
+    # date_hierarchy = 'created'
+    # readonly_fields = ('badge', 'user')
+    # fieldsets = [
+    #     [
+    #         EarnedBadge._meta.verbose_name, {
+    #             'fields': ('badge', 'user',),
+    #         }
+    #     ]
+    # ]
 
 
 DefaultSiteAdmin.register_app(BadgesAppAdmin)
 DefaultSiteAdmin.register_model(Badge, BadgeAdmin)
-DefaultSiteAdmin.register_model(GotBadge, GotBadgeAdmin)
+DefaultSiteAdmin.register_model(EarnedBadge, EarnedBadgeAdmin)

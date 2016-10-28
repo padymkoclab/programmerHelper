@@ -6,67 +6,28 @@ from django.utils.translation import ugettext_lazy as _
 from django.db import models
 from django.conf import settings
 
-from utils.django.models_fields import ConfiguredAutoSlugField
 from utils.django.models import TimeStampedModel
 from utils.django.models_utils import get_admin_url
 
-from .managers import BadgeManager
+from .managers import BadgeManager, EarnedBadgeManager
+from .constants import Badges
 
 
 class Badge(TimeStampedModel):
     """
-    next badge
 
-    top tags
-        posts
-        score
     """
 
-    BRONZE = 'bronze'
-    SILVER = 'silver'
-    GOLD = 'gold'
-
-    ANSWERS = 'answers'
-    QUESTIONS = 'questions'
-    ARTICLES = 'articles'
-    SOLUTIONS = 'solutions'
-    SNIPPETS = 'snippets'
-    POLLS = 'polls'
-    FORUMS = 'forums'
-    OPINIONS = 'opinions'
-    COMMENTS = 'comments'
-    PROFILE = 'profile'
-    OTHER = 'other'
-
-    CHOICES_CATEGORY = (
-        (ANSWERS, _('Answers')),
-        (QUESTIONS, _('Questions')),
-        (ARTICLES, _('Articles')),
-        (SOLUTIONS, _('Solutions')),
-        (SNIPPETS, _('Snippets')),
-        (POLLS, _('Polls')),
-        (FORUMS, _('Forums')),
-        (OPINIONS, _('Opinions')),
-        (COMMENTS, _('Comments')),
-        (PROFILE, _('Profile')),
-        (OTHER, _('Other')),
-    )
-
-    CHOICES_KIND = (
-        (BRONZE, _('Bronze')),
-        (SILVER, _('Silver')),
-        (GOLD, _('Gold')),
-    )
-
     id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
-    name = models.CharField(_('Name'), max_length=30)
-    slug = ConfiguredAutoSlugField(populate_from='name', unique_with=['kind'])
-    description = models.CharField(_('Short description'), max_length=200)
-    category = models.CharField(_('Category'), max_length=30, choices=CHOICES_CATEGORY)
-    kind = models.CharField(_('Kind'), max_length=20, choices=CHOICES_KIND)
+
+    name = models.CharField(_('Name'), max_length=50, choices=Badges.CHOICES_NAME)
+    description = models.CharField(_('Description'), max_length=50, choices=Badges.CHOICES_DESCRIPTION)
+    category = models.CharField(_('Category'), max_length=20, choices=Badges.CHOICES_CATEGORY)
+    kind = models.CharField(_('Kind'), max_length=10, choices=Badges.CHOICES_KIND)
+
     users = models.ManyToManyField(
         settings.AUTH_USER_MODEL, verbose_name=_('Users'),
-        through='GotBadge',
+        through='EarnedBadge',
         through_fields=('badge', 'user'),
         related_name='+',
     )
@@ -82,10 +43,14 @@ class Badge(TimeStampedModel):
         unique_together = (('name', 'kind'), )
 
     def __str__(self):
-        return '{0.name}'.format(self)
+
+        return '{} badge "{}"'.format(
+            self.get_kind_display(),
+            self.get_name_display(),
+        )
 
     def get_absolute_url(self):
-        return reverse('badges:detail', kwargs={'pk': self.pk, 'slug': self.slug})
+        return reverse('badges:detail', kwargs={'pk': self.pk, 'name': self.name})
 
     def get_admin_url(self):
         return get_admin_url(self)
@@ -101,16 +66,18 @@ class Badge(TimeStampedModel):
 
         pass
 
-    def check_badge_for_user(self, user):
+    # def check_badge_for_user(self, user):
 
-        Notification.objects.create(
-            user=user,
-            action=Notification.EARNED_BADGE,
-            content=_('You earned badge "{}"').format(self),
-        )
+    #     Notification.objects.create(
+    #         user=user,
+    #         action=Notification.EARNED_BADGE,
+    #         content=_('You earned badge "{}"').format(self),
+    #     )
 
 
-class GotBadge(models.Model):
+class EarnedBadge(models.Model):
+
+    id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
 
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, verbose_name=_('User'),
@@ -122,9 +89,11 @@ class GotBadge(models.Model):
     )
     created = models.DateTimeField(_('Date getting'), auto_now_add=True)
 
+    objects = EarnedBadgeManager()
+
     class Meta:
-        verbose_name = "Got badge"
-        verbose_name_plural = "Got badges"
+        verbose_name = "Earned badge"
+        verbose_name_plural = "Earned badges"
         ordering = ('-created', )
         get_latest_by = 'created'
         unique_together = (('user', 'badge'), )

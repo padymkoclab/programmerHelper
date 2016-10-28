@@ -36,6 +36,9 @@ class AppAdmin:
     @classmethod
     def get_app_label(cls):
 
+        if cls.app_config_class is None:
+            raise AttributeError('app_config_class must be not None.')
+
         if AppConfig != cls.app_config_class.__mro__[1]:
             raise ImproperlyConfigured('Attribute "app_config_class" must be instance of {}'.format(AppConfig))
 

@@ -35,6 +35,7 @@ from utils.django.views_mixins import ContextTitleMixin
 from utils.python.utils import get_filename_with_datetime
 
 from apps.notifications.models import Notification
+from apps.notifications.constants import Actions
 
 from .models import LogEntry
 from .filters import DateTimeRangeFilter, RelatedOnlyFieldListFilter, ChoiceFilter
@@ -79,9 +80,11 @@ class IndexView(SiteAdminMixin, SiteAdminView):
 
         context = super().get_context_data(**kwargs)
 
-        context['notifications'] = self.get_notifications()
+        context['all_notifications'] = self.get_all_notifications()
+        context['badges_notifications'] = self.get_badges_notifications()
 
         context['site_admin'] = self.site_admin
+        context['notification_changelist_url'] = self.site_admin.get_url('changelist', Notification)
 
         return context
 
@@ -91,11 +94,19 @@ class IndexView(SiteAdminMixin, SiteAdminView):
             'admin/admin/index.html',
         )
 
-    def get_notifications(self):
+    def get_all_notifications(self):
 
-        notifications = Notification.objects.all()[:50]
+        notifications = Notification.objects.all()
 
-        return notifications
+        return notifications[:50]
+
+    def get_badges_notifications(self):
+
+        notifications = Notification.objects.filter(
+            models.Q(action=Actions.ADDED_BADGE.value) | models.Q(action=Actions.DELETED_BADGE.value)
+        )
+
+        return notifications[:50]
 
 
 class LoginView(ContextTitleMixin, generic.FormView):

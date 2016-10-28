@@ -29,7 +29,7 @@ from utils.django.models_utils import get_admin_url
 from utils.django.functions_db import Round
 
 from apps.tags.models import Tag
-from apps.badges.managers import BadgeManager
+# from apps.badges.managers import BadgeManager
 from apps.badges.models import Badge
 # from apps.polls.managers import PollsManager
 # from apps.polls.querysets import UserPollQuerySet
@@ -201,7 +201,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     objects = models.Manager()
     objects = UserManager()
     # polls = PollsManager.from_queryset(UserPollQuerySet)()
-    badges_manager = BadgeManager()
+    # badges_manager = BadgeManager()
 
     class Meta:
         verbose_name = _("User")

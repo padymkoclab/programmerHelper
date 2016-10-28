@@ -1,6 +1,7 @@
 
 import uuid
 
+from django.core.exceptions import ValidationError
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.utils.translation import ugettext_lazy as _
@@ -12,11 +13,13 @@ from utils.python.utils import classproperty
 from utils.django.datetime_utils import convert_date_to_django_date_format
 
 from .managers import NotificationManager
-from .constants import Action
+from .constants import Actions
 
 
 class Notification(models.Model):
     """ """
+
+    ANONIMUOS_DISPLAY_TEXT = _('Anonimuos user')
 
     SUCCESS = 'success'
     INFO = 'info'
@@ -35,7 +38,7 @@ class Notification(models.Model):
     level = models.CharField(_('level'), default=SUCCESS, choices=CHOICES_LEVEL, max_length=10)
     action = models.CharField(_('action'), max_length=200)
 
-    is_read = models.BooleanField(_('is read?'), default=False)
+    is_read = models.BooleanField(_('is read?'), default=False, db_index=True)
     is_deleted = models.BooleanField(_('is deleted?'), default=False)
     is_public = models.BooleanField(_('is public?'), default=True)
     is_emailed = models.BooleanField(_('is emailed?'), default=True)
@@ -47,8 +50,9 @@ class Notification(models.Model):
     #     verbose_name=_('recipient'), on_delete=models.CASCADE
     # )
 
+    is_anonimuos = models.BooleanField(_('is anonimuos?'), default=False)
     user = models.ForeignKey(
-        settings.AUTH_USER_MODEL, verbose_name=_('user'),
+        settings.AUTH_USER_MODEL, verbose_name=_('user'), db_index=True,
         related_name='+', on_delete=models.SET_NULL, null=True, blank=True
     )
     user_display_text = models.CharField(_('user_display_text'), max_length=100, blank=True)
@@ -59,7 +63,7 @@ class Notification(models.Model):
     )
     target_object_id = models.CharField(max_length=200, null=True, blank=True)
     target = GenericForeignKey(ct_field='target_content_type', fk_field='target_object_id')
-    target_str = models.CharField(_('target'), max_length=200, null=True, blank=True)
+    target_display_text = models.CharField(_('target'), max_length=200, null=True, blank=True)
 
     action_target_content_type = models.ForeignKey(
         ContentType, on_delete=models.SET_NULL,
@@ -92,7 +96,7 @@ class Notification(models.Model):
                 user_display_text,
                 action,
                 self.target_type_verbose_name,
-                self.target_str,
+                self.target_display_text,
                 created,
             )
 
@@ -104,13 +108,13 @@ class Notification(models.Model):
 
         target = kwargs.pop('target', None)
         if target is not None:
-            self.target_str = str(target)
-            self.full_clean()
+            self.target_display_text = str(target)
 
         user = kwargs.pop('user', None)
         if user is not None:
             self.user_display_text = user.get_full_name()
-            self.full_clean()
+
+        self.full_clean()
 
         super(Notification, self).save(*args, **kwargs)
 
@@ -146,7 +150,7 @@ class Notification(models.Model):
 
         if self.target is None:
             target_content_type_name = self.target_content_type.model_class()._meta.verbose_name.lower()
-            target_display_text = self.target_str
+            target_display_text = self.target_display_text
         else:
             target_content_type_name = self.target._meta.verbose_name.lower()
             target_display_text = str(self.target)
@@ -190,11 +194,15 @@ class Notification(models.Model):
 
     def get_action_display(self):
 
-        return Action.get_action_display(self.action)
+        return Actions.get_action_display(self.action)
 
-    def get_type_action_title(self):
+    def get_action_title(self):
 
-        return Action.get_type_action_title(self.action)
+        return Actions.get_action_title(self.action)
+
+    def display_anonimuos(self):
+
+        return self.ANONIMUOS_DISPLAY_TEXT
 
 
 class Follow(models.Model):
@@ -203,23 +211,28 @@ class Follow(models.Model):
     """
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, db_index=True)
-    content_type = models.ForeignKey(
-        ContentType, on_delete=models.CASCADE,
-        related_name='follow', db_index=True
+    follower = models.ForeignKey(
+        settings.AUTH_USER_MODEL, db_index=True,
+        on_delete=models.CASCADE, related_name='following',
+        verbose_name=_('follower')
     )
-    object_id = models.TextField(db_index=True)
-    content_object = GenericForeignKey(
-        ct_field='content_type', fk_field='object_id'
+    following = models.ForeignKey(
+        settings.AUTH_USER_MODEL, db_index=True,
+        on_delete=models.CASCADE, related_name='followers',
+        verbose_name=_('following')
     )
-    started = models.DateTimeField(_('started'))
+    started = models.DateTimeField(_('started'), auto_now_add=True)
 
     class Meta:
         verbose_name = "Follow"
         verbose_name_plural = "Follows"
-        unique_together = ('user', 'content_type', 'object_id')
+        unique_together = ('follower', 'following')
 
     def __str__(self):
 
-        return '{0.user} --> {0.content_object}'.format(self)
+        return '{0.follower} --> {0.following}'.format(self)
+
+    def clean(self):
+
+        if self.follower == self.following:
+            raise ValidationError(_('User not possible following for yourself'))

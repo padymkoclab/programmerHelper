@@ -86,4 +86,27 @@ jQuery(document).ready(function($) {
         var elem = document.body; // Make the body go full screen.
         requestFullScreen(elem);
     });
+
+
+    /*
+
+    */
+    $('button.close.close_panel').bind({
+        click: function(e){
+            $(this).parents('div.panel').fadeOut('slow');
+        },
+    });
+
+    $('button.close.hide_panel').bind({
+        click: function(e){
+            $(this).parents('div.panel').find('div.panel-body').slideUp('slow');
+        },
+    });
+
+    $('button.close.show_panel').bind({
+        click: function(e){
+            $(this).parents('div.panel').find('div.panel-body').slideDown('slow');
+        },
+    });
+
 });

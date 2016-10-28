@@ -65,7 +65,7 @@
             <a href="#fieldset{{ forloop.counter }}_model" role="tab" data-toggle="tab">
                 <span class="{% if fieldset.total_error_count > 0 %}text-danger{% endif %}">
                   {% if fieldset.name %}
-                    {{ fieldset.name }}
+                    {{ fieldset.name|capfirst }}
                   {% else %}
                     {% blocktrans with forloop.counter as num %}
                         Fieldset # {{ num }}
@@ -86,22 +86,22 @@
       {% endfor %}
 
       {% for inline, formset in inlines_formsets %}
-      <li role="presentation">
-        <a href="#fieldset{{ forloop.counter }}_inline" role="tab" data-toggle="tab">
+        <li role="presentation">
+          <a href="#fieldset{{ forloop.counter }}_inline" role="tab" data-toggle="tab">
 
-            <span class="{% if formset.total_error_count > 0 %}text-danger{% endif %}">
-                {{ inline.verbose_name_plural }}
+              <span class="{% if formset.total_error_count > 0 %}text-danger{% endif %}">
+                  {{ inline.verbose_name_plural }}
 
-                {% if formset.total_error_count > 0 %}
-                    {% blocktrans count counter=formset.total_error_count trimmed %}
-                        ({{ counter }} error)
-                    {% plural %}
-                        ({{ counter }} errors)
-                    {% endblocktrans %}
-                {% endif %}
-            </span>
-        </a>
-      </li>
+                  {% if formset.total_error_count > 0 %}
+                      {% blocktrans count counter=formset.total_error_count trimmed %}
+                          ({{ counter }} error)
+                      {% plural %}
+                          ({{ counter }} errors)
+                      {% endblocktrans %}
+                  {% endif %}
+              </span>
+          </a>
+        </li>
       {% endfor %}
 
     </ul>

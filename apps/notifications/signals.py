@@ -8,7 +8,7 @@ from .models import Notification
 
 
 notify = Signal(providing_args=[
-    'user', 'target', 'action', 'is_public', 'is_emailed', 'level', 'action_target'
+    'user', 'target', 'action', 'is_public', 'is_emailed', 'level', 'action_target', 'is_anonimuos'
 ])
 
 
@@ -23,6 +23,7 @@ def handle_notify(sender, **kwargs):
     is_deleted = kwargs.get('is_deleted')
     level = kwargs.get('level')
     action_target = kwargs.get('action_target')
+    is_anonimuos = kwargs.get('is_anonimuos')
     # recipient = kwargs.get('recipient')
 
     options = dict(
@@ -42,7 +43,11 @@ def handle_notify(sender, **kwargs):
     if is_deleted is not None:
         options['is_deleted'] = is_deleted
 
+    if is_anonimuos is not None:
+        options['is_anonimuos'] = is_anonimuos
+
     notification = Notification(**options)
+
     try:
         notification.full_clean()
     except ValidationError:

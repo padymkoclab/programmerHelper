@@ -4,6 +4,7 @@ import logging
 from django.core.urlresolvers import reverse
 from django.conf.urls import url, include
 from django.apps import apps
+from django.db import models
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 # from django.db.models.base import ModelBase
@@ -173,10 +174,16 @@ class SiteAdmin:
     def urls(self):
         return self.get_urls(), 'admin', self.name
 
-    def get_url(self, key_name, *args, **kwargs):
+    def get_url(self, key_name, arbitrary_object=None, **kwargs):
 
-        model_meta = args[0]
-        app_label = args[0]
+        if arbitrary_object is not None:
+
+            if isinstance(arbitrary_object, str):
+                app_label = arbitrary_object
+            elif isinstance(arbitrary_object, models.options.Options):
+                model_meta = arbitrary_object
+            elif isinstance(arbitrary_object, models.base.ModelBase):
+                model_meta = arbitrary_object._meta
 
         if key_name == 'changelist':
             return reverse(

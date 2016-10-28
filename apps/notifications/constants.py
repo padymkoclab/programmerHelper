@@ -1,15 +1,11 @@
 
-import logging
+import enum
 
 from django.utils.translation import ugettext_lazy as _
 
-from utils.python.utils import classproperty
 
-
-logger = logging.getLogger('django.development')
-
-
-class Action(object):
+@enum.unique
+class Actions(enum.Enum):
     """
 
     """
@@ -41,11 +37,9 @@ class Action(object):
     DELETED_OBJECT = 'deleted'
     DELETED_USER = 'deleted_user'
     DELETED_BADGE = 'lost_badge'
-    DELETED_VOTE = 'deleted_vote'
     DELETED_OPINION = 'deleted_opinion'
     DELETED_COMMENT = 'deleted_comment'
     DELETED_MARK = 'deleted_mark'
-    DELETED_ANSWER = 'deleted_answer'
     DELETED_REPLY = 'deleted_reply'
     DELETED_POST = 'deleted_post'
     DELETED_ANSWER = 'deleted_answer'
@@ -53,86 +47,85 @@ class Action(object):
 
     USER_LOGGED_IN = 'user_logged_in'
     USER_LOGGED_OUT = 'user_logged_out'
+    USER_LOGIN_FAILED = 'user_loggin_failed'
 
     ADDED_ACTION_TITLE = 'added_action_title'
     UPDATED_ACTION_TITLE = 'updated_action_title'
     DELETED_ACTION_TITLE = 'deleted_action_title'
 
-    _ACTION_TITLES = {
-        ADDED_ACTION_TITLE: _('New'),
-        UPDATED_ACTION_TITLE: _('Updated'),
-        DELETED_ACTION_TITLE: _('Deleted'),
-        USER_LOGGED_IN: _('Successful loggin'),
-        USER_LOGGED_OUT: _('Successful logout'),
+    _TITLES = {
+        ADDED_ACTION_TITLE: (_('New'), True),
+        UPDATED_ACTION_TITLE: (_('Updated'), True),
+        DELETED_ACTION_TITLE: (_('Deleted'), True),
+        USER_LOGGED_IN: (_('Successful loggin'), False),
+        USER_LOGGED_OUT: (_('Successful logout'), False),
+        USER_LOGIN_FAILED: (_('Failed loggin'), False),
+        ADDED_BADGE: (_('Earned a badge'), False),
+        DELETED_BADGE: (_('Lost the badge'), False),
     }
 
-    logger.info('Will write checkup_undublicate_keys()')
+    _CHOICES = {
+        ADDED_OBJECT: _('added'),
+        ADDED_USER: _('registered'),
+        ADDED_BADGE: _('earned'),
+        ADDED_VOTE: _('added vote to'),
+        ADDED_OPINION: _('added opinion to'),
+        ADDED_COMMENT: _('added comment to'),
+        ADDED_MARK: _('added mark to'),
+        ADDED_ANSWER: _('added answer to'),
+        ADDED_REPLY: _('added reply to'),
+        ADDED_POST: _('added post to'),
 
-    @classproperty
-    def choices(cls):
+        UPDATED_OBJECT: _('updated'),
+        UPDATED_USER: _('updated'),
+        UPDATED_VOTE: _('updated vote to'),
+        UPDATED_OPINION: _('updated opinion to'),
+        UPDATED_COMMENT: _('updated comment to'),
+        UPDATED_MARK: _('updated mark to'),
+        UPDATED_ANSWER: _('updated answer to'),
+        UPDATED_REPLY: _('updated reply to'),
+        UPDATED_POST: _('updated post to'),
+        UPDATED_REPUTATION: _('updated reputation'),
+        UPDATED_PROFILE: _('updated profile'),
+        UPDATED_DIARY: _('updated diary'),
 
-        return {
+        DELETED_OBJECT: _('deleted'),
+        DELETED_USER: _('deleted'),
+        DELETED_BADGE: _('lost'),
+        DELETED_VOTE: _('deleted vote to'),
+        DELETED_OPINION: _('deleted opinion to'),
+        DELETED_COMMENT: _('deleted comment to'),
+        DELETED_MARK: _('deleted mark to'),
+        DELETED_ANSWER: _('deleted answer to'),
+        DELETED_REPLY: _('deleted reply to'),
+        DELETED_POST: _('deleted post to'),
 
-            cls.ADDED_OBJECT: _('added'),
-            cls.ADDED_USER: _('registered'),
-            cls.ADDED_BADGE: _('earned badge'),
-            cls.ADDED_VOTE: _('added vote to'),
-            cls.ADDED_OPINION: _('added opinion to'),
-            cls.ADDED_COMMENT: _('added comment to'),
-            cls.ADDED_MARK: _('added mark to'),
-            cls.ADDED_ANSWER: _('added answer to'),
-            cls.ADDED_REPLY: _('added reply to'),
-            cls.ADDED_POST: _('added post to'),
-
-            cls.UPDATED_OBJECT: _('updated'),
-            cls.UPDATED_USER: _('updated'),
-            cls.UPDATED_VOTE: _('updated vote to'),
-            cls.UPDATED_OPINION: _('updated opinion to'),
-            cls.UPDATED_COMMENT: _('updated comment to'),
-            cls.UPDATED_MARK: _('updated mark to'),
-            cls.UPDATED_ANSWER: _('updated answer to'),
-            cls.UPDATED_REPLY: _('updated reply to'),
-            cls.UPDATED_POST: _('updated post to'),
-            cls.UPDATED_REPUTATION: _('updated reputation'),
-            cls.UPDATED_PROFILE: _('updated profile'),
-            cls.UPDATED_DIARY: _('updated diary'),
-
-            cls.DELETED_OBJECT: _('deleted'),
-            cls.DELETED_USER: _('deleted'),
-            cls.DELETED_BADGE: _('deleted'),
-            cls.DELETED_VOTE: _('deleted vote to'),
-            cls.DELETED_OPINION: _('deleted opinion to'),
-            cls.DELETED_COMMENT: _('deleted comment to'),
-            cls.DELETED_MARK: _('deleted mark to'),
-            cls.DELETED_ANSWER: _('deleted answer to'),
-            cls.DELETED_REPLY: _('deleted reply to'),
-            cls.DELETED_POST: _('deleted post to'),
-
-            cls.USER_LOGGED_IN: _('logged in'),
-            cls.USER_LOGGED_OUT: _('logged out'),
-        }
+        USER_LOGGED_IN: _('logged in'),
+        USER_LOGGED_OUT: _('logged out'),
+        USER_LOGIN_FAILED: _('failed loggin'),
+    }
 
     @classmethod
     def get_action_display(cls, action_key):
         """ """
 
         try:
-            return cls.choices[action_key]
+            return cls._CHOICES.value[action_key]
         except KeyError:
-            raise ValueError('Action with key {} does not exists'.format(action_key))
+            raise ValueError('Action with key "{}" does not exists'.format(action_key))
 
     @classmethod
-    def get_type_action_title(cls, action_key):
+    def get_action_title(cls, action_key):
 
         if action_key.startswith('added'):
-            return cls.ADDED_ACTION_TITLE
+            return cls._TITLES.value[cls.ADDED_ACTION_TITLE.value]
         elif action_key.startswith('updated'):
-            return cls.UPDATED_ACTION_TITLE
+            return cls._TITLES.value[cls.UPDATED_ACTION_TITLE.value]
         elif action_key.startswith('deleted'):
-            return cls.DELETED_ACTION_TITLE
+            return cls._TITLES.value[cls.DELETED_ACTION_TITLE.value]
         else:
 
             try:
-                return cls._ACTION_TITLES[action_key]
+                return cls._TITLES.value[action_key]
             except KeyError:
-                raise ValueError('Unregisted action key {}.'.format(action_key))
+                raise ValueError('Unregisted action key "{}".'.format(action_key))

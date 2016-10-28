@@ -2,13 +2,20 @@
 from django.utils.html import format_html
 from django.contrib import admin
 
-# from apps.core.admin import AdminSite
+from apps.admin.admin import ModelAdmin
+from apps.admin.app import AppAdmin
+from apps.admin.site import DefaultSiteAdmin
 
-# from .models import Notification
+from .models import Notification
+from .apps import NotificationsConfig
 
 
-# @admin.register(Notification, site=AdminSite)
-class NotificationAdmin(admin.ModelAdmin):
+class NotificationsAppAdmin(AppAdmin):
+
+    app_config_class = NotificationsConfig
+
+
+class NotificationModelAdmin(ModelAdmin):
     '''
     Admin view for notifications of accounts
     '''
@@ -46,3 +53,7 @@ class NotificationAdmin(admin.ModelAdmin):
     def display_user_with_admin_url(self, obj):
         return format_html('<a href="{}">{}</a>', obj.user.get_admin_url(), obj.user)
     # display_user_with_admin_url.short_description = Notification._meta.get_field('user').verbose_name
+
+
+DefaultSiteAdmin.register_app(NotificationsAppAdmin)
+DefaultSiteAdmin.register_model(Notification, NotificationModelAdmin)

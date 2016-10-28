@@ -4,12 +4,12 @@ import logging
 
 from django.contrib.auth.signals import user_logged_in, user_logged_out, user_login_failed
 from django.db.models.signals import pre_save, post_save, m2m_changed, pre_delete, post_delete
-
 # from django.core.exceptions import ValidationError
 # from django.contrib.contenttypes.models import ContentType
 from django.utils.translation import ugettext_lazy as _
 from django.dispatch import receiver
 # from django.conf import settings
+# from django.contrib.auth import get_user_model
 
 from apps.users.models import User, Profile
 from apps.diaries.models import Diary
@@ -22,10 +22,11 @@ from apps.forums.models import Topic, Post
 from apps.library.models import Reply
 from apps.comments.models import Comment
 from apps.opinions.models import Opinion
+from apps.badges.models import Badge
 
 from apps.notifications.signals import notify
 from apps.notifications.models import Notification
-from apps.notifications.constants import Action
+from apps.notifications.constants import Actions
 
 
 logger = logging.getLogger('django.development')
@@ -39,6 +40,10 @@ def added_update_object(sender, instance, created, **kwargs):
         Article, Mark, Reply, Comment, Opinion, Post, Topic
     ]:
 
+        if sender in [Diary, Profile]:
+
+            return
+
         if created is True:
 
             if sender in [Vote, Opinion, Comment, Mark, Answer, Reply, Post]:
@@ -47,38 +52,47 @@ def added_update_object(sender, instance, created, **kwargs):
                 action_target = instance
 
                 if sender == Vote:
-                    action = Action.ADDED_VOTE
+                    action = Actions.ADDED_VOTE.value
                     target = instance.poll
                 elif sender == Opinion:
-                    action = Action.ADDED_OPINION
+                    action = Actions.ADDED_OPINION.value
                     target = instance.content_object
                 elif sender == Comment:
-                    action = Action.ADDED_COMMENT
+                    action = Actions.ADDED_COMMENT.value
                     target = instance.content_object
                 elif sender == Mark:
-                    action = Action.ADDED_MARK
+                    action = Actions.ADDED_MARK.value
                     target = instance.article
                 elif sender == Answer:
-                    action = Action.ADDED_ANSWER
+                    action = Actions.ADDED_ANSWER.value
                     target = instance.question
                 elif sender == Reply:
-                    action = Action.ADDED_REPLY
+                    action = Actions.ADDED_REPLY.value
                     target = instance.book
                 elif sender == Post:
-                    action = Action.ADDED_POST
+                    action = Actions.ADDED_POST.value
                     target = instance.topic
 
             elif sender in [Solution, Snippet, Question, Article, Topic]:
-                action = Action.ADDED_OBJECT
+                action = Actions.ADDED_OBJECT.value
                 target = instance
                 user = instance.user
                 action_target = None
 
             elif sender == User:
-                action = Action.ADDED_USER
+                action = Actions.ADDED_USER.value
                 target = None
                 action_target = None
                 user = instance
+
+            notify.send(
+                sender,
+                user=user,
+                target=target,
+                action=action,
+                action_target=action_target,
+                level=Notification.SUCCESS,
+            )
 
         else:
 
@@ -89,52 +103,82 @@ def added_update_object(sender, instance, created, **kwargs):
 
                 if sender == Vote:
                     target = instance.poll
-                    action = Action.UPDATED_VOTE
+                    action = Actions.UPDATED_VOTE.value
                 elif sender == Opinion:
                     target = instance.content_object
-                    action = Action.UPDATED_OPINION
+                    action = Actions.UPDATED_OPINION.value
                 elif sender == Comment:
                     target = instance.content_object
-                    action = Action.UPDATED_COMMENT
+                    action = Actions.UPDATED_COMMENT.value
                 elif sender == Mark:
                     target = instance.article
-                    action = Action.UPDATED_MARK
+                    action = Actions.UPDATED_MARK.value
                 elif sender == Answer:
                     target = instance.question
-                    action = Action.UPDATED_ANSWER
+                    action = Actions.UPDATED_ANSWER.value
                 elif sender == Reply:
                     target = instance.book
-                    action = Action.UPDATED_REPLY
+                    action = Actions.UPDATED_REPLY.value
                 elif sender == Post:
                     target = instance.topic
-                    action = Action.UPDATED_POST
+                    action = Actions.UPDATED_POST.value
                 elif sender == Diary:
                     target = None
-                    action = Action.UPDATED_DIARY
+                    action = Actions.UPDATED_DIARY.value
                 elif sender == Profile:
                     target = None
-                    action = Action.UPDATED_PROFILE
+                    action = Actions.UPDATED_PROFILE.value
 
             elif sender in [Solution, Snippet, Question, Article, Topic]:
-                action = Action.UPDATED_OBJECT
+                action = Actions.UPDATED_OBJECT.value
                 action_target = None
                 target = instance
                 user = instance.user
 
             elif sender == User:
-                action = Action.UPDATED_USER
+                action = Actions.UPDATED_USER.value
                 action_target = None
                 target = None
                 user = instance
 
-        notify.send(
-            sender,
-            user=user,
-            target=target,
-            action=action,
-            action_target=action_target,
-            level=Notification.SUCCESS,
-        )
+            notify.send(
+                sender,
+                user=user,
+                target=target,
+                action=action,
+                action_target=action_target,
+                level=Notification.SUCCESS,
+            )
+
+    if sender in [Poll, Vote] and created is True:
+
+        users_lost_badges, users_earned_badges = Badge.objects.check_badges_for_instance(instance)
+
+        for user, badges in users_lost_badges.items():
+
+            for badge in badges:
+
+                notify.send(
+                    sender,
+                    user=user,
+                    target=badge,
+                    action=Actions.DELETED_BADGE.value,
+                    action_target=None,
+                    level=Notification.INFO,
+                )
+
+        for user, badges in users_earned_badges.items():
+
+            for badge in badges:
+
+                notify.send(
+                    sender,
+                    user=user,
+                    target=badge,
+                    action=Actions.ADDED_BADGE.value,
+                    action_target=None,
+                    level=Notification.INFO,
+                )
 
 
 @receiver(pre_delete, dispatch_uid=uuid.uuid4)
@@ -150,55 +194,55 @@ def deleted_object(sender, instance, **kwargs):
         if sender == Vote:
             target = instance.poll
             action_target = instance
-            action = Action.DELETED_VOTE
+            action = Actions.DELETED_VOTE.value
         elif sender == Mark:
             target = instance.article
             action_target = instance
-            action = Action.DELETED_MARK
+            action = Actions.DELETED_MARK.value
         elif sender == Answer:
             target = instance.question
             action_target = instance
-            action = Action.DELETED_ANSWER
+            action = Actions.DELETED_ANSWER.value
         elif sender == Reply:
             target = instance.book
             action_target = instance
-            action = Action.DELETED_REPLY
+            action = Actions.DELETED_REPLY.value
         elif sender == Post:
             target = instance.topic
             action_target = instance
-            action = Action.DELETED_POST
+            action = Actions.DELETED_POST.value
         elif sender == User:
             target = None
             action_target = None
-            action = Action.DELETED_USER
+            action = Actions.DELETED_USER.value
         elif sender == Solution:
             target = instance
             action_target = None
-            action = Action.DELETED_OBJECT
+            action = Actions.DELETED_OBJECT.value
         elif sender == Snippet:
             target = instance
             action_target = None
-            action = Action.DELETED_OBJECT
+            action = Actions.DELETED_OBJECT.value
         elif sender == Question:
             target = instance
             action_target = None
-            action = Action.DELETED_OBJECT
+            action = Actions.DELETED_OBJECT.value
         elif sender == Article:
             target = instance
             action_target = None
-            action = Action.DELETED_OBJECT
+            action = Actions.DELETED_OBJECT.value
         elif sender == Topic:
             target = instance
             action_target = None
-            action = Action.DELETED_OBJECT
+            action = Actions.DELETED_OBJECT.value
         elif sender == Opinion:
             target = instance.content_object
             action_target = instance
-            action = Action.DELETED_OPINION
+            action = Actions.DELETED_OPINION.value
         elif sender == Comment:
             target = instance.content_object
             action_target = instance
-            action = Action.DELETED_COMMENT
+            action = Actions.DELETED_COMMENT.value
 
         notify.send(
             sender,
@@ -210,13 +254,47 @@ def deleted_object(sender, instance, **kwargs):
         )
 
 
+@receiver(post_delete, dispatch_uid=uuid.uuid4)
+def deleted_object2(sender, instance, **kwargs):
+
+    if sender in [User, Poll, Vote, Choice]:
+
+        users_lost_badges, users_earned_badges = Badge.objects.check_badges_for_instance(instance)
+
+        for user, badges in users_lost_badges.items():
+
+            for badge in badges:
+
+                notify.send(
+                    sender,
+                    user=user,
+                    target=badge,
+                    action=Actions.DELETED_BADGE.value,
+                    action_target=None,
+                    level=Notification.INFO,
+                )
+
+        for user, badges in users_earned_badges.items():
+
+            for badge in badges:
+
+                notify.send(
+                    sender,
+                    user=user,
+                    target=badge,
+                    action=Actions.ADDED_BADGE.value,
+                    action_target=None,
+                    level=Notification.INFO,
+                )
+
+
 @receiver(user_logged_in, dispatch_uid=uuid.uuid4)
 def login_user(sender, request, user, **kwargs):
 
     notify.send(
         sender,
         user=user,
-        action=Action.USER_LOGGED_IN,
+        action=Actions.USER_LOGGED_IN.value,
         target=None,
         action_target=None,
         level=Notification.SUCCESS,
@@ -229,21 +307,22 @@ def logout_user(sender, request, user, **kwargs):
     notify.send(
         sender,
         user=user,
-        action=Action.USER_LOGGED_OUT,
+        action=Actions.USER_LOGGED_OUT.value,
         target=None,
         action_target=None,
         level=Notification.SUCCESS,
     )
 
 
-# @receiver(user_login_failed, dispatch_uid=uuid.uuid4)
+@receiver(user_login_failed, dispatch_uid=uuid.uuid4)
 def failed_login_user(sender, credentials, **kwargs):
 
     notify.send(
         sender,
-        user=user,
-        action=Action.USER_LOGIN_FAILED,
+        user=None,
+        is_anonimuos=True,
+        action=Actions.USER_LOGIN_FAILED.value,
         target=None,
         action_target=None,
-        level=Notification.SUCCESS,
+        level=Notification.ERROR,
     )

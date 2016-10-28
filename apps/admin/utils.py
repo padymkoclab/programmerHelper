@@ -56,5 +56,5 @@ def autodiscover_modules(filename):
     for app_config in apps.app_configs.values():
         try:
             import_module('{}.{}'.format(app_config.name, filename))
-        except ImportError:
-            pass
+        except ImportError as e:
+            print('AdminRegisterError: ', e)

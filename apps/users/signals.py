@@ -29,4 +29,3 @@ def signal_post_migrate_model_levels_of_users(sender, **kwargs):
     call_command('create_groups')
     call_command('create_test_superuser')
     call_command('create_test_superuser')
-    logger.debug('A signal post_migration for app Users was called')

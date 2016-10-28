@@ -29,7 +29,9 @@
     {% endblock header %}
 
     {% block content %}
-        
+
+        <h1>I want to know everything</h1>
+
         <p>Now is registers users: {{ ONLINE_AUTHENTICATED_USERS|length }}</p>
         <p>Now is anonymous users: {{ ONLINE_ANONYMOUS_USERS|length }}</p>
         <p>Online users: {{ ONLINE_AUTHENTICATED_USERS|join:', ' }}</p>
