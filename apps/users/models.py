@@ -870,7 +870,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         raise NotImplementedError
         return self.popular_topics_of_user.count()
 
-    def get_reputation(self):
+    def check_reputation(self):
         """
         Getting reputation of user for activity on website:
         marks of published snippets, answers, questions and rating of articles,
@@ -885,7 +885,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         Mark snippets                  = *2
         Filled profile                  = *1
         Participate in poll             = *1
-        Popular topic                   = *100
+        Popular topic                   = 1000 views = + 1
 
         Vote in poll +1
 
@@ -894,12 +894,37 @@ class User(AbstractBaseUser, PermissionsMixin):
 
         reputation = 0
 
-        # Vote in poll +1
-        count_votes = self.get_count_votes()
+        total_count_views = self.topics.aggregate(total_count_views=models.Sum('count_views'))
+        reputation_for_posts = total_count_views / 1000
 
-        reputation += count_votes
+        reputation_for_votes = self.get_count_votes()
+        reputation_for_articles = \
+            self.articles.objects_with_rating().aggregate(total_rating=models.Sum('rating'))['total_rating']
+        reputation_for_questions = \
+            self.questions.objects_with_rating().aggregate(total_rating=models.Sum('rating'))['total_rating']
+        reputation_for_snippets = \
+            self.snippets.objects_with_rating().aggregate(total_rating=models.Sum('rating'))['total_rating']
+        reputation_for_solutions = \
+            self.solutions.objects_with_rating().aggregate(total_rating=models.Sum('rating'))['total_rating']
+        reputation_for_questions = \
+            self.questions.objects_with_rating().aggregate(total_rating=models.Sum('rating'))['total_rating']
+        reputation_for_answers = \
+            self.answers.objects_with_rating().aggregate(total_rating=models.Sum('rating'))['total_rating']
 
-    get_reputation.short_description = _('Reputation')
+        reputation = sum((
+            reputation_for_posts,
+            reputation_for_votes,
+            reputation_for_articles,
+            reputation_for_questions,
+            reputation_for_snippets,
+            reputation_for_solutions,
+            reputation_for_questions,
+            reputation_for_answers,
+        ))
+
+        self.reputation = round(reputation)
+        self.full_clean()
+        self.save()
 
     def has_badge(self, badge):
 
@@ -1067,7 +1092,7 @@ class Profile(models.Model):
         return template_.render(context=context_)
     display_location.short_description = _('Location')
 
-    def get_percentage_filling(self):
+    def get_percentage_filling(self, with_sign=False):
         """Getting percent filled profile of user."""
 
         considering_fields = (
@@ -1091,7 +1116,9 @@ class Profile(models.Model):
         result = result * 100 / len(considering_fields) + 1
         result = round(result, 2)
 
-        return '{0}%'.format(result)
+        if with_sign is True:
+            return '{0}%'.format(result)
+        return result
     get_percentage_filling.short_description = _('Percentage filling')
     get_percentage_filling.admin_order_field = 'percentage_filling'
 

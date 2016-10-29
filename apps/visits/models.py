@@ -5,6 +5,8 @@ from django.utils.translation import ugettext_lazy as _
 from django.db import models
 from django.conf import settings
 
+from utils.django.datetime_utils import convert_date_to_django_date_format
+
 from .validators import validate_comma_separated_objects_list
 from .managers import VisitPageManager, AttendanceManager, VisitUserBrowserManager, VisitUserSystemManager
 
@@ -42,7 +44,7 @@ class Attendance(models.Model):
     )
     date = models.DateField(
         _('date'), editable=False, auto_now_add=True,
-        unique=True, error_messages={
+        db_index=True, unique=True, error_messages={
             'unique': _('Attendance on this day already exists')
         }
     )
@@ -57,7 +59,14 @@ class Attendance(models.Model):
         ordering = ('-date', )
 
     def __str__(self):
-        return '{0.date}'.format(self)
+
+        return convert_date_to_django_date_format(self.date)
+
+    def get_count_visitors(self):
+
+        return self.users.count()
+    get_count_visitors.short_description = _('Count visitors')
+    get_count_visitors.admin_order_field = 'count_visitors'
 
 
 class Visit(models.Model):
@@ -67,10 +76,8 @@ class Visit(models.Model):
 
     id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
     user = models.OneToOneField(
-        settings.AUTH_USER_MODEL,
-        related_name='last_seen',
-        verbose_name=_('user'),
-        editable=False,
+        settings.AUTH_USER_MODEL, related_name='last_seen',
+        verbose_name=_('user'), editable=False, db_index=True
     )
     date = models.DateTimeField(_('date'), editable=False, auto_now=True)
 

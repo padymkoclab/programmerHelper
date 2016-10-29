@@ -49,3 +49,7 @@ div[id^=fieldset]{
 table.tabular_table{
     background-color: #f7f7f7;
 }
+
+table.tabular_table th.column_delete, table.tabular_table th.column_change_link{
+    width: 10px;
+}

@@ -7,7 +7,6 @@ from django.contrib import admin
 from utils.django.listfilters import AllValuesChoicesFieldListFilter
 
 # from apps.core.admin import AdminSite, AppAdmin
-from apps.replies.admin import ReplyGenericInline
 
 from .models import Book, Writer, Publisher
 from .forms import BookAdminModelForm, WriterAdminModelForm, PublisherAdminModelForm
@@ -21,7 +20,7 @@ from .apps import LibraryConfig
 
 # @AdminSite.register_app_admin_class
 # class ThisAppAdmin(AppAdmin):
-class ThisAppAdmin():
+class LibraryAppAdmin():
 
     label = LibraryConfig.label
 

@@ -3,12 +3,11 @@ from django.template.defaultfilters import truncatechars
 from django.utils.translation import ugettext_lazy as _
 from django.contrib import admin
 
-from apps.marks.admin import MarkGenericInline
 from apps.comments.admin import CommentGenericInline
 
 from apps.admin.admin import ModelAdmin
 from apps.admin.app import AppAdmin
-from apps.admin.site import DefaultSiteAdmin
+from apps.admin.utils import register_app, register_model
 
 from .forms import ArticleAdminModelForm, SubsectionAdminModelForm
 from .formsets import SubsectionFormset
@@ -17,6 +16,7 @@ from .apps import ArticlesConfig
 from .actions import make_articles_as_draft, make_articles_as_published
 
 
+@register_app
 class ArticlesAppAdmin(AppAdmin):
 
     app_config_class = ArticlesConfig
@@ -110,6 +110,7 @@ class SubsectionInline(admin.StackedInline):
     suit_classes = 'suit-tab suit-tab-subsections'
 
 
+@register_model(Article)
 class ArticleAdmin(ModelAdmin):
     '''
     Admin View for Article
@@ -128,18 +129,35 @@ class ArticleAdmin(ModelAdmin):
 
     form = ArticleAdminModelForm
     list_display = (
-        'truncated_name',
-        'user',
-        'status',
-        'get_rating',
-        'get_count_subsections',
-        'get_count_links',
-        'get_count_tags',
-        'get_count_marks',
-        'get_count_comments',
-        'is_new',
-        'updated',
-        'created',
+        (
+            'main_info', {
+                'title': _('Main info'),
+                'fields': (
+                    'truncated_name',
+                    'user',
+                    'status',
+                    'get_rating',
+                    'count_views',
+                    'is_new',
+                    'updated',
+                    'created',
+                )
+            }
+        ),
+        (
+            'additional_info', {
+                'title': _('Additional info'),
+                'fields': (
+                    'truncated_name',
+                    'get_rating',
+                    'get_count_subsections',
+                    'get_count_links',
+                    'get_count_tags',
+                    'get_count_marks',
+                    'get_count_comments',
+                )
+            }
+        )
     )
     list_filter = (
         ('user', admin.RelatedOnlyFieldListFilter),
@@ -239,7 +257,3 @@ class ArticleAdmin(ModelAdmin):
         return truncatechars(obj.name, 75)
     truncated_name.short_description = Article._meta.get_field('name').verbose_name
     truncated_name.admin_order_field = 'name'
-
-
-DefaultSiteAdmin.register_app(ArticlesAppAdmin)
-DefaultSiteAdmin.register_model(Article, ArticleAdmin)

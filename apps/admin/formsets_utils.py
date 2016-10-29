@@ -13,6 +13,7 @@ from .utils import pretty_label_or_short_description
 class InlineFormset(object):
 
     def __init__(self, inline, formset, request):
+
         self.formset = formset
         self.inline = inline
         self.request = request
@@ -25,12 +26,18 @@ class InlineFormset(object):
 
         self.id = uuid.uuid1()
 
+        self.fieldnames = self.get_fieldnames()
+
     def __iter__(self):
+
         for form in self.formset:
 
             instance = form.instance
             fields = self.inline.get_fields(self.request, instance)
             readonly_fields = self.inline.get_readonly_fields(self.request, instance)
+
+            if not fields:
+                fields = tuple(self.formset.empty_form.base_fields) + tuple(readonly_fields)
 
             yield InlineFormsetForm(
                 self.inline,
@@ -39,28 +46,22 @@ class InlineFormset(object):
                 readonly_fields,
             )
 
-    @property
-    def fieldnames(self):
-        editable_fields = self.inline.get_fields(self.request)
-        readonly_fields = self.inline.get_readonly_fields(self.request)
-        raw_fieldnames = editable_fields + tuple(field for field in readonly_fields if field not in editable_fields)
+    def get_fieldnames(self):
 
         fieldnames = list()
-        model = self.inline.model
-        for fieldname in raw_fieldnames:
+        editable_fields = self.inline.get_fields(self.request)
 
-            # field or method of a instance or method admin inline model
-            field = getattr(model, fieldname, None)
+        if not editable_fields:
+            editable_fields = tuple(self.formset.empty_form.base_fields)
 
-            if callable(field):
-                label = pretty_label_or_short_description(field)
-            elif hasattr(field, 'field_name'):
-                label = model._meta.get_field(fieldname).verbose_name
-            else:
-                method = getattr(self.inline, fieldname)
-                label = pretty_label_or_short_description(method)
+        visible_fieldnames = [i.name for i in self.empty_form.visible_fields()]
+        for fieldname, formfield in self.empty_form.base_fields.items():
 
-            fieldnames.append(label)
+            if fieldname in visible_fieldnames:
+                fieldnames.append(fieldname)
+
+        for fieldname in self.inline.readonly_fields:
+            fieldnames.append(fieldname)
 
         return fieldnames
 
@@ -68,6 +69,7 @@ class InlineFormset(object):
 class InlineFormsetForm(object):
 
     def __init__(self, inline, form, fields, readonly_fields):
+
         self.inline = inline
         self.form = form
         self.fields = fields
@@ -93,6 +95,7 @@ class InlineFormsetForm(object):
 class InlineFormsetFormEditableField(object):
 
     def __init__(self, fieldname, form):
+
         self.fieldname = fieldname
         self.form = form
         self.field = form[self.fieldname]
@@ -112,6 +115,7 @@ class InlineFormsetFormEditableField(object):
 class InlineFormsetFormReadonlyField(object):
 
     def __init__(self, fieldname, instance, inline_admin):
+
         self.fieldname = fieldname
         self.instance = instance
         self.inline_admin = inline_admin

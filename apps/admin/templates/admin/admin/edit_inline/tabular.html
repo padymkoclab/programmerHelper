@@ -10,52 +10,62 @@
 
 <p>{% trans "Total count" %} {{ formset.inline.verbose_name_plural.lower }}: {{ formset.formset.total_form_count }}</p>
 
-<table class="table table-bordered tabular_table">
-    <thead>
-        <tr>
-            {% if formset.inline.can_delete is True %}
-                <td class="text-center">
-                    <label for="formset_inline_{{ formset.id }}">
-                        <input type="checkbox" name="switch_all_checkboxes" class="switch_all_checkboxes hidden" id="formset_inline_{{ formset.id }}">
-                        {% trans "Delete" %}
-                    </label>
-                </td>
-            {% endif %}
-
-            {% for fieldname in formset.fieldnames %}
-                <th class="text-center">{{ fieldname }}</th>
-            {% endfor %}
-
-            {% if formset.inline.show_change_link is True %}
-                <td></td>
-            {% endif %}
-
-        </tr>
-    </thead>
-    <tbody>
-        {% for form in formset %}
-            <tr>
+<div class="table-responsive">
+    <table class="table table-bordered tabular_table">
+        <thead>
+            <tr class="bg-info">
                 {% if formset.inline.can_delete is True %}
-                    <td class="text-center">
-                        <input type="checkbox" name="object" id="" value="{{ form.instance.pk }}">
-                    </td>
+                    <th class="text-center column_delete">
+                        <label for="formset_inline_{{ formset.id }}">
+                            <input type="checkbox" name="switch_all_checkboxes" class="switch_all_checkboxes hidden" id="formset_inline_{{ formset.id }}">
+                            {% trans "Delete" %}
+                        </label>
+                    </th>
                 {% endif %}
-                {% for field in form %}
-                    {% if field.is_hidden is True %}
-                        {{ field }}
-                    {% else %}
-                        <td {% if field.fieldname in formset.inline.readonly_fields_tabular_align and field.is_readonly is True %} class="text-{{ formset.inline.readonly_fields_tabular_align|get_item_by_key:field.fieldname }}"{% endif %}>
-                            {{ field }}
+
+                {% for fieldname in formset.fieldnames %}
+                    <th class="text-center">{{ fieldname|capfirst }}</th>
+                {% endfor %}
+
+                {% if formset.inline.show_change_link is True %}
+                    <th class="column_change_link"></th>
+                {% endif %}
+
+            </tr>
+        </thead>
+        <tbody>
+            {% for form in formset %}
+                <tr>
+                    {% if formset.inline.can_delete is True %}
+                        <td class="text-center">
+                            <input type="checkbox" name="object" id="" value="{{ form.instance.pk }}">
                         </td>
                     {% endif %}
+                    {% for field in form %}
+                        {% if field.is_hidden is True %}
+                            {{ field }}
+                        {% else %}
+                            <td {% if field.fieldname in formset.inline.readonly_fields_tabular_align and field.is_readonly is True %} class="text-{{ formset.inline.readonly_fields_tabular_align|get_item_by_key:field.fieldname }}"{% endif %}>
+                                {{ field }}
+                            </td>
+                        {% endif %}
 
-                {% endfor %}
-                {% if formset.inline.show_change_link is True %}
-                    <td class="text-center">
-                        <a href="{{ form.instance|get_admin_url:'change' }}">{% trans "Change" %}</a>
-                    </td>
-                {% endif %}
-            </tr>
-        {% endfor %}
-    </tbody>
-</table>
+                    {% endfor %}
+                    {% if formset.inline.show_change_link is True %}
+                        <td class="text-center">
+                            <a href="{{ form.instance|get_admin_url:'change' }}">{% trans "Change" %}</a>
+                        </td>
+                    {% endif %}
+                </tr>
+            {% endfor %}
+
+
+        </tbody>
+    </table>
+</div>
+
+<div class="col-sm-12">
+    <a href="" class="pull-right btn_add_another_tabular {% if formset.formset.total_form_count >= formset.formset.max_num %}hidden{% endif %}">
+        {% trans "Add another " %} {{ formset.inline.verbose_name.lower }}
+    </a>
+</div>

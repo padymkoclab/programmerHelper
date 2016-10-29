@@ -148,6 +148,7 @@ class ModelAdmin(BaseAdmin):
     changelist_view = None
 
     def __init__(self, model, site_admin, **kwargs):
+
         self.model = model
         self.site_admin = site_admin
 
@@ -155,6 +156,7 @@ class ModelAdmin(BaseAdmin):
         return 'Admin model class "{}" for a model "{}"'.format(self.__class__.__name__, self.model)
 
     def check(self, **kwargs):
+
         return self.checks_class().check(self, **kwargs)
 
     def get_urls(self):
@@ -203,6 +205,7 @@ class ModelAdmin(BaseAdmin):
 
     @property
     def urls(self):
+
         return self.get_urls()
 
     def get_list_display(self):
@@ -238,7 +241,7 @@ class ModelAdmin(BaseAdmin):
 
         return (
             (
-                None, {
+                self.model._meta.verbose_name, {
                     'fields': self.get_fields(request, obj),
                 }
             ),
@@ -306,9 +309,30 @@ class ModelAdmin(BaseAdmin):
         #     queryset =
         #     kwargs['kwargs'] = queryset
 
+        raise NotImplementedError
+
         return db_field.formfield(**kwargs)
 
     def formfield_for_manytomany(self, db_field, request, **kwargs):
+
+        # deny for intermediary model
+        if not db_field.remote_field.through._meta.auto_created:
+            raise TypeError('For intermediary model use AdminInline.')
+            return
+
+        raise NotImplementedError
+
+        db = kwargs.get('using')
+
+        if db_field.name in self.raw_id_fields:
+            kwargs['widget'] = 1
+        elif db_field.name in self.filter_horizontal + self.filter_horizontal:
+            kwargs['widget'] = 1
+
+        if 'queryset' not in kwargs:
+            queryset = self.get_field_queryset(db, db_field, request)
+            if queryset is not None:
+                kwargs['queryset'] = queryset
 
         return db_field.formfield(**kwargs)
 
@@ -366,6 +390,7 @@ class ModelAdmin(BaseAdmin):
 
         inlines_formsets = list()
         for inline in self.get_inline_instances(request, obj):
+
             inline_formset = inline.get_formset(request, obj)
 
             params = {
@@ -400,7 +425,7 @@ class AdminInline(BaseAdmin):
     formset = BaseInlineFormSet
     extra = 3
     classes = None
-    form = forms.ModelForm
+    form = AddChangeModelForm
 
     def __init__(self, parent_model, site_admin, *args, **kwargs):
         self.parent_model = parent_model
@@ -491,6 +516,8 @@ class StackedInline(AdminInline):
 
 class TabularInline(AdminInline):
     template = 'admin/admin/edit_inline/tabular.html'
+
+    logger.warning("Feature 'Add another' is not implemented for a tabular inline.")
 
 
 class OtherAdmin:

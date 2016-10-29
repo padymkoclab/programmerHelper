@@ -20,10 +20,10 @@ class Badge(TimeStampedModel):
 
     id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
 
-    name = models.CharField(_('Name'), max_length=50, choices=Badges.CHOICES_NAME)
-    description = models.CharField(_('Description'), max_length=50, choices=Badges.CHOICES_DESCRIPTION)
-    category = models.CharField(_('Category'), max_length=20, choices=Badges.CHOICES_CATEGORY)
-    kind = models.CharField(_('Kind'), max_length=10, choices=Badges.CHOICES_KIND)
+    name = models.CharField(_('Name'), max_length=50, choices=Badges.CHOICES_NAME, db_index=True)
+    description = models.CharField(_('Description'), max_length=50, choices=Badges.CHOICES_DESCRIPTION, db_index=True)
+    category = models.CharField(_('Category'), max_length=20, choices=Badges.CHOICES_CATEGORY, db_index=True)
+    kind = models.CharField(_('Kind'), max_length=10, choices=Badges.CHOICES_KIND, db_index=True)
 
     users = models.ManyToManyField(
         settings.AUTH_USER_MODEL, verbose_name=_('Users'),
@@ -44,9 +44,9 @@ class Badge(TimeStampedModel):
 
     def __str__(self):
 
-        return '{} badge "{}"'.format(
-            self.get_kind_display(),
+        return '{} ({})'.format(
             self.get_name_display(),
+            self.get_kind_display().lower(),
         )
 
     def get_absolute_url(self):
@@ -56,7 +56,10 @@ class Badge(TimeStampedModel):
         return get_admin_url(self)
 
     def get_count_awarded_users(self):
-        pass
+
+        return self.earned.count()
+    get_count_awarded_users.short_description = _('Count awarded users')
+    get_count_awarded_users.admin_order_field = 'count_awarded_userst'
 
     def get_count_awarded_users_in_humanreadble_format(self):
         """
@@ -65,6 +68,24 @@ class Badge(TimeStampedModel):
         """
 
         pass
+
+    def get_date_latest_awarded(self):
+
+        if self.earned.exists():
+            return self.earned.latest().created
+        return
+
+    get_date_latest_awarded.short_description = _('Date latest awarded')
+    get_date_latest_awarded.admin_order_field = 'date_latest_awarded'
+
+    def get_lastest_awarded_user(self):
+
+        if self.earned.exists():
+            return self.earned.latest().user
+        return
+
+    get_lastest_awarded_user.short_description = _('Lastest awarded user')
+    get_lastest_awarded_user.admin_order_field = 'lastest_awarded_user'
 
     # def check_badge_for_user(self, user):
 
@@ -82,12 +103,14 @@ class EarnedBadge(models.Model):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, verbose_name=_('User'),
         on_delete=models.CASCADE, related_name='badges',
+        db_index=True
     )
     badge = models.ForeignKey(
         'Badge', verbose_name=_('Badge'),
-        on_delete=models.CASCADE, related_name='+',
+        on_delete=models.CASCADE, related_name='earned',
+        db_index=True
     )
-    created = models.DateTimeField(_('Date getting'), auto_now_add=True)
+    created = models.DateTimeField(_('Date getting'), auto_now_add=True, db_index=True)
 
     objects = EarnedBadgeManager()
 

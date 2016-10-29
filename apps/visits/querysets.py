@@ -7,6 +7,7 @@ class AttendanceQuerySet(models.QuerySet):
 
     """
 
-    def objects_by_count_consecutive_days(self, consecutive_days):
+    def objects_with_count_visitors(self):
         """Return users satisfied consecutive days of attendances on website."""
-        return self.order_by('day_attendance').annotate()
+
+        return self.annotate(count_visitors=models.Count('users', distinct=True))

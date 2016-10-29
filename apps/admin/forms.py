@@ -149,6 +149,7 @@ class InlinesFormsets:
 
     def __iter__(self):
         for inline, formset in self.inlines_formsets:
+
             yield inline, InlineFormset(
                 inline,
                 formset,

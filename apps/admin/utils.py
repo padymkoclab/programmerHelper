@@ -57,4 +57,32 @@ def autodiscover_modules(filename):
         try:
             import_module('{}.{}'.format(app_config.name, filename))
         except ImportError as e:
-            print('AdminRegisterError: ', e)
+            print('AdminRegisterError for app {}: {}'.format(app_config.verbose_name, e))
+
+
+def register_app(app_admin, admin_site=None):
+
+    from .site import DefaultSiteAdmin
+
+    if admin_site is None:
+        admin_site = DefaultSiteAdmin
+
+    admin_site.register_app(app_admin)
+
+    return app_admin
+
+
+def register_model(model, admin_site=None):
+
+    from .site import DefaultSiteAdmin
+
+    if admin_site is None:
+        admin_site = DefaultSiteAdmin
+
+    def _wrapped(model_admin):
+
+        admin_site.register_model(model, model_admin)
+
+        return model_admin
+
+    return _wrapped

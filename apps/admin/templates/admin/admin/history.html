@@ -41,6 +41,10 @@
                         </td>
                         <td class="text-right">{{ log_entry.action_time }}</td>
                     </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-center"><i>{% trans "No actions with this object in the admin" %}</i></td>
+                    </tr>
                 {% endfor %}
             </tbody>
         </table>

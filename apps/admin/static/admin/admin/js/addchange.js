@@ -64,7 +64,7 @@
 
     };
 
-    $('.btn_add_another').on({
+    $('a.btn_add_another').on({
         click: function(e){
 
             e.preventDefault();
@@ -137,5 +137,27 @@
     /*
     */
     $('table.tabular_table input.switch_all_checkboxes').change_status_all_checkboxes();
+
+    $('a.btn_add_another_tabular').bind({
+
+        click: function(e){
+
+            e.preventDefault();
+            e.stopPropagation();
+
+            function NotImplementError(message){
+                this.message = message;
+            };
+
+            Object.setPrototypeOf(NotImplementError, Error);
+            NotImplementError.prototype = Object.create(Error.prototype);
+            NotImplementError.prototype.name = "NotImplementError";
+            NotImplementError.prototype.message = "";
+            NotImplementError.prototype.constructor = NotImplementError;
+
+            throw new NotImplementError("Feature 'Add another' is not implement for a tabular inline.")
+
+        },
+    })
 
 })(jQuery, _);

@@ -10,7 +10,6 @@ from utils.django.listfilters import IsNewSimpleListFilter
 from apps.comments.admin import CommentGenericInline
 from apps.opinions.admin import OpinionGenericInline
 from apps.opinions.admin_mixins import OpinionsAdminMixin
-from apps.flavours.admin import FlavourGenericInline
 
 from .forms import QuestionAdminModelForm, AnswerAdminModelForm, AnswerInlineAdminModelForm
 from .models import Question, Answer
@@ -19,7 +18,7 @@ from .apps import QuestionsConfig
 
 
 # @AdminSite.register_app_admin_class
-class AppAdmin():
+class QuestionsAppAdmin():
 
     label = QuestionsConfig.label
 

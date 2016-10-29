@@ -12,9 +12,9 @@ class CoreConfig(AppConfig):
     def ready(self):
 
         from .signals import (
-            added_update_object,
-            deleted_object,
-            deleted_object2,
+            post_added_updated_object,
+            pre_deleted_object,
+            post_deleted_object,
             login_user,
             logout_user,
             failed_login_user,

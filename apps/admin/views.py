@@ -277,23 +277,22 @@ class ChangeListView(SiteModelAdminMixin, SiteAdminView):
 
         search_fields = self.model_admin.get_search_fields()
 
-        if search_fields:
+        if search_fields and self.q:
 
-            if self.q and search_fields:
+            # make the same conditions for each field in the search_fields
+            search_restrictions = {
+                self.convert_search_field_to_lookup(search_field): self.q
+                for search_field in search_fields
+            }
 
-                # make the same conditions for each field in the search_fields
-                search_restrictions = {
-                    self.convert_search_field_to_lookup(search_field): self.q
-                    for search_field in search_fields
-                }
+            search_restrictions = functools.reduce(
+                operator.or_,
+                (models.Q(**{k: v}) for k, v in search_restrictions.items())
+            )
 
-                search_restrictions = functools.reduce(
-                    operator.or_,
-                    (models.Q(**{k: v}) for k, v in search_restrictions.items())
-                )
+            qs = qs.filter(search_restrictions)
 
-                return qs.filter(search_restrictions)
-            return qs
+        return qs
 
     def get_date_hierarchy_restrictions(self, request):
 
@@ -698,9 +697,16 @@ class AddChangeView(SiteAdminView):
 
     def get_form(self):
 
+        modelform = self.get_modelform()
+        fieldsets = self.model_admin.get_fieldsets(self.request, self.obj)
+
+        if len(fieldsets) == 1 and fieldsets[0][1]['fields'] == ():
+
+            fieldsets[0][1]['fields'] = tuple(modelform.base_fields)
+
         return AddChangeDisplayForm(
-            self.get_modelform(),
-            fieldsets=self.model_admin.get_fieldsets(self.request, self.obj),
+            form=modelform,
+            fieldsets=fieldsets,
             readonly_fields=self.model_admin.get_readonly_fields(self.request, self.obj),
             model_admin=self.model_admin,
         )
