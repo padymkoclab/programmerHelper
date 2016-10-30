@@ -2,7 +2,7 @@
 
 def check_boolean_return(func, *agrs, **kwargs):
 
-    def _wrap():
+    def _wrap(*agrs, **kwargs):
 
         result = func(*agrs, **kwargs)
 

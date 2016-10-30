@@ -29,7 +29,9 @@ def check_badges_for_instance_and_notify(sender, instance):
         Snippet, Opinion, Reply, Solution, Visit, User, Profile, Diary
     ]:
 
-        users_lost_badges, users_earned_badges = Badge.objects.check_badges_for_instance(instance)
+        return
+
+        users_lost_badges, users_earned_badges = check_badges_for_instance(instance)
 
         for user, badges in users_lost_badges.items():
 
@@ -61,7 +63,8 @@ def check_badges_for_instance_and_notify(sender, instance):
 def check_badges_for_instance(instance):
     """ """
 
-    users_lost_badges, users_earned_badges = collections.defaultdict(set), collections.defaultdict(set)
+    users_lost_badges = collections.defaultdict(set)
+    users_earned_badges = users_lost_badges.copy()
 
     if isinstance(instance, Vote):
 
@@ -261,7 +264,7 @@ def check_badges_for_instance(instance):
 
     if isinstance(instance, Poll):
 
-        users_pks = Vote._default_manager.filter(poll=instance).values('users')
+        users_pks = Vote._default_manager.filter(poll=instance).values('user')
         users = User._default_manager.filter(pk__in=users_pks)
 
         for user in users:
@@ -280,6 +283,9 @@ def check_badges_for_instance(instance):
 
     else:
 
+        if isinstance(instance, User):
+            user = instance
+
         users_lost_badges, users_earned_badges = update_badges_and_return_result(
             user, Badges.Badge.EPIC_SILVER, users_lost_badges, users_earned_badges
         )
@@ -297,11 +303,11 @@ def check_badge_for_user(user, badge_const, *checker_args):
     return checker(user, *checker_args)
 
 
-def update_badges_and_return_result(user, badge_const, users_lost_badges, users_earned_badges, checker_args):
+def update_badges_and_return_result(user, badge_const, users_lost_badges, users_earned_badges, *checker_args):
 
     badge = Badge.objects.get(name=badge_const.value)
 
-    must_earn_badge = check_badge_for_user(user, badge_const, checker_args)
+    must_earn_badge = check_badge_for_user(user, badge_const, *checker_args)
 
     if must_earn_badge is False and Badge.objects.has_badge(badge, user) is True:
 
@@ -329,7 +335,11 @@ def make_notification(sender, instance, action):
 
         if action == 'created':
 
-            if sender in [Vote, Opinion, Comment, Mark, Answer, Reply, Post]:
+            if sender in [Diary, Profile]:
+
+                return
+
+            elif sender in [Vote, Opinion, Comment, Mark, Answer, Reply, Post]:
 
                 user = instance.user
                 action_target = instance

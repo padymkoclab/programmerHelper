@@ -58,7 +58,7 @@ def check_badge_publicist_bronze(user, article_model):
 
     if qs.exists():
 
-        return qs.objects_with_rating(rating__gt=0).exists()
+        return qs.objects_with_rating().filter(rating__gt=0).exists()
 
     return False
 
@@ -71,7 +71,7 @@ def check_badge_publicist_silver(user, article_model):
 
     if qs.exists():
 
-        return qs.objects_with_rating(rating__gte=10).exists()
+        return qs.objects_with_rating().filter(rating__gte=10).exists()
 
     return False
 
@@ -84,7 +84,7 @@ def check_badge_publicist_gold(user, article_model):
 
     if qs.exists():
 
-        return qs.objects_with_rating(rating__gte=50).exists()
+        return qs.objects_with_rating().filter(rating__gte=50).exists()
 
     return False
 
@@ -295,7 +295,7 @@ def check_badge_enthusiast_bronze(user, attendance_model):
 
     qs = attendance_model._default_manager.filter(users=user)
 
-    dates = qs.values_list('date', flat=True)
+    dates = tuple(qs.values_list('date', flat=True))
 
     pairs_neighboring_dates = zip(dates[0:-1], dates[1:])
 
@@ -320,7 +320,7 @@ def check_badge_fanatic_silver(user, attendance_model):
 
     qs = attendance_model._default_manager.filter(users=user)
 
-    dates = qs.values_list('date', flat=True)
+    dates = tuple(qs.values_list('date', flat=True))
 
     pairs_neighboring_dates = zip(dates[0:-1], dates[1:])
 

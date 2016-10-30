@@ -27,5 +27,4 @@ def signal_login_failed_user(sender, credentials, **kwargs):
 def signal_post_migrate_model_levels_of_users(sender, **kwargs):
     call_command('create_levels_of_users')
     call_command('create_groups')
-    call_command('create_test_superuser')
-    call_command('create_test_superuser')
+    call_command('create_superuser')

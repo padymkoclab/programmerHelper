@@ -24,7 +24,9 @@ class Command(BaseCommand):
         try:
             User.objects.get_by_natural_key(TEST_SUPERUSER_DATA[User.USERNAME_FIELD])
         except User.DoesNotExist:
+
             get_user_model().objects.create_superuser(**TEST_SUPERUSER_DATA)
+
             logger.info('Succesful added superuser with {0} "{1}"!'.format(
                 User.USERNAME_FIELD,
                 TEST_SUPERUSER_DATA[User.USERNAME_FIELD],

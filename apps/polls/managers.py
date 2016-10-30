@@ -278,3 +278,17 @@ class VoteManager(models.Manager):
         return get_chart_count_objects_for_the_past_year(
             self.get_statistics_count_votes_for_the_past_year()
         )
+
+    def is_active_voter(self, user):
+        """Check up, a user is an active voter."""
+
+        from .models import Poll
+
+        count_polls = Poll._default_manager.count()
+
+        if count_polls < 1:
+            return False
+
+        count_votes = self.filter(user=user).count()
+
+        return count_polls / 2 < count_votes

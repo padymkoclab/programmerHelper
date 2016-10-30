@@ -21,3 +21,8 @@ class SolutionQuerySet(models.QuerySet):
         self = annotate_queryset_for_determinate_rating(self)
 
         return self
+
+    def objects_with_rating(self):
+        """ """
+
+        return annotate_queryset_for_determinate_rating(self)

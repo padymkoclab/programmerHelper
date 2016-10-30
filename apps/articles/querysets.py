@@ -12,7 +12,7 @@ class ArticleQuerySet(models.QuerySet):
     Suit methods for work with queryset of artices.
     """
 
-    def articles_with_rating(self):
+    def objects_with_rating(self):
         """Adding for each the article field with determined rating of an itself."""
 
         self = self.defer('subsections').annotate(rating=models.Avg('marks__mark'))
@@ -76,7 +76,7 @@ class ArticleQuerySet(models.QuerySet):
     def articles_with_all_additional_fields(self):
         """Determining for each article: count tags, comments, links, marks, subsections and rating."""
 
-        self = self.articles_with_rating()
+        self = self.objects_with_rating()
         self = self.articles_with_count_comments()
         self = self.articles_with_count_marks()
         self = self.articles_with_count_tags()
@@ -120,7 +120,7 @@ class ArticleQuerySet(models.QuerySet):
     def popular_articles(self):
         """Articles with rating from 4 and more."""
 
-        self = self.articles_with_rating()
+        self = self.objects_with_rating()
         return self.filter(rating__gte=4)
 
     def articles_by_rating(self, min_rating=None, max_rating=None):
@@ -128,7 +128,7 @@ class ArticleQuerySet(models.QuerySet):
 
         if min_rating is None and max_rating is None:
             raise TypeError('Please point at least either min_rating or max_rating.')
-        self = self.articles_with_rating()
+        self = self.objects_with_rating()
         if isinstance(min_rating, numbers.Real) and isinstance(max_rating, numbers.Real):
             if min_rating > max_rating:
                 raise ValueError('Don`t right values: min_rating is more than max_rating.')

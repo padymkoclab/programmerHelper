@@ -31,6 +31,7 @@ from utils.django.functions_db import Round
 from apps.tags.models import Tag
 # from apps.badges.managers import BadgeManager
 from apps.badges.models import Badge
+from apps.badges.constants import Badges
 # from apps.polls.managers import PollsManager
 # from apps.polls.querysets import UserPollQuerySet
 # from apps.activity.models import Activity
@@ -852,6 +853,9 @@ class User(AbstractBaseUser, PermissionsMixin):
 
         counter = self._get_couter_pks_usage_tags()
 
+        if len(counter) == 0:
+            return
+
         max_count = counter.most_common(1)[0][1]
 
         tag_pks = [tag_pk for tag_pk, count in counter.items() if count == max_count]
@@ -870,7 +874,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         raise NotImplementedError
         return self.popular_topics_of_user.count()
 
-    def check_reputation(self):
+    def get_reputation(self):
         """
         Getting reputation of user for activity on website:
         marks of published snippets, answers, questions and rating of articles,
@@ -894,22 +898,34 @@ class User(AbstractBaseUser, PermissionsMixin):
 
         reputation = 0
 
-        total_count_views = self.topics.aggregate(total_count_views=models.Sum('count_views'))
+        total_count_views = self.topics.aggregate(
+            total_count_views=models.functions.Coalesce(
+                models.Sum('count_views'), 0
+            )
+        )['total_count_views']
         reputation_for_posts = total_count_views / 1000
 
         reputation_for_votes = self.get_count_votes()
-        reputation_for_articles = \
-            self.articles.objects_with_rating().aggregate(total_rating=models.Sum('rating'))['total_rating']
-        reputation_for_questions = \
-            self.questions.objects_with_rating().aggregate(total_rating=models.Sum('rating'))['total_rating']
-        reputation_for_snippets = \
-            self.snippets.objects_with_rating().aggregate(total_rating=models.Sum('rating'))['total_rating']
-        reputation_for_solutions = \
-            self.solutions.objects_with_rating().aggregate(total_rating=models.Sum('rating'))['total_rating']
-        reputation_for_questions = \
-            self.questions.objects_with_rating().aggregate(total_rating=models.Sum('rating'))['total_rating']
-        reputation_for_answers = \
-            self.answers.objects_with_rating().aggregate(total_rating=models.Sum('rating'))['total_rating']
+
+        values = self.articles.objects_with_rating().values_list('rating', flat=True)
+        values = filter(lambda x: x is not None, values)
+        reputation_for_articles = sum(values)
+
+        values = self.questions.objects_with_rating().values_list('rating', flat=True)
+        values = filter(lambda x: x is not None, values)
+        reputation_for_questions = sum(values)
+
+        values = self.snippets.objects_with_rating().values_list('rating', flat=True)
+        values = filter(lambda x: x is not None, values)
+        reputation_for_snippets = sum(values)
+
+        values = self.solutions.objects_with_rating().values_list('rating', flat=True)
+        values = filter(lambda x: x is not None, values)
+        reputation_for_solutions = sum(values)
+
+        values = self.answers.objects_with_rating().values_list('rating', flat=True)
+        values = filter(lambda x: x is not None, values)
+        reputation_for_answers = sum(values)
 
         reputation = sum((
             reputation_for_posts,
@@ -918,13 +934,16 @@ class User(AbstractBaseUser, PermissionsMixin):
             reputation_for_questions,
             reputation_for_snippets,
             reputation_for_solutions,
-            reputation_for_questions,
             reputation_for_answers,
         ))
 
-        self.reputation = round(reputation)
-        self.full_clean()
-        self.save()
+        if self.reputation != round(reputation):
+
+            self.reputation = round(reputation)
+            self.full_clean()
+            self.save()
+
+        return self.reputation
 
     def has_badge(self, badge):
 
@@ -982,15 +1001,49 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def get_gold_badges(self):
 
-        return self.badges.filter(badge__kind=Badge.GOLD)
+        return self.badges.filter(badge__kind=Badges.Kind.GOLD.value)
 
     def get_silver_badges(self):
 
-        return self.badges.filter(badge__kind=Badge.SILVER)
+        return self.badges.filter(badge__kind=Badges.Kind.SILVER.value)
 
     def get_bronze_badges(self):
 
-        return self.badges.filter(badge__kind=Badge.BRONZE)
+        return self.badges.filter(badge__kind=Badges.Kind.BRONZE.value)
+
+    def get_notifications(self, by_type='all'):
+
+        if by_type not in ['all', 'read', 'unread']:
+            raise ValueError('')
+
+        return self.notifications.order_by('-created')
+
+    def get_count_notifications(self):
+        """Count notification send to this user."""
+
+        return 0
+
+        self.get_notifications('all')
+
+        raise NotImplementedError
+
+    def get_count_unread_notifications(self):
+        """Count notification send to this user."""
+
+        return 0
+
+        self.get_notifications('all')
+
+        raise NotImplementedError
+
+    def get_count_read_notifications(self):
+        """Count notification send to this user."""
+
+        return 0
+
+        self.get_notifications('all')
+
+        raise NotImplementedError
 
 
 class Profile(models.Model):

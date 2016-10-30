@@ -75,7 +75,9 @@ class Diary(models.Model):
             return self.total_size
 
         partitions = self.partitions.partitions_with_sizes()
-        return partitions.aggregate(total_size=models.Sum('size'))['total_size']
+        return partitions.aggregate(
+            total_size=models.functions.Coalesce(models.Sum('size'), 0)
+        )['total_size']
     get_total_size.short_description = _('Total size')
     get_total_size.admin_order_field = 'total_size'
 

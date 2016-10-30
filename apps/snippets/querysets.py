@@ -22,33 +22,6 @@ class SnippetQuerySet(models.QuerySet):
         else:
             raise TypeError('Missing 1 required argument: "min_mark" or "max_mark".')
 
-    def snippets_with_count_favours(self):
-        """Added to each snippet new field with count of favours of the each snippet."""
-
-        return self.annotate(count_favours=models.Count('favours', distinct=True))
-
-    def snippets_with_count_like_favours(self):
-        """Added to each snippet new field with count of liked favours of the each snippet."""
-
-        return self.annotate(count_like_favours=models.Sum(
-            models.Case(
-                models.When(favours__is_favour=True, then=1),
-                default=0,
-                output_field=models.IntegerField()
-            )
-        ))
-
-    def snippets_with_count_dislike_favours(self):
-        """Added to each snippet new field with count of disliked favours of the each snippet."""
-
-        return self.annotate(count_dislike_favours=models.Sum(
-            models.Case(
-                models.When(favours__is_favour=False, then=1),
-                default=0,
-                output_field=models.IntegerField()
-            )
-        ))
-
     def snippets_with_all_additional_fields(self):
         """Determinating for each snippet count_tags, opinions, favours, comments,
         getting mark, count good/bad opinions, and count likes/dislikes favours."""
@@ -62,3 +35,9 @@ class SnippetQuerySet(models.QuerySet):
         self = annotate_queryset_for_determinate_rating(self)
 
         return self
+
+    def objects_with_rating(self):
+        """ """
+
+        return annotate_queryset_for_determinate_rating(self)
+

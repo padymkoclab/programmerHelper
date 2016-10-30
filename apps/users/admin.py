@@ -255,6 +255,8 @@ class UserAdmin(ModelAdmin):
             'title': _('Users and notifications'),
             'fields': (
                 '__str__',
+                'get_count_unread_notifications',
+                'get_count_read_notifications',
                 'get_count_notifications',
             ),
         }),
@@ -355,6 +357,8 @@ class UserAdmin(ModelAdmin):
         # if request.path == '/admin/users/user/voters/':
         #     qs = qs.model.polls.users_as_voters()
         #     return qs.filter(count_votes__gt=0)
+
+        raise NotImplementedError('Change this method for each list_display')
 
         return qs
 

@@ -40,20 +40,20 @@ class Snippet(CommentsModelMixin, OpinionsModelMixin, TagsModelMixin, TimeStampe
     CHOICES_LEXERS = CHOICES_LEXERS
 
     name = models.CharField(
-        _('Name'), max_length=200, unique=True,
+        _('name'), max_length=200, unique=True,
         validators=[MinLengthValidator(10)]
     )
     slug = ConfiguredAutoSlugField(populate_from='name', unique=True)
-    lexer = models.CharField(_('Lexer'), max_length=50, choices=CHOICES_LEXERS)
+    lexer = models.CharField(_('lexer'), max_length=50, choices=CHOICES_LEXERS)
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, verbose_name=_('user'),
         related_name='snippets', on_delete=models.CASCADE,
     )
-    views = models.PositiveIntegerField(_('count views'), editable=False, default=0)
-    description = models.TextField(_('Decription'), validators=[MinLengthValidator(50)])
-    code = models.TextField(_('Code'), validators=[MinLengthValidator(5)])
+    count_views = models.PositiveIntegerField(_('count views'), editable=False, default=0)
+    description = models.TextField(_('decription'), validators=[MinLengthValidator(50)])
+    code = models.TextField(_('code'), validators=[MinLengthValidator(5)])
     tags = models.ManyToManyField(
-        Tag, verbose_name=_('Tags'), related_name='snippets',
+        Tag, verbose_name=_('tags'), related_name='snippets',
     )
 
     opinions = GenericRelation(Opinion, related_query_name='snippets')
