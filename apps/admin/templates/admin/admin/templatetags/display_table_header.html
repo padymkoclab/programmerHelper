@@ -24,6 +24,10 @@
 
           <div class="header_column_display_name">{{ header.display_name|capfirst }}</div>
 
+          {% if header.position is not None and header.order is not None %}
+            <div class="close discard_ordering_column" aria-label="Discard ordering column"><span aria-hidden="true">&times;</span></div>
+          {% endif %}
+
       </th>
     {% endfor %}
 {% else %}

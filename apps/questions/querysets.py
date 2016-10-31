@@ -3,6 +3,8 @@ import logging
 
 from django.db import models
 
+from utils.django.sql import NullsLastQuerySet
+
 from apps.opinions.utils import annotate_queryset_for_determinate_rating
 
 
@@ -90,3 +92,43 @@ class AnswerQuerySet(models.QuerySet):
         """ """
 
         return annotate_queryset_for_determinate_rating(self)
+
+
+class UserQuestionQuerySet(NullsLastQuerySet):
+    """
+
+    """
+
+    def users_with_count_questions(self):
+
+        return self.annotate(count_questions=models.Count('questions', distinct=True))
+
+    def users_with_count_answers_on_questions(self):
+
+        raise NotImplementedError
+
+    def users_with_date_latest_question(self):
+
+        return self.annotate(date_latest_question=models.Max('questions__created'))
+
+    def users_with_rating_by_questions(self):
+
+        return self.annotate(count_questions=models.Count('questions', distinct=True))
+
+    def users_with_count_questions_and_date_latest_question_and_users_with_rating_by_questions(self):
+
+        self = self.users_with_count_questions()
+        self = self.users_with_date_latest_question()
+        self = self.users_with_rating_by_questions()
+
+        return self
+
+
+class UserAnswerQuerySet(models.QuerySet):
+    """
+
+    """
+
+    def users_with_count_answers(self):
+
+        return self.annotate(count_answers=models.Count('answers', distinct=True))

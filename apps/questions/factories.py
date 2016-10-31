@@ -22,7 +22,7 @@ class QuestionFactory(AbstractTimeStampedFactory):
 
     text_question = factory.Faker('text', locale='ru')
     status = fuzzy.FuzzyChoice([value for value, label in Question.CHOICES_STATUS])
-    views = fuzzy.FuzzyInteger(1000)
+    count_views = fuzzy.FuzzyInteger(1000)
 
     @factory.lazy_attribute
     def title(self):

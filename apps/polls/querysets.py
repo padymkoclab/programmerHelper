@@ -59,7 +59,9 @@ class ChoiceQuerySet(models.QuerySet):
 
 
 class UserPollQuerySet(models.QuerySet):
-    """ """
+    """
+
+    """
 
     def users_with_count_votes(self):
         """ """
@@ -77,8 +79,10 @@ class UserPollQuerySet(models.QuerySet):
         # make determination of count votes of each user
         self = self.users_with_count_votes()
 
+        from .models import Poll
+
         # get a half from count polls
-        half_from_count_polls = self.model.polls._get_half_from_total_count_polls()
+        half_from_count_polls = Poll._default_manager.count() / 2
 
         #
         return self.annotate(is_active_voter=models.Case(
@@ -87,7 +91,7 @@ class UserPollQuerySet(models.QuerySet):
             output_field=models.BooleanField()
         ))
 
-    def users_as_voters(self):
+    def users_with_count_votes_and_date_latest_voting_and_active_voters_status(self):
         """ """
 
         self = self.users_with_date_latest_voting()

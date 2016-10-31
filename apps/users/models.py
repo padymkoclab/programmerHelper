@@ -29,11 +29,10 @@ from utils.django.models_utils import get_admin_url
 from utils.django.functions_db import Round
 
 from apps.tags.models import Tag
-# from apps.badges.managers import BadgeManager
+from apps.badges.managers import BadgeManager
 from apps.badges.models import Badge
 from apps.badges.constants import Badges
 # from apps.polls.managers import PollsManager
-# from apps.polls.querysets import UserPollQuerySet
 # from apps.activity.models import Activity
 # from apps.forum.models import Topic
 # from apps.sessions.models import ExpandedSession
@@ -44,6 +43,10 @@ from apps.solutions.models import Solution
 from apps.utilities.models import Utility
 from apps.snippets.models import Snippet
 from apps.questions.models import Answer, Question
+
+from apps.polls.querysets import UserPollQuerySet
+from apps.visits.querysets import UserAttendanceQuerySet
+from apps.questions.querysets import UserQuestionQuerySet, UserAnswerQuerySet
 
 from .managers import UserManager, LevelManager
 from .exceptions import ProtectDeleteUser
@@ -201,8 +204,13 @@ class User(AbstractBaseUser, PermissionsMixin):
     # managers
     objects = models.Manager()
     objects = UserManager()
-    # polls = PollsManager.from_queryset(UserPollQuerySet)()
-    # badges_manager = BadgeManager()
+
+    badges_manager = BadgeManager()
+
+    polls_manager = UserPollQuerySet.as_manager()
+    visits_manager = UserAttendanceQuerySet().as_manager()
+    questions_manager = UserQuestionQuerySet().as_manager()
+    answers_manager = UserAnswerQuerySet().as_manager()
 
     class Meta:
         verbose_name = _("User")
@@ -785,18 +793,18 @@ class User(AbstractBaseUser, PermissionsMixin):
         except self.votes.model.DoesNotExist:
             return
     get_date_latest_vote.admin_order_field = 'date_latest_voting'
-    get_date_latest_vote.short_description = _('Date of latest voting')
+    get_date_latest_vote.short_description = _('Date latest voting')
 
     def is_active_voter(self):
         """ """
 
         count_polls = Poll._default_manager.count()
 
-        half_count_polls = count_polls // 2
+        half_count_polls = count_polls / 2
 
         return self.get_count_votes() > half_count_polls
     is_active_voter.admin_order_field = 'is_active_voter'
-    is_active_voter.short_description = _('Is active\nvoter?')
+    is_active_voter.short_description = _('Is active voter?')
     is_active_voter.boolean = True
 
     def get_statistics_usage_tags(self, count=None):

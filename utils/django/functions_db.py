@@ -3,7 +3,7 @@ from django.db import models
 from django.db.models.expressions import Func
 
 
-class IsNullAsLast(models.Func):
+class IsNull(models.Func):
     """
     Used for made entries with value Null (Pythonic is None) as last in queryset
     """

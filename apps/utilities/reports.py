@@ -12,7 +12,7 @@ from reportlab.pdfgen import canvas
 import xlsxwriter
 from weasyprint import HTML as weasyprint_HTML
 
-from utils.django.functions_db import IsNullAsLast
+# from utils.django.functions_db import IsNullAsLast
 
 from apps.core.reports import BaseReport
 

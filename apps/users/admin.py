@@ -2,6 +2,7 @@
 import collections
 import logging
 
+from django.db import models
 from django.db.models.fields import BLANK_CHOICE_DASH
 from django.core.urlresolvers import reverse
 from django.conf.urls import url
@@ -12,6 +13,7 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from apps.admin.site import DefaultSiteAdmin
 from apps.admin.admin import ModelAdmin, StackedInline, TabularInline
 from apps.admin.app import AppAdmin
+from apps.admin.utils import register_model, register_app
 from apps.polls.listfilters import IsActiveVoterListFilter
 
 from .actions import (
@@ -30,6 +32,7 @@ from .apps import UsersConfig
 logger = logging.getLogger('django.development')
 
 
+@register_app
 class UserAppAdmin(AppAdmin):
 
     app_config_class = UsersConfig
@@ -80,8 +83,9 @@ class ProfileInline(StackedInline):
     suit_classes = 'suit-tab suit-tab-profile'
 
 
-# class UserAdmin(BaseUserAdmin):
-class UserAdmin(ModelAdmin):
+# class UserAdminModel(BaseUserAdmin):
+@register_model(User)
+class UserAdminModel(ModelAdmin):
     """
     Admin configuration for model User
     """
@@ -126,6 +130,8 @@ class UserAdmin(ModelAdmin):
                 'get_last_seen',
                 'get_count_days_attendances',
             ),
+            'filters': [],
+            'ordering': [],
         }),
         ('users_polls', {
             'title': _('Users and polls'),
@@ -307,7 +313,7 @@ class UserAdmin(ModelAdmin):
         # ('date_joined', admin.DateFieldListFilter),
     ]
     ordering = ('date_joined', )
-    list_per_page = 10
+    list_per_page = 15
     search_fields = ('alias', 'email', 'username')
     date_hierarchy = 'date_joined'
 
@@ -350,15 +356,74 @@ class UserAdmin(ModelAdmin):
         # 'display_diary_details',
     )
 
-    def get_queryset(self, request):
+    def get_queryset(self, request, list_display_name=None):
 
-        qs = super().get_queryset(request)
+        if list_display_name is None or list_display_name in ['users_main_info', 'users_extra_info']:
 
-        # if request.path == '/admin/users/user/voters/':
-        #     qs = qs.model.polls.users_as_voters()
-        #     return qs.filter(count_votes__gt=0)
+            qs = super(UserAdminModel, self).get_queryset(request)
 
-        raise NotImplementedError('Change this method for each list_display')
+        elif list_display_name == 'users_visits':
+
+            qs = self.model.visits_manager.users_with_count_attendances()
+
+        elif list_display_name == 'users_polls':
+
+            qs = self.model.polls_manager.\
+                users_with_count_votes_and_date_latest_voting_and_active_voters_status()
+
+        elif list_display_name == 'users_questions':
+
+            qs = self.model.questions_manager.\
+                users_with_count_questions_and_date_latest_question_and_users_with_rating_by_questions()
+
+        elif list_display_name == 'users_answers':
+
+            qs = self.model.answers_manager.users_with_count_answers()
+
+        elif list_display_name == 'users_articles':
+
+            qs = super(UserAdminModel, self).get_queryset(request)
+
+        elif list_display_name == 'users_solutions':
+
+            qs = super(UserAdminModel, self).get_queryset(request)
+
+        elif list_display_name == 'users_snippets':
+
+            qs = super(UserAdminModel, self).get_queryset(request)
+
+        elif list_display_name == 'users_comments':
+
+            qs = super(UserAdminModel, self).get_queryset(request)
+
+        elif list_display_name == 'users_library':
+
+            qs = super(UserAdminModel, self).get_queryset(request)
+
+        elif list_display_name == 'users_opinions':
+
+            qs = super(UserAdminModel, self).get_queryset(request)
+
+        elif list_display_name == 'users_marks':
+
+            qs = super(UserAdminModel, self).get_queryset(request)
+
+        elif list_display_name == 'users_badges':
+
+            qs = super(UserAdminModel, self).get_queryset(request)
+
+        elif list_display_name == 'users_notifications':
+
+            qs = super(UserAdminModel, self).get_queryset(request)
+
+        elif list_display_name == 'users_forums':
+
+            qs = super(UserAdminModel, self).get_queryset(request)
+
+        elif list_display_name == 'users_tags':
+
+            qs = super(UserAdminModel, self).get_queryset(request)
+
 
         return qs
 
@@ -448,10 +513,9 @@ class UserAdmin(ModelAdmin):
 
     def get_urls(self):
 
-        urls = super(UserAdmin, self).get_urls()
+        urls = super(UserAdminModel, self).get_urls()
 
         additional_urls = [
-            url(r'voters/$', self.voters_view, {}, 'users_user_voters'),
         ]
 
         # additional urls must be before standartic urls
@@ -471,7 +535,7 @@ class UserAdmin(ModelAdmin):
         # for reject unneccessary calculation use straight access instead user.get_top_tag()
         extra_context['user_top_tag'] = None if statistics_usage_tags is not None else statistics_usage_tags[0][0]
 
-        return super().change_view(request, object_id, form_url, extra_context)
+        return super(UserAdminModel, self).change_view(request, object_id, form_url, extra_context)
 
     def changelist_view(self, request, extra_context=None):
 
@@ -507,7 +571,7 @@ class UserAdmin(ModelAdmin):
             ]
             self.ordering = ['date_joined']
 
-        response = super(UserAdmin, self).changelist_view(request, extra_context)
+        response = super(UserAdminModel, self).changelist_view(request, extra_context)
         return response
 
     def get_inline_instances(self, request, obj=None):
@@ -516,24 +580,6 @@ class UserAdmin(ModelAdmin):
             # inlines = inlines
             return [inline(self.model, self.admin_site) for inline in inlines]
         return []
-
-    def voters_view(self, request):
-        """ """
-
-        self.list_display = [
-            'get_full_name',
-            'get_count_votes',
-            'is_active_voter',
-            'get_date_latest_voting',
-        ]
-
-        self.list_filter = [
-            IsActiveVoterListFilter,
-            # ('date_latest_voting', admin.BooleanFieldListFilter),
-        ]
-        self.ordering = ['count_votes', 'date_latest_voting']
-
-        return self.changelist_view(request)
 
     def display_diary_details(self, obj):
 
@@ -554,7 +600,8 @@ class UserAdmin(ModelAdmin):
         return format_html('<span>{}</span><a href="{}">{}</a>', msg, link_url, link_text)
 
 
-class ProfileAdmin(ModelAdmin):
+@register_model(Profile)
+class ProfileAdminModel(ModelAdmin):
 
     list_display = (
         'user',
@@ -682,7 +729,8 @@ class UserInline(TabularInline):
     can_delete = False
 
 
-class LevelAdmin(ModelAdmin):
+@register_model(Level)
+class LevelAdminModel(ModelAdmin):
     '''
     Admin View for Level
     '''
@@ -766,10 +814,3 @@ class LevelAdmin(ModelAdmin):
         )
     display_color.short_description = Level._meta.get_field('color').verbose_name
     display_color.admin_order_field = 'color'
-
-
-DefaultSiteAdmin.register_app(UserAppAdmin)
-
-DefaultSiteAdmin.register_model(User, UserAdmin)
-DefaultSiteAdmin.register_model(Profile, ProfileAdmin)
-DefaultSiteAdmin.register_model(Level, LevelAdmin)

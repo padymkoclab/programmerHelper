@@ -42,10 +42,17 @@ jQuery(function(){
         var $form = $(this).parents('form');
 
         var $hidden_input = $('<input />').
-            attr('name', '__clickedColumn').
-            attr('value', name_clicked_column).
-            attr('type', 'hidden');
+          attr('name', '__clickedColumn').
+          attr('value', name_clicked_column).
+          attr('type', 'hidden');
         $form.append($hidden_input);
+
+        var $hidden_input = $('<input />').
+          attr('name', '__discardSorting').
+          attr('value', false).
+          attr('type', 'hidden');
+        $form.append($hidden_input);
+
         $form.submit();
    });
 
@@ -72,5 +79,37 @@ jQuery(function(){
             $(this).parents('form').submit();
         },
     });
+
+   /*
+   */
+   $('div.discard_ordering_column').bind({
+    click: function(e){
+
+      e.stopPropagation();
+      e.preventDefault();
+
+      var value_clicked_column = $(this).parent().find('input[type="hidden"]').val();
+      var object = JSON.parse(value_clicked_column);
+
+        var name_clicked_column = Object.keys(object)[0];
+
+        var $form = $(this).parents('form');
+
+        var $hidden_input = $('<input />').
+          attr('name', '__clickedColumn').
+          attr('value', name_clicked_column).
+          attr('type', 'hidden');
+        $form.append($hidden_input);
+
+        var $hidden_input = $('<input />').
+          attr('name', '__discardSorting').
+          attr('value', true).
+          attr('type', 'hidden');
+        $form.append($hidden_input);
+
+        $form.submit();
+
+    },
+   });
 
 });

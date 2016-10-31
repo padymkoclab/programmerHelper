@@ -204,6 +204,13 @@ class ChangeListView(SiteModelAdminMixin, SiteAdminView):
 
         # self.set_filters()
 
+        self.q = request.GET.get('q', '').strip()
+        self.page = self.request.GET.get('page')
+        self.activated_list_display_name = request.GET.get('list_display')
+        self.old_list_display_name = request.GET.get('old_list_display_name', '')
+
+        self.ordering = self.get_ordering()
+
         return self.render_to_response(request)
 
     def render_to_response(self, request):
@@ -325,26 +332,24 @@ class ChangeListView(SiteModelAdminMixin, SiteAdminView):
     def get_queryset(self, request):
 
         # Queryset
-        qs = self.model_admin.get_queryset(request)
+        qs = self.model_admin.get_queryset(request, self.activated_list_display_name)
 
         qs = self.filter_by_filter_restrictions(request, qs)
         qs = self.filter_by_search_restrictions(request, qs)
 
         # Ordering
-        #
-        ordering = self.get_ordering()
-        qs = qs.order_by(*ordering)
+        qs = qs.order_by(*self.ordering)
 
         # send message only if applyed a search or a filter or after delete
-        if request.GET.get('q'):
+        if self.q != '':
             count = qs.count()
             object_name = self.model_meta.verbose_name if count == 1 else self.model_meta.verbose_name_plural
             object_name = object_name.lower()
             msg = ungettext(
-                'Found {} {}',
-                'Found {} {}',
+                'Found {} {} by condition "{}"',
+                'Found {} {} by condition "{}"',
                 count
-            ).format(count, object_name)
+            ).format(count, object_name, self.q)
             self.model_admin.message_user(request, msg, extra_tags='info', level='INFO')
 
         return qs
@@ -357,7 +362,8 @@ class ChangeListView(SiteModelAdminMixin, SiteAdminView):
             ordering = self.model_meta.ordering
 
         clickedColumn = self.request.GET.get('__clickedColumn')
-        if clickedColumn is not None:
+        if self.activated_list_display_name == self.old_list_display_name and clickedColumn is not None:
+
             ordering = self.determinate_dynamic_ordering(clickedColumn)
 
         return ordering or ()
@@ -366,33 +372,11 @@ class ChangeListView(SiteModelAdminMixin, SiteAdminView):
 
         context = super().get_context_data(**kwargs)
 
-        self.q = self.request.GET.get('q', '')
-        self.q = self.q.strip()
-
         qs = self.get_queryset(self.request)
 
-        self.list_per_page = self.model_admin.list_per_page
-        list_per_page = self.request.GET.get('list_per_page', self.list_per_page)
-        list_per_page = int(list_per_page)
+        page_object_list, list_per_page, total_count_objects = self.split_queryset_by_pages(qs)
 
-        paginator = Paginator(qs, list_per_page)
-        total_count_objects = paginator.count
-
-        page = self.request.GET.get('page')
-
-        try:
-            page_object_list = paginator.page(page)
-        except PageNotAnInteger:
-            page = 1
-            page_object_list = paginator.page(page)
-        except EmptyPage:
-            page = paginator.num_pages
-            page_object_list = paginator.page(page)
-
-        list_per_page = total_count_objects if total_count_objects < list_per_page else list_per_page
-
-        all_list_display, current_list_display_name, list_display_title, list_display_fields =\
-            self.determinate_list_display_title_and_fields(self.request)
+        all_list_display, list_display_title, list_display_fields = self.determinate_list_display_title_and_fields(self.request)
 
         context.update({
             'title': _('Select {} to change').format(self.model_meta.verbose_name_plural.lower()),
@@ -406,23 +390,48 @@ class ChangeListView(SiteModelAdminMixin, SiteAdminView):
             'list_per_page': list_per_page,
             'actions': self.model_admin.get_actions(),
             'page_object_list': page_object_list,
-            'ordering': self.get_ordering(),
+            'ordering': self.ordering,
             'filters': self.filters,
             'search_details': self.get_search_details(),
             'list_display_title': list_display_title,
             'list_display_fields': list_display_fields,
-            'current_list_display_name': current_list_display_name,
+            'activated_list_display_name': self.activated_list_display_name,
+            'old_list_display_name': self.old_list_display_name,
             'all_list_display': all_list_display,
         })
 
         return context
 
-    def determinate_dynamic_ordering(self, clickedColumn):
+    def split_queryset_by_pages(self, qs):
+
+        self.list_per_page = self.model_admin.list_per_page
+        list_per_page = self.request.GET.get('list_per_page', self.list_per_page)
+        list_per_page = int(list_per_page)
+
+        paginator = Paginator(qs, list_per_page)
+        total_count_objects = paginator.count
+
+        try:
+            page_object_list = paginator.page(self.page)
+        except PageNotAnInteger:
+            self.page = 1
+            page_object_list = paginator.page(self.page)
+        except EmptyPage:
+            self.page = paginator.num_pages
+            page_object_list = paginator.page(self.page)
+
+        list_per_page = total_count_objects if total_count_objects < list_per_page else list_per_page
+
+        return page_object_list, list_per_page, total_count_objects
+
+    def determinate_dynamic_ordering(self, clickedColumn=None):
 
         sortable_fields = self.request.GET.getlist('sortable_field')
         sortable_fields = [json.loads(i) for i in sortable_fields]
 
         concrete_fields = [i.name for i in self.model_meta.concrete_fields]
+
+        discardSorting = self.request.GET.get('__discardSorting')
 
         ordering = list()
         for sortable_field in sortable_fields:
@@ -433,26 +442,41 @@ class ChangeListView(SiteModelAdminMixin, SiteAdminView):
 
                     position = options['position']
 
-                    if column_name == clickedColumn:
-                        position = 1
+                    if discardSorting == 'false':
 
-                        order = options['order']
-                        if options['order'] is None:
-                            options['order'] = 'asc'
-                        elif options['order'] == 'desc':
-                            options['order'] = 'asc'
-                        elif options['order'] == 'asc':
-                            options['order'] = 'desc'
-                    else:
-                        position += 1
+                        if column_name == clickedColumn:
 
-                    if column_name not in concrete_fields:
-                        if hasattr(self.model_admin.model, column_name):
-                            column_name = getattr(self.model_admin.model, column_name).admin_order_field
-                        elif hasattr(self.model_admin, column_name):
-                            column_name = getattr(self.model_admin, column_name).admin_order_field
+                            position = 1
+
+                            order = options['order']
+                            if options['order'] is None:
+                                options['order'] = 'asc'
+                            elif options['order'] == 'desc':
+                                options['order'] = 'asc'
+                            elif options['order'] == 'asc':
+                                options['order'] = 'desc'
                         else:
-                            raise AttributeError('Instance has not method or field {}'.format(column_name))
+                            position += 1
+
+                    elif discardSorting == 'true':
+
+                        position = options['position']
+
+                        if column_name == clickedColumn:
+                            position = None
+                            options['order'] = None
+                        else:
+                            position -= 1
+
+                if column_name not in concrete_fields:
+                    if hasattr(self.model_admin.model, column_name):
+                        column_name = getattr(self.model_admin.model, column_name).admin_order_field
+                    elif hasattr(self.model_admin, column_name):
+                        column_name = getattr(self.model_admin, column_name).admin_order_field
+                    else:
+                        raise AttributeError('Instance has not method or field {}'.format(column_name))
+
+                if options['order'] is not None:
 
                     if options['order'] == 'asc':
                         field_name = column_name
@@ -505,21 +529,6 @@ class ChangeListView(SiteModelAdminMixin, SiteAdminView):
             else:
                 self.expected_parameters.update(filter_.expected_parameters)
 
-    def get_querystring(self, **params):
-
-        GET_ = self.request.GET.copy()
-
-        for key, value in params.items():
-
-            if value is None:
-                GET_.pop(key, None)
-            else:
-                GET_[key] = value
-
-        querystring = GET_.urlencode()
-
-        return '?' + querystring
-
     def determinate_list_display_title_and_fields(self, request):
 
         all_list_display = self.model_admin.get_list_display()
@@ -529,24 +538,22 @@ class ChangeListView(SiteModelAdminMixin, SiteAdminView):
             return (None, None, None, all_list_display)
 
         all_list_display = collections.OrderedDict(all_list_display)
-        current_list_display_name = request.GET.get('list_display')
 
-        if current_list_display_name is None:
+        if self.activated_list_display_name is None:
 
             # first list_display now is active
-            current_list_display = next(iter(all_list_display.items()))
+            activated_list_display = next(iter(all_list_display.items()))
 
-            current_list_display_name = current_list_display[0]
-            current_list_display_options = current_list_display[1]
+            self.activated_list_display_name = activated_list_display[0]
+            activated_list_display_options = activated_list_display[1]
 
         else:
-            current_list_display_options = all_list_display[current_list_display_name]
+            activated_list_display_options = all_list_display[self.activated_list_display_name]
 
         return (
             all_list_display,
-            current_list_display_name,
-            current_list_display_options['title'],
-            current_list_display_options['fields'],
+            activated_list_display_options['title'],
+            activated_list_display_options['fields'],
         )
 
 

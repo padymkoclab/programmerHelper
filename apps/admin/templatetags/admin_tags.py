@@ -189,6 +189,7 @@ def display_object_list(model_admin, page_object_list, list_display_fields):
 
             # try get value from method or field of the model
             elif hasattr(obj, column_name):
+
                 value = getattr(obj, column_name)
 
                 # method of the model
@@ -211,6 +212,14 @@ def display_object_list(model_admin, page_object_list, list_display_fields):
 
                     # logical field will be returned as corresponding icon
                     if isinstance(field, (models.NullBooleanField, models.BooleanField)):
+                        value = convert_boolean_to_bootstrap_icon(value)
+
+                # boolean field annotated from a queryset
+                elif hasattr(model_admin.model, column_name) and value in [False, True]:
+
+                    func = getattr(model_admin.model, column_name, None)
+
+                    if func is not None and getattr(func, 'boolean', False) is True:
                         value = convert_boolean_to_bootstrap_icon(value)
 
             else:
@@ -529,14 +538,15 @@ def display_table_header(context, model_admin, list_display_fields):
                 if isinstance(method, property):
                     method = method.fget
 
-                is_sortable = True
+                admin_order_field = getattr(method, 'admin_order_field', None)
+
             elif getattr(model_admin, column_name, None):
                 method = getattr(model_admin, column_name)
-                is_sortable = True
+                admin_order_field = getattr(method, 'admin_order_field', None)
             else:
-                is_sortable = False
+                admin_order_field = None
 
-            admin_order_field = getattr(method, 'admin_order_field', None)
+            is_sortable = False if admin_order_field is None else True
             is_method = True
 
         if is_method and admin_order_field in applyed_ordering.keys():

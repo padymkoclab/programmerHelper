@@ -77,6 +77,8 @@ class BaseAdmin(object):
 
     def get_queryset(self, request):
 
+        raise NotImplementedError
+
         qs = self.model._default_manager.get_queryset()
 
         ordering = self.get_ordering()
@@ -211,6 +213,16 @@ class ModelAdmin(BaseAdmin):
     def get_list_display(self):
 
         return self.list_display
+
+    def get_queryset(self, request, list_display_name=None):
+
+        if list_display_name is None:
+
+            qs = self.model._default_manager.get_queryset()
+
+            return qs
+
+        raise NotImplementedError('You must will implemented this behaviour')
 
     def has_module_permissions(self, request):
 

@@ -41,9 +41,10 @@
 
   {% block switch_list_display %}
     {% if all_list_display is not None %}
+      <input type="hidden" name="old_list_display_name" value="{{ activated_list_display_name }}">
       <select name="list_display" id="list_display" class="form-control">
         {% for list_display_name, list_display_options in all_list_display.items %}
-          <option value="{{ list_display_name }}" {% if list_display_name == current_list_display_name %}selected{% endif %}  > {{ list_display_options.title }}</option>
+          <option value="{{ list_display_name }}" {% if list_display_name == activated_list_display_name %}selected{% endif %}  > {{ list_display_options.title }}</option>
         {% endfor %}
       </select>
     {% endif %}
