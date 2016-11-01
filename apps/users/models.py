@@ -717,16 +717,55 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def get_total_rating_for_questions(self):
 
+        if hasattr(self, 'total_rating'):
+            return self.total_rating
+
         questions = self.questions.annotate(rating=models.Sum(models.Case(
             models.When(opinions__is_useful=True, then=1),
             models.When(opinions__is_useful=False, then=-1),
             output_field=models.IntegerField()
         )))
 
-        total_rating = questions.aggregate(total_rating=Round(models.Avg('rating')))['total_rating']
+        total_rating = questions.aggregate(total_rating=models.Avg('rating'))['total_rating']
         return total_rating
     get_total_rating_for_questions.short_description = _('Total rating')
     get_total_rating_for_questions.admin_order_field = 'total_rating'
+
+    def get_count_opinions_on_questions(self):
+
+        if hasattr(self, 'count_opinions_on_questions'):
+            return self.count_opinions_on_questions
+
+        return
+    get_count_opinions_on_questions.admin_order_field = 'count_opinions_on_questions'
+    get_count_opinions_on_questions.short_description = _('Count opinions on questions')
+
+    def get_count_answers_on_questions(self):
+
+        if hasattr(self, 'count_answers_on_questions'):
+            return self.count_answers_on_questions
+
+        return
+    get_count_answers_on_questions.admin_order_field = 'count_answers_on_questions'
+    get_count_answers_on_questions.short_description = _('Count answers on questions')
+
+    def get_count_good_opinions_about_questions(self):
+
+        if hasattr(self, 'count_good_opinions'):
+            return self.count_good_opinions
+
+        return
+    get_count_good_opinions_about_questions.admin_order_field = 'count_good_opinions'
+    get_count_good_opinions_about_questions.short_description = _('Count good opinions about questions')
+
+    def get_count_bad_opinions_about_questions(self):
+
+        if hasattr(self, 'count_bad_opinions'):
+            return self.count_bad_opinions
+
+        return
+    get_count_bad_opinions_about_questions.admin_order_field = 'count_bad_opinions'
+    get_count_bad_opinions_about_questions.short_description = _('Count bad opinions about questions')
 
     def get_count_solutions(self):
         """ """

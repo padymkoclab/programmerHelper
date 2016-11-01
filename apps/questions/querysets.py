@@ -1,6 +1,7 @@
 
 import logging
 
+from django.contrib.contenttypes.models import ContentType
 from django.db import models
 
 from utils.django.sql import NullsLastQuerySet
@@ -105,21 +106,125 @@ class UserQuestionQuerySet(NullsLastQuerySet):
 
     def users_with_count_answers_on_questions(self):
 
-        raise NotImplementedError
+        return self.annotate(count_answers_on_questions=models.Count('questions__answers', distinct=True))
+
+    def users_with_count_opinions_on_questions(self):
+
+        return self.annotate(count_opinions_on_questions=models.Count('questions__opinions', distinct=True))
 
     def users_with_date_latest_question(self):
 
         return self.annotate(date_latest_question=models.Max('questions__created'))
 
-    def users_with_rating_by_questions(self):
+    def users_with_total_rating_by_questions(self):
 
-        return self.annotate(count_questions=models.Count('questions', distinct=True))
+        from apps.opinions.models import Opinion
+
+        from .models import Question
+
+        return self.extra(
+            select={
+                'total_rating':
+                    """
+                    (
+                    SELECT
+                        SUM(
+                            CASE
+                                WHEN {opinion_table}."is_useful" = True THEN 1
+                                WHEN {opinion_table}."is_useful" = False THEN -1
+                            END
+                        )
+                    FROM {question_table}
+                    LEFT OUTER JOIN {opinion_table}
+                        ON ({opinion_table}."object_id" = {question_table}."id"
+                            AND ({opinion_table}."content_type_id" = %s)
+                        )
+                    WHERE {user_table}."id" = {question_table}.user_id
+                    )
+                    """.format(
+                        user_table=self.model._meta.db_table,
+                        question_table=Question._meta.db_table,
+                        opinion_table=Opinion._meta.db_table,
+                    )
+            },
+            select_params=[ContentType.objects.get_for_model(Question).pk]
+        )
+
+    def users_with_count_good_opinions_about_questions(self):
+
+        from apps.opinions.models import Opinion
+
+        from .models import Question
+
+        return self.extra(
+            select={
+                'count_good_opinions':
+                    """
+                    (
+                    SELECT
+                        COUNT(
+                            CASE
+                                WHEN {opinion_table}."is_useful" = True THEN 1
+                            END
+                        )
+                    FROM {question_table}
+                    LEFT OUTER JOIN {opinion_table}
+                        ON ({opinion_table}."object_id" = {question_table}."id"
+                            AND ({opinion_table}."content_type_id" = %s)
+                        )
+                    WHERE {user_table}."id" = {question_table}.user_id
+                    )
+                    """.format(
+                        user_table=self.model._meta.db_table,
+                        question_table=Question._meta.db_table,
+                        opinion_table=Opinion._meta.db_table,
+                    )
+            },
+            select_params=[ContentType.objects.get_for_model(Question).pk]
+        )
+
+    def users_with_count_bad_opinions_about_questions(self):
+
+        from apps.opinions.models import Opinion
+
+        from .models import Question
+
+        return self.extra(
+            select={
+                'count_bad_opinions':
+                    """
+                    (
+                    SELECT
+                        COUNT(
+                            CASE
+                                WHEN {opinion_table}."is_useful" = False THEN 1
+                            END
+                        )
+                    FROM {question_table}
+                    LEFT OUTER JOIN {opinion_table}
+                        ON ({opinion_table}."object_id" = {question_table}."id"
+                            AND ({opinion_table}."content_type_id" = %s)
+                        )
+                    WHERE {user_table}."id" = {question_table}.user_id
+                    )
+                    """.format(
+                        user_table=self.model._meta.db_table,
+                        question_table=Question._meta.db_table,
+                        opinion_table=Opinion._meta.db_table,
+                    )
+            },
+            select_params=[ContentType.objects.get_for_model(Question).pk]
+        )
 
     def users_with_count_questions_and_date_latest_question_and_users_with_rating_by_questions(self):
 
         self = self.users_with_count_questions()
         self = self.users_with_date_latest_question()
-        self = self.users_with_rating_by_questions()
+        self = self.users_with_total_rating_by_questions()
+        self = self.users_with_count_answers_on_questions()
+        self = self.users_with_count_opinions_on_questions()
+        self = self.users_with_count_good_opinions_about_questions()
+        self = self.users_with_count_bad_opinions_about_questions()
 
         return self
 
