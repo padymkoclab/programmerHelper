@@ -1,4 +1,4 @@
-
+BEGIN;
 -- CREATE EXTENSIONS (create extension is can only do for superuser
 CREATE EXTENSION IF NOT EXISTS unaccent;
 
@@ -11,11 +11,12 @@ DROP TABLE IF EXISTS "users_work" CASCADE;
 -- CREATE TABLES
 
 CREATE TABLE IF NOT EXISTS users_level(
+
     name varchar(20),
     description text,
+
     PRIMARY KEY (name)
 );
-
 
 CREATE TABLE users_user (
 
@@ -38,19 +39,27 @@ CREATE TABLE users_user (
 );
 
 CREATE TABLE users_work(
+
     work_id serial PRIMARY KEY,
     public_user_id integer,
     private_user_id integer,
     name varchar(50),
+
     FOREIGN KEY (public_user_id, private_user_id) REFERENCES "users_user",
     UNIQUE (public_user_id, private_user_id, name)
+
 );
 
 
 -- CREATE FUNCTIONS
 
-CREATE OR REPLACE FUNCTION make_lowercase_name()
-RETURNS trigger AS $make_lowercase_name$
+CREATE OR REPLACE FUNCTION capfirst("value" TEXT) RETURNS TEXT AS $capfirst$
+    BEGIN
+        RETURN 1;
+    END;
+$capfirst$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION make_lowercase_name() RETURNS trigger AS $make_lowercase_name$
     BEGIN
         NEW.username = LOWER(NEW.username);
         NEW.age = GREATEST(1, 2, 3, 4, NEW.age);
@@ -59,8 +68,7 @@ RETURNS trigger AS $make_lowercase_name$
     END;
 $make_lowercase_name$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION slufigy_level_name("value" TEXT, "allow_unicode" BOOLEAN)
-RETURNS TEXT AS $slufigy_level_name$
+CREATE OR REPLACE FUNCTION slugify("value" TEXT, "allow_unicode" BOOLEAN) RETURNS TEXT AS $slugify$
     WITH "normalized" AS (
         SELECT
             CASE
@@ -69,10 +77,33 @@ RETURNS TEXT AS $slufigy_level_name$
             END AS "value"
     ),
     "remove_chars" AS (
-        SELECT LOWER("value") AS "value" FROM "normalized"
+        SELECT regexp_replace("value", E'[^\\w\\s-]', '', 'gi') AS "value"
+        FROM "normalized"
+    ),
+    "lower" AS (
+        SELECT LOWER("value") AS "value"
+        FROM "remove_chars"
+    ),
+    "trimmed" AS (
+        SELECT TRIM("value") AS "value"
+        FROM "lower"
+    ),
+    "hyphenated" AS (
+        SELECT regexp_replace("value", E'[-\\s]+', '-', 'gi') AS "value"
+        FROM "trimmed"
     )
-    SELECT "value" FROM "remove_chars";
-$slufigy_level_name$ LANGUAGE SQL STRICT IMMUTABLE;
+    SELECT "value" FROM "hyphenated";
+$slugify$ LANGUAGE SQL STRICT IMMUTABLE;
+
+CREATE OR REPLACE FUNCTION slugify(TEXT) RETURNS TEXT AS 'SELECT slugify($1, false)'
+LANGUAGE SQL IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION slugify_level_name() RETURNS trigger AS $slugify_level_name$
+    BEGIN
+        NEW.name = slugify(NEW.name);
+        RETURN NEW;
+    END;
+$slugify_level_name$ LANGUAGE plpgsql;
 
 -- CREATE TRIGGERS
 
@@ -81,10 +112,10 @@ CREATE TRIGGER lowercase_name
     FOR EACH ROW
     EXECUTE PROCEDURE make_lowercase_name();
 
--- CREATE TRIGGER slufigy
---     BEFORE INSERT OR UPDATE ON users_level
---     FOR EACH ROW
---     EXECUTE PROCEDURE slufigy_level_name();
+CREATE TRIGGER slugify
+    BEFORE INSERT OR UPDATE OF name ON users_level
+    FOR EACH ROW
+    EXECUTE PROCEDURE slugify_level_name();
 
 
 -- INSERT DATA
@@ -93,20 +124,18 @@ INSERT INTO users_level (name) VALUES ('REgular');
 INSERT INTO users_level (name) VALUES ('Diamond-gold');
 INSERT INTO users_level (name) VALUES ('Gold and silver');
 
-INSERT INTO "users_user" (username, age, display_name, gender, salary, level_name)
-    VALUES ('Me', 22, 'My name', 'man', 99, 'regular');
-INSERT INTO "users_user" (username, age, display_name, gender, level_name)
-    VALUES ('He', 22, 'His name', NULL, 'diamond-gold');
-INSERT INTO "users_user" (username, age, display_name, gender, level_name)
-    VALUES ('She', 22, 'Her name', NULL, 'gold-and-silver');
+INSERT INTO "users_user" (username, age, display_name, gender, salary, level_name) VALUES ('Me', 22, 'My name', 'man', 99, 'regular');
+INSERT INTO "users_user" (username, age, display_name, gender, level_name) VALUES ('He', 22, 'His name', NULL, 'diamond-gold');
+INSERT INTO "users_user" (username, age, display_name, gender, level_name) VALUES ('She', 22, 'Her name', NULL, 'gold-and-silver');
 
-INSERT INTO  "users_work" (public_user_id, private_user_id, name)
-    VALUES (1, 1, 'Pianino');
-INSERT INTO  "users_work" (public_user_id, private_user_id, name)
-    VALUES (2, 2, 'Roal');
+INSERT INTO  "users_work" (public_user_id, private_user_id, name) VALUES (1, 1, 'Pianino');
+INSERT INTO  "users_work" (public_user_id, private_user_id, name) VALUES (2, 2, 'Roal');
 
 -- GET RANDOM OBJECT
+
 SELECT * FROM "users_user" ORDER BY RANDOM() LIMIT 1;
 SELECT * FROM "users_user" LIMIT 1 OFFSET FLOOR(RANDOM() * (SELECT COUNT(*) FROM "users_user"));
 SELECT "users_user"."username", "users_work"."name" FROM "users_work" JOIN "users_user" USING (public_user_id, private_user_id);
 SELECT * FROM "users_level";
+
+END;
