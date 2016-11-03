@@ -1,19 +1,26 @@
 #!/bin/bash
 
-TESTS = $(wildcard *.sql)
-REGRESS = $(patsubst %.sql,%,$(TESTS))
+TESTS = $(wildcard tests/*.sql)
+REGRESS = $(patsubst tests/%.sql,%,$(TESTS))
 REGRESS_OPTS = --load-language plpgsql
 
-all: try_connect show_data
+all: show_data
+
+connect:
+	@ psql -d temp_db -U temp_user -h localhost
 
 try_connect:
 	@ python -m script --try_connect
 
+update_db:
+	@ python -m script --update_db
+
 show_results: script.py
 	@ python -m script --show_results
 
-run_tests: script.py
-	@ pg_prove --pset tuples_only=1 $(TESTS)
+test: script.py tests/*.sql
+	@ bash update_test_plan.sh
+	@ pg_prove --dbname temp_db --pset tuples_only=1 $(TESTS) -U postgres --verbose
 
 copyright:
-	@ echo "Me"
+	@ printf " © Seti Volkylany (setivolkylany@gmail.com) from 7525 от СМЗХ.\nMade from soul and with love.\n"

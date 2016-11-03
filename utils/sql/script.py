@@ -13,16 +13,16 @@ parser.add_argument(
     help='Show main data in database',
 )
 parser.add_argument(
-    '--run_tests',
-    action='store_true',
-    default=False,
-    help='Run tests',
-)
-parser.add_argument(
     '--try_connect',
     action='store_true',
     default=False,
     help='Try connect to database',
+)
+parser.add_argument(
+    '--update_db',
+    action='store_true',
+    default=False,
+    help='Update a structure of database to latest',
 )
 
 
@@ -31,7 +31,7 @@ def main():
 
     args = parser.parse_args()
 
-    RUN_TESTS = args.run_tests
+    UPDATE_DB = args.update_db
     SHOW_RESULTS = args.show_results
     TRY_CONNECT = args.try_connect
 
@@ -57,26 +57,13 @@ def main():
 
             cursor = connection.cursor()
 
-            file_sql_code = open('./code.sql', 'r')
-            sql_code = file_sql_code.read()
-
-            cursor.execute(sql_code)
-
-            if RUN_TESTS is True:
-
-                file_tests = open('./tests.sql', 'r')
-
-                test_code = file_tests.read()
-
-                cursor.execute(test_code)
-
             if SHOW_RESULTS is True:
 
                 select_sql = """
                     SELECT
                         "users_user"."username", "users_work"."name", "users_user"."level_name"
-                    FROM "users_work"
-                    JOIN "users_user" USING (public_user_id, private_user_id);
+                    FROM "project"."users_work"
+                    JOIN "project"."users_user" USING (public_user_id, private_user_id);
                 """
 
                 cursor.execute(select_sql)
@@ -96,16 +83,21 @@ def main():
                         print('|{0:^12}|{1:^12}|{2:^13}|'.format(*row))
                         print(table_line)
 
+            if UPDATE_DB is True:
+
+                file_sql_code = open('./code.sql', 'r')
+                sql_code = file_sql_code.read()
+
                 cursor.execute(sql_code)
 
             connection.commit()
 
         finally:
 
-            if RUN_TESTS is True:
-                file_tests.close()
+            if UPDATE_DB is True:
 
-            file_sql_code.close()
+                file_sql_code.close()
+
             connection.close()
 
 
