@@ -5,6 +5,7 @@ from django.utils import timezone
 from django.db import models
 
 from utils.django.functions_db import Round, ArrayLength
+from utils.django.sql import NullsLastQuerySet
 
 
 class ArticleQuerySet(models.QuerySet):
@@ -150,3 +151,53 @@ class SubsectionQuerySet(models.QuerySet):
         """ """
 
         return self.annotate(content_length=models.functions.Length('content'))
+
+
+class UserArticleQuerySet(NullsLastQuerySet):
+    """
+
+    """
+
+    def users_with_count_articles(self):
+        """ """
+
+        return self.annotate(count_articles=models.Count('articles', distinct=True))
+
+    def users_with_total_rating_on_articles(self):
+        """Adding for each the article field with determined rating of an itself."""
+
+        return self.defer('articles__subsections').annotate(
+            total_rating_articles=Round(models.Avg('articles__marks__mark'))
+        )
+
+    def users_with_count_comments_on_articles(self):
+        """Adding for each the article field with determined count comments of an itself."""
+
+        return self.defer('articles__subsections').annotate(
+            count_comments_articles=models.Count('articles__comments', distinct=True)
+        )
+
+    def users_with_count_marks_on_articles(self):
+        """Adding for each the article field with determined count marks of an itself."""
+
+        return self.defer('articles__subsections').annotate(
+            count_marks_articles=models.Count('articles__marks', distinct=True)
+        )
+
+    def users_with_date_latest_article(self):
+        """Adding for each the article field with determined count marks of an itself."""
+
+        return self.defer('articles__subsections').annotate(
+            date_latest_article=models.Max('articles__created')
+        )
+
+    def users_with_count_articles_comments_marks_and_rating_and_date_latest_articles(self):
+        """Determining for each article: count tags, comments, links, marks, subsections and rating."""
+
+        self = self.users_with_count_articles()
+        self = self.users_with_total_rating_on_articles()
+        self = self.users_with_count_comments_on_articles()
+        self = self.users_with_count_marks_on_articles()
+        self = self.users_with_date_latest_article()
+
+        return self

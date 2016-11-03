@@ -149,8 +149,8 @@ class UserAdminModel(ModelAdmin):
                 'get_favorite_tags_of_questions',
                 'get_count_questions',
                 'get_total_rating_for_questions',
-                'get_count_opinions_on_questions',
                 'get_count_answers_on_questions',
+                'get_count_opinions_on_questions',
                 'get_count_good_opinions_about_questions',
                 'get_count_bad_opinions_about_questions',
                 'get_date_latest_question',
@@ -163,6 +163,9 @@ class UserAdminModel(ModelAdmin):
                 'get_favorite_tags_of_answers',
                 'get_count_answers',
                 'get_total_rating_for_answers',
+                'get_count_opinions_on_answers',
+                'get_count_good_opinions_about_answers',
+                'get_count_bad_opinions_about_answers',
                 'get_date_latest_answer',
             ),
         }),
@@ -170,9 +173,11 @@ class UserAdminModel(ModelAdmin):
             'title': _('Users and articles'),
             'fields': (
                 '__str__',
-                'get_favorite_tags_of_articles',
                 'get_count_articles',
-                'get_total_rating_for_articles',
+                'get_total_rating_of_articles',
+                'get_favorite_tags_of_articles',
+                'get_count_marks_of_articles',
+                'get_count_comments_of_articles',
                 'get_date_latest_article',
             ),
         }),
@@ -183,6 +188,10 @@ class UserAdminModel(ModelAdmin):
                 'get_favorite_tags_of_solutions',
                 'get_count_solutions',
                 'get_total_rating_for_solutions',
+                'get_count_comments_of_solutions',
+                'get_count_opinions_of_solutions',
+                'get_count_good_opinions_about_solutions',
+                'get_count_bad_opinions_about_solutions',
                 'get_date_latest_solution',
             ),
         }),
@@ -206,7 +215,6 @@ class UserAdminModel(ModelAdmin):
                 'get_count_comments_of_answers',
                 'get_count_comments_of_utilities',
                 'get_total_count_comments',
-                'get_rating_comments',
                 'get_date_latest_comment',
             ),
         }),
@@ -372,25 +380,28 @@ class UserAdminModel(ModelAdmin):
 
         elif list_display_name == 'users_polls':
 
-            qs = self.model.polls_manager.\
-                users_with_count_votes_and_date_latest_voting_and_active_voters_status()
+            qs = self.model.polls_manager\
+                .users_with_count_votes_and_date_latest_voting_and_active_voters_status()
 
         elif list_display_name == 'users_questions':
 
-            qs = self.model.questions_manager.\
-                users_with_count_questions_and_date_latest_question_and_users_with_rating_by_questions()
+            qs = self.model.questions_manager\
+                .users_with_count_questions_and_date_latest_question_and_users_with_rating_by_questions()
 
         elif list_display_name == 'users_answers':
 
-            qs = self.model.answers_manager.users_with_count_answers()
+            qs = self.model.answers_manager\
+                .users_with_count_answers_and_date_latest_answer_and_count_good_bad_total_opinions_about_answers()
 
         elif list_display_name == 'users_articles':
 
-            qs = super(UserAdminModel, self).get_queryset(request)
+            qs = self.model.articles_manager\
+                .users_with_count_articles_comments_marks_and_rating_and_date_latest_articles()
 
         elif list_display_name == 'users_solutions':
 
-            qs = super(UserAdminModel, self).get_queryset(request)
+            qs = self.model.solutions_manager\
+                .users_with_count_comments_solutions_bad_good_and_total_opinions_and_rating_and_date_latest_solutions()
 
         elif list_display_name == 'users_snippets':
 
@@ -427,7 +438,6 @@ class UserAdminModel(ModelAdmin):
         elif list_display_name == 'users_tags':
 
             qs = super(UserAdminModel, self).get_queryset(request)
-
 
         return qs
 

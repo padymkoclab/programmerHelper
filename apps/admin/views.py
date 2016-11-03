@@ -535,7 +535,7 @@ class ChangeListView(SiteModelAdminMixin, SiteAdminView):
 
         if not isinstance(all_list_display[0], (tuple, list)):
 
-            return (None, None, None, all_list_display)
+            return (None, None, all_list_display)
 
         all_list_display = collections.OrderedDict(all_list_display)
 

@@ -46,32 +46,32 @@ class Article(CommentsModelMixin, TagsModelMixin, TimeStampedModel):
         return upload_image(instance, filename)
 
     name = models.CharField(
-        _('Name'), max_length=200,
+        _('name'), max_length=200,
         validators=[MinLengthValidator(settings.MIN_LENGTH_FOR_NAME_OR_TITLE_OBJECT)],
     )
     slug = ConfiguredAutoSlugField(populate_from='name', unique_with=['user'])
-    quotation = models.CharField(_('Quotation'), max_length=200, validators=[MinLengthValidator(10)])
-    image = models.ImageField(_('Picture'), upload_to=upload_image, max_length=1000)
-    heading = models.TextField(_('Heading'), validators=[MinCountWordsValidator(10)])
-    conclusion = models.TextField(_('Conclusion'), validators=[MinCountWordsValidator(10)])
-    status = models.CharField(_('Status'), max_length=10, choices=STATUS_ARTICLE, default=DRAFT)
+    quotation = models.CharField(_('quotation'), max_length=200, validators=[MinLengthValidator(10)])
+    image = models.ImageField(_('image'), upload_to=upload_image, max_length=1000)
+    header = models.TextField(_('header'), validators=[MinCountWordsValidator(10)])
+    conclusion = models.TextField(_('conclusion'), validators=[MinCountWordsValidator(10)])
+    status = models.CharField(_('status'), max_length=10, choices=STATUS_ARTICLE, default=DRAFT)
     count_views = models.PositiveIntegerField(_('count views'), editable=False, default=0)
     user = models.ForeignKey(
-        settings.AUTH_USER_MODEL, verbose_name=_('User'),
+        settings.AUTH_USER_MODEL, verbose_name=_('user'),
         related_name='articles', on_delete=models.CASCADE,
     )
     source = models.URLField(
-        _('Source'), max_length=1000,
+        _('source'), max_length=1000,
         null=True, default='',
         help_text=_('If this article is taken from another a web resource, please point URL to there.')
     )
     tags = models.ManyToManyField(
-        Tag, related_name='articles', verbose_name=_('Tags'),
+        Tag, related_name='articles', verbose_name=_('tags'),
     )
     links = ArrayField(
         models.URLField(max_length=1000),
         size=MAX_COUNT_LINKS,
-        verbose_name=_('Links'),
+        verbose_name=_('links'),
         help_text=_('Useful links'),
     )
     comments = GenericRelation(Comment, related_query_name='articles')
@@ -117,7 +117,7 @@ class Article(CommentsModelMixin, TagsModelMixin, TimeStampedModel):
             total_content_length=models.Sum('content_length')
         )['total_content_length']
 
-        return sum([len(self.heading), len(self.conclusion), total_content_length])
+        return sum([len(self.header), len(self.conclusion), total_content_length])
     get_volume.short_description = _('Volume')
 
     def get_count_subsections(self):
@@ -166,18 +166,18 @@ class Subsection(TimeStampedModel):
     ERROR_MSG_UNIQUE_TOGETHER_ARTICLE_AND_TITLE = _('Subsection with this name already exists in this article.')
 
     article = models.ForeignKey(
-        'Article',
+        'article',
         related_name='subsections',
         on_delete=models.CASCADE,
         verbose_name=_('Article'),
     )
     name = models.CharField(
-        _('Name'),
+        _('name'),
         max_length=200,
         validators=[MinLengthValidator(settings.MIN_LENGTH_FOR_NAME_OR_TITLE_OBJECT)],
     )
     slug = ConfiguredAutoSlugField(populate_from='name', unique_with=['article'])
-    content = models.TextField(_('Content'), validators=[MinLengthValidator(100)])
+    content = models.TextField(_('content'), validators=[MinLengthValidator(100)])
 
     class Meta:
         verbose_name = _("Subsection")
@@ -207,14 +207,14 @@ class Mark(TimeStampedModel):
 
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
-        related_name='marks', verbose_name=_('User'),
+        related_name='marks', verbose_name=_('user'),
     )
     article = models.ForeignKey(
         Article, verbose_name=_('article'),
         on_delete=models.CASCADE, related_name='marks'
     )
     mark = models.SmallIntegerField(
-        _('Mark'), default=MIN_MARK,
+        _('mark'), default=MIN_MARK,
         validators=[MinValueValidator(MIN_MARK), MaxValueValidator(MAX_MARK)]
     )
 

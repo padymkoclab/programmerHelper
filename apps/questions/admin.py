@@ -6,10 +6,13 @@ from django.contrib import admin
 from utils.django.datetime_utils import convert_date_to_django_date_format
 from utils.django.listfilters import IsNewSimpleListFilter
 
-# from apps.core.admin import AppAdmin, AdminSite
-from apps.comments.admin import CommentGenericInline
-from apps.opinions.admin import OpinionGenericInline
-from apps.opinions.admin_mixins import OpinionsAdminMixin
+from apps.admin.admin import ModelAdmin
+from apps.admin.app import AppAdmin
+from apps.admin.utils import register_app, register_model
+
+# from apps.comments.admin import CommentGenericInline
+# from apps.opinions.admin import OpinionGenericInline
+# from apps.opinions.admin_mixins import OpinionsAdminMixin
 
 from .forms import QuestionAdminModelForm, AnswerAdminModelForm, AnswerInlineAdminModelForm
 from .models import Question, Answer
@@ -17,10 +20,10 @@ from .listfilters import HasAcceptedAnswerSimpleListFilter, LatestActivitySimple
 from .apps import QuestionsConfig
 
 
-# @AdminSite.register_app_admin_class
-class QuestionsAppAdmin():
+@register_app
+class QuestionsAppAdmin(AppAdmin):
 
-    label = QuestionsConfig.label
+    app_config_class = QuestionsConfig
 
     def get_context_for_tables_of_statistics(self):
 
@@ -50,11 +53,6 @@ class QuestionsAppAdmin():
                     (_('Average count opinions'), Answer.opinions_manager.get_avg_count_opinions()),
                     (_('Count critics'), Answer.opinions_manager.get_count_critics()),
                     (_('Count supporters'), Answer.opinions_manager.get_count_supporters()),
-                ),
-            ),
-            (
-                _('Flavours to questions'), (
-                    (_('Count flavours'), Question.flavours_manager.get_count_flavours()),
                 ),
             ),
             (
@@ -162,8 +160,9 @@ class AnswerInline(admin.StackedInline):
     )
 
 
-# @admin.register(Question, site=AdminSite)
-class QuestionAdmin(OpinionsAdminMixin, admin.ModelAdmin):
+@register_model(Question)
+# class QuestionAdmin(OpinionsAdminMixin, admin.ModelAdmin):
+class QuestionAdmin(ModelAdmin):
     '''
     Admin View for Question
     '''
@@ -177,18 +176,17 @@ class QuestionAdmin(OpinionsAdminMixin, admin.ModelAdmin):
         'get_rating',
         'get_count_opinions',
         'get_count_tags',
-        'get_count_flavours',
         'is_new',
         'get_date_latest_activity',
         'created',
     )
     list_filter = (
-        ('user', admin.RelatedOnlyFieldListFilter),
-        'status',
-        HasAcceptedAnswerSimpleListFilter,
-        IsNewSimpleListFilter,
-        LatestActivitySimpleListFilter,
-        'created',
+        # ('user', admin.RelatedOnlyFieldListFilter),
+        # 'status',
+        # HasAcceptedAnswerSimpleListFilter,
+        # IsNewSimpleListFilter,
+        # LatestActivitySimpleListFilter,
+        # 'created',
     )
     filter_horizontal = ('tags', )
     form = QuestionAdminModelForm
@@ -203,7 +201,6 @@ class QuestionAdmin(OpinionsAdminMixin, admin.ModelAdmin):
         'get_count_supporters',
         'get_listing_supporters_with_admin_urls',
         'get_count_tags',
-        'get_count_flavours',
         'get_count_like_flavours',
         'get_count_dislike_flavours',
         'get_date_latest_activity_for_admin_readonly',
@@ -211,7 +208,7 @@ class QuestionAdmin(OpinionsAdminMixin, admin.ModelAdmin):
         'updated',
     )
 
-    def get_queryset(self, request):
+    def get_queryset(self, request, activated_list_display_name=None):
         qs = super(QuestionAdmin, self).get_queryset(request)
         qs = qs.queryset_with_all_additional_fields()
         return qs
@@ -254,7 +251,6 @@ class QuestionAdmin(OpinionsAdminMixin, admin.ModelAdmin):
                             'get_count_supporters',
                             'get_listing_supporters_with_admin_urls',
                             'get_count_tags',
-                            'get_count_flavours',
                             'get_count_like_flavours',
                             'get_count_dislike_flavours',
                             'get_date_latest_activity_for_admin_readonly',
@@ -306,8 +302,9 @@ class QuestionAdmin(OpinionsAdminMixin, admin.ModelAdmin):
     get_date_latest_activity_for_admin_readonly.short_description = _('Date latest activity')
 
 
-# @admin.register(Answer, site=AdminSite)
-class AnswerAdmin(OpinionsAdminMixin, admin.ModelAdmin):
+@register_model(Answer)
+# class AnswerAdmin(OpinionsAdminMixin, admin.ModelAdmin):
+class AnswerAdmin(ModelAdmin):
     '''
     Admin View for Answer
     '''
