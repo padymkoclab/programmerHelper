@@ -10,11 +10,10 @@ body{
 
 #sidebar
 {
-    position: fixed;
+    position: absolute;
     z-index: 100;
 
     width: 250px;
-    height: 100%;
 
     -webkit-transition: width .5s ease;
        -moz-transition: width .5s ease;
@@ -24,6 +23,8 @@ body{
     background: #2A3F54;
     overflow-y: hidden;
     color: rgb(255, 255, 255);
+    margin-bottom: -100%;
+    /*padding-bottom: 100%;*/
 }
 
 #wrapper.toggle_sidebar #sidebar
@@ -36,6 +37,8 @@ body{
     position: relative;
     padding-left: 250px;
     padding-right: 0;
+    margin-bottom: -100%;
+    /*padding-bottom: 100%;*/
 
     width: 100%;
     height: 100%;
@@ -220,7 +223,7 @@ li.nested_list_active_page a{
 }
 
 #sidebar_footer {
-  position: absolute;
+  position: relative;
   bottom: 0;
   width: 100%;
   background: #2A3F54;
@@ -262,4 +265,8 @@ li.nested_list_active_page a{
     padding: 15px;
     /* background-color: #fff; */
     /* border-radius: 5px; */
+}
+
+#sidebar_apps > ul{
+  /*margin-bottom: 0;*/
 }

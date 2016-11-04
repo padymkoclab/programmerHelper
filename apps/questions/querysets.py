@@ -120,6 +120,8 @@ class UserQuestionQuerySet(NullsLastQuerySet):
 
     def users_with_total_rating_by_questions(self):
 
+        return self
+
         raise NotImplementedError
 
         from .models import Question
@@ -152,13 +154,13 @@ class UserQuestionQuerySet(NullsLastQuerySet):
             select_params=[ContentType.objects.get_for_model(Question).pk]
         )
 
-    def users_with_count_good_opinions_about_questions(self):
+    def users_with_count_good_opinions_on_questions(self):
 
         from .models import Question
 
         return self.extra(
             select={
-                'count_good_opinions':
+                'count_good_opinions_on_questions':
                     """
                     SELECT
                         COUNT(
@@ -167,11 +169,11 @@ class UserQuestionQuerySet(NullsLastQuerySet):
                             END
                         )
                     FROM {question_table}
-                    LEFT OUTER JOIN {opinion_table}
-                        ON ({opinion_table}."object_id" = {question_table}."id"
+                    LEFT OUTER JOIN {opinion_table} ON
+                        ({opinion_table}."object_id" = {question_table}."id"
                             AND ({opinion_table}."content_type_id" = %s)
+                        )
                     WHERE {user_table}."id" = {question_table}.user_id
-                    )
                     """.format(
                         user_table=self.model._meta.db_table,
                         question_table=Question._meta.db_table,
@@ -181,15 +183,14 @@ class UserQuestionQuerySet(NullsLastQuerySet):
             select_params=[ContentType.objects.get_for_model(Question).pk]
         )
 
-    def users_with_count_bad_opinions_about_questions(self):
+    def users_with_count_bad_opinions_on_questions(self):
 
         from .models import Question
 
         return self.extra(
             select={
-                'count_bad_opinions':
+                'count_bad_opinions_on_questions':
                     """
-                    (
                     SELECT
                         COUNT(
                             CASE
@@ -197,12 +198,11 @@ class UserQuestionQuerySet(NullsLastQuerySet):
                             END
                         )
                     FROM {question_table}
-                    LEFT OUTER JOIN {opinion_table}
-                        ON ({opinion_table}."object_id" = {question_table}."id"
+                    LEFT OUTER JOIN {opinion_table} ON
+                        ({opinion_table}."object_id" = {question_table}."id"
                             AND ({opinion_table}."content_type_id" = %s)
                         )
                     WHERE {user_table}."id" = {question_table}.user_id
-                    )
                     """.format(
                         user_table=self.model._meta.db_table,
                         question_table=Question._meta.db_table,
@@ -216,11 +216,11 @@ class UserQuestionQuerySet(NullsLastQuerySet):
 
         self = self.users_with_count_questions()
         self = self.users_with_date_latest_question()
-        self = self.users_with_total_rating_by_questions()
+        # self = self.users_with_total_rating_by_questions()
         self = self.users_with_count_answers_on_questions()
         self = self.users_with_count_opinions_on_questions()
-        self = self.users_with_count_good_opinions_about_questions()
-        self = self.users_with_count_bad_opinions_about_questions()
+        self = self.users_with_count_good_opinions_on_questions()
+        self = self.users_with_count_bad_opinions_on_questions()
 
         return self
 
@@ -234,11 +234,11 @@ class UserAnswerQuerySet(models.QuerySet):
 
         return self.annotate(count_answers=models.Count('answers', distinct=True))
 
-    def users_with_count_opinions_about_answers(self):
+    def users_with_count_opinions_on_answers(self):
 
         return self.annotate(count_opinions=models.Count('answers__opinions', distinct=True))
 
-    def users_with_count_good_opinions_about_answers(self):
+    def users_with_count_good_opinions_on_answers(self):
 
         from .models import Answer
 
@@ -266,7 +266,7 @@ class UserAnswerQuerySet(models.QuerySet):
             select_params=[ContentType.objects.get_for_model(Answer).pk]
         )
 
-    def users_with_count_bad_opinions_about_answers(self):
+    def users_with_count_bad_opinions_on_answers(self):
 
         from .models import Answer
 
@@ -298,12 +298,12 @@ class UserAnswerQuerySet(models.QuerySet):
 
         return self.annotate(date_latest_answer=models.Max('answers__created'))
 
-    def users_with_count_answers_and_date_latest_answer_and_count_good_bad_total_opinions_about_answers(self):
+    def users_with_count_answers_and_date_latest_answer_and_count_good_bad_total_opinions_on_answers(self):
 
         self = self.users_with_count_answers()
-        self = self.users_with_count_opinions_about_answers()
-        self = self.users_with_count_good_opinions_about_answers()
-        self = self.users_with_count_bad_opinions_about_answers()
+        self = self.users_with_count_opinions_on_answers()
+        self = self.users_with_count_good_opinions_on_answers()
+        self = self.users_with_count_bad_opinions_on_answers()
         self = self.users_with_date_latest_question()
 
         return self

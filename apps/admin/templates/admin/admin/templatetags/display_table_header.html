@@ -4,32 +4,52 @@
     <th class="checkbox_column">
       <input type="checkbox">
     </th>
+
     {% for header in headers %}
+
       <th class="{% if header.is_sortable is True %}is_sortable{% endif %}">
+          <table class="inner_table_header_column">
+            <tbody>
+              <tr>
 
-          {% if header.is_sortable is True %}
+                {% if header.is_sortable is True %}
 
-            <input type="hidden" name="sortable_field" value="{{ header.sortable_data }}">
+                  <input type="hidden" name="sortable_field" value="{{ header.sortable_data }}">
 
-            {% if header.position is not None and header.order is not None %}
-              {% if header.order == 'asc' %}
-                <div class="text-success header_column_sortable_icon">{{ header.position }}<i class="fa fa-fw fa-sort-asc"></i></div>
-              {% else %}
-                <div class="text-danger header_column_sortable_icon">{{ header.position }}<i class="fa fa-fw fa-sort-desc"></i></div>
-              {% endif %}
-            {% else %}
-              <div class="header_column_sortable_icon"><i class="fa fa-fw fa-sort"></i></div>
-            {% endif %}
-          {% endif %}
+                  {% if header.position is not None and header.order is not None %}
 
-          <div class="header_column_display_name">{{ header.display_name|capfirst }}</div>
+                    <td class="text-{% if header.order == 'asc' %}success{% else %}danger{% endif %} header_column_sortable_icon">
+                      <table>
+                        <tbody>
+                          <tr>
+                            <td>{{ header.position }}</td>
+                            <td class="fa fa-fw fa-sort-{% if header.order == 'asc' %}asc{% else %}desc{% endif %}"></td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </td>
 
-          {% if header.position is not None and header.order is not None %}
-            <div class="close discard_ordering_column" aria-label="Discard ordering column"><span aria-hidden="true">&times;</span></div>
-          {% endif %}
+                  {% else %}
 
+                    <td class="header_column_sortable_icon"><i class="fa fa-fw fa-sort"></i></td>
+
+                  {% endif %}
+
+                {% endif %}
+
+                <td class="header_column_display_name {% if header.is_sortable is True %}is_sortable{% endif %}">{{ header.display_name|capfirst }}</td>
+
+                {% if header.position is not None and header.order is not None %}
+                  <td class="close discard_ordering_column" aria-label="Discard ordering column"><span aria-hidden="true">&times;</span></td>
+                {% endif %}
+
+              </tr>
+            </tbody>
+          </table>
       </th>
+
     {% endfor %}
+
 {% else %}
   <th>&nbsp;</th>
 {% endif %}

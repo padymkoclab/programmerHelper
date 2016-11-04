@@ -82,7 +82,7 @@ jQuery(function(){
 
    /*
    */
-   $('div.discard_ordering_column').bind({
+   $('td.discard_ordering_column').bind({
     click: function(e){
 
       e.stopPropagation();

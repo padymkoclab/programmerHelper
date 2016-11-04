@@ -2,6 +2,8 @@
 from django.db import models
 from django.contrib.contenttypes.models import ContentType
 
+from utils.django.sql import NullsLastQuerySet
+
 from apps.opinions.utils import annotate_queryset_for_determinate_rating
 from apps.opinions.models import Opinion
 
@@ -30,7 +32,7 @@ class SolutionQuerySet(models.QuerySet):
         return annotate_queryset_for_determinate_rating(self)
 
 
-class UserSolutionQuerySet(models.QuerySet):
+class UserSolutionQuerySet(NullsLastQuerySet):
     """
 
     """

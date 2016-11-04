@@ -51,17 +51,28 @@ table thead th.is_sortable:hover{
     text-align: right;
 }
 
+table.inner_table_header_column{
+    width: 100%;
 
-.header_column_sortable_icon{
-    width: 30px;
+}
+
+td.header_column_display_name{
     text-align: center;
-    float: left;
 }
 
 
-.header_column_display_name{
-    overflow: hidden;
+td.header_column_sortable_icon{
     text-align: center;
+    vertical-align: middle;
+    display: table-cell;
+    padding-right: 5px;
+}
+
+td.discard_ordering_column{
+    float: none;
+    vertical-align: middle;
+    display: table-cell;
+    padding: 0 0 0 4px;
 }
 
 
