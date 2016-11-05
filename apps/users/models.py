@@ -11,6 +11,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.postgres.fields import ArrayField
 from django import template
 from django.utils.html import format_html
+# from django.template.defaultfilters import truncatechars
 from django.core.validators import MinLengthValidator
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
@@ -48,7 +49,11 @@ from apps.polls.querysets import UserPollQuerySet
 from apps.solutions.querysets import UserSolutionQuerySet
 from apps.visits.querysets import UserAttendanceQuerySet
 from apps.questions.querysets import UserQuestionQuerySet, UserAnswerQuerySet
-from apps.articles.querysets import UserArticleQuerySet
+from apps.articles.querysets import UserArticleQuerySet, UserMarkQuerySet
+from apps.snippets.querysets import UserSnippetQuerySet
+from apps.comments.querysets import UserCommentQuerySet
+from apps.library.querysets import UserReplyQuerySet
+from apps.opinions.querysets import UserOpinionQuerySet
 
 from .managers import UserManager, LevelManager
 from .exceptions import ProtectDeleteUser
@@ -198,6 +203,11 @@ class User(AbstractBaseUser, PermissionsMixin):
     answers_manager = UserAnswerQuerySet().as_manager()
     articles_manager = UserArticleQuerySet().as_manager()
     solutions_manager = UserSolutionQuerySet().as_manager()
+    snippets_manager = UserSnippetQuerySet().as_manager()
+    comments_manager = UserCommentQuerySet().as_manager()
+    replies_manager = UserReplyQuerySet().as_manager()
+    opinions_manager = UserOpinionQuerySet().as_manager()
+    marks_manager = UserMarkQuerySet().as_manager()
 
     class Meta:
         verbose_name = _("User")
@@ -394,6 +404,51 @@ class User(AbstractBaseUser, PermissionsMixin):
     # Start comments methods
     # ------------------------------------------------------
 
+    def get_count_comments_on_articles_other_users(self):
+
+        if hasattr(self, 'count_comments_on_articles_other_users'):
+            return self.count_comments_on_articles_other_users
+
+        return self.comments.filter(content_type=ContentType.objects.get_for_model(Article)).count()
+    get_count_comments_on_articles_other_users.short_description = _('Count comments on articles')
+    get_count_comments_on_articles_other_users.admin_order_field = 'count_comments_on_articles_other_users'
+
+    def get_count_comments_on_solutions_other_users(self):
+
+        if hasattr(self, 'count_comments_on_solutions_other_users'):
+            return self.count_comments_on_solutions_other_users
+
+        return self.comments.filter(content_type=ContentType.objects.get_for_model(Solution)).count()
+    get_count_comments_on_solutions_other_users.short_description = _('Count comments on solutions')
+    get_count_comments_on_solutions_other_users.admin_order_field = 'count_comments_on_solutions_other_users'
+
+    def get_count_comments_on_snippets_other_users(self):
+
+        if hasattr(self, 'count_comments_on_snippets_other_users'):
+            return self.count_comments_on_snippets_other_users
+
+        return self.comments.filter(content_type=ContentType.objects.get_for_model(Snippet)).count()
+    get_count_comments_on_snippets_other_users.short_description = _('Count comments on snippets')
+    get_count_comments_on_snippets_other_users.admin_order_field = 'count_comments_on_snippets_other_users'
+
+    def get_count_comments_on_answers_other_users(self):
+
+        if hasattr(self, 'count_comments_on_answers_other_users'):
+            return self.count_comments_on_answers_other_users
+
+        return self.comments.filter(content_type=ContentType.objects.get_for_model(Answer)).count()
+    get_count_comments_on_answers_other_users.short_description = _('Count comments on answers')
+    get_count_comments_on_answers_other_users.admin_order_field = 'count_comments_on_answers_other_users'
+
+    def get_count_comments_on_utilities(self):
+
+        if hasattr(self, 'count_comments_on_utilities'):
+            return self.count_comments_on_utilities
+
+        return self.comments.filter(content_type=ContentType.objects.get_for_model(Utility)).count()
+    get_count_comments_on_utilities.short_description = _('Count comments on utilities')
+    get_count_comments_on_utilities.admin_order_field = 'count_comments_on_utilities'
+
     def get_total_count_comments(self):
         """ """
 
@@ -407,13 +462,12 @@ class User(AbstractBaseUser, PermissionsMixin):
     def get_date_latest_comment(self):
         """ """
 
-        # if hasattr(self, 'count_comments'):
-        #     return self.count_comments
+        if hasattr(self, 'date_latest_comment'):
+            return self.date_latest_comment
 
-        try:
-            return self.comments.latest().created
-        except self.comments.model.DoesNotExist:
-            return
+        return self.comments.aggregate(
+            date_latest_comment=models.Max('created')
+        )['date_latest_comment'], self.date_latest_comment
     get_date_latest_comment.short_description = _('Latest comment')
     get_date_latest_comment.admin_order_field = 'date_latest_comment'
 
@@ -424,6 +478,51 @@ class User(AbstractBaseUser, PermissionsMixin):
     # ------------------------------------------------------
     # Start opinions methods
     # ------------------------------------------------------
+
+    def get_count_opinions_on_questions_other_users(self):
+
+        if hasattr(self, 'count_opinions_on_questions_other_users'):
+            return self.count_opinions_on_questions_other_users
+
+        return self.opinions.filter(content_type=ContentType.objects.get_for_model(Question)).count()
+    get_count_opinions_on_questions_other_users.short_description = _('Count opinions on questions')
+    get_count_opinions_on_questions_other_users.admin_order_field = 'count_opinions_on_questions_other_users'
+
+    def get_count_opinions_on_solutions_other_users(self):
+
+        if hasattr(self, 'count_opinions_on_solutions_other_users'):
+            return self.count_opinions_on_solutions_other_users
+
+        return self.opinions.filter(content_type=ContentType.objects.get_for_model(Solution)).count()
+    get_count_opinions_on_solutions_other_users.short_description = _('Count opinions on solutions')
+    get_count_opinions_on_solutions_other_users.admin_order_field = 'count_opinions_on_solutions_other_users'
+
+    def get_count_opinions_on_snippets_other_users(self):
+
+        if hasattr(self, 'count_opinions_on_snippets_other_users'):
+            return self.count_opinions_on_snippets_other_users
+
+        return self.opinions.filter(content_type=ContentType.objects.get_for_model(Snippet)).count()
+    get_count_opinions_on_snippets_other_users.short_description = _('Count opinions on snippets')
+    get_count_opinions_on_snippets_other_users.admin_order_field = 'count_opinions_on_snippets_other_users'
+
+    def get_count_opinions_on_answers_other_users(self):
+
+        if hasattr(self, 'count_opinions_on_answers_other_users'):
+            return self.count_opinions_on_answers_other_users
+
+        return self.opinions.filter(content_type=ContentType.objects.get_for_model(Answer)).count()
+    get_count_opinions_on_answers_other_users.short_description = _('Count opinions on answers')
+    get_count_opinions_on_answers_other_users.admin_order_field = 'count_opinions_on_answers_other_users'
+
+    def get_count_opinions_on_utilities(self):
+
+        if hasattr(self, 'count_opinions_on_utilities'):
+            return self.count_opinions_on_utilities
+
+        return self.opinions.filter(content_type=ContentType.objects.get_for_model(Utility)).count()
+    get_count_opinions_on_utilities.short_description = _('Count opinions on utilities')
+    get_count_opinions_on_utilities.admin_order_field = 'count_opinions_on_utilities'
 
     def get_total_count_opinions(self):
         """ """
@@ -438,10 +537,12 @@ class User(AbstractBaseUser, PermissionsMixin):
     def get_date_latest_opinion(self):
         """ """
 
-        try:
-            return self.opinions.latest().created
-        except self.opinions.model.DoesNotExist:
-            return
+        if hasattr(self, 'date_latest_opinion'):
+            return self.date_latest_opinion
+
+        return self.opinions.aggregate(
+            date_latest_opinion=models.Max('created')
+        )['date_latest_opinion']
     get_date_latest_opinion.admin_order_field = 'date_latest_opinion'
     get_date_latest_opinion.short_description = _('Latest opinion')
 
@@ -475,14 +576,14 @@ class User(AbstractBaseUser, PermissionsMixin):
     def get_total_rating_on_articles(self):
         """ """
 
-        # if hasattr(self, 'total_rating_articles'):
-        #     return self.total_rating_articles
+        if hasattr(self, 'total_rating_articles'):
+            return self.total_rating_articles
 
         return self.articles.annotate(
             rating=models.Avg('marks__mark')
         ).aggregate(
             total_rating_articles=Round(models.Avg('rating'))
-        )['total_rating_articles'], self.total_rating_articles
+        )['total_rating_articles']
     get_total_rating_on_articles.admin_order_field = 'total_rating_articles'
     get_total_rating_on_articles.short_description = _('Total rating')
 
@@ -492,10 +593,9 @@ class User(AbstractBaseUser, PermissionsMixin):
         if hasattr(self, 'date_latest_article'):
             return self.date_latest_article
 
-        try:
-            return self.articles.latest().created
-        except self.articles.model.DoesNotExist:
-            return
+        return self.articles.aggregate(
+            date_latest_article=models.Max('created')
+        )['date_latest_article']
     get_date_latest_article.admin_order_field = 'date_latest_article'
     get_date_latest_article.short_description = _('Latest article')
 
@@ -508,7 +608,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     get_count_marks_on_articles.short_description = _('Count marks')
     get_count_marks_on_articles.admin_order_field = 'count_marks_articles'
 
-    def get_count_comments_on_articles(self):
+    def get_count_comments_on_its_articles(self):
         """ """
 
         if hasattr(self, 'count_comments_articles'):
@@ -516,9 +616,9 @@ class User(AbstractBaseUser, PermissionsMixin):
 
         return self.articles.aggregate(
             count_comments_articles=models.Count('comments', distinct=True)
-        )['count_comments_articles']
-    get_count_comments_on_articles.short_description = _('Count comments')
-    get_count_comments_on_articles.admin_order_field = 'count_comments_articles'
+        )['count_comments_articles'], self.count_comments_articles
+    get_count_comments_on_its_articles.short_description = _('Count comments on articles')
+    get_count_comments_on_its_articles.admin_order_field = 'count_comments_articles'
 
     # ------------------------------------------------------
     # End articles methods
@@ -564,10 +664,9 @@ class User(AbstractBaseUser, PermissionsMixin):
         if hasattr(self, 'date_latest_question'):
             return self.date_latest_question
 
-        try:
-            return self.questions.latest().created
-        except self.questions.model.DoesNotExist:
-            return
+        return self.questions.aggregate(
+            date_latest_question=models.Max('created')
+        )['date_latest_question']
     get_date_latest_question.admin_order_field = 'date_latest_question'
     get_date_latest_question.short_description = _('Latest question')
 
@@ -585,6 +684,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
         return questions.aggregate(total_rating=Round(models.Avg('rating')))['total_rating']
     get_total_rating_on_questions.short_description = _('Total rating')
+    get_total_rating_on_questions.admin_order_field = 'total_rating_questions'
 
     def get_count_opinions_on_questions(self):
 
@@ -643,47 +743,73 @@ class User(AbstractBaseUser, PermissionsMixin):
     def get_total_rating_on_snippets(self):
         """ """
 
+        if hasattr(self, 'total_rating_snippets'):
+            return self.total_rating_snippets
+
         snippets = self.snippets.annotate(rating=models.Sum(models.Case(
             models.When(opinions__is_useful=True, then=1),
             models.When(opinions__is_useful=False, then=-1),
             output_field=models.IntegerField()
         )))
 
-        total_rating = snippets.aggregate(total_rating=Round(models.Avg('rating')))['total_rating']
-        return total_rating
-    get_total_rating_on_snippets.admin_order_field = 'total_rating'
+        return snippets.aggregate(
+            total_rating_snippets=Round(models.Avg('rating'))
+        )['total_rating_snippets']
+    get_total_rating_on_snippets.admin_order_field = 'total_rating_snippets'
     get_total_rating_on_snippets.short_description = _('Total rating')
 
     def get_date_latest_snippet(self):
         """ """
 
-        # if hasattr(self, 'count_snippets'):
-        #     return self.count_snippets
+        if hasattr(self, 'date_latest_snippet'):
+            return self.date_latest_snippet
 
-        try:
-            return self.snippets.latest().created
-        except self.snippets.model.DoesNotExist:
-            return
+        return self.snippets.aggregate(
+            date_latest_snippet=models.Max('created')
+        )['date_latest_snippet']
     get_date_latest_snippet.admin_order_field = 'date_latest_snippet'
     get_date_latest_snippet.short_description = _('Latest snippet')
 
-    def get_count_comments_on_snippets(self):
+    def get_count_comments_on_its_snippets(self):
         """ """
 
         if hasattr(self, 'count_comments_snippets'):
             return self.count_comments_snippets
 
-        ct_model = ContentType.objects.get_for_model(Snippet)
-        return self.comments.filter(content_type=ct_model).count()
-    get_count_comments_on_snippets.short_description = _('Count comments of snippets')
-    get_count_comments_on_snippets.admin_order_field = 'count_comments_snippets'
+        return self.snippets.aggregate(
+            count_comments_snippets=models.Count('comments')
+        )['count_comments_snippets'], self.count_comments_snippets
+    get_count_comments_on_its_snippets.short_description = _('Count comments on snippets')
+    get_count_comments_on_its_snippets.admin_order_field = 'count_comments_snippets'
 
     def get_count_opinions_on_snippets(self):
 
-        ct_model = ContentType.objects.get_for_model(Snippet)
-        return self.opinions.filter(content_type=ct_model).count()
-    get_count_opinions_on_snippets.short_description = _('Count opinions of snippets')
+        if hasattr(self, 'count_opinions_snippets'):
+            return self.count_opinions_snippets
+
+        return self.snippets.aggregate(
+            count_opinions_snippets=models.Count('opinions')
+        )['count_opinions_snippets']
+    get_count_opinions_on_snippets.short_description = _('Count opinions')
     get_count_opinions_on_snippets.admin_order_field = 'count_opinions_snippets'
+
+    def get_count_good_opinions_on_snippets(self):
+
+        if hasattr(self, 'count_good_opinions_snippets'):
+            return self.count_good_opinions_snippets
+
+        return self.snippets.filter(opinions__is_useful=True).count()
+    get_count_good_opinions_on_snippets.short_description = _('count good opinions')
+    get_count_good_opinions_on_snippets.admin_order_field = 'count_good_opinions_snippets'
+
+    def get_count_bad_opinions_on_snippets(self):
+
+        if hasattr(self, 'count_bad_opinions_snippets'):
+            return self.count_bad_opinions_snippets
+
+        return self.snippets.filter(opinions__is_useful=False).count()
+    get_count_bad_opinions_on_snippets.short_description = _('count bad opinions')
+    get_count_bad_opinions_on_snippets.admin_order_field = 'count_bad_opinions_snippets'
 
     # ------------------------------------------------------
     # End snippets methods
@@ -715,45 +841,52 @@ class User(AbstractBaseUser, PermissionsMixin):
     def get_total_rating_on_solutions(self):
         """ """
 
+        if hasattr(self, 'total_rating_solutions'):
+            return self.total_rating_solutions
+
         solutions = self.solutions.annotate(rating=models.Sum(models.Case(
             models.When(opinions__is_useful=True, then=1),
             models.When(opinions__is_useful=False, then=-1),
             output_field=models.IntegerField()
         )))
 
-        total_rating = solutions.aggregate(total_rating=Round(models.Avg('rating')))['total_rating']
-        return total_rating
-    # get_total_rating_on_solutions.admin_order_field = 'total_rating'
+        return solutions.aggregate(total_rating=Round(models.Avg('rating')))['total_rating']
+    get_total_rating_on_solutions.admin_order_field = 'total_rating_solutions'
     get_total_rating_on_solutions.short_description = _('Total rating')
 
     def get_date_latest_solution(self):
         """ """
 
-        # if hasattr(self, 'count_solutions'):
-        #     return self.count_solutions
+        if hasattr(self, 'date_latest_solution'):
+            return self.date_latest_solution
 
-        try:
-            return self.solutions.latest().created
-        except self.solutions.model.DoesNotExist:
-            return
+        return self.solutions.aggregate(
+            date_latest_solution=models.Max('created')
+        )['date_latest_solution']
     get_date_latest_solution.admin_order_field = 'date_latest_solution'
     get_date_latest_solution.short_description = _('Latest solution')
 
-    def get_count_comments_on_solutions(self):
+    def get_count_comments_on_its_solutions(self):
         """ """
 
         if hasattr(self, 'count_comments_solutions'):
             return self.count_comments_solutions
 
-        ct_model = ContentType.objects.get_for_model(Solution)
-        return self.comments.filter(content_type=ct_model).count()
-    get_count_comments_on_solutions.short_description = _('Count comments of solutions')
-    get_count_comments_on_solutions.admin_order_field = 'count_comments_solutions'
+        return self.solutions.aggregate(
+            count_comments_solutions=models.Count('comments')
+        )['count_comments_solutions'], self.count_comments_solutions
+    get_count_comments_on_its_solutions.short_description = _('Count comments on solutions')
+    get_count_comments_on_its_solutions.admin_order_field = 'count_comments_solutions'
 
     def get_count_opinions_on_solutions(self):
 
-        return self.solutions.aggregate(count_opinions=models.Count('opinions'))['count_opinions']
-    get_count_opinions_on_solutions.short_description = _('Count opinions of solutions')
+        if hasattr(self, 'count_opinions_solutions'):
+            return self.count_opinions_solutions
+
+        return self.solutions.aggregate(
+            count_opinions_solutions=models.Count('opinions')
+        )['count_opinions_solutions']
+    get_count_opinions_on_solutions.short_description = _('Count opinions')
     get_count_opinions_on_solutions.admin_order_field = 'count_opinions_solutions'
 
     def get_count_good_opinions_on_solutions(self):
@@ -761,18 +894,18 @@ class User(AbstractBaseUser, PermissionsMixin):
         if hasattr(self, 'count_good_opinions'):
             return self.count_good_opinions
 
-        return
+        return self.solutions.filter(opinions__is_useful=True).count()
     get_count_good_opinions_on_solutions.admin_order_field = 'count_good_opinions'
-    get_count_good_opinions_on_solutions.short_description = _('Count good opinions about solutions')
+    get_count_good_opinions_on_solutions.short_description = _('Count good opinions')
 
     def get_count_bad_opinions_on_solutions(self):
 
         if hasattr(self, 'count_bad_opinions'):
             return self.count_bad_opinions
 
-        return
+        return self.solutions.filter(opinions__is_useful=False).count()
     get_count_bad_opinions_on_solutions.admin_order_field = 'count_bad_opinions'
-    get_count_bad_opinions_on_solutions.short_description = _('Count bad opinions about solutions')
+    get_count_bad_opinions_on_solutions.short_description = _('Count bad opinions')
 
     # ------------------------------------------------------
     # End solutions methods
@@ -807,14 +940,16 @@ class User(AbstractBaseUser, PermissionsMixin):
         if hasattr(self, 'date_latest_answer'):
             return self.date_latest_answer
 
-        try:
-            return self.answers.latest().created
-        except self.answers.model.DoesNotExist:
-            return
+        return self.answers.aggregate(
+            date_latest_answer=models.Max('created')
+        )['date_latest_answer']
     get_date_latest_answer.admin_order_field = 'date_latest_answer'
     get_date_latest_answer.short_description = _('Latest answer')
 
     def get_total_rating_on_answers(self):
+
+        if hasattr(self, 'total_rating_answers'):
+            return self.total_rating_answers
 
         answers = self.answers.annotate(rating=models.Sum(models.Case(
             models.When(opinions__is_useful=True, then=1),
@@ -822,10 +957,9 @@ class User(AbstractBaseUser, PermissionsMixin):
             output_field=models.IntegerField()
         )))
 
-        total_rating = answers.aggregate(total_rating=Round(models.Avg('rating')))['total_rating']
-        return total_rating
+        return answers.aggregate(total_rating=Round(models.Avg('rating')))['total_rating']
     get_total_rating_on_answers.short_description = _('Total rating')
-    # get_total_rating_on_answers.admin_order_field = 'total_rating'
+    get_total_rating_on_answers.admin_order_field = 'total_rating_answers'
 
     def get_count_good_opinions_on_answers(self):
 
@@ -854,49 +988,46 @@ class User(AbstractBaseUser, PermissionsMixin):
     get_count_opinions_on_answers.admin_order_field = 'count_opinions'
     get_count_opinions_on_answers.short_description = _('Count opinions')
 
-    def get_count_comments_on_answers(self):
+    def get_count_comments_on_its_answers(self):
         """ """
 
         if hasattr(self, 'count_comments_answers'):
             return self.count_comments_answers
 
         return self.answers.aggregate(count_comments=models.Count('comments'))['count_comments']
-    get_count_comments_on_answers.short_description = _('Count comments of answers')
-    get_count_comments_on_answers.admin_order_field = 'count_comments_answers'
+    get_count_comments_on_its_answers.short_description = _('Count comments on answers')
+    get_count_comments_on_its_answers.admin_order_field = 'count_comments_answers'
 
     # ------------------------------------------------------
     # End answers methods
     # ------------------------------------------------------
 
-    # ------------------------------------------------------
-    # Start utilities methods
-    # ------------------------------------------------------
+    def get_total_count_marks(self):
 
-    def get_count_comments_on_utilities(self):
-        """ """
+        if hasattr(self, 'total_count_marks'):
+            return self.total_count_marks
 
-        if hasattr(self, 'count_comments_utilities'):
-            return self.count_comments_utilities
+        return self.marks.count()
+    get_total_count_marks.short_description = _('Total count marks')
+    get_total_count_marks.admin_order_field = 'total_count_marks'
 
-        ct_model = ContentType.objects.get_for_model(Utility)
-        return self.comments.filter(content_type=ct_model).count()
-    get_count_comments_on_utilities.short_description = _('Count comments of utilities')
-    get_count_comments_on_utilities.admin_order_field = 'count_comments_utilities'
+    def get_date_latest_mark(self):
 
-    def get_count_opinions_on_utilities(self):
-        """ """
+        if hasattr(self, 'date_latest_mark'):
+            return self.date_latest_mark
 
-        if hasattr(self, 'count_opinions_utilities'):
-            return self.count_opinions_utilities
+        return self.marks.aggregate(
+            date_latest_mark=models.Max('created')
+        )['date_latest_mark']
+    get_date_latest_mark.short_description = _('Date latest mark')
+    get_date_latest_mark.admin_order_field = 'date_latest_mark'
 
-        ct_model = ContentType.objects.get_for_model(Utility)
-        return self.opinions.filter(content_type=ct_model).count()
-    get_count_opinions_on_utilities.short_description = _('Count opinions of utilities')
-    get_count_opinions_on_utilities.admin_order_field = 'count_opinions_utilities'
+    def get_article_with_latest_mark_and_admin_url(self):
 
-    # ------------------------------------------------------
-    # End utilities methods
-    # ------------------------------------------------------
+        latest_mark = self.marks.order_by('-created').first()
+        return None if latest_mark is None else latest_mark.article
+    get_article_with_latest_mark_and_admin_url.short_description = _('Article with latest mark')
+    get_article_with_latest_mark_and_admin_url.with_change_admin_url = True
 
     # ------------------------------------------------------
     # Start forums methods
@@ -997,19 +1128,29 @@ class User(AbstractBaseUser, PermissionsMixin):
     def get_date_latest_reply(self):
         """ """
 
-        try:
-            return self.replies.latest().created
-        except self.replies.model.DoesNotExist:
-            return
+        if hasattr(self, 'date_latest_reply'):
+            return self.date_latest_reply
+
+        return self.replies.aggregate(date_latest_reply=models.Max('created'))['date_latest_reply']
     get_date_latest_reply.admin_order_field = 'date_latest_reply'
     get_date_latest_reply.short_description = _('Latest reply')
 
     def get_count_replies(self):
         """ """
 
+        if hasattr(self, 'count_replies'):
+            return self.count_replies
+
         return self.replies.count()
     get_count_replies.admin_order_field = 'count_replies'
     get_count_replies.short_description = _('Count replies')
+
+    def get_book_with_latest_reply_and_admin_url(self):
+
+        latest_reply = self.replies.order_by('-created').first()
+        return None if latest_reply is None else latest_reply.book
+    get_book_with_latest_reply_and_admin_url.short_description = _('Book with latest replies')
+    get_book_with_latest_reply_and_admin_url.with_change_admin_url = True
 
     # ------------------------------------------------------
     # End replies methods

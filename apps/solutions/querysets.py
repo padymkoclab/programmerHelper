@@ -37,10 +37,43 @@ class UserSolutionQuerySet(NullsLastQuerySet):
 
     """
 
-    def users_with_rating_of_solutions(self):
+    def users_with_rating_on_solutions(self):
         """ """
 
-        return annotate_queryset_for_determinate_rating(self)
+        from .models import Solution
+
+        return self.extra(
+            select={
+                'total_rating_solutions': """
+                SELECT
+                    ROUND(AVG(RATING_FOR_SOLUTION), 3)
+                FROM
+                    (
+                        SELECT
+                            {solution_table}."user_id",
+                            (
+                                SELECT
+                                    SUM(
+                                        CASE
+                                            WHEN {opinion_table}."is_useful" = True THEN 1
+                                            WHEN {opinion_table}."is_useful" = False THEN -1
+                                        END
+                                    ) AS RATING_FOR_SOLUTION
+                                FROM {opinion_table}
+                                WHERE {opinion_table}."object_id" = {solution_table}."id"
+                                    AND ({opinion_table}."content_type_id" = %s)
+                            )
+                        FROM {solution_table}
+                    ) AS TABLE_SOLUTION
+                WHERE TABLE_SOLUTION."user_id" = {user_table}."id"
+                """.format(
+                    opinion_table=Opinion._meta.db_table,
+                    solution_table=Solution._meta.db_table,
+                    user_table=self.model._meta.db_table,
+                )
+            },
+            select_params=[ContentType.objects.get_for_model(Solution).pk]
+        )
 
     def users_with_count_solutions(self):
 
@@ -116,7 +149,7 @@ class UserSolutionQuerySet(NullsLastQuerySet):
 
     def users_with_count_comments_solutions_bad_good_and_total_opinions_and_rating_and_date_latest_solutions(self):
 
-        # self = self.users_with_rating_of_solutions()
+        self = self.users_with_rating_on_solutions()
         self = self.users_with_count_solutions()
         self = self.users_with_count_opinions_of_solutions()
         self = self.users_with_count_bad_opinions_of_solutions()

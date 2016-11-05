@@ -34,6 +34,7 @@ class UtilityFactory(AbstractTimeStampedFactory):
     class Meta:
         model = Utility
 
+    count_views = fuzzy.FuzzyInteger(0, 1500)
     web_link = factory.Faker('url', locale='en')
 
     @factory.lazy_attribute

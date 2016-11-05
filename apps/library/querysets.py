@@ -161,3 +161,24 @@ class PublisherQuerySet(models.QuerySet):
         return self.prefetch_related('books').annotate(
             count_books=models.Count('books', distinct=True)
         )
+
+
+class UserReplyQuerySet(models.QuerySet):
+    """
+
+    """
+
+    def users_with_count_replies(self):
+
+        return self.annotate(count_replies=models.Count('replies', distinct=True))
+
+    def users_with_date_latest_reply(self):
+
+        return self.annotate(date_latest_reply=models.Max('replies__created'))
+
+    def users_with_count_replies_and_date_latest_reply(self):
+
+        self = self.users_with_count_replies()
+        self = self.users_with_date_latest_reply()
+
+        return self

@@ -166,8 +166,32 @@ class UserArticleQuerySet(NullsLastQuerySet):
     def users_with_total_rating_on_articles(self):
         """Adding for each the article field with determined rating of an itself."""
 
-        return self.defer('articles__subsections').annotate(
-            total_rating_articles=Round(models.Avg('articles__marks__mark'))
+        from .models import Mark, Article
+
+        return self.defer('articles__subsections').extra(
+            select={
+                'total_rating_articles': """
+                    SELECT
+                        ROUND(AVG(R), 3)
+                    FROM
+                        (
+                        SELECT
+                            {article_table}."user_id",
+                            (
+                                SELECT AVG({mark_table}."mark") AS R
+                                FROM {mark_table}
+                                WHERE {mark_table}."article_id" = {article_table}."id"
+                            )
+                        FROM
+                            {article_table}
+                        ) AS ARTICLE_TABLE
+                    WHERE ARTICLE_TABLE."user_id" = {user_table}."id"
+                """.format(
+                    mark_table=Mark._meta.db_table,
+                    article_table=Article._meta.db_table,
+                    user_table=self.model._meta.db_table,
+                )
+            },
         )
 
     def users_with_count_comments_on_articles(self):
@@ -199,5 +223,26 @@ class UserArticleQuerySet(NullsLastQuerySet):
         self = self.users_with_count_comments_on_articles()
         self = self.users_with_count_marks_on_articles()
         self = self.users_with_date_latest_article()
+
+        return self
+
+
+class UserMarkQuerySet(NullsLastQuerySet):
+    """
+
+    """
+
+    def users_with_total_count_marks(self):
+
+        return self.annotate(total_count_marks=models.Count('marks', distinct=True))
+
+    def users_with_date_latest_mark(self):
+
+        return self.annotate(date_latest_mark=models.Max('marks__created'))
+
+    def users_with_count_marks_and_latest_mark(self):
+
+        self = self.users_with_total_count_marks()
+        self = self.users_with_date_latest_mark()
 
         return self

@@ -29,7 +29,7 @@ class Category(TimeStampedModel):
     """
 
     name = models.CharField(
-        _('Name'), max_length=100, unique=True,
+        _('name'), max_length=100, unique=True,
         validators=[MinLengthValidator(10)],
         error_messages={
             'unique': _('Category with this name already exists.'),
@@ -37,13 +37,13 @@ class Category(TimeStampedModel):
     )
     slug = ConfiguredAutoSlugField(populate_from='name', unique=True)
     description = models.CharField(
-        _('Description'), max_length=500,
+        _('description'), max_length=500,
         validators=[MinLengthValidator(50)]
     )
 
     class Meta:
-        verbose_name = _("Category")
-        verbose_name_plural = _("Categories")
+        verbose_name = _("category")
+        verbose_name_plural = _("categories")
         get_latest_by = 'date_modified'
         ordering = ['name']
 
@@ -112,24 +112,25 @@ class Utility(CommentsModelMixin, OpinionsModelMixin, TimeStampedModel):
     """
 
     name = models.CharField(
-        _('Name'), max_length=200,
+        _('name'), max_length=200,
         validators=[MinLengthValidator(10)]
     )
-    description = models.TextField(_('Description'), validators=[MinLengthValidator(50)])
+    description = models.TextField(_('description'), validators=[MinLengthValidator(50)])
     category = models.ForeignKey(
         'Category',
         related_name='utilities',
-        verbose_name=_('Category'),
+        verbose_name=_('category'),
         on_delete=models.CASCADE,
     )
-    web_link = models.URLField(_('Web link'))
+    count_views = models.PositiveIntegerField(_('count views'), default=0, editable=False)
+    web_link = models.URLField(_('web link'))
 
     opinions = GenericRelation(Opinion)
     comments = GenericRelation(Comment)
 
     class Meta:
-        verbose_name = _("Utility")
-        verbose_name_plural = _("Utilities")
+        verbose_name = _("utility")
+        verbose_name_plural = _("utilities")
         ordering = ('category', 'name')
         unique_together = (('category', 'name'), )
 

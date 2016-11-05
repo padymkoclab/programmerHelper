@@ -166,6 +166,7 @@ class UserAdminModel(ModelAdmin):
                 'get_count_opinions_on_answers',
                 'get_count_good_opinions_on_answers',
                 'get_count_bad_opinions_on_answers',
+                'get_count_comments_on_its_answers',
                 'get_date_latest_answer',
             ),
         }),
@@ -177,7 +178,7 @@ class UserAdminModel(ModelAdmin):
                 'get_total_rating_on_articles',
                 'get_favorite_tags_on_articles',
                 'get_count_marks_on_articles',
-                'get_count_comments_on_articles',
+                'get_count_comments_on_its_articles',
                 'get_date_latest_article',
             ),
         }),
@@ -187,74 +188,78 @@ class UserAdminModel(ModelAdmin):
                 '__str__',
                 'get_favorite_tags_on_solutions',
                 'get_count_solutions',
-                'get_total_rating_for_solutions',
-                'get_count_comments_on_solutions',
+                'get_total_rating_on_solutions',
                 'get_count_opinions_on_solutions',
                 'get_count_good_opinions_on_solutions',
                 'get_count_bad_opinions_on_solutions',
+                'get_count_comments_on_its_solutions',
                 'get_date_latest_solution',
             ),
         }),
+
         ('users_snippets', {
             'title': _('Users and snippets'),
             'fields': (
                 '__str__',
                 'get_favorite_tags_on_snippets',
                 'get_count_snippets',
-                'get_total_rating_for_snippets',
+                'get_total_rating_on_snippets',
+                'get_count_opinions_on_snippets',
+                'get_count_good_opinions_on_snippets',
+                'get_count_bad_opinions_on_snippets',
+                'get_count_comments_on_its_snippets',
                 'get_date_latest_snippet',
             ),
         }),
+
         ('users_comments', {
             'title': _('Users and comments'),
             'fields': (
                 '__str__',
-                'get_count_comments_on_articles',
-                'get_count_comments_on_solutions',
-                'get_count_comments_on_snippets',
-                'get_count_comments_on_answers',
+                'get_count_comments_on_articles_other_users',
+                'get_count_comments_on_solutions_other_users',
+                'get_count_comments_on_snippets_other_users',
+                'get_count_comments_on_answers_other_users',
                 'get_count_comments_on_utilities',
                 'get_total_count_comments',
                 'get_date_latest_comment',
             ),
         }),
 
-        # Library
         ('users_library', {
             'title': _('Users and library'),
             'fields': (
                 '__str__',
                 'get_count_replies',
+                'get_book_with_latest_reply_and_admin_url',
                 'get_date_latest_reply',
             ),
         }),
 
-        # Opinions
         ('users_opinions', {
             'title': _('Users and opinions'),
             'fields': (
                 '__str__',
-                'get_count_opinions_on_solutions',
-                'get_count_opinions_on_questions',
-                'get_count_opinions_on_snippets',
+                'get_count_opinions_on_solutions_other_users',
+                'get_count_opinions_on_snippets_other_users',
+                'get_count_opinions_on_questions_other_users',
+                'get_count_opinions_on_answers_other_users',
                 'get_count_opinions_on_utilities',
-                'get_count_opinions_on_answers',
                 'get_total_count_opinions',
                 'get_date_latest_opinion',
             ),
         }),
 
-        # Marks
         ('users_marks', {
             'title': _('Users and marks'),
             'fields': (
                 '__str__',
-                'get_count_marks',
+                'get_total_count_marks',
+                'get_article_with_latest_mark_and_admin_url',
                 'get_date_latest_mark',
             ),
         }),
 
-        # Badge
         ('users_badges', {
             'title': _('Users and badges'),
             'fields': (
@@ -268,7 +273,6 @@ class UserAdminModel(ModelAdmin):
             ),
         }),
 
-        # Notification
         ('users_notifications', {
             'title': _('Users and notifications'),
             'fields': (
@@ -279,7 +283,6 @@ class UserAdminModel(ModelAdmin):
             ),
         }),
 
-        # Forum
         ('users_forums', {
             'title': _('Users and forums'),
             'fields': (
@@ -290,7 +293,6 @@ class UserAdminModel(ModelAdmin):
             ),
         }),
 
-        # Tags
         ('users_tags', {
             'title': _('Users and tags '),
             'fields': (
@@ -405,23 +407,27 @@ class UserAdminModel(ModelAdmin):
 
         elif list_display_name == 'users_snippets':
 
-            qs = super(UserAdminModel, self).get_queryset(request)
+            qs = self.model.snippets_manager\
+                .users_with_count_comments_on_its_related_objects_and_total_and_date_latest_comment()
 
         elif list_display_name == 'users_comments':
 
-            qs = super(UserAdminModel, self).get_queryset(request)
+            qs = self.model.comments_manager\
+                .users_with_count_comments_on_its_related_objects_and_total_and_date_latest_comment()
 
         elif list_display_name == 'users_library':
 
-            qs = super(UserAdminModel, self).get_queryset(request)
+            qs = self.model.replies_manager\
+                .users_with_count_replies_and_date_latest_reply()
 
         elif list_display_name == 'users_opinions':
 
-            qs = super(UserAdminModel, self).get_queryset(request)
+            qs = self.model.opinions_manager\
+                .users_with_count_opinions_on_related_objects_and_total_and_date_latest_opinion()
 
         elif list_display_name == 'users_marks':
 
-            qs = super(UserAdminModel, self).get_queryset(request)
+            qs = self.model.marks_manager.users_with_count_marks_and_latest_mark()
 
         elif list_display_name == 'users_badges':
 

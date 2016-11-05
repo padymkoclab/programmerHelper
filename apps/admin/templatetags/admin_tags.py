@@ -167,7 +167,7 @@ def display_object_list(model_admin, page_object_list, list_display_fields):
             colored_rows_by = getattr(model_admin, colored_rows_by)
             row_color = colored_rows_by(obj)
 
-        # url to add/chage page of thi object
+        # url to add/chage page of this object
         change_url = model_admin.site_admin.get_url(
             'change', model_meta, kwargs={'pk': obj.pk}
         )
@@ -195,11 +195,22 @@ def display_object_list(model_admin, page_object_list, list_display_fields):
                 # method of the model
                 if callable(value):
 
-                    if getattr(value, 'boolean', False) is True:
-                        value = value()
+                    method = value
+
+                    value = value()
+
+                    if getattr(method, 'boolean', False) is True:
                         value = convert_boolean_to_bootstrap_icon(value)
-                    else:
-                        value = value()
+                    elif getattr(method, 'with_change_admin_url', False) is True:
+
+                        try:
+                            change_url = model_admin.site_admin.get_url(
+                                'change', value.__class__, kwargs={'pk': value.pk}
+                            )
+                        except Exception:
+                            pass
+                        else:
+                            value = format_html('<a href="{}">{}</a>', change_url, value)
 
                 # field of the model
                 elif column_name in fieldnames:
