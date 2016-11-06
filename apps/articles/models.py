@@ -15,16 +15,16 @@ from utils.django.models import TimeStampedModel
 from utils.django.validators import MinCountWordsValidator
 
 from apps.comments.models import Comment
-from apps.comments.models_mixins import CommentsModelMixin
+from apps.comments.mixins_models import CommentModelMixin
 from apps.comments.managers import CommentManager
 from apps.tags.models import Tag
-from apps.tags.models_mixins import TagsModelMixin
+from apps.tags.mixins_models import TagModelMixin
 from apps.tags.managers import TagManager
 
 from .managers import ArticleManager, SubsectionManager, MarkManager
 
 
-class Article(CommentsModelMixin, TagsModelMixin, TimeStampedModel):
+class Article(CommentModelMixin, TagModelMixin, TimeStampedModel):
     """
     Model for article
     """

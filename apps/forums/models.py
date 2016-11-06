@@ -25,14 +25,14 @@ class Section(models.Model):
     """
 
     id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
-    name = models.CharField(_('Name'), max_length=80, unique=True, validators=[MinLengthValidator(5)])
+    name = models.CharField(_('name'), max_length=80, unique=True, validators=[MinLengthValidator(5)])
     groups = models.ManyToManyField(
         Group, blank=True,
-        verbose_name=_('Groups'),
-        help_text=_('Only users from these groups can see this section')
+        verbose_name=_('groups'),
+        help_text=_('only users from these groups can see this section')
     )
     position = models.PositiveSmallIntegerField(
-        _('Position'), unique=True,
+        _('position'), unique=True,
         validators=[MinValueValidator(1)]
     )
 
@@ -65,7 +65,7 @@ class Section(models.Model):
             return self.count_forums
 
         return self.forums.count()
-    get_count_forums.short_description = _('Count forums')
+    get_count_forums.short_description = _('count forums')
     get_count_forums.admin_order_field = 'count_forums'
 
     def get_total_count_topics(self):
@@ -76,7 +76,7 @@ class Section(models.Model):
 
         forums = self.forums.forums_with_count_topics()
         return forums.aggregate(sum=models.Sum('count_topics'))['sum']
-    get_total_count_topics.short_description = _('Total count topics')
+    get_total_count_topics.short_description = _('total count topics')
     get_total_count_topics.admin_order_field = 'total_count_topics'
 
     def get_total_count_posts(self):
@@ -86,7 +86,7 @@ class Section(models.Model):
             return self.total_count_posts
 
         return self.forums.count()
-    get_total_count_posts.short_description = _('Total count posts')
+    get_total_count_posts.short_description = _('total count posts')
     get_total_count_posts.admin_order_field = 'total_count_posts'
 
     def has_access(self, user):
@@ -109,19 +109,19 @@ class Forum(TimeStampedModel):
     """
 
     name = models.CharField(
-        _('Name'), max_length=200,
+        _('name'), max_length=200,
         validators=[MinLengthValidator(5)]
     )
     slug = ConfiguredAutoSlugField(populate_from='name', unique_with=['section'])
     section = models.ForeignKey(
         'Section', related_name='forums',
-        on_delete=models.CASCADE, verbose_name=_('Section')
+        on_delete=models.CASCADE, verbose_name=_('section')
     )
     description = models.TextField(
-        _('Description'),
+        _('description'),
         validators=[MinLengthValidator(10)]
     )
-    moderators = models.ManyToManyField(settings.AUTH_USER_MODEL, verbose_name=_('Moderator'))
+    moderators = models.ManyToManyField(settings.AUTH_USER_MODEL, verbose_name=_('moderator'))
 
     objects = models.Manager()
     objects = ForumManager()
@@ -171,7 +171,7 @@ class Forum(TimeStampedModel):
 
                     if value_post > value_latest_post:
                         latest_post = post
-    get_latest_post.short_description = _('Latest post')
+    get_latest_post.short_description = _('latest post')
 
     def get_count_topics(self):
         """ """
@@ -181,7 +181,7 @@ class Forum(TimeStampedModel):
 
         return self.topics.count()
     get_count_topics.admin_order_field = 'count_topics'
-    get_count_topics.short_description = _('Count topics')
+    get_count_topics.short_description = _('count topics')
 
     def get_total_count_posts(self):
         """ """
@@ -195,7 +195,7 @@ class Forum(TimeStampedModel):
                 models.Sum('count_posts'), 0
             )
         )['total_count_posts']
-    get_total_count_posts.short_description = _('Total count posts')
+    get_total_count_posts.short_description = _('total count posts')
     get_total_count_posts.admin_order_field = 'total_count_posts'
 
     def get_count_active_users(self):
@@ -207,7 +207,7 @@ class Forum(TimeStampedModel):
             users.add(user2)
 
         return len(users)
-    get_count_active_users.short_description = _('Count active users')
+    get_count_active_users.short_description = _('count active users')
     get_count_active_users.admin_order_field = 'count_active_users'
 
     def display_details_latest_post(self):
@@ -221,7 +221,7 @@ class Forum(TimeStampedModel):
         latest_post_updated = convert_date_to_django_date_format(latest_post.updated)
 
         return format_html(_('by {}<br />{}'), latest_post.user, latest_post_updated)
-    display_details_latest_post.short_description = _('Latest post')
+    display_details_latest_post.short_description = _('latest post')
 
 
 class Topic(TimeStampedModel):
@@ -229,27 +229,27 @@ class Topic(TimeStampedModel):
 
     """
 
-    subject = models.CharField(_('Subject'), max_length=200, validators=[MinLengthValidator(5)])
+    subject = models.CharField(_('subject'), max_length=200, validators=[MinLengthValidator(5)])
     slug = ConfiguredAutoSlugField(populate_from='subject', unique_with=['forum'])
     forum = models.ForeignKey(
-        'Forum', verbose_name=_('Forum'),
+        'Forum', verbose_name=_('forum'),
         related_name='topics', on_delete=models.CASCADE
     )
     user = models.ForeignKey(
-        settings.AUTH_USER_MODEL, verbose_name=_('User'),
+        settings.AUTH_USER_MODEL, verbose_name=_('user'),
         related_name='topics', on_delete=models.CASCADE,
     )
     count_views = models.PositiveIntegerField(_('count views'), editable=False, default=0)
-    is_sticky = models.BooleanField(_('Is sticky'), default=False)
-    is_opened = models.BooleanField(_('Is opened?'), default=True)
+    is_sticky = models.BooleanField(_('is sticky'), default=False)
+    is_opened = models.BooleanField(_('is opened?'), default=True)
 
     # managers
     objects = models.Manager()
     objects = TopicManager()
 
     class Meta:
-        verbose_name = _('Topic')
-        verbose_name_plural = _('Topics')
+        verbose_name = _('topic')
+        verbose_name_plural = _('topics')
         ordering = ['-is_sticky', 'forum', '-created']
         unique_together = ['subject', 'forum']
         get_latest_by = 'updated'
@@ -277,7 +277,7 @@ class Topic(TimeStampedModel):
 
         return self.posts.count()
     get_count_posts.admin_order_field = 'count_posts'
-    get_count_posts.short_description = _('Count posts')
+    get_count_posts.short_description = _('count posts')
 
     def get_count_active_users(self):
         """Return set users posted in this topic"""
@@ -288,7 +288,7 @@ class Topic(TimeStampedModel):
         """Count users posted in topic"""
         active_users = self.get_active_users()
         return len(active_users)
-    count_active_users.short_description = _('Active users')
+    count_active_users.short_description = _('active users')
     count_active_users.admin_order_field = 'count_active_users'
 
     def get_latest_post(self):
@@ -310,7 +310,7 @@ class Topic(TimeStampedModel):
         latest_post_updated = convert_date_to_django_date_format(latest_post.updated)
 
         return format_html(_('by {}<br />{}'), latest_post.user, latest_post_updated)
-    display_details_latest_post.short_description = _('Latest post')
+    display_details_latest_post.short_description = _('latest post')
 
 
 class Post(TimeStampedModel):
@@ -319,17 +319,17 @@ class Post(TimeStampedModel):
     """
 
     topic = models.ForeignKey(
-        'Topic', verbose_name=_('Topic'),
+        'Topic', verbose_name=_('topic'),
         on_delete=models.CASCADE, related_name='posts',
     )
     user = models.ForeignKey(
-        settings.AUTH_USER_MODEL, verbose_name=_('User'),
+        settings.AUTH_USER_MODEL, verbose_name=_('user'),
         related_name='posts', on_delete=models.CASCADE,
     )
     markup = MarkupField(fill_from='content', fill_to='content_html')
-    content = models.TextField(_('Content'))
-    content_html = models.TextField(_('Content (HTML)'))
-    user_ip = models.GenericIPAddressField(_('User IP'), blank=True, null=True)
+    content = models.TextField(_('content'))
+    content_html = models.TextField(_('content (HTML)'))
+    user_ip = models.GenericIPAddressField(_('user IP'), blank=True, null=True)
 
     objects = models.Manager()
     objects = PostManager()

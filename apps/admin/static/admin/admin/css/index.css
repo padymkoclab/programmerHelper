@@ -24,7 +24,7 @@ body{
     overflow-y: hidden;
     color: rgb(255, 255, 255);
     margin-bottom: -100%;
-    /*padding-bottom: 100%;*/
+    padding-bottom: 100%;
 }
 
 #wrapper.toggle_sidebar #sidebar

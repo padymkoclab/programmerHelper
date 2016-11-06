@@ -31,17 +31,17 @@ class Command(FactoryCountBaseCommand):
             for j in range(count_forums):
                 forum = ForumFactory(section=section)
 
-                count_topics = random.randint(0, 5)
+                count_topics = random.randint(0, 10)
 
                 for k in range(count_topics):
                     topic = TopicFactory(forum=forum)
 
-                    count_posts = random.randint(0, 5)
+                    count_posts = random.randint(0, 15)
 
                     for l in range(count_posts):
                         PostFactory(topic=topic)
 
-        logger.debug('Made factory {} sections, {} forums, {} topics, {} posts.'.format(
+        logger.info('Made factory {} sections, {} forums, {} topics, {} posts.'.format(
             SectionModel._default_manager.count(),
             ForumModel._default_manager.count(),
             TopicModel._default_manager.count(),

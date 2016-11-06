@@ -55,3 +55,72 @@ class PurelyTagQuerySet(models.QuerySet):
         condition = dict(total_count_usage=CombinedExpression)
 
         return self.annotate(**condition)
+
+
+class UserTagQuerySet(models.QuerySet):
+    """
+
+    """
+
+    def users_with_count_used_unique_tags(self):
+        """ """
+
+        return self.extra(
+            select={
+                'count_used_unique_tags': """
+                    SELECT COUNT("tag_id") FROM
+                    (
+                    SELECT "tag_id", "user_id" FROM "snippets" AS Sn
+                    LEFT OUTER JOIN "snippets_tags" AS Sntag ON Sntag."snippet_id" = Sn."id"
+                    WHERE Sn."user_id" = "users_user"."id"
+                    UNION
+                    SELECT "tag_id", "user_id" FROM "solutions_solution" AS So
+                    LEFT OUTER JOIN "solutions_solution_tags" AS Sotag ON Sotag."solution_id" = So."id"
+                    WHERE So."user_id" = "users_user"."id"
+                    UNION
+                    SELECT "tag_id", "user_id" FROM "questions_question" AS Q
+                    LEFT OUTER JOIN "questions_question_tags" AS Qtag ON Qtag."question_id" = Q."id"
+                    WHERE Q."user_id" = "users_user"."id"
+                    UNION
+                    SELECT "tag_id", "user_id" FROM "articles_article" AS A
+                    LEFT OUTER JOIN "articles_article_tags" AS Atag ON Atag."article_id" = A."id"
+                    WHERE A."user_id" = "users_user"."id"
+                    ) AS A
+                """
+            }
+        )
+
+    def users_with_total_count_used_tags(self):
+        """ """
+
+        return self.extra(
+            select={
+                'total_count_used_tags': """
+                SELECT COUNT("tag_id") FROM
+                    (
+                    SELECT "tag_id", "user_id" FROM "snippets" AS Sn
+                    LEFT OUTER JOIN "snippets_tags" AS Sntag ON Sntag."snippet_id" = Sn."id"
+                    WHERE Sn."user_id" = "users_user"."id"
+                    UNION ALL
+                    SELECT "tag_id", "user_id" FROM "solutions_solution" AS So
+                    LEFT OUTER JOIN "solutions_solution_tags" AS Sotag ON Sotag."solution_id" = So."id"
+                    WHERE So."user_id" = "users_user"."id"
+                    UNION ALL
+                    SELECT "tag_id", "user_id" FROM "questions_question" AS Q
+                    LEFT OUTER JOIN "questions_question_tags" AS Qtag ON Qtag."question_id" = Q."id"
+                    WHERE Q."user_id" = "users_user"."id"
+                    UNION ALL
+                    SELECT "tag_id", "user_id" FROM "articles_article" AS A
+                    LEFT OUTER JOIN "articles_article_tags" AS Atag ON Atag."article_id" = A."id"
+                    WHERE A."user_id" = "users_user"."id"
+                    ) AS A
+                """,
+            }
+        )
+
+    def users_with_count_used_unique_tags_and_total_count_used_tags(self):
+
+        self = self.users_with_count_used_unique_tags()
+        self = self.users_with_total_count_used_tags()
+
+        return self

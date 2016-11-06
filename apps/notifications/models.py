@@ -115,7 +115,6 @@ class Notification(models.Model):
             self.user_display_text = user.get_full_name()
 
         self.full_clean()
-
         super(Notification, self).save(*args, **kwargs)
 
     def mark_as_read(self):

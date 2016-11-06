@@ -81,7 +81,7 @@ class TopicFactory(AbstractTimeStampedFactory):
     class Meta:
         model = Topic
 
-    views = fuzzy.FuzzyInteger(0, 1000)
+    count_views = fuzzy.FuzzyInteger(0, 1000)
     is_sticky = fuzzy.FuzzyChoice((True, False))
     is_opened = fuzzy.FuzzyChoice((True, False))
 

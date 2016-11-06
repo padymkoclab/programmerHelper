@@ -1,6 +1,8 @@
 
 from django.db import models
 
+# from utils.django.sql import NullsLastQuerySet
+
 
 class AttendanceQuerySet(models.QuerySet):
     """

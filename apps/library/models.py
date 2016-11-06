@@ -24,7 +24,7 @@ from utils.django.validators import OnlyLettersValidator
 
 from apps.tags.models import Tag
 from apps.tags.managers import TagManager
-from apps.tags.models_mixins import TagsModelMixin
+from apps.tags.mixins_models import TagModelMixin
 
 from .managers import BookManager, WriterManager, PublisherManager
 
@@ -39,7 +39,7 @@ logger.info('Idea: I read it and I read it now and I want read it')
 NOW_YEAR = timezone.now().year
 
 
-class Book(TagsModelMixin, models.Model):
+class Book(TagModelMixin, models.Model):
     """
     Model for books
     """

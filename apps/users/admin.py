@@ -279,7 +279,7 @@ class UserAdminModel(ModelAdmin):
                 '__str__',
                 'get_count_unread_notifications',
                 'get_count_read_notifications',
-                'get_count_notifications',
+                'get_total_count_notifications',
             ),
         }),
 
@@ -289,6 +289,7 @@ class UserAdminModel(ModelAdmin):
                 '__str__',
                 'get_count_topics',
                 'get_count_posts',
+                'get_count_popular_topics',
                 'get_date_latest_activity_on_forums',
             ),
         }),
@@ -298,8 +299,8 @@ class UserAdminModel(ModelAdmin):
             'fields': (
                 '__str__',
                 'get_favorite_tags',
-                'get_count_usaged_unique_tags',
-                'get_total_count_usaged_tags',
+                'get_count_used_unique_tags',
+                'get_total_count_used_tags',
             ),
         }),
 
@@ -408,7 +409,7 @@ class UserAdminModel(ModelAdmin):
         elif list_display_name == 'users_snippets':
 
             qs = self.model.snippets_manager\
-                .users_with_count_comments_on_its_related_objects_and_total_and_date_latest_comment()
+                .users_with_count_comments_bad_good_and_total_opinions_and_rating_and_date_latest_snippets()
 
         elif list_display_name == 'users_comments':
 
@@ -439,11 +440,13 @@ class UserAdminModel(ModelAdmin):
 
         elif list_display_name == 'users_forums':
 
-            qs = super(UserAdminModel, self).get_queryset(request)
+            qs = self.model.forums_manager\
+                .users_with_count_posts_topic_popular_topic_and_date_latest_activity_on_forums()
 
         elif list_display_name == 'users_tags':
 
-            qs = super(UserAdminModel, self).get_queryset(request)
+            qs = self.model.tags_manager\
+                .users_with_count_used_unique_tags_and_total_count_used_tags()
 
         return qs
 

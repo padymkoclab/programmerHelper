@@ -15,16 +15,13 @@ from utils.python.constants import CHOICES_LEXERS
 
 from apps.comments.models import Comment
 from apps.comments.managers import CommentManager
-from apps.comments.models_mixins import CommentsModelMixin
+from apps.comments.mixins_models import CommentModelMixin
 from apps.opinions.models import Opinion
 from apps.opinions.managers import OpinionManager
-from apps.opinions.models_mixins import OpinionsModelMixin
-# from apps.flavours.models import Flavour
-# from apps.flavours.managers import FlavourManager
-# from apps.flavours.models_mixins import FlavourModelMixin
+from apps.opinions.mixins_models import OpinionModelMixin
 from apps.tags.models import Tag
 from apps.tags.managers import TagManager
-from apps.tags.models_mixins import TagsModelMixin
+from apps.tags.mixins_models import TagModelMixin
 
 # from apps.visits.models import Visit
 
@@ -32,7 +29,7 @@ from .managers import SnippetManager
 from .querysets import SnippetQuerySet
 
 
-class Snippet(CommentsModelMixin, OpinionsModelMixin, TagsModelMixin, TimeStampedModel):
+class Snippet(CommentModelMixin, OpinionModelMixin, TagModelMixin, TimeStampedModel):
     """
     Model for snippet.
     """

@@ -14,13 +14,13 @@ from utils.django.models_utils import get_admin_url
 
 from apps.comments.models import Comment
 from apps.comments.managers import CommentManager
-from apps.comments.models_mixins import CommentsModelMixin
+from apps.comments.mixins_models import CommentModelMixin
 from apps.opinions.models import Opinion
 from apps.opinions.managers import OpinionManager
-from apps.opinions.models_mixins import OpinionsModelMixin
+from apps.opinions.mixins_models import OpinionModelMixin
 from apps.tags.models import Tag
 from apps.tags.managers import TagManager
-from apps.tags.models_mixins import TagsModelMixin
+from apps.tags.mixins_models import TagModelMixin
 
 from .managers import QuestionManager, AnswerManager
 from .querysets import QuestionQuerySet, AnswerQuerySet
@@ -31,7 +31,7 @@ logger = logging.getLogger('django.development')
 logger.warning('scrapy data question from StackOverFlow or MailList Google Groups by tags Django, JS as latest')
 
 
-class Question(TagsModelMixin, OpinionsModelMixin, TimeStampedModel):
+class Question(TagModelMixin, OpinionModelMixin, TimeStampedModel):
     """
 
     """
@@ -125,7 +125,7 @@ class Question(TagsModelMixin, OpinionsModelMixin, TimeStampedModel):
         # analysis tags
 
 
-class Answer(OpinionsModelMixin, CommentsModelMixin, TimeStampedModel):
+class Answer(OpinionModelMixin, CommentModelMixin, TimeStampedModel):
     """
 
     """

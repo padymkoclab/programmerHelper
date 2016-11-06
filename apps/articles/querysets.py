@@ -236,6 +236,29 @@ class UserMarkQuerySet(NullsLastQuerySet):
 
         return self.annotate(total_count_marks=models.Count('marks', distinct=True))
 
+    def users_with_pk_article_with_latest_mark(self):
+
+        return self.extra(
+            select={
+                'latest_mark_article_id': """
+                    SELECT
+                        "latest_mark_article_id"
+                    FROM
+                    (
+                    SELECT
+                        "articles_mark"."user_id",
+                        "articles_article"."id" AS "latest_mark_article_id",
+                        rank() OVER (
+                            PARTITION BY "articles_mark"."user_id" ORDER BY "articles_mark"."created" DESC
+                            ) AS "RANK"
+                        FROM "articles_mark"
+                        INNER JOIN "articles_article" ON "articles_mark"."article_id" = "articles_article"."id"
+                    ) AS M
+                    WHERE "users_user"."id" = M."user_id" AND ("RANK" = 1)
+                """
+            }
+        )
+
     def users_with_date_latest_mark(self):
 
         return self.annotate(date_latest_mark=models.Max('marks__created'))
@@ -244,5 +267,6 @@ class UserMarkQuerySet(NullsLastQuerySet):
 
         self = self.users_with_total_count_marks()
         self = self.users_with_date_latest_mark()
+        self = self.users_with_pk_article_with_latest_mark()
 
         return self

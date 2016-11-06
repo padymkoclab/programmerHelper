@@ -12,13 +12,10 @@ from utils.django.models_utils import get_admin_url
 
 from apps.comments.models import Comment
 from apps.comments.managers import CommentManager
-from apps.comments.models_mixins import CommentsModelMixin
+from apps.comments.mixins_models import CommentModelMixin
 from apps.opinions.models import Opinion
 from apps.opinions.managers import OpinionManager
-from apps.opinions.models_mixins import OpinionsModelMixin
-# from apps.flavours.models import Flavour
-# from apps.flavours.managers import FlavourManager
-# from apps.flavours.models_mixins import FlavourModelMixin
+from apps.opinions.mixins_models import OpinionModelMixin
 
 from .managers import CategoryManager, UtilityManager
 
@@ -106,7 +103,7 @@ class Category(TimeStampedModel):
     get_count_utilities.admin_order_field = 'count_utilities'
 
 
-class Utility(CommentsModelMixin, OpinionsModelMixin, TimeStampedModel):
+class Utility(CommentModelMixin, OpinionModelMixin, TimeStampedModel):
     """
     Model of a utility
     """

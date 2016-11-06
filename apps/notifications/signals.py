@@ -1,6 +1,7 @@
 
 import uuid
 
+from django.core.exceptions import ValidationError
 from django.dispatch import Signal, receiver
 
 from .models import Notification
@@ -47,13 +48,10 @@ def handle_notify(sender, **kwargs):
 
     notification = Notification(**options)
 
-    # try:
-    #     notification.full_clean()
-    # except ValidationError:
-    #     notification.user = None
-    #     notification.full_clean()
-    # finally:
-    #     notification.save(user=user, target=target)
-
-    notification.full_clean()
-    notification.save(user=user, target=target)
+    try:
+        notification.full_clean()
+    except ValidationError:
+        notification.user = None
+        notification.full_clean()
+    finally:
+        notification.save(user=user, target=target)
