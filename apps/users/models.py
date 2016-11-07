@@ -100,10 +100,8 @@ class Level(models.Model):
         (REGULAR, _('Regular')),
     )
 
-    id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
     name = models.CharField(
-        _('Name'), max_length=50,
-        choices=CHOICES_LEVEL, unique=True,
+        _('Name'), max_length=50, choices=CHOICES_LEVEL, primary_key=True,
         error_messages={'unique': _('Level with name already exists.')}
     )
     slug = utils_models_fields.ConfiguredAutoSlugField(populate_from='name', unique=True)
@@ -182,10 +180,9 @@ class User(AbstractBaseUser, PermissionsMixin, UserCommentModelMixin, UserOpinio
     is_active = models.BooleanField(_('is active?'), default=True)
     level = models.ForeignKey(
         'level',
-        verbose_name='Level',
+        verbose_name='level',
         related_name='users',
         default=Level.REGULAR,
-        to_field='name',
     )
     date_joined = models.DateTimeField(_('date joined'), auto_now_add=True)
 
@@ -210,8 +207,8 @@ class User(AbstractBaseUser, PermissionsMixin, UserCommentModelMixin, UserOpinio
     tags_manager = UserTagQuerySet().as_manager()
 
     class Meta:
-        verbose_name = _("User")
-        verbose_name_plural = _("Users")
+        verbose_name = _("user")
+        verbose_name_plural = _("users")
         ordering = ('-date_joined', )
         get_latest_by = 'date_joined'
 

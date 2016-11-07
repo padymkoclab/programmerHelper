@@ -29,8 +29,6 @@ def check_badges_for_instance_and_notify(sender, instance):
         Snippet, Opinion, Reply, Solution, Visit, User, Profile, Diary
     ]:
 
-        return
-
         users_lost_badges, users_earned_badges = check_badges_for_instance(instance)
 
         for user, badges in users_lost_badges.items():

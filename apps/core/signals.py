@@ -21,7 +21,7 @@ from apps.notifications.constants import Actions
 from .helpers import check_badges_for_instance_and_notify, make_notification
 
 
-@receiver(post_save, dispatch_uid=uuid.uuid4)
+# @receiver(post_save, dispatch_uid=uuid.uuid4)
 def post_added_updated_object(sender, instance, created, **kwargs):
 
     action = 'created' if created is True else 'updated'
@@ -39,11 +39,11 @@ def pre_deleted_object(sender, instance, **kwargs):
 @receiver(pre_delete, dispatch_uid=uuid.uuid4)
 def post_deleted_object(sender, instance, **kwargs):
 
-    make_notification(sender, instance, 'deleted')
+    # make_notification(sender, instance, 'deleted')
     check_badges_for_instance_and_notify(sender, instance)
 
 
-@receiver(user_logged_in, dispatch_uid=uuid.uuid4)
+# @receiver(user_logged_in, dispatch_uid=uuid.uuid4)
 def login_user(sender, request, user, **kwargs):
 
     notify.send(
@@ -56,7 +56,7 @@ def login_user(sender, request, user, **kwargs):
     )
 
 
-@receiver(user_logged_out, dispatch_uid=uuid.uuid4)
+# @receiver(user_logged_out, dispatch_uid=uuid.uuid4)
 def logout_user(sender, request, user, **kwargs):
 
     notify.send(
@@ -69,7 +69,7 @@ def logout_user(sender, request, user, **kwargs):
     )
 
 
-@receiver(user_login_failed, dispatch_uid=uuid.uuid4)
+# @receiver(user_login_failed, dispatch_uid=uuid.uuid4)
 def failed_login_user(sender, credentials, **kwargs):
 
     notify.send(

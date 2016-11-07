@@ -12,7 +12,7 @@ from django.contrib.auth import get_user_model
 from utils.python.utils import classproperty
 from utils.django.datetime_utils import convert_date_to_django_date_format
 
-from .managers import NotificationManager
+from .managers import NotificationManager, NotificationBadgeManager
 from .constants import Actions
 
 
@@ -73,7 +73,8 @@ class Notification(models.Model):
     action_target = GenericForeignKey(ct_field='action_target_content_type', fk_field='action_target_object_id')
 
     objects = models.Manager()
-    objects = NotificationManager()
+    all_notifications = NotificationManager()
+    notifications_badges = NotificationBadgeManager()
 
     class Meta:
         verbose_name = _('notification')

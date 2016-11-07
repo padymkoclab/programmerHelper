@@ -108,17 +108,28 @@ class Utility(CommentModelMixin, OpinionModelMixin, TimeStampedModel):
     Model of a utility
     """
 
-    name = models.CharField(
-        _('name'), max_length=200,
-        validators=[MinLengthValidator(10)]
-    )
-    description = models.TextField(_('description'), validators=[MinLengthValidator(50)])
     category = models.ForeignKey(
         'Category',
         related_name='utilities',
         verbose_name=_('category'),
         on_delete=models.CASCADE,
     )
+
+    name = models.CharField(
+        _('name'), max_length=200,
+        validators=[MinLengthValidator(10)]
+    )
+
+    # As Django package manager for Tornado an Flask
+    # Operating system
+    # avaible language version
+    # type (Package, web framework, library, service)
+    # purpose
+    # written on (package, programm, application, site)
+    # development status
+    # lisence
+
+    description = models.TextField(_('description'), validators=[MinLengthValidator(50)])
     count_views = models.PositiveIntegerField(_('count views'), default=0, editable=False)
     web_link = models.URLField(_('web link'))
 

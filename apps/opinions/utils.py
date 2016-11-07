@@ -1,14 +1,7 @@
 
-import logging
-
-
-logger = logging.getLogger('django.development')
-
 
 def annotate_queryset_for_determinate_rating(queryset):
     """ """
-
-    logger.warning('If Django ORM will be have support for subqueries rewrite this query.')
 
     # subquery if using combination annotations and aggregations
 

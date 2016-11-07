@@ -40,16 +40,16 @@ class Poll(TimeStampedModel):
     )
 
     title = models.CharField(
-        _('Title'), max_length=200, unique=True,
+        _('title'), max_length=200, unique=True,
         validators=[MinLengthValidator(settings.MIN_LENGTH_FOR_NAME_OR_TITLE_OBJECT)],
     )
     description = models.CharField(
-        _('Short description'),
+        _('description'),
         validators=[MinLengthValidator(10)],
         max_length=100,
     )
     slug = ConfiguredAutoSlugField(populate_from='title', unique=True)
-    status = models.CharField(_('Status'), max_length=10, choices=CHOICES_STATUS, default=DRAFT)
+    status = models.CharField(_('status'), max_length=10, choices=CHOICES_STATUS, default=DRAFT)
     # deactivate_date = models.DateTimeField(null=True, blank=True,
     #     help_text=_("Point of time after this poll would be automatic deactivated"),
     # )
@@ -57,15 +57,15 @@ class Poll(TimeStampedModel):
         settings.AUTH_USER_MODEL,
         through='Vote',
         through_fields=['poll', 'user'],
-        verbose_name=_('Voters'),
+        verbose_name=_('voters'),
     )
 
     objects = models.Manager()
     objects = PollManager.from_queryset(PollQuerySet)()
 
     class Meta:
-        verbose_name = _("Poll")
-        verbose_name_plural = _("Polls")
+        verbose_name = _("poll")
+        verbose_name_plural = _("polls")
         ordering = ['created']
         get_latest_by = 'created'
 
@@ -188,17 +188,17 @@ class Choice(models.Model):
 
     id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
     poll = models.ForeignKey(
-        'Poll', verbose_name=_('Poll'),
+        'Poll', verbose_name=_('poll'),
         on_delete=models.CASCADE, related_name='choices',
     )
-    text_choice = models.TextField(_('Text choice'))
+    text_choice = models.TextField(_('text choice'))
 
     objects = models.Manager()
     objects = ChoiceManager.from_queryset(ChoiceQuerySet)()
 
     class Meta:
-        verbose_name = _("Choice")
-        verbose_name_plural = _("Choices")
+        verbose_name = _("choice")
+        verbose_name_plural = _("choices")
         ordering = ['poll']
         unique_together = ('poll', 'text_choice')
 
@@ -234,32 +234,32 @@ class Choice(models.Model):
 
 class Vote(models.Model):
     """
-    Model of vote. This model is intermediate model for keeping a choice of a user in certain poll.
+    Model of vote. This model is intermediate model for keep a choice of a user in a certain poll.
     """
 
     id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
     poll = models.ForeignKey(
         'Poll', models.CASCADE,
-        verbose_name=_('Poll'), related_name='votes',
+        verbose_name=_('poll'), related_name='votes',
     )
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, models.CASCADE,
-        verbose_name=_('User'), related_name='votes',
+        verbose_name=_('user'), related_name='votes',
     )
     choice = models.ForeignKey(
         'Choice',
         models.CASCADE,
-        verbose_name=_('Choice'),
+        verbose_name=_('choice'),
         related_name='votes',
     )
-    created = models.DateTimeField(_('Date added'), auto_now_add=True)
+    created = models.DateTimeField(_('Created'), auto_now_add=True)
 
     objects = models.Manager()
     objects = VoteManager()
 
     class Meta:
-        verbose_name = "Vote"
-        verbose_name_plural = "Votes"
+        verbose_name = "vote"
+        verbose_name_plural = "votes"
         ordering = ['-created']
         get_latest_by = 'created'
         unique_together = ('poll', 'user')
