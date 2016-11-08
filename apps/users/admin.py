@@ -264,10 +264,10 @@ class UserAdminModel(ModelAdmin):
             'title': _('Users and badges'),
             'fields': (
                 '__str__',
-                'get_count_badges',
-                'get_count_gold_badges',
-                'get_count_silver_badges',
                 'get_count_bronze_badges',
+                'get_count_silver_badges',
+                'get_count_gold_badges',
+                'get_count_earned_badges',
                 'get_latest_badge',
                 'get_date_getting_latest_badge',
             ),
@@ -432,7 +432,8 @@ class UserAdminModel(ModelAdmin):
 
         elif list_display_name == 'users_badges':
 
-            qs = super(UserAdminModel, self).get_queryset(request)
+            qs = self.model.badges_manager\
+                .users_with_count_gold_silver_bronze_and_total_badges_and_date_getting_latest_badge()
 
         elif list_display_name == 'users_notifications':
 

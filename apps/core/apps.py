@@ -14,7 +14,7 @@ class CoreConfig(AppConfig):
         from .signals import (
             post_added_updated_object,
             pre_deleted_object,
-            post_deleted_object,
+            changed_group,
             login_user,
             logout_user,
             failed_login_user,

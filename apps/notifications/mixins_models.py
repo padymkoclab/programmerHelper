@@ -17,20 +17,20 @@ class UserNotificationModelMixin(object):
     def get_total_count_notifications(self):
         """Count notification send to this user."""
 
-        raise NotImplementedError
+        return 0
     get_total_count_notifications.short_description = _('Total count notifications')
     get_total_count_notifications.admin_order_field = 'total_count_notifications'
 
     def get_count_unread_notifications(self):
         """Count notification send to this user."""
 
-        raise NotImplementedError
+        return 0
     get_count_unread_notifications.short_description = _('Count unread notifications')
     get_count_unread_notifications.admin_order_field = 'count_unread_notifications'
 
     def get_count_read_notifications(self):
         """Count notification send to this user."""
 
-        raise NotImplementedError
+        return 0
     get_count_read_notifications.short_description = _('Count read notifications')
     get_count_read_notifications.admin_order_field = 'count_read_notifications'

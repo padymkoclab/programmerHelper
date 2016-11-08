@@ -49,6 +49,7 @@ from apps.library.querysets import UserReplyQuerySet
 from apps.opinions.querysets import UserOpinionQuerySet
 from apps.forums.querysets import UserForumQuerySet
 from apps.tags.querysets import UserTagQuerySet
+from apps.badges.querysets import UserBadgeQuerySet
 
 from .managers import UserManager, LevelManager
 from .exceptions import ProtectDeleteUser
@@ -205,6 +206,7 @@ class User(AbstractBaseUser, PermissionsMixin, UserCommentModelMixin, UserOpinio
     marks_manager = UserMarkQuerySet().as_manager()
     forums_manager = UserForumQuerySet().as_manager()
     tags_manager = UserTagQuerySet().as_manager()
+    badges_manager = UserBadgeQuerySet().as_manager()
 
     class Meta:
         verbose_name = _("user")
@@ -221,7 +223,6 @@ class User(AbstractBaseUser, PermissionsMixin, UserCommentModelMixin, UserOpinio
         super(User, self).save(*args, **kwargs)
 
         # auto create
-        # self.diary
         # self.profile
 
     def delete(self, *args, **kwargs):

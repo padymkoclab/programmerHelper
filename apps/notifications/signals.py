@@ -1,6 +1,7 @@
 
 import uuid
 
+from django.contrib.auth.models import Group
 from django.core.exceptions import ValidationError
 from django.dispatch import Signal, receiver
 
@@ -8,7 +9,7 @@ from .models import Notification
 
 
 notify = Signal(providing_args=[
-    'user', 'target', 'action', 'is_public', 'is_emailed', 'level', 'action_target', 'is_anonimuos'
+    'user', 'target', 'action', 'is_public', 'is_emailed', 'level', 'action_target', 'is_anonimuos', 'recipient'
 ])
 
 
@@ -24,7 +25,7 @@ def handle_notify(sender, **kwargs):
     level = kwargs.get('level')
     action_target = kwargs.get('action_target')
     is_anonimuos = kwargs.get('is_anonimuos')
-    # recipient = kwargs.get('recipient')
+    recipient = kwargs.get('recipient')
 
     options = dict(
         user=user,
@@ -46,12 +47,20 @@ def handle_notify(sender, **kwargs):
     if is_anonimuos is not None:
         options['is_anonimuos'] = is_anonimuos
 
-    notification = Notification(**options)
+    if isinstance(recipient, Group):
+        recipients = recipient.user_set.all()
+    else:
+        recipients = [recipient]
 
-    try:
-        notification.full_clean()
-    except ValidationError:
-        notification.user = None
-        notification.full_clean()
-    finally:
-        notification.save(user=user, target=target)
+    for recipient in recipients:
+
+        options['recipient'] = recipient
+
+        notification = Notification(**options)
+        try:
+            notification.full_clean()
+        except ValidationError:
+            notification.user = None
+            notification.full_clean()
+        finally:
+            notification.save(user=user, target=target)

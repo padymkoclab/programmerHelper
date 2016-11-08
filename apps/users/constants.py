@@ -87,8 +87,12 @@ LEVELS = (
 
 
 GROUPS_NAMES = (
-    'Moderators',
-    'Banned',
+    'moderators',
+    'superusers',
+    # 'publicists',
+    # 'Suggest book',
+    'regular',
+    'banned',
 )
 
 

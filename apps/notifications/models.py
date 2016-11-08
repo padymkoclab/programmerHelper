@@ -45,10 +45,10 @@ class Notification(models.Model):
 
     created = models.DateTimeField(_('created'), auto_now_add=True)
 
-    # recipient = models.ForeignKey(
-    #     settings.AUTH_USER_MODEL, related_name='notifications',
-    #     verbose_name=_('recipient'), on_delete=models.CASCADE
-    # )
+    recipient = models.ForeignKey(
+        settings.AUTH_USER_MODEL, related_name='notifications',
+        verbose_name=_('recipient'), on_delete=models.CASCADE,
+    )
 
     is_anonimuos = models.BooleanField(_('is anonimuos?'), default=False)
     user = models.ForeignKey(
@@ -72,6 +72,7 @@ class Notification(models.Model):
     action_target_object_id = models.CharField(max_length=200, null=True, blank=True)
     action_target = GenericForeignKey(ct_field='action_target_content_type', fk_field='action_target_object_id')
 
+    # managers
     objects = models.Manager()
     all_notifications = NotificationManager()
     notifications_badges = NotificationBadgeManager()
@@ -114,6 +115,7 @@ class Notification(models.Model):
         user = kwargs.pop('user', None)
         if user is not None:
             self.user_display_text = user.get_full_name()
+            self.user = None
 
         self.full_clean()
         super(Notification, self).save(*args, **kwargs)
@@ -212,9 +214,8 @@ class Follow(models.Model):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     follower = models.ForeignKey(
-        settings.AUTH_USER_MODEL, db_index=True,
-        on_delete=models.CASCADE, related_name='following',
-        verbose_name=_('follower')
+        settings.AUTH_USER_MODEL, models.CASCADE, db_index=True,
+        related_name='following', verbose_name=_('follower')
     )
     following = models.ForeignKey(
         settings.AUTH_USER_MODEL, db_index=True,

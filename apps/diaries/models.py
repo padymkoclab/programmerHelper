@@ -9,7 +9,6 @@ from django.utils.translation import ugettext_lazy as _
 from django.db import models
 from django.conf import settings
 
-from utils.django.models_fields import AutoOneToOneField
 from utils.django.models import TimeStampedModel
 from utils.django.models_utils import get_admin_url
 
@@ -22,7 +21,7 @@ class Diary(models.Model):
     MAX_COUNT_PARTITION = 50
 
     id = models.UUIDField(default=uuid.uuid4, primary_key=True, editable=False)
-    user = AutoOneToOneField(
+    user = models.OneToOneField(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
         verbose_name=_('Owner'), related_name='diary'
     )
