@@ -1,5 +1,6 @@
 
 import uuid
+import collections
 
 from django.contrib.auth.models import Group
 from django.core.exceptions import ValidationError
@@ -9,14 +10,14 @@ from .models import Notification
 
 
 notify = Signal(providing_args=[
-    'user', 'target', 'action', 'is_public', 'is_emailed', 'level', 'action_target', 'is_anonimuos', 'recipient'
+    'actor', 'target', 'action', 'is_public', 'is_emailed', 'level', 'action_target', 'is_anonimuos', 'recipient'
 ])
 
 
 @receiver(notify, dispatch_uid=uuid.uuid4)
 def handle_notify(sender, **kwargs):
 
-    user = kwargs.get('user')
+    actor = kwargs.get('actor')
     target = kwargs.get('target')
     action = kwargs.get('action')
     is_public = kwargs.get('is_public')
@@ -28,7 +29,7 @@ def handle_notify(sender, **kwargs):
     recipient = kwargs.get('recipient')
 
     options = dict(
-        user=user,
+        actor=actor,
         target=target,
         action=action,
         level=level,
@@ -47,20 +48,29 @@ def handle_notify(sender, **kwargs):
     if is_anonimuos is not None:
         options['is_anonimuos'] = is_anonimuos
 
-    if isinstance(recipient, Group):
-        recipients = recipient.user_set.all()
+    if isinstance(recipient, collections.Iterable):
+        recipients = set()
+        for obj in recipient:
+            if isinstance(obj, Group):
+                recipients.update(frozenset(obj.user_set.all()))
+            else:
+                recipients.add(obj)
     else:
-        recipients = [recipient]
+        if isinstance(recipient, Group):
+            recipients = recipient.user_set.iterator()
+        else:
+            recipients = frozenset({recipient})
 
     for recipient in recipients:
 
         options['recipient'] = recipient
 
         notification = Notification(**options)
+
         try:
             notification.full_clean()
         except ValidationError:
-            notification.user = None
+            notification.actor = None
             notification.full_clean()
         finally:
-            notification.save(user=user, target=target)
+            notification.save()

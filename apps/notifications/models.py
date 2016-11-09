@@ -1,6 +1,7 @@
 
 import uuid
 
+from django.utils.text import capfirst
 from django.core.exceptions import ValidationError
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
@@ -10,7 +11,6 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 
 from utils.python.utils import classproperty
-from utils.django.datetime_utils import convert_date_to_django_date_format
 
 from .managers import NotificationManager, NotificationBadgeManager
 from .constants import Actions
@@ -46,28 +46,28 @@ class Notification(models.Model):
     created = models.DateTimeField(_('created'), auto_now_add=True)
 
     recipient = models.ForeignKey(
-        settings.AUTH_USER_MODEL, related_name='notifications',
-        verbose_name=_('recipient'), on_delete=models.CASCADE,
+        settings.AUTH_USER_MODEL, models.CASCADE,
+        verbose_name=_('recipient'), related_name='notifications',
     )
 
     is_anonimuos = models.BooleanField(_('is anonimuos?'), default=False)
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL, verbose_name=_('user'), db_index=True,
-        related_name='+', on_delete=models.SET_NULL, null=True, blank=True
+    actor = models.ForeignKey(
+        settings.AUTH_USER_MODEL, models.SET_NULL, verbose_name=_('actor'),
+        related_name='+', null=True, blank=True, db_index=True,
     )
-    user_display_text = models.CharField(_('user_display_text'), max_length=100, blank=True)
+    actor_display_text = models.CharField(_('actor_display_text'), max_length=100, blank=True)
 
     target_content_type = models.ForeignKey(
-        ContentType, on_delete=models.SET_NULL,
-        null=True, blank=True, related_name='notifications_targets',
+        ContentType, models.SET_NULL, null=True,
+        blank=True, related_name='notifications_targets',
     )
     target_object_id = models.CharField(max_length=200, null=True, blank=True)
     target = GenericForeignKey(ct_field='target_content_type', fk_field='target_object_id')
     target_display_text = models.CharField(_('target'), max_length=200, null=True, blank=True)
 
     action_target_content_type = models.ForeignKey(
-        ContentType, on_delete=models.SET_NULL,
-        null=True, blank=True, related_name='notifications_action_targets',
+        ContentType, models.SET_NULL, blank=True,
+        null=True, related_name='notifications_action_targets',
     )
     action_target_object_id = models.CharField(max_length=200, null=True, blank=True)
     action_target = GenericForeignKey(ct_field='action_target_content_type', fk_field='action_target_object_id')
@@ -85,25 +85,26 @@ class Notification(models.Model):
 
     def __str__(self):
 
+        if self.created is None:
+            return 'Unsaved object'
+
         action = self.get_action_display()
-        user_display_text = self.get_user_display_text()
-        created = convert_date_to_django_date_format(self.created)
+        actor_display_text = self.get_actor_display_text()
 
         if self.has_target():
 
             target_content_type_name, target_display_text = self.get_target_info()
 
-            return '{} "{}" {} {} "{}" on {}'.format(
-                self.user_verbose_name,
-                user_display_text,
+            return '{} "{}" {} {} "{}"'.format(
+                self.actor_verbose_name,
+                actor_display_text,
                 action,
-                self.target_type_verbose_name,
-                self.target_display_text,
-                created,
+                target_content_type_name,
+                target_display_text,
             )
 
-        return '{} "{}" {} on {}'.format(
-            self.user_verbose_name, user_display_text, action, created
+        return '{} "{}" {}'.format(
+            self.actor_verbose_name, actor_display_text, action
         )
 
     def save(self, *args, **kwargs):
@@ -112,10 +113,10 @@ class Notification(models.Model):
         if target is not None:
             self.target_display_text = str(target)
 
-        user = kwargs.pop('user', None)
-        if user is not None:
-            self.user_display_text = user.get_full_name()
-            self.user = None
+        actor = kwargs.pop('actor', None)
+        if actor is not None:
+            self.actor_display_text = actor.get_full_name()
+            self.actor = None
 
         self.full_clean()
         super(Notification, self).save(*args, **kwargs)
@@ -159,16 +160,16 @@ class Notification(models.Model):
 
         return target_content_type_name, target_display_text
 
-    def get_user_display_text(self):
+    def get_actor_display_text(self):
 
-        if self.user is None:
-            return self.user_display_text
-        return self.user.get_full_name()
+        if self.actor is None:
+            return self.actor_display_text
+        return self.actor.get_full_name()
 
     @classproperty
-    def user_verbose_name(self):
+    def actor_verbose_name(self):
 
-        return get_user_model()._meta.verbose_name
+        return capfirst(get_user_model()._meta.verbose_name)
 
     def has_target(self):
 
@@ -182,7 +183,7 @@ class Notification(models.Model):
             target_model = self.target_content_type.model_class()
             return target_model._meta.verbose_name
 
-        return self.user_verbose_name
+        return self.actor_verbose_name
 
     @property
     def action_target_type_verbose_name(self):
@@ -218,15 +219,14 @@ class Follow(models.Model):
         related_name='following', verbose_name=_('follower')
     )
     following = models.ForeignKey(
-        settings.AUTH_USER_MODEL, db_index=True,
-        on_delete=models.CASCADE, related_name='followers',
-        verbose_name=_('following')
+        settings.AUTH_USER_MODEL, models.CASCADE, db_index=True,
+        related_name='followers', verbose_name=_('following')
     )
     started = models.DateTimeField(_('started'), auto_now_add=True)
 
     class Meta:
-        verbose_name = "Follow"
-        verbose_name_plural = "Follows"
+        verbose_name = _("follow")
+        verbose_name_plural = _("follows")
         unique_together = ('follower', 'following')
 
     def __str__(self):

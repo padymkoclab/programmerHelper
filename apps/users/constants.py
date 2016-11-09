@@ -3,7 +3,7 @@ from .models import Level
 
 
 # Attributes for default superuser
-TEST_SUPERUSER_DATA = dict(
+SUPERUSER_DATA = dict(
     email='admin@admin.com',
     username='admin',
     password='admin',
@@ -86,16 +86,7 @@ LEVELS = (
 )
 
 
-GROUPS_NAMES = (
+GROUPS_NAMES = frozenset({
     'moderators',
-    'superusers',
-    # 'publicists',
-    # 'Suggest book',
-    'regular',
     'banned',
-)
-
-
-CALCULATION_REPUTATION = {
-    'VOTE': 1,
-}
+})

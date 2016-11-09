@@ -49,6 +49,9 @@ class Actions(enum.Enum):
     USER_LOGGED_OUT = 'user_logged_out'
     USER_LOGIN_FAILED = 'user_loggin_failed'
 
+    USER_ADDED_TO_GROUP = 'user_added_to_group'
+    USER_REMOVED_FROM_GROUP = 'user_removed_from_group'
+
     ADDED_ACTION_TITLE = 'added_action_title'
     UPDATED_ACTION_TITLE = 'updated_action_title'
     DELETED_ACTION_TITLE = 'deleted_action_title'
@@ -62,6 +65,8 @@ class Actions(enum.Enum):
         USER_LOGIN_FAILED: (_('Failed loggin'), False),
         ADDED_BADGE: (_('Earned a badge'), False),
         DELETED_BADGE: (_('Lost the badge'), False),
+        USER_ADDED_TO_GROUP: (_('added to'), True),
+        USER_REMOVED_FROM_GROUP: (_('removed from'), True),
     }
 
     _CHOICES = {
@@ -103,6 +108,9 @@ class Actions(enum.Enum):
         USER_LOGGED_IN: _('logged in'),
         USER_LOGGED_OUT: _('logged out'),
         USER_LOGIN_FAILED: _('failed loggin'),
+
+        USER_ADDED_TO_GROUP: _('added to'),
+        USER_REMOVED_FROM_GROUP: _('removed from'),
     }
 
     @classmethod

@@ -1,6 +1,8 @@
 
+import random
 import logging
 
+from django.contrib.auth.models import Group
 from utils.django.basecommands import FactoryCountBaseCommand
 
 from ...factories import UserFactory
@@ -19,11 +21,19 @@ class Command(FactoryCountBaseCommand):
 
         UserModel._default_manager.filter().delete()
 
+        group_moderators = Group.objects.get(name='moderators')
+        group_banned = Group.objects.get(name='banned')
+
         count = kwargs['count'][0]
 
         for i in range(count):
-            UserFactory()
 
-        logger.info('Made factory {} users.'.format(
-            UserModel.objects.count()
-        ))
+            number = random.random()
+            user = UserFactory()
+
+            if number > .9:
+                user.groups.add(group_moderators)
+            elif number < .1:
+                user.groups.add(group_banned)
+
+        logger.info('Made factory {} users.'.format(UserModel.objects.count()))

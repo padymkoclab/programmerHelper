@@ -2,9 +2,10 @@
 import logging
 
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Group
 from django.core.management.base import BaseCommand
 
-from apps.users.constants import TEST_SUPERUSER_DATA
+from apps.users.constants import SUPERUSER_DATA
 
 
 logger = logging.getLogger('django.development')
@@ -12,7 +13,7 @@ logger = logging.getLogger('django.development')
 
 class Command(BaseCommand):
 
-    help = 'Creating a superuser fo testing or debug.'
+    help = 'Creating a superuser for debug.'
 
     def handle(self, *args, **kwargs):
 
@@ -22,18 +23,12 @@ class Command(BaseCommand):
         # create a superuser if yet does not exists
         # or return message that it already exists
         try:
-            User.objects.get_by_natural_key(TEST_SUPERUSER_DATA[User.USERNAME_FIELD])
+            user = User.objects.get_by_natural_key(SUPERUSER_DATA[User.USERNAME_FIELD])
         except User.DoesNotExist:
-
-            get_user_model().objects.create_superuser(**TEST_SUPERUSER_DATA)
-
-            logger.info('Succesful added superuser with {0} "{1}"!'.format(
-                User.USERNAME_FIELD,
-                TEST_SUPERUSER_DATA[User.USERNAME_FIELD],
-            ))
+            user = User.objects.create_superuser(**SUPERUSER_DATA)
+            logger.info('Added superuser "{}"'.format(user))
         else:
-            logger.warning(
-                'Superuser with %s "%s" already exist.' % (
-                    User.USERNAME_FIELD, TEST_SUPERUSER_DATA[User.USERNAME_FIELD]
-                )
-            )
+            logger.warning('Superuser "{}" already exist.'.format(user))
+
+        group = Group.objects.get(name='moderators')
+        user.groups.add(group)

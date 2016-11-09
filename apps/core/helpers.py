@@ -1,5 +1,6 @@
-
 import collections
+
+from django.contrib.auth.models import Group
 
 from apps.polls.models import Poll, Vote
 from apps.comments.models import Comment
@@ -37,11 +38,12 @@ def check_badges_for_instance_and_notify(sender, instance):
 
                 notify.send(
                     sender,
-                    user=user,
+                    actor=None,
                     target=badge,
                     action=Actions.DELETED_BADGE.value,
                     action_target=None,
                     level=Notification.INFO,
+                    recipient=user,
                 )
 
         for user, badges in users_earned_badges.items():
@@ -50,11 +52,12 @@ def check_badges_for_instance_and_notify(sender, instance):
 
                 notify.send(
                     sender,
-                    user=user,
+                    actor=None,
                     target=badge,
                     action=Actions.ADDED_BADGE.value,
                     action_target=None,
                     level=Notification.INFO,
+                    recipient=user,
                 )
 
 
@@ -328,8 +331,10 @@ def make_notification(sender, instance, action):
 
     if sender in [
         User, Vote, Solution, Snippet, Question, Answer, Profile, Diary,
-        Article, Mark, Reply, Comment, Opinion, Post, Topic
+        Article, Mark, Reply, Comment, Opinion, Post, Topic,
     ]:
+
+        GroupModerators = Group.objects.get(name='moderators')
 
         if action == 'created':
 
@@ -337,49 +342,55 @@ def make_notification(sender, instance, action):
 
                 return
 
-            elif sender in [Vote, Opinion, Comment, Mark, Answer, Reply, Post]:
+            elif sender in [Opinion, Comment, Mark, Answer, Reply, Post]:
 
-                user = instance.user
+                actor = instance.user
                 action_target = instance
 
-                if sender == Vote:
-                    action = Actions.ADDED_VOTE.value
-                    target = instance.poll
-                elif sender == Opinion:
+                if sender == Opinion:
                     action = Actions.ADDED_OPINION.value
                     target = instance.content_object
+                    recipient = (GroupModerators, instance.content_object.user)
                 elif sender == Comment:
                     action = Actions.ADDED_COMMENT.value
                     target = instance.content_object
+                    recipient = (GroupModerators, instance.content_object.user)
                 elif sender == Mark:
                     action = Actions.ADDED_MARK.value
                     target = instance.article
+                    recipient = (GroupModerators, instance.article.user)
                 elif sender == Answer:
                     action = Actions.ADDED_ANSWER.value
                     target = instance.question
+                    recipient = (GroupModerators, instance.question.user)
                 elif sender == Reply:
                     action = Actions.ADDED_REPLY.value
                     target = instance.book
+                    recipient = GroupModerators
                 elif sender == Post:
                     action = Actions.ADDED_POST.value
                     target = instance.topic
+                    recipient = (GroupModerators, instance.topic.user)
 
             elif sender in [Solution, Snippet, Question, Article, Topic]:
                 action = Actions.ADDED_OBJECT.value
                 target = instance
-                user = instance.user
+                actor = instance.user
+                recipient = GroupModerators
                 action_target = None
 
             elif sender == User:
                 action = Actions.ADDED_USER.value
                 target = None
                 action_target = None
-                user = instance
+                actor = instance
+                recipient = (instance, GroupModerators)
 
             notify.send(
                 sender,
-                user=user,
+                actor=actor,
                 target=target,
+                recipient=recipient,
                 action=action,
                 action_target=action_target,
                 level=Notification.SUCCESS,
@@ -387,127 +398,124 @@ def make_notification(sender, instance, action):
 
         elif action == 'updated':
 
-            if sender in [Vote, Opinion, Comment, Mark, Answer, Reply, Post, Profile, Diary]:
+            if sender in [Opinion, Comment, Mark, Answer, Reply, Post, Profile, Diary]:
 
-                user = instance.user
+                actor = instance.user
                 action_target = instance
 
-                if sender == Vote:
-                    target = instance.poll
-                    action = Actions.UPDATED_VOTE.value
-                elif sender == Opinion:
+                if sender == Opinion:
                     target = instance.content_object
                     action = Actions.UPDATED_OPINION.value
+                    recipient = (GroupModerators, instance.content_object.user)
                 elif sender == Comment:
                     target = instance.content_object
                     action = Actions.UPDATED_COMMENT.value
+                    recipient = (GroupModerators, instance.content_object.user)
                 elif sender == Mark:
                     target = instance.article
                     action = Actions.UPDATED_MARK.value
+                    recipient = (GroupModerators, instance.article.user)
                 elif sender == Answer:
                     target = instance.question
                     action = Actions.UPDATED_ANSWER.value
+                    recipient = (GroupModerators, instance.question.user)
                 elif sender == Reply:
                     target = instance.book
                     action = Actions.UPDATED_REPLY.value
+                    recipient = GroupModerators
                 elif sender == Post:
                     target = instance.topic
                     action = Actions.UPDATED_POST.value
+                    recipient = (GroupModerators, instance.topic.user)
                 elif sender == Diary:
                     target = None
                     action = Actions.UPDATED_DIARY.value
+                    recipient = instance
                 elif sender == Profile:
                     target = None
                     action = Actions.UPDATED_PROFILE.value
+                    recipient = instance
 
             elif sender in [Solution, Snippet, Question, Article, Topic]:
                 action = Actions.UPDATED_OBJECT.value
                 action_target = None
                 target = instance
-                user = instance.user
+                actor = instance.user
+                recipient = GroupModerators
 
             elif sender == User:
                 action = Actions.UPDATED_USER.value
                 action_target = None
                 target = None
-                user = instance
+                actor = instance
+                recipient = instance
 
             notify.send(
                 sender,
-                user=user,
+                actor=actor,
                 target=target,
                 action=action,
                 action_target=action_target,
                 level=Notification.SUCCESS,
+                recipient=recipient,
             )
 
         elif action == 'deleted':
 
             if sender in [
-                User, Vote, Solution, Snippet, Question, Answer, Article,
+                User, Solution, Snippet, Question, Answer, Article,
                 Mark, Reply, Comment, Opinion, Post, Topic
             ]:
 
-                user = instance if sender == User else instance.user
+                actor = instance if sender == User else instance.user
 
-                if sender == Vote:
-                    target = instance.poll
-                    action_target = instance
-                    action = Actions.DELETED_VOTE.value
-                elif sender == Mark:
+                if sender == Mark:
                     target = instance.article
                     action_target = instance
                     action = Actions.DELETED_MARK.value
+                    recipient = (GroupModerators, instance.article.user)
                 elif sender == Answer:
                     target = instance.question
                     action_target = instance
                     action = Actions.DELETED_ANSWER.value
+                    recipient = (GroupModerators, instance.question.user)
                 elif sender == Reply:
                     target = instance.book
                     action_target = instance
                     action = Actions.DELETED_REPLY.value
+                    recipient = GroupModerators
                 elif sender == Post:
                     target = instance.topic
                     action_target = instance
                     action = Actions.DELETED_POST.value
+                    recipient = (GroupModerators, instance.topic.user)
                 elif sender == User:
                     target = None
                     action_target = None
                     action = Actions.DELETED_USER.value
-                elif sender == Solution:
-                    target = instance
-                    action_target = None
-                    action = Actions.DELETED_OBJECT.value
-                elif sender == Snippet:
-                    target = instance
-                    action_target = None
-                    action = Actions.DELETED_OBJECT.value
-                elif sender == Question:
-                    target = instance
-                    action_target = None
-                    action = Actions.DELETED_OBJECT.value
-                elif sender == Article:
-                    target = instance
-                    action_target = None
-                    action = Actions.DELETED_OBJECT.value
-                elif sender == Topic:
-                    target = instance
-                    action_target = None
-                    action = Actions.DELETED_OBJECT.value
+                    recipient = GroupModerators
                 elif sender == Opinion:
                     target = instance.content_object
                     action_target = instance
                     action = Actions.DELETED_OPINION.value
+                    recipient = (GroupModerators, instance.content_object.user)
                 elif sender == Comment:
                     target = instance.content_object
                     action_target = instance
                     action = Actions.DELETED_COMMENT.value
+                    recipient = (GroupModerators, instance.content_object.user)
+                elif sender in (Solution, Snippet, Question, Article, Topic):
+                    target = instance
+                    action_target = None
+                    action = Actions.DELETED_OBJECT.value
+                    recipient = (GroupModerators, instance.user)
 
                 notify.send(
                     sender,
-                    user=user,
+                    actor=actor,
                     target=target,
                     action=action,
                     action_target=action_target,
                     level=Notification.SUCCESS,
+                    recipient=recipient,
                 )
