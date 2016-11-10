@@ -50,6 +50,7 @@ from apps.opinions.querysets import UserOpinionQuerySet
 from apps.forums.querysets import UserForumQuerySet
 from apps.tags.querysets import UserTagQuerySet
 from apps.badges.querysets import UserBadgeQuerySet
+from apps.notifications.querysets import UserNotificationQuerySet
 
 from .managers import UserManager, LevelManager
 from .exceptions import ProtectDeleteUser
@@ -190,9 +191,7 @@ class User(AbstractBaseUser, PermissionsMixin, UserCommentModelMixin, UserOpinio
     # managers
     objects = models.Manager()
     objects = UserManager()
-
-    badges_manager = BadgeManager()
-
+    # external managers
     polls_manager = UserPollQuerySet.as_manager()
     visits_manager = UserAttendanceQuerySet().as_manager()
     questions_manager = UserQuestionQuerySet().as_manager()
@@ -207,6 +206,7 @@ class User(AbstractBaseUser, PermissionsMixin, UserCommentModelMixin, UserOpinio
     forums_manager = UserForumQuerySet().as_manager()
     tags_manager = UserTagQuerySet().as_manager()
     badges_manager = UserBadgeQuerySet().as_manager()
+    notifications_manager = UserNotificationQuerySet().as_manager()
 
     class Meta:
         verbose_name = _("user")

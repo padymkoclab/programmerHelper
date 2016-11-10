@@ -35,7 +35,6 @@ from utils.django.views_mixins import ContextTitleMixin
 from utils.python.utils import get_filename_with_datetime
 
 from apps.notifications.models import Notification
-from apps.notifications.constants import Actions
 
 from .models import LogEntry
 from .filters import DateTimeRangeFilter, RelatedOnlyFieldListFilter, ChoiceFilter
@@ -96,15 +95,13 @@ class IndexView(SiteAdminMixin, SiteAdminView):
 
     def get_all_notifications(self):
 
-        notifications = Notification.objects.all()
+        notifications = Notification.notifications_activity.all()
 
         return notifications[:50]
 
     def get_badges_notifications(self):
 
-        notifications = Notification.objects.filter(
-            models.Q(action=Actions.ADDED_BADGE.value) | models.Q(action=Actions.DELETED_BADGE.value)
-        )
+        notifications = Notification.notifications_badges.all()
 
         return notifications[:50]
 

@@ -3,14 +3,15 @@ import uuid
 import collections
 
 from django.contrib.auth.models import Group
-from django.core.exceptions import ValidationError
+# from django.core.exceptions import ValidationError
 from django.dispatch import Signal, receiver
 
 from .models import Notification
+from .constants import Actions
 
 
 notify = Signal(providing_args=[
-    'actor', 'target', 'action', 'is_public', 'is_emailed', 'level', 'action_target', 'is_anonimuos', 'recipient'
+    'actor', 'target', 'action', 'is_public', 'is_emailed', 'level', 'action_target', 'recipient'
 ])
 
 
@@ -25,7 +26,6 @@ def handle_notify(sender, **kwargs):
     is_deleted = kwargs.get('is_deleted')
     level = kwargs.get('level')
     action_target = kwargs.get('action_target')
-    is_anonimuos = kwargs.get('is_anonimuos')
     recipient = kwargs.get('recipient')
 
     options = dict(
@@ -45,9 +45,6 @@ def handle_notify(sender, **kwargs):
     if is_deleted is not None:
         options['is_deleted'] = is_deleted
 
-    if is_anonimuos is not None:
-        options['is_anonimuos'] = is_anonimuos
-
     if isinstance(recipient, collections.Iterable):
         recipients = set()
         for obj in recipient:
@@ -66,11 +63,8 @@ def handle_notify(sender, **kwargs):
         options['recipient'] = recipient
 
         notification = Notification(**options)
-
-        try:
-            notification.full_clean()
-        except ValidationError:
+        if action == Actions.DELETED_USER.value:
             notification.actor = None
-            notification.full_clean()
-        finally:
-            notification.save()
+        notification.full_clean()
+        # reqired additional variables
+        notification.save(actor=actor, target=target)

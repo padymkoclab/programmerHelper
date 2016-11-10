@@ -12,8 +12,13 @@ from django.contrib.auth import get_user_model
 
 from utils.python.utils import classproperty
 
-from .managers import NotificationManager, NotificationBadgeManager
 from .constants import Actions
+from .managers import (
+    NotificationManager,
+    NotificationBadgeManager,
+    NotificationActivityManager,
+    NotificationReputationManager,
+)
 
 
 class Notification(models.Model):
@@ -50,7 +55,6 @@ class Notification(models.Model):
         verbose_name=_('recipient'), related_name='notifications',
     )
 
-    is_anonimuos = models.BooleanField(_('is anonimuos?'), default=False)
     actor = models.ForeignKey(
         settings.AUTH_USER_MODEL, models.SET_NULL, verbose_name=_('actor'),
         related_name='+', null=True, blank=True, db_index=True,
@@ -74,8 +78,10 @@ class Notification(models.Model):
 
     # managers
     objects = models.Manager()
-    all_notifications = NotificationManager()
+    notifications = NotificationManager()
     notifications_badges = NotificationBadgeManager()
+    notifications_activity = NotificationActivityManager()
+    notifications_reputation = NotificationReputationManager()
 
     class Meta:
         verbose_name = _('notification')
@@ -116,7 +122,9 @@ class Notification(models.Model):
         actor = kwargs.pop('actor', None)
         if actor is not None:
             self.actor_display_text = actor.get_full_name()
-            self.actor = None
+
+        if self.is_deleted is True:
+            self.is_read = True
 
         self.full_clean()
         super(Notification, self).save(*args, **kwargs)
@@ -237,3 +245,18 @@ class Follow(models.Model):
 
         if self.follower == self.following:
             raise ValidationError(_('User not possible following for yourself'))
+
+
+"""
+class Reputation():
+
+    created
+    reasons
+
+    changes_for_lasT_time 7 days
+
+    chart reputation
+
+
+class Reason
+"""

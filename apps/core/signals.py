@@ -6,7 +6,7 @@ from django.contrib.auth.signals import user_logged_in, user_logged_out, user_lo
 from django.db.models.signals import post_save, pre_delete, m2m_changed
 # from django.core.exceptions import ValidationError
 # from django.contrib.contenttypes.models import ContentType
-from django.utils.translation import ugettext_lazy as _
+# from django.utils.translation import ugettext_lazy as _
 from django.dispatch import receiver
 # from django.conf import settings
 # from django.contrib.auth import get_user_model
@@ -15,23 +15,29 @@ from apps.notifications.signals import notify
 from apps.notifications.models import Notification
 from apps.notifications.constants import Actions
 
-from .helpers import check_badges_for_instance_and_notify, make_notification
+from .helpers import notify_badges, notify_activity, notify_reputation
 
 
 @receiver(post_save, dispatch_uid=uuid.uuid4)
-def post_added_updated_object(sender, instance, created, **kwargs):
+def post_added_updated_object(sender, instance, created, raw, using, update_fields, **kwargs):
 
     action = 'created' if created is True else 'updated'
 
-    make_notification(sender, instance, action)
-    check_badges_for_instance_and_notify(sender, instance)
+    notify_activity(sender, instance, action, update_fields=update_fields)
+    notify_badges(sender, instance)
+    notify_reputation(sender, instance, action, users_for_deleting=None)
 
 
 @receiver(pre_delete, dispatch_uid=uuid.uuid4)
 def pre_deleted_object(sender, instance, **kwargs):
 
-    make_notification(sender, instance, 'deleted')
-    check_badges_for_instance_and_notify(sender, instance)
+    action = 'deleted'
+
+    users_for_deleting = kwargs.get('users_for_deleting')
+
+    notify_activity(sender, instance, action, users_for_deleting=users_for_deleting)
+    notify_badges(sender, instance, users_for_deleting=users_for_deleting)
+    notify_reputation(sender, instance, action, users_for_deleting=users_for_deleting)
 
 
 @receiver(user_logged_in, dispatch_uid=uuid.uuid4)
@@ -85,7 +91,7 @@ def changed_group(sender, instance, action, reverse, model, pk_set, **kwargs):
 
     notify_options = dict(
         sender=Group,
-        is_anonimuos=True,
+        is_anonimuos=False,
         action_target=None,
         level=Notification.SUCCESS,
         recipient=Group.objects.get(name='moderators'),
@@ -114,7 +120,7 @@ def changed_group(sender, instance, action, reverse, model, pk_set, **kwargs):
                     notify_options_for_add['target'] = group
                     notify.send(**notify_options_for_add)
 
-    if action == 'pre_remove':
+    elif action == 'pre_remove':
 
         notify_options_for_remove = dict()
         notify_options_for_remove.update(notify_options)
@@ -137,12 +143,11 @@ def changed_group(sender, instance, action, reverse, model, pk_set, **kwargs):
                     notify_options_for_remove['target'] = group
                     notify.send(**notify_options_for_remove)
 
-    if action == 'pre_clear':
+    elif action == 'pre_clear':
 
         notify_options_for_clear = dict()
         notify_options_for_clear.update(notify_options)
         notify_options_for_clear['action'] = Actions.USER_REMOVED_FROM_GROUP.value
-
         if reverse is True:
             for user in instance.user_set.iterator():
                 notify_options_for_clear['recipient'] = user
@@ -155,4 +160,3 @@ def changed_group(sender, instance, action, reverse, model, pk_set, **kwargs):
                 notify_options_for_clear['actor'] = instance
                 notify_options_for_clear['target'] = group
                 notify.send(**notify_options_for_clear)
-                import pdb; pdb.set_trace()

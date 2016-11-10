@@ -12,7 +12,6 @@ class Actions(enum.Enum):
 
     ADDED_OBJECT = 'added'
     ADDED_USER = 'added_user'
-    ADDED_BADGE = 'earned_badge'
     ADDED_VOTE = 'added_vote'
     ADDED_OPINION = 'added_opinion'
     ADDED_COMMENT = 'added_comment'
@@ -36,7 +35,6 @@ class Actions(enum.Enum):
 
     DELETED_OBJECT = 'deleted'
     DELETED_USER = 'deleted_user'
-    DELETED_BADGE = 'lost_badge'
     DELETED_OPINION = 'deleted_opinion'
     DELETED_COMMENT = 'deleted_comment'
     DELETED_MARK = 'deleted_mark'
@@ -44,6 +42,9 @@ class Actions(enum.Enum):
     DELETED_POST = 'deleted_post'
     DELETED_ANSWER = 'deleted_answer'
     DELETED_VOTE = 'deleted_vote'
+
+    EARNED_BADGE = 'earned_badge'
+    LOST_BADGE = 'lost_badge'
 
     USER_LOGGED_IN = 'user_logged_in'
     USER_LOGGED_OUT = 'user_logged_out'
@@ -63,8 +64,8 @@ class Actions(enum.Enum):
         USER_LOGGED_IN: (_('Successful loggin'), False),
         USER_LOGGED_OUT: (_('Successful logout'), False),
         USER_LOGIN_FAILED: (_('Failed loggin'), False),
-        ADDED_BADGE: (_('Earned a badge'), False),
-        DELETED_BADGE: (_('Lost the badge'), False),
+        EARNED_BADGE: (_('Earned a badge'), False),
+        LOST_BADGE: (_('Lost the badge'), False),
         USER_ADDED_TO_GROUP: (_('added to'), True),
         USER_REMOVED_FROM_GROUP: (_('removed from'), True),
     }
@@ -72,7 +73,7 @@ class Actions(enum.Enum):
     _CHOICES = {
         ADDED_OBJECT: _('added'),
         ADDED_USER: _('registered'),
-        ADDED_BADGE: _('earned'),
+        EARNED_BADGE: _('earned'),
         ADDED_VOTE: _('added vote to'),
         ADDED_OPINION: _('added opinion to'),
         ADDED_COMMENT: _('added comment to'),
@@ -96,7 +97,7 @@ class Actions(enum.Enum):
 
         DELETED_OBJECT: _('deleted'),
         DELETED_USER: _('deleted'),
-        DELETED_BADGE: _('lost'),
+        LOST_BADGE: _('lost'),
         DELETED_VOTE: _('deleted vote to'),
         DELETED_OPINION: _('deleted opinion to'),
         DELETED_COMMENT: _('deleted comment to'),

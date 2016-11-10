@@ -80,26 +80,12 @@ class UserManager(BaseUserManager):
         # return as dictioinary {instance.pk: percent}
         return result
 
-    def change_reputation(self, user, sign, constant):
-
-        if sign not in ('+', '-'):
-            raise ValueError()
-
-        value = CALCULATION_REPUTATION[constant]
-
-        if sign == '+':
-            user.reputation += value
-        else:
-            user.reputation -= value
-
-        user.full_clean()
-        user.save()
-
-
-UserManager = UserManager.from_queryset(UserQuerySet)
 
 
 class ActiveUserManager(models.Manager):
     """ """
 
     pass
+
+
+UserManager = UserManager.from_queryset(UserQuerySet)

@@ -57,7 +57,6 @@ def check_badge_publicist_bronze(user, article_model):
     qs = article_model._default_manager.filter(user=user, count_views__gte=100)
 
     if qs.exists():
-
         return qs.objects_with_rating().filter(rating__gt=0).exists()
 
     return False
@@ -70,7 +69,6 @@ def check_badge_publicist_silver(user, article_model):
     qs = article_model._default_manager.filter(user=user, count_views__gte=500)
 
     if qs.exists():
-
         return qs.objects_with_rating().filter(rating__gte=10).exists()
 
     return False
@@ -83,7 +81,6 @@ def check_badge_publicist_gold(user, article_model):
     qs = article_model._default_manager.filter(user=user, count_views__gte=1000)
 
     if qs.exists():
-
         return qs.objects_with_rating().filter(rating__gte=50).exists()
 
     return False
@@ -96,8 +93,7 @@ def check_badge_coder_bronze(user, snippet_model):
     qs = snippet_model._default_manager.filter(user=user, count_views__gte=100)
 
     if qs.exists():
-
-        return qs.objects_with_rating(rating__gt=0).exists()
+        return qs.objects_with_rating().filter(rating__gt=0).exists()
 
     return False
 
@@ -109,8 +105,7 @@ def check_badge_coder_silver(user, snippet_model):
     qs = snippet_model._default_manager.filter(user=user, count_views__gte=500)
 
     if qs.exists():
-
-        return qs.objects_with_rating(rating__gte=10).exists()
+        return qs.objects_with_rating().filter(rating__gte=10).exists()
 
     return False
 
@@ -122,8 +117,7 @@ def check_badge_coder_gold(user, snippet_model):
     qs = snippet_model._default_manager.filter(user=user, count_views__gte=1000)
 
     if qs.exists():
-
-        return qs.objects_with_rating(rating__gte=50).exists()
+        return qs.objects_with_rating().filter(rating__gte=50).exists()
 
     return False
 
@@ -135,8 +129,7 @@ def check_badge_inventor_bronze(user, solution_model):
     qs = solution_model._default_manager.filter(user=user, count_views__gte=100)
 
     if qs.exists():
-
-        return qs.objects_with_rating(rating__gt=0).exists()
+        return qs.objects_with_rating().filter(rating__gt=0).exists()
 
     return False
 
@@ -148,8 +141,7 @@ def check_badge_inventor_silver(user, solution_model):
     qs = solution_model._default_manager.filter(user=user, count_views__gte=500)
 
     if qs.exists():
-
-        return qs.objects_with_rating(rating__gte=10).exists()
+        return qs.objects_with_rating().filter(rating__gte=10).exists()
 
     return False
 
@@ -161,8 +153,7 @@ def check_badge_inventor_gold(user, solution_model):
     qs = solution_model._default_manager.filter(user=user, count_views__gte=1000)
 
     if qs.exists():
-
-        return qs.objects_with_rating(rating__gte=50).exists()
+        return qs.objects_with_rating().filter(rating__gte=50).exists()
 
     return False
 
@@ -174,8 +165,7 @@ def check_badge_questioner_bronze(user, question_model):
     qs = question_model._default_manager.filter(user=user, count_views__gte=100)
 
     if qs.exists():
-
-        return qs.objects_with_rating(rating__gt=0).exists()
+        return qs.objects_with_rating().filter(rating__gt=0).exists()
 
     return False
 
@@ -187,8 +177,7 @@ def check_badge_questioner_silver(user, question_model):
     qs = question_model._default_manager.filter(user=user, count_views__gte=500)
 
     if qs.exists():
-
-        return qs.objects_with_rating(rating__gte=10).exists()
+        return qs.objects_with_rating().filter(rating__gte=10).exists()
 
     return False
 
@@ -200,8 +189,7 @@ def check_badge_questioner_gold(user, question_model):
     qs = question_model._default_manager.filter(user=user, count_views__gte=1000)
 
     if qs.exists():
-
-        return qs.objects_with_rating(rating__gte=50).exists()
+        return qs.objects_with_rating().filter(rating__gte=50).exists()
 
     return False
 
@@ -213,7 +201,6 @@ def check_badge_teacher_bronze(user, answer_model):
     qs = answer_model._default_manager.filter(user=user)
 
     if qs.exists():
-
         return qs.objects_with_rating().filter(rating__gt=0).exists()
 
     return False
@@ -226,7 +213,6 @@ def check_badge_enlightened_silver(user, answer_model):
     qs = answer_model._default_manager.filter(user=user)
 
     if qs.exists():
-
         return qs.objects_with_rating().filter(rating__gte=10).exists()
 
     return False
@@ -239,7 +225,6 @@ def check_badge_guru_gold(user, answer_model):
     qs = answer_model._default_manager.filter(user=user)
 
     if qs.exists():
-
         return qs.objects_with_rating().filter(rating__gte=50).exists()
 
     return False
@@ -252,7 +237,6 @@ def check_badge_self_learner_bronze(user, answer_model):
     qs = answer_model._default_manager.filter(user=user, question__user=user)
 
     if qs.exists():
-
         return qs.objects_with_rating().filter(rating__gt=3).exists()
 
     return False
@@ -335,14 +319,14 @@ def check_badge_fanatic_silver(user, attendance_model):
 def check_badge_epic_silver(user):
     """Reputation is at least 1000."""
 
-    return user.get_reputation() >= 1000
+    return user.reputation >= 1000
 
 
 @check_boolean_return
 def check_badge_legendary_gold(user):
     """Reputation is at least 10000."""
 
-    return user.get_reputation() >= 10000
+    return user.reputation >= 10000
 
 
 @check_boolean_return

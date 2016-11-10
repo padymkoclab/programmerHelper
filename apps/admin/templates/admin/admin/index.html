@@ -230,7 +230,7 @@
                   <div class="panel-heading">
                     <div class="panel-title">
 
-                      {{ notification.get_action_title.0 }}
+                      {{ notification.get_action_title.0|capfirst }}
 
                       {% if notification.get_action_title.1 is True %}
                         {{ notification.action_target_type_verbose_name|lower }}
@@ -248,12 +248,12 @@
 
                     {% else %}
 
-                      {{ notification.user_verbose_name }}
+                      {{ notification.actor_verbose_name }}
 
-                      {% if notification.user is None %}
-                        {{ notification.get_user_display_text }}
+                      {% if notification.actor is None %}
+                        {{ notification.get_actor_display_text }}
                       {% else %}
-                        <a href="{{ notification.user|get_admin_url:'change' }}">{{ notification.get_user_display_text }}</a>
+                        <a href="{{ notification.actor|get_admin_url:'change' }}">{{ notification.get_actor_display_text }}</a>
                       {% endif %}
 
                     {% endif %}
@@ -309,7 +309,7 @@
                   <div class="panel-heading">
                     <div class="panel-title">
 
-                      {{ notification.get_action_title.0 }}
+                      {{ notification.get_action_title.0|capfirst }}
 
                       {% if notification.get_action_title.1 is True %}
                         {{ notification.action_target_type_verbose_name|lower }}
@@ -327,12 +327,12 @@
 
                     {% else %}
 
-                      {{ notification.user_verbose_name }}
+                      {{ notification.actor_verbose_name }}
 
-                      {% if notification.user is None %}
-                        {{ notification.get_user_display_text }}
+                      {% if notification.actor is None %}
+                        {{ notification.get_actor_display_text }}
                       {% else %}
-                        <a href="{{ notification.user|get_admin_url:'change' }}">{{ notification.get_user_display_text }}</a>
+                        <a href="{{ notification.actor|get_admin_url:'change' }}">{{ notification.get_actor_display_text }}</a>
                       {% endif %}
 
                     {% endif %}

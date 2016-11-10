@@ -279,6 +279,7 @@ class UserAdminModel(ModelAdmin):
                 '__str__',
                 'get_count_unread_notifications',
                 'get_count_read_notifications',
+                'get_count_deleted_notifications',
                 'get_total_count_notifications',
             ),
         }),
@@ -437,7 +438,8 @@ class UserAdminModel(ModelAdmin):
 
         elif list_display_name == 'users_notifications':
 
-            qs = super(UserAdminModel, self).get_queryset(request)
+            qs = self.model.notifications_manager\
+                .users_with_count_deleted_read_unread_and_total_notifications()
 
         elif list_display_name == 'users_forums':
 
