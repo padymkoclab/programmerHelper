@@ -53,6 +53,18 @@ class Actions(enum.Enum):
     USER_ADDED_TO_GROUP = 'user_added_to_group'
     USER_REMOVED_FROM_GROUP = 'user_removed_from_group'
 
+    PARTICIPATE_IN_POLL = 'participate_in_poll'
+    UNDO_PARTICIPATE_IN_POLL = 'undo_participate_in_poll'
+    UPVOTE = 'upvote'
+    CHANGE_TO_UPVOTE = 'change_to_upvote'
+    DOWNVOTE = 'downvote'
+    CHANGE_TO_DOWNVOTE = 'change_to_downvote'
+    LOSE_UPVOTE = 'lose_upvote'
+    LOSE_DOWNVOTE = 'lose_downvote'
+    PUT_ASSESSMENT = 'put_assessment'
+    CHANGE_ASSESSMENT = 'change_assessment'
+    UNDO_ASSESSMENT = 'undo_assessment'
+
     ADDED_ACTION_TITLE = 'added_action_title'
     UPDATED_ACTION_TITLE = 'updated_action_title'
     DELETED_ACTION_TITLE = 'deleted_action_title'
@@ -112,6 +124,18 @@ class Actions(enum.Enum):
 
         USER_ADDED_TO_GROUP: _('added to'),
         USER_REMOVED_FROM_GROUP: _('removed from'),
+
+        PARTICIPATE_IN_POLL: _('participate_in_poll for reputation'),
+        UNDO_PARTICIPATE_IN_POLL: _('undo_participate_in_poll for reputation'),
+        UPVOTE: _('upvote for reputation'),
+        CHANGE_TO_UPVOTE: _('change_to_upvote for reputation'),
+        DOWNVOTE: _('downvote for reputation'),
+        CHANGE_TO_DOWNVOTE: _('change_to_downvote for reputation'),
+        LOSE_UPVOTE: _('lose_upvote for reputation'),
+        LOSE_DOWNVOTE: _('lose_downvote for reputation'),
+        PUT_ASSESSMENT: _('put_assessment for reputation'),
+        CHANGE_ASSESSMENT: _('change_assessment for reputation'),
+        UNDO_ASSESSMENT: _('undo_assessment for reputation'),
     }
 
     @classmethod

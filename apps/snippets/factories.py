@@ -20,6 +20,8 @@ class SnippetFactory(AbstractTimeStampedFactory):
     class Meta:
         model = Snippet
 
+    comments_is_allowed = fuzzy.FuzzyChoice((True, False))
+
     @factory.lazy_attribute
     def lexer(self):
         field = Snippet._meta.get_field('lexer')

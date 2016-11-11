@@ -4,6 +4,9 @@ from django.utils import timezone
 import pygal
 from dateutil.relativedelta import relativedelta
 
+from apps.notifications.constants import Actions
+from apps.notifications.models import Notification
+
 
 def get_statistics_count_objects_for_the_past_year(queryset, date_field_name):
     """ """
@@ -71,3 +74,49 @@ def get_chart_count_objects_for_the_past_year(statistics_data):
     chart.add('Count objects', data)
     svg = chart.render()
     return svg
+
+
+def get_user_reputation_by_notifications(user):
+    """
+    Getting reputation of user for activity on website:
+    marks of published snippets, answers, questions and rating of articles,
+    participate in polls.
+    ---------------------------------------
+        Evaluate reputation for activity
+    ---------------------------------------
+    Mark answers                   +3
+    Mark questions                 +2
+    Mark solutions                 +2
+    Mark articles                +mark
+    Mark snippets                  +2
+    Participate in poll            +1
+
+    +1 for each 1000 views
+        Topic
+        Article
+        Question
+        Solution
+        Snippet
+
+    ---------------------------------------
+    """
+
+    notifications = Notification.objects.filter(recipient=user)
+
+    reputation = 0
+
+    count_participate_in_poll = notifications.filter(action=Actions.PARTICIPATE_IN_POLL.value).count()
+    count_undo_participate_in_poll = notifications.filter(action=Actions.UNDO_PARTICIPATE_IN_POLL.value).count()
+
+    reputation += count_participate_in_poll
+    reputation -= count_undo_participate_in_poll
+
+    # count_upvote = notifications.filter(action=Actions.UPVOTE.value).count()
+    # count_downvote = notifications.filter(action=Actions.DOWNVOTE.value).count()
+    # count_lose_upvote = notifications.filter(action=Actions.LOSE_UPVOTE.value).count()
+    # count_lose_downvote = notifications.filter(action=Actions.LOSE_DOWNVOTE.value).count()
+    # count_change_to_upvote = notifications.filter(action=Actions.CHANGE_TO_UPVOTE.value).count()
+    # count_downvote = notifications.filter(action=Actions.DOWNVOTE.value).count()
+    # count_change_to_downvote = notifications.filter(action=Actions.CHANGE_TO_DOWNVOTE.value).count()
+
+    return reputation

@@ -1,4 +1,6 @@
 
+from django.db import models
+
 
 def annotate_queryset_for_determinate_rating(queryset):
     """ """
@@ -23,3 +25,14 @@ def annotate_queryset_for_determinate_rating(queryset):
     })
 
     return queryset
+
+
+def get_rating_instance(instance):
+
+    opinions = instance.opinions.annotate(is_useful_int=models.Case(
+        models.When(is_useful=True, then=1),
+        models.When(is_useful=False, then=-1),
+        output_field=models.IntegerField(),
+    ))
+
+    return opinions.aggregate(rating=models.Sum('is_useful_int'))['rating']

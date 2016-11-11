@@ -22,7 +22,22 @@ from apps.notifications.models import Notification
 from apps.notifications.signals import notify
 from apps.notifications.constants import Actions
 
-from .constants import UpdateReputation
+
+def determinate_recipient_while_deleting(users_for_deleting, GroupModerators, *users):
+
+    if users_for_deleting is None:
+        a = list()
+        a.append(GroupModerators)
+        return a.extend(users)
+
+    alive_recipients = GroupModerators.user_set.exclude(pk__in=[i.pk for i in users_for_deleting])
+    alive_recipients = set(alive_recipients)
+
+    for user in users:
+        if user not in users_for_deleting:
+            alive_recipients.add(user)
+
+    return alive_recipients
 
 
 def notify_badges(sender, instance, users_for_deleting=None):
@@ -35,7 +50,7 @@ def notify_badges(sender, instance, users_for_deleting=None):
         if users_for_deleting is None:
             users_for_deleting = ()
 
-        users_lost_badges, users_earned_badges = check_badges_for_instance(instance)
+        users_lost_badges, users_earned_badges = check_badges_for_instance(instance, users_for_deleting)
 
         for user, badges in users_lost_badges.items():
 
@@ -72,7 +87,7 @@ def notify_badges(sender, instance, users_for_deleting=None):
                 )
 
 
-def check_badges_for_instance(instance):
+def check_badges_for_instance(instance, users_for_deleting):
     """ """
 
     users_lost_badges = collections.defaultdict(set)
@@ -81,6 +96,9 @@ def check_badges_for_instance(instance):
     if isinstance(instance, Vote):
 
         user = instance.user
+
+        if user in users_for_deleting:
+            return users_lost_badges, users_earned_badges
 
         users_lost_badges, users_earned_badges = update_badges_and_return_result(
             user, Badges.Badge.VOTER_BRONZE, users_lost_badges, users_earned_badges, Vote
@@ -98,6 +116,9 @@ def check_badges_for_instance(instance):
 
         user = instance.user
 
+        if user in users_for_deleting:
+            return users_lost_badges, users_earned_badges
+
         users_lost_badges, users_earned_badges = update_badges_and_return_result(
             user, Badges.Badge.COMMENTATOR_BRONZE, users_lost_badges, users_earned_badges, Comment
         )
@@ -113,6 +134,9 @@ def check_badges_for_instance(instance):
     elif isinstance(instance, (Mark, Article)):
 
         user = instance.user if isinstance(instance, Article) else instance.article.user
+
+        if user in users_for_deleting:
+            return users_lost_badges, users_earned_badges
 
         users_lost_badges, users_earned_badges = update_badges_and_return_result(
             user, Badges.Badge.PUBLICIST_BRONZE, users_lost_badges, users_earned_badges, Article
@@ -130,6 +154,9 @@ def check_badges_for_instance(instance):
 
         user = instance.user
 
+        if user in users_for_deleting:
+            return users_lost_badges, users_earned_badges
+
         users_lost_badges, users_earned_badges = update_badges_and_return_result(
             user, Badges.Badge.INVENTOR_BRONZE, users_lost_badges, users_earned_badges, Solution
         )
@@ -145,6 +172,9 @@ def check_badges_for_instance(instance):
     elif isinstance(instance, Snippet):
 
         user = instance.user
+
+        if user in users_for_deleting:
+            return users_lost_badges, users_earned_badges
 
         users_lost_badges, users_earned_badges = update_badges_and_return_result(
             user, Badges.Badge.CODER_BRONZE, users_lost_badges, users_earned_badges, Snippet
@@ -162,6 +192,9 @@ def check_badges_for_instance(instance):
 
         user = instance.user
 
+        if user in users_for_deleting:
+            return users_lost_badges, users_earned_badges
+
         users_lost_badges, users_earned_badges = update_badges_and_return_result(
             user, Badges.Badge.QUESTIONER_BRONZE, users_lost_badges, users_earned_badges, Question
         )
@@ -177,6 +210,9 @@ def check_badges_for_instance(instance):
     elif isinstance(instance, Answer):
 
         user = instance.user
+
+        if user in users_for_deleting:
+            return users_lost_badges, users_earned_badges
 
         users_lost_badges, users_earned_badges = update_badges_and_return_result(
             user, Badges.Badge.TEACHER_BRONZE, users_lost_badges, users_earned_badges, Answer
@@ -202,6 +238,9 @@ def check_badges_for_instance(instance):
 
         user = instance.user
 
+        if user in users_for_deleting:
+            return users_lost_badges, users_earned_badges
+
         users_lost_badges, users_earned_badges = update_badges_and_return_result(
             user, Badges.Badge.INTERLOCUTOR_BRONZE, users_lost_badges, users_earned_badges, Post
         )
@@ -218,6 +257,9 @@ def check_badges_for_instance(instance):
 
         user = instance.user
 
+        if user in users_for_deleting:
+            return users_lost_badges, users_earned_badges
+
         users_lost_badges, users_earned_badges = update_badges_and_return_result(
             user, Badges.Badge.CRITIC_BRONZE, users_lost_badges, users_earned_badges, Opinion
         )
@@ -229,6 +271,9 @@ def check_badges_for_instance(instance):
     elif isinstance(instance, Reply):
 
         user = instance.user
+
+        if user in users_for_deleting:
+            return users_lost_badges, users_earned_badges
 
         users_lost_badges, users_earned_badges = update_badges_and_return_result(
             user, Badges.Badge.READER_BRONZE, users_lost_badges, users_earned_badges, Reply
@@ -246,6 +291,9 @@ def check_badges_for_instance(instance):
 
         user = instance.user
 
+        if user in users_for_deleting:
+            return users_lost_badges, users_earned_badges
+
         users_lost_badges, users_earned_badges = update_badges_and_return_result(
             user, Badges.Badge.YEARLING_BRONZE, users_lost_badges, users_earned_badges, Visit
         )
@@ -262,6 +310,9 @@ def check_badges_for_instance(instance):
 
         user = instance.user
 
+        if user in users_for_deleting:
+            return users_lost_badges, users_earned_badges
+
         users_lost_badges, users_earned_badges = update_badges_and_return_result(
             user, Badges.Badge.FREQUENT_RECORDER_BRONZE, users_lost_badges, users_earned_badges, Diary
         )
@@ -269,6 +320,9 @@ def check_badges_for_instance(instance):
     elif isinstance(instance, Profile):
 
         user = instance.user
+
+        if user in users_for_deleting:
+            return users_lost_badges, users_earned_badges
 
         users_lost_badges, users_earned_badges = update_badges_and_return_result(
             user, Badges.Badge.AUTOBIOGRAPHER_BRONZE, users_lost_badges, users_earned_badges, Profile
@@ -280,6 +334,9 @@ def check_badges_for_instance(instance):
         users = User._default_manager.filter(pk__in=users_pks)
 
         for user in users:
+
+            if user in users_for_deleting:
+                continue
 
             users_lost_badges, users_earned_badges = update_badges_and_return_result(
                 user, Badges.Badge.VOTER_BRONZE, users_lost_badges, users_earned_badges, Vote
@@ -297,6 +354,9 @@ def check_badges_for_instance(instance):
 
         if isinstance(instance, User):
             user = instance
+
+        if user in users_for_deleting:
+            return users_lost_badges, users_earned_badges
 
         users_lost_badges, users_earned_badges = update_badges_and_return_result(
             user, Badges.Badge.EPIC_SILVER, users_lost_badges, users_earned_badges
@@ -488,67 +548,69 @@ def notify_activity(sender, instance, action, update_fields=None, users_for_dele
 
                 actor = instance if sender == User else instance.user
 
-                def determinate_recipient_while_deleting(GroupModerators, *users):
-
-                    if users_for_deleting is None:
-                        a = list()
-                        a.append(GroupModerators)
-                        return a.extend(users)
-
-                    alive_recipients = GroupModerators.user_set.exclude(pk__in=[i.pk for i in users_for_deleting])
-                    alive_recipients = set(alive_recipients)
-
-                    for user in users:
-                        if user not in users_for_deleting:
-                            alive_recipients.add(user)
-
-                    return alive_recipients
-
                 if sender == Mark:
                     target = instance.article
                     action_target = instance
                     action = Actions.DELETED_MARK.value
-                    recipient = determinate_recipient_while_deleting(GroupModerators, instance.article.user)
+                    recipient = determinate_recipient_while_deleting(
+                        users_for_deleting, GroupModerators, instance.article.user
+                    )
                 elif sender == Answer:
                     target = instance.question
                     action_target = instance
                     action = Actions.DELETED_ANSWER.value
-                    recipient = determinate_recipient_while_deleting(GroupModerators, instance.question.user)
+                    recipient = determinate_recipient_while_deleting(
+                        users_for_deleting, GroupModerators, instance.question.user
+                    )
                 elif sender == Vote:
                     target = instance.poll
                     action_target = instance
                     action = Actions.DELETED_VOTE.value
-                    recipient = determinate_recipient_while_deleting(GroupModerators)
+                    recipient = determinate_recipient_while_deleting(
+                        users_for_deleting, GroupModerators
+                    )
                 elif sender == Reply:
                     target = instance.book
                     action_target = instance
                     action = Actions.DELETED_REPLY.value
-                    recipient = determinate_recipient_while_deleting(GroupModerators)
+                    recipient = determinate_recipient_while_deleting(
+                        users_for_deleting, GroupModerators
+                    )
                 elif sender == Post:
                     target = instance.topic
                     action_target = instance
                     action = Actions.DELETED_POST.value
-                    recipient = determinate_recipient_while_deleting(GroupModerators, instance.topic.user)
+                    recipient = determinate_recipient_while_deleting(
+                        users_for_deleting, GroupModerators, instance.topic.user
+                    )
                 elif sender == Opinion:
                     target = instance.content_object
                     action_target = instance
                     action = Actions.DELETED_OPINION.value
-                    recipient = determinate_recipient_while_deleting(GroupModerators, instance.content_object.user)
+                    recipient = determinate_recipient_while_deleting(
+                        users_for_deleting, GroupModerators, instance.content_object.user
+                    )
                 elif sender == Comment:
                     target = instance.content_object
                     action_target = instance
                     action = Actions.DELETED_COMMENT.value
-                    recipient = determinate_recipient_while_deleting(GroupModerators, instance.content_object.user)
+                    recipient = determinate_recipient_while_deleting(
+                        users_for_deleting, GroupModerators, instance.content_object.user
+                    )
                 elif sender in (Solution, Snippet, Question, Article, Topic):
                     target = instance
                     action_target = None
                     action = Actions.DELETED_OBJECT.value
-                    recipient = determinate_recipient_while_deleting(GroupModerators, instance.user)
+                    recipient = determinate_recipient_while_deleting(
+                        users_for_deleting, GroupModerators, instance.user
+                    )
                 elif sender == User:
                     target = None
                     action_target = None
                     action = Actions.DELETED_USER.value
-                    recipient = determinate_recipient_while_deleting(GroupModerators)
+                    recipient = determinate_recipient_while_deleting(
+                        users_for_deleting, GroupModerators
+                    )
 
                 if recipient:
                     notify.send(
@@ -566,38 +628,109 @@ def notify_reputation(sender, instance, action, users_for_deleting):
 
     if sender in (Vote, Opinion, Mark):
 
-        changed = False
+        is_increase = None
 
         if sender == Vote:
 
-            user = instance.user
+            recipient = instance.user
 
-            if users_for_deleting is not None and user in users_for_deleting:
+            if users_for_deleting is not None and recipient in users_for_deleting:
                 return
 
+            target = instance.poll
+
             if action == 'created':
-                user.reputation += UpdateReputation.ADDED_VOTE.value
-                changed = True
+                action = Actions.PARTICIPATE_IN_POLL.value
+                is_increase = True
             elif action == 'deleted':
-                user.reputation += UpdateReputation.DELETED_VOTE.value
-                changed = True
+                action = Actions.UNDO_PARTICIPATE_IN_POLL.value
+                is_increase = False
 
         elif sender == Opinion:
 
-            user
+            recipient = instance.content_object.user
 
-        if changed is False:
+            if users_for_deleting is not None and recipient in users_for_deleting:
+                return
+
+            target = instance.content_object
+
+            if action == 'created':
+
+                if instance.is_useful is True:
+                    action = Actions.UPVOTE.value
+                    is_increase = True
+                elif instance.is_useful is False:
+                    action = Actions.DOWNVOTE.value
+                    is_increase = False
+
+            elif action == 'updated':
+
+                if instance.is_useful is True:
+                    action = Actions.CHANGE_TO_DOWNVOTE.value
+                    is_increase = False
+                elif instance.is_useful is False:
+                    action = Actions.CHANGE_TO_UPVOTE.value
+                    is_increase = True
+
+            elif action == 'deleted':
+
+                if instance.is_useful is True:
+                    action = Actions.LOSE_UPVOTE.value
+                    is_increase = False
+                elif instance.is_useful is False:
+                    action = Actions.LOSE_DOWNVOTE.value
+                    is_increase = True
+
+            target = instance.content_object
+            recipient = instance.content_object.user
+
+        elif sender == Mark:
+
+            recipient = instance.article.user
+
+            if users_for_deleting is not None and recipient in users_for_deleting:
+                return
+
+            if action == 'created':
+                pass
+            elif action == 'updated':
+                pass
+            elif action == 'deleted':
+                pass
+
+            target = instance.content_object
+            recipient = instance.content_object.user
+
+        if is_increase is None:
             return
 
-        user.full_clean()
-        user.save()
+        value = get_value_changing_reputation(recipient, is_increase, instance)
+
+        recipient.reputation += value
+        recipient.full_clean()
+        recipient.save()
 
         notify.send(
             sender,
-            actor=user,
-            target=None,
-            action=Actions.UPDATED_REPUTATION.value,
+            actor=None,
+            target=target,
+            action=action,
             action_target=None,
             level=Notification.SUCCESS,
-            recipient=user,
+            recipient=recipient,
         )
+
+
+def get_value_changing_reputation(recipient, is_increase, instance):
+
+    cons = {
+        Vote: 1,
+        Question: 2,
+        Answer: 3,
+        Solution: 3,
+        Snippet: 2,
+    }
+
+    val = cons[type(instance)]
+    return val if is_increase is True else -val

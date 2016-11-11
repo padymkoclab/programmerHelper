@@ -21,6 +21,8 @@ class SolutionFactory(AbstractTimeStampedFactory):
     class Meta:
         model = Solution
 
+    comments_is_allowed = fuzzy.FuzzyChoice((True, False))
+
     @factory.lazy_attribute
     def user(self):
         return fuzzy.FuzzyChoice(get_user_model()._default_manager.all()).fuzz()

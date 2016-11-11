@@ -24,19 +24,19 @@ from utils.django.models_utils import get_admin_url
 
 from apps.badges.managers import BadgeManager
 
-from apps.badges.mixins_models import BadgeModelMixin
-from apps.comments.mixins_models import UserCommentModelMixin
-from apps.opinions.mixins_models import UserOpinionModelMixin
-from apps.articles.mixins_models import ArticleModelMixin, UserMarkModelMixin
-from apps.snippets.mixins_models import SnippetModelMixin
-from apps.questions.mixins_models import QuestionModelMixin, AnswerModelMixin
-from apps.library.mixins_models import UserReplyModelMixin
-from apps.solutions.mixins_models import SolutionModelMixin
-from apps.forums.mixins_models import UserForumModelMixin
-from apps.polls.mixins_models import UserPollModelMixin
-from apps.tags.mixins_models import UserTagModelMixin
-from apps.notifications.mixins_models import UserNotificationModelMixin
-from apps.visits.mixins_models import UserVisitModelMixin
+from apps.badges.modelmixins import BadgeModelMixin
+from apps.comments.modelmixins import UserCommentModelMixin
+from apps.opinions.modelmixins import UserOpinionModelMixin
+from apps.articles.modelmixins import ArticleModelMixin, UserMarkModelMixin
+from apps.snippets.modelmixins import SnippetModelMixin
+from apps.questions.modelmixins import QuestionModelMixin, AnswerModelMixin
+from apps.library.modelmixins import UserReplyModelMixin
+from apps.solutions.modelmixins import SolutionModelMixin
+from apps.forums.modelmixins import UserForumModelMixin
+from apps.polls.modelmixins import UserPollModelMixin
+from apps.tags.modelmixins import UserTagModelMixin
+from apps.notifications.modelmixins import UserNotificationModelMixin
+from apps.visits.modelmixins import UserVisitModelMixin
 
 from apps.polls.querysets import UserPollQuerySet
 from apps.solutions.querysets import UserSolutionQuerySet
@@ -178,7 +178,6 @@ class User(AbstractBaseUser, PermissionsMixin, UserCommentModelMixin, UserOpinio
         _('alias'), max_length=200,
         help_text=_('Name for public display'),
     )
-    reputation = models.IntegerField(_('reputation'), default=0, editable=False)
     is_active = models.BooleanField(_('is active?'), default=True)
     level = models.ForeignKey(
         'level',
@@ -186,11 +185,13 @@ class User(AbstractBaseUser, PermissionsMixin, UserCommentModelMixin, UserOpinio
         related_name='users',
         default=Level.REGULAR,
     )
+    reputation = models.IntegerField(_('reputation'), default=0, editable=False)
     date_joined = models.DateTimeField(_('date joined'), auto_now_add=True)
 
     # managers
     objects = models.Manager()
     objects = UserManager()
+
     # external managers
     polls_manager = UserPollQuerySet.as_manager()
     visits_manager = UserAttendanceQuerySet().as_manager()
@@ -221,9 +222,6 @@ class User(AbstractBaseUser, PermissionsMixin, UserCommentModelMixin, UserOpinio
     def save(self, *args, **kwargs):
 
         super(User, self).save(*args, **kwargs)
-
-        # auto create
-        # self.profile
 
     def delete(self, *args, **kwargs):
 
@@ -301,76 +299,15 @@ class User(AbstractBaseUser, PermissionsMixin, UserCommentModelMixin, UserOpinio
         return format_html('<img src="{}" />', self.get_avatar_path(size))
     display_avatar.short_description = _('Avatar')
 
-    def get_reputation(self):
-        """
-        Getting reputation of user for activity on website:
-        marks of published snippets, answers, questions and rating of articles,
-        participate in polls.
-        ---------------------------------------
-            Evaluate reputation for activity
-        ---------------------------------------
-        Mark answers                   = *2
-        Mark questions                 = *1
-        Mark solutions                 = *3
-        Rating articles                 = *4
-        Mark snippets                  = *2
-        Filled profile                  = *1
-        Participate in poll             = *1
-        Popular topic                   = 1000 views = + 1
+    def get_changes_reputation_for_last_week(self):
 
-        Vote in poll +1
+        raise NotImplementedError
+        return
 
-        ---------------------------------------
-        """
+    def get_data_for_chart_reputation(self):
 
-        reputation = 0
-
-        total_count_views = self.topics.aggregate(
-            total_count_views=models.functions.Coalesce(
-                models.Sum('count_views'), 0
-            )
-        )['total_count_views']
-        reputation_on_posts = total_count_views / 1000
-
-        reputation_on_votes = self.get_count_votes()
-
-        values = self.articles.objects_with_rating().values_list('rating', flat=True)
-        values = filter(lambda x: x is not None, values)
-        reputation_on_articles = sum(values)
-
-        values = self.questions.objects_with_rating().values_list('rating', flat=True)
-        values = filter(lambda x: x is not None, values)
-        reputation_on_questions = sum(values)
-
-        values = self.snippets.objects_with_rating().values_list('rating', flat=True)
-        values = filter(lambda x: x is not None, values)
-        reputation_on_snippets = sum(values)
-
-        values = self.solutions.objects_with_rating().values_list('rating', flat=True)
-        values = filter(lambda x: x is not None, values)
-        reputation_on_solutions = sum(values)
-
-        values = self.answers.objects_with_rating().values_list('rating', flat=True)
-        values = filter(lambda x: x is not None, values)
-        reputation_on_answers = sum(values)
-
-        reputation = sum((
-            reputation_on_posts,
-            reputation_on_votes,
-            reputation_on_articles,
-            reputation_on_questions,
-            reputation_on_snippets,
-            reputation_on_solutions,
-            reputation_on_answers,
-        ))
-
-        if self.reputation != round(reputation):
-
-            self.reputation = round(reputation)
-            self.full_clean()
-            self.save()
-
-        return self.reputation
+        raise NotImplementedError
+        return
 
 
 class Profile(models.Model):
@@ -501,7 +438,3 @@ class Profile(models.Model):
         return result
     get_percentage_filling.short_description = _('Percentage filling')
     get_percentage_filling.admin_order_field = 'percentage_filling'
-
-
-# chart reputation
-# get_badges_by_sort (silver, bronze, gold)

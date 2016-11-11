@@ -17,7 +17,6 @@ class Command(BaseCommand):
         count_created = 0
         count_updated = 0
 
-        # import ipdb; ipdb.set_trace()
         for badge_data in Badges._DEFAULT_BADGES:
 
             obj, was_created = Badge.objects.update_or_create(
@@ -29,13 +28,9 @@ class Command(BaseCommand):
                 ),
             )
 
-            if was_created:
+            if was_created is True:
                 count_created += 1
-                action = 'was created'
             else:
                 count_updated += 1
-                action = 'was updated'
-
-            print('{} {}.'.format(obj, action))
 
         logger.info('Were created {} badges. Were updated {} badges.'.format(count_created, count_updated))

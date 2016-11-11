@@ -26,6 +26,7 @@ class ArticleFactory(AbstractTimeStampedFactory):
         model = Article
 
     status = fuzzy.FuzzyChoice([val for val, label in Article.STATUS_ARTICLE])
+    comments_is_allowed = fuzzy.FuzzyChoice((True, False))
     count_views = fuzzy.FuzzyInteger(0, 1000)
 
     @factory.lazy_attribute

@@ -15,13 +15,13 @@ from utils.python.constants import CHOICES_LEXERS
 
 from apps.comments.models import Comment
 from apps.comments.managers import CommentManager
-from apps.comments.mixins_models import CommentModelMixin
+from apps.comments.modelmixins import CommentModelMixin
 from apps.opinions.models import Opinion
 from apps.opinions.managers import OpinionManager
-from apps.opinions.mixins_models import OpinionModelMixin
+from apps.opinions.modelmixins import OpinionModelMixin
 from apps.tags.models import Tag
 from apps.tags.managers import TagManager
-from apps.tags.mixins_models import TagModelMixin
+from apps.tags.modelmixins import TagModelMixin
 
 # from apps.visits.models import Visit
 
@@ -47,6 +47,7 @@ class Snippet(CommentModelMixin, OpinionModelMixin, TagModelMixin, TimeStampedMo
         related_name='snippets', on_delete=models.CASCADE,
     )
     count_views = models.PositiveIntegerField(_('count views'), editable=False, default=0)
+    comments_is_allowed = models.BooleanField(_('comments is allowed'), default=True)
     description = models.TextField(_('decription'), validators=[MinLengthValidator(50)])
     code = models.TextField(_('code'), validators=[MinLengthValidator(5)])
     tags = models.ManyToManyField(

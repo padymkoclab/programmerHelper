@@ -12,13 +12,13 @@ from utils.django.models import TimeStampedModel
 
 from apps.comments.models import Comment
 from apps.comments.managers import CommentManager
-from apps.comments.mixins_models import CommentModelMixin
+from apps.comments.modelmixins import CommentModelMixin
 from apps.opinions.models import Opinion
 from apps.opinions.managers import OpinionManager
-from apps.opinions.mixins_models import OpinionModelMixin
+from apps.opinions.modelmixins import OpinionModelMixin
 from apps.tags.models import Tag
 from apps.tags.managers import TagManager
-from apps.tags.mixins_models import TagModelMixin
+from apps.tags.modelmixins import TagModelMixin
 
 from .managers import SolutionManager
 from .querysets import SolutionQuerySet
@@ -50,6 +50,7 @@ class Solution(CommentModelMixin, OpinionModelMixin, TagModelMixin, TimeStampedM
         verbose_name=_('Tags'),
     )
     count_views = models.PositiveIntegerField(_('count views'), editable=False, default=0)
+    comments_is_allowed = models.BooleanField(_('comments is allowed'), default=True)
 
     comments = GenericRelation(Comment, related_query_name='solutions')
     opinions = GenericRelation(Opinion, related_query_name='solutions')

@@ -12,10 +12,10 @@ from utils.django.models_utils import get_admin_url
 
 from apps.comments.models import Comment
 from apps.comments.managers import CommentManager
-from apps.comments.mixins_models import CommentModelMixin
+from apps.comments.modelmixins import CommentModelMixin
 from apps.opinions.models import Opinion
 from apps.opinions.managers import OpinionManager
-from apps.opinions.mixins_models import OpinionModelMixin
+from apps.opinions.modelmixins import OpinionModelMixin
 
 from .managers import CategoryManager, UtilityManager
 

@@ -15,10 +15,10 @@ from utils.django.models import TimeStampedModel
 from utils.django.validators import MinCountWordsValidator
 
 from apps.comments.models import Comment
-from apps.comments.mixins_models import CommentModelMixin
+from apps.comments.modelmixins import CommentModelMixin
 from apps.comments.managers import CommentManager
 from apps.tags.models import Tag
-from apps.tags.mixins_models import TagModelMixin
+from apps.tags.modelmixins import TagModelMixin
 from apps.tags.managers import TagManager
 
 from .managers import ArticleManager, SubsectionManager, MarkManager
@@ -56,6 +56,7 @@ class Article(CommentModelMixin, TagModelMixin, TimeStampedModel):
     conclusion = models.TextField(_('conclusion'), validators=[MinCountWordsValidator(10)])
     status = models.CharField(_('status'), max_length=10, choices=STATUS_ARTICLE, default=DRAFT)
     count_views = models.PositiveIntegerField(_('count views'), editable=False, default=0)
+    comments_is_allowed = models.BooleanField(_('comments is allowed'), default=True)
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, verbose_name=_('user'),
         related_name='articles', on_delete=models.CASCADE,

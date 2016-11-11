@@ -2,7 +2,6 @@
 import uuid
 
 from django.utils.text import capfirst
-from django.core.exceptions import ValidationError
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.utils.translation import ugettext_lazy as _
@@ -214,49 +213,3 @@ class Notification(models.Model):
     def display_anonimuos(self):
 
         return self.ANONIMUOS_DISPLAY_TEXT
-
-
-class Follow(models.Model):
-    """
-
-    """
-
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    follower = models.ForeignKey(
-        settings.AUTH_USER_MODEL, models.CASCADE, db_index=True,
-        related_name='following', verbose_name=_('follower')
-    )
-    following = models.ForeignKey(
-        settings.AUTH_USER_MODEL, models.CASCADE, db_index=True,
-        related_name='followers', verbose_name=_('following')
-    )
-    started = models.DateTimeField(_('started'), auto_now_add=True)
-
-    class Meta:
-        verbose_name = _("follow")
-        verbose_name_plural = _("follows")
-        unique_together = ('follower', 'following')
-
-    def __str__(self):
-
-        return '{0.follower} --> {0.following}'.format(self)
-
-    def clean(self):
-
-        if self.follower == self.following:
-            raise ValidationError(_('User not possible following for yourself'))
-
-
-"""
-class Reputation():
-
-    created
-    reasons
-
-    changes_for_lasT_time 7 days
-
-    chart reputation
-
-
-class Reason
-"""

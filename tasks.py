@@ -1,4 +1,6 @@
 
+import textwrap
+import logging
 import uuid
 import pathlib
 import shutil
@@ -9,10 +11,14 @@ from django.conf import settings
 
 from invoke import task
 
-from utils.python.logging_utils import create_logger_by_filename
 
-
-logger = create_logger_by_filename(__name__)
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+logFormatter = logging.Formatter('%(levelname)s: %(message)s')
+logHandler = logging.StreamHandler()
+logHandler.setFormatter(logFormatter)
+logHandler.setLevel(logging.DEBUG)
+logger.addHandler(logHandler)
 
 
 def make_backup_project():
@@ -162,3 +168,56 @@ def recreate_db(ctx):
         logger.debug('Created migrations for database.')
         ctx.run('./manage.py migrate')
         logger.debug('Applied migrations to database.')
+
+
+@task
+def replace_text_pythonic(ctx, path, original_text, replaceable_text):
+
+    path = pathlib.Path(path)
+    if not path.exists():
+        raise OSError('Path {} does not exists'.format(path.absolute()))
+
+    if original_text == replaceable_text:
+        logger.warn('Original text is equal to replaceable text.')
+        return
+
+    opened_files = dict()
+
+    for i in path.iterdir():
+        for j in i.rglob('*.py'):
+            if j.is_file():
+                f = j.open()
+
+                lines_details = list()
+                max_len_num_line = 1
+                for line_num, original_line in enumerate(f.readlines(), 1):
+                    if original_text in original_line:
+                        replaceable_line = original_line.replace(original_text, replaceable_text)
+                    else:
+                        replaceable_line = original_line
+                    lines_details.append((line_num, original_line, replaceable_line))
+
+                    if len(str(line_num)) > max_len_num_line:
+                        max_len_num_line = line_num
+
+                opened_files[f] = lines_details
+
+    terminal_size = shutil.get_terminal_size().columns
+    for f, details in opened_files.items():
+
+        print(f.name)
+        print('-' * terminal_size)
+        for line_num, original_line, replaceable_line in details:
+            if original_line != replaceable_line:
+
+                original_line_display = original_line.replace('\n', '')
+                replaceable_line_display = replaceable_line.replace('\n', '')
+                print('{line_num:>{max_len_num_line}} | {original_line:<{line_part_length}} {replaceable_line}'.format(
+                    line_num=line_num,
+                    max_len_num_line=max_len_num_line,
+                    line_part_length=terminal_size // 2,
+                    original_line=original_line_display,
+                    replaceable_line=replaceable_line_display,
+                ))
+
+        f.close()

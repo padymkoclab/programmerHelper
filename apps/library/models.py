@@ -24,7 +24,7 @@ from utils.django.validators import OnlyLettersValidator
 
 from apps.tags.models import Tag
 from apps.tags.managers import TagManager
-from apps.tags.mixins_models import TagModelMixin
+from apps.tags.modelmixins import TagModelMixin
 
 from .managers import BookManager, WriterManager, PublisherManager
 
