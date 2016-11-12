@@ -10,7 +10,7 @@ from django.conf import settings
 
 from utils.django.models_utils import get_admin_url
 from utils.django.models_fields import ConfiguredAutoSlugField
-from utils.django.models import TimeStampedModel
+from utils.django.models import Timestampable, UUIDable, Viewable, Commentable
 from utils.python.constants import CHOICES_LEXERS
 
 from apps.comments.models import Comment
@@ -29,7 +29,7 @@ from .managers import SnippetManager
 from .querysets import SnippetQuerySet
 
 
-class Snippet(CommentModelMixin, OpinionModelMixin, TagModelMixin, TimeStampedModel):
+class Snippet(CommentModelMixin, OpinionModelMixin, TagModelMixin, Timestampable, UUIDable, Viewable, Commentable):
     """
     Model for snippet.
     """
@@ -46,8 +46,6 @@ class Snippet(CommentModelMixin, OpinionModelMixin, TagModelMixin, TimeStampedMo
         settings.AUTH_USER_MODEL, verbose_name=_('user'),
         related_name='snippets', on_delete=models.CASCADE,
     )
-    count_views = models.PositiveIntegerField(_('count views'), editable=False, default=0)
-    comments_is_allowed = models.BooleanField(_('comments is allowed'), default=True)
     description = models.TextField(_('decription'), validators=[MinLengthValidator(50)])
     code = models.TextField(_('code'), validators=[MinLengthValidator(5)])
     tags = models.ManyToManyField(

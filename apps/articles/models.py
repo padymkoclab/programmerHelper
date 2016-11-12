@@ -11,7 +11,7 @@ from django.contrib.postgres.fields import ArrayField
 from utils.django.models_fields import ConfiguredAutoSlugField
 from utils.django.functions_db import Round
 from utils.django.models_utils import upload_image, get_admin_url
-from utils.django.models import TimeStampedModel
+from utils.django.models import Timestampable, UUIDable, Viewable, Commentable
 from utils.django.validators import MinCountWordsValidator
 
 from apps.comments.models import Comment
@@ -24,7 +24,7 @@ from apps.tags.managers import TagManager
 from .managers import ArticleManager, SubsectionManager, MarkManager
 
 
-class Article(CommentModelMixin, TagModelMixin, TimeStampedModel):
+class Article(CommentModelMixin, TagModelMixin, Timestampable, UUIDable, Viewable, Commentable):
     """
     Model for article
     """
@@ -55,8 +55,6 @@ class Article(CommentModelMixin, TagModelMixin, TimeStampedModel):
     header = models.TextField(_('header'), validators=[MinCountWordsValidator(10)])
     conclusion = models.TextField(_('conclusion'), validators=[MinCountWordsValidator(10)])
     status = models.CharField(_('status'), max_length=10, choices=STATUS_ARTICLE, default=DRAFT)
-    count_views = models.PositiveIntegerField(_('count views'), editable=False, default=0)
-    comments_is_allowed = models.BooleanField(_('comments is allowed'), default=True)
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, verbose_name=_('user'),
         related_name='articles', on_delete=models.CASCADE,
@@ -162,7 +160,7 @@ class Article(CommentModelMixin, TagModelMixin, TimeStampedModel):
     get_rating.short_description = _('Rating')
 
 
-class Subsection(TimeStampedModel):
+class Subsection(Timestampable, UUIDable):
 
     ERROR_MSG_UNIQUE_TOGETHER_ARTICLE_AND_TITLE = _('Subsection with this name already exists in this article.')
 
@@ -198,7 +196,7 @@ class Subsection(TimeStampedModel):
         return super().unique_error_message(model_class, unique_check)
 
 
-class Mark(TimeStampedModel):
+class Mark(Timestampable, UUIDable):
     """
     Model for keeping mark of other objects.
     """

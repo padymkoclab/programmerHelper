@@ -1,6 +1,4 @@
 
-import uuid
-
 from django.utils.text import capfirst
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
@@ -9,6 +7,7 @@ from django.db import models
 from django.conf import settings
 from django.contrib.auth import get_user_model
 
+from utils.django.models import UUIDable
 from utils.python.utils import classproperty
 
 from .constants import Actions
@@ -20,7 +19,7 @@ from .managers import (
 )
 
 
-class Notification(models.Model):
+class Notification(UUIDable):
     """ """
 
     ANONIMUOS_DISPLAY_TEXT = _('Anonimuos user')
@@ -36,8 +35,6 @@ class Notification(models.Model):
         (ERROR, _('Error')),
         (WARNING, _('Warning')),
     )
-
-    id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
 
     level = models.CharField(_('level'), default=SUCCESS, choices=CHOICES_LEVEL, max_length=10)
     action = models.CharField(_('action'), max_length=200)

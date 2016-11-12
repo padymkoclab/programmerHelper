@@ -8,7 +8,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.db import models
 from django.conf import settings
 
-from utils.django.models import TimeStampedModel
+from utils.django.models import Timestampable, UUIDable
 from utils.django.models_fields import ConfiguredAutoSlugField
 from utils.django.models_utils import get_admin_url
 
@@ -31,7 +31,7 @@ logger = logging.getLogger('django.development')
 logger.warning('scrapy data question from StackOverFlow or MailList Google Groups by tags Django, JS as latest')
 
 
-class Question(TagModelMixin, OpinionModelMixin, TimeStampedModel):
+class Question(TagModelMixin, OpinionModelMixin, Timestampable, UUIDable):
     """
 
     """
@@ -125,7 +125,7 @@ class Question(TagModelMixin, OpinionModelMixin, TimeStampedModel):
         # analysis tags
 
 
-class Answer(OpinionModelMixin, CommentModelMixin, TimeStampedModel):
+class Answer(OpinionModelMixin, CommentModelMixin, Timestampable, UUIDable):
     """
 
     """

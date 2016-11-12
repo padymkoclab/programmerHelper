@@ -1,6 +1,4 @@
 
-import uuid
-
 from django.utils.safestring import mark_safe
 from django.utils.html import format_html
 from django.template.defaultfilters import truncatechars
@@ -12,28 +10,23 @@ from django.db import models
 from django.conf import settings
 
 from utils.django.datetime_utils import convert_date_to_django_date_format
-from utils.django.models import TimeStampedModel
+from utils.django.models import Timestampable, UUIDable, Orderable, Viewable
 from utils.django.models_fields import ConfiguredAutoSlugField, MarkupField
 from utils.django.models_utils import get_admin_url
 
 from .managers import SectionManager, ForumManager, TopicManager, PostManager
 
 
-class Section(models.Model):
+class Section(UUIDable, Orderable):
     """
 
     """
 
-    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
     name = models.CharField(_('name'), max_length=80, unique=True, validators=[MinLengthValidator(5)])
     groups = models.ManyToManyField(
         Group, blank=True,
         verbose_name=_('groups'),
         help_text=_('only users from these groups can see this section')
-    )
-    position = models.PositiveSmallIntegerField(
-        _('position'), unique=True,
-        validators=[MinValueValidator(1)]
     )
 
     objects = models.Manager()
@@ -103,7 +96,7 @@ class Section(models.Model):
         return True
 
 
-class Forum(TimeStampedModel):
+class Forum(UUIDable, Timestampable):
     """
 
     """
@@ -224,7 +217,7 @@ class Forum(TimeStampedModel):
     display_details_latest_post.short_description = _('latest post')
 
 
-class Topic(TimeStampedModel):
+class Topic(UUIDable, Timestampable, Viewable):
     """
 
     """
@@ -239,7 +232,6 @@ class Topic(TimeStampedModel):
         settings.AUTH_USER_MODEL, verbose_name=_('user'),
         related_name='topics', on_delete=models.CASCADE,
     )
-    count_views = models.PositiveIntegerField(_('count views'), editable=False, default=0)
     is_sticky = models.BooleanField(_('is sticky'), default=False)
     is_opened = models.BooleanField(_('is opened?'), default=True)
 
@@ -313,7 +305,7 @@ class Topic(TimeStampedModel):
     display_details_latest_post.short_description = _('latest post')
 
 
-class Post(TimeStampedModel):
+class Post(UUIDable, Timestampable):
     """
 
     """

@@ -4,13 +4,13 @@ from django.utils.translation import ugettext_lazy as _
 from django.db import models
 from django.conf import settings
 
-from utils.django.models import BaseGenericModel
+from utils.django.models import GenericRelatable, Timestampable, UUIDable
 
 from .managers import OpinionManager
 from .querysets import OpinionQuerySet
 
 
-class Opinion(BaseGenericModel):
+class Opinion(GenericRelatable, Timestampable, UUIDable):
 
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,

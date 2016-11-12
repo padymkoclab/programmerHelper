@@ -5,14 +5,14 @@ from django.utils.translation import ugettext_lazy as _
 from django.db import models
 from django.conf import settings
 
-from utils.django.models import BaseGenericModel
+from utils.django.models import GenericRelatable, Timestampable, UUIDable
 
 from .constants import MAX_LENGTH_COMMENT
 
 # comment design from website
 
 
-class Comment(BaseGenericModel):
+class Comment(GenericRelatable, Timestampable, UUIDable):
     """ """
 
     text_comment = models.TextField(

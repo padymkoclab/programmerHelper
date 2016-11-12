@@ -8,7 +8,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from utils.django.models_utils import get_admin_url
 from utils.django.models_fields import ConfiguredAutoSlugField
-from utils.django.models import TimeStampedModel
+from utils.django.models import Timestampable, UUIDable, Viewable, Commentable
 
 from apps.comments.models import Comment
 from apps.comments.managers import CommentManager
@@ -24,7 +24,7 @@ from .managers import SolutionManager
 from .querysets import SolutionQuerySet
 
 
-class Solution(CommentModelMixin, OpinionModelMixin, TagModelMixin, TimeStampedModel):
+class Solution(CommentModelMixin, OpinionModelMixin, TagModelMixin, Timestampable, UUIDable, Commentable, Viewable):
     """
     Model for solution.
     """
@@ -49,8 +49,6 @@ class Solution(CommentModelMixin, OpinionModelMixin, TagModelMixin, TimeStampedM
         related_name='solutions',
         verbose_name=_('Tags'),
     )
-    count_views = models.PositiveIntegerField(_('count views'), editable=False, default=0)
-    comments_is_allowed = models.BooleanField(_('comments is allowed'), default=True)
 
     comments = GenericRelation(Comment, related_query_name='solutions')
     opinions = GenericRelation(Opinion, related_query_name='solutions')

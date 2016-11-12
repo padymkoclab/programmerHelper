@@ -1,5 +1,8 @@
 
-import textwrap
+import fnmatch
+import os
+import webbrowser
+import collections
 import logging
 import uuid
 import pathlib
@@ -19,6 +22,17 @@ logHandler = logging.StreamHandler()
 logHandler.setFormatter(logFormatter)
 logHandler.setLevel(logging.DEBUG)
 logger.addHandler(logHandler)
+
+
+# width of console
+TERMINAL_SIZE = shutil.get_terminal_size().columns
+
+
+def checkup_path(path):
+
+    path = pathlib.Path(path)
+    if not path.exists():
+        raise OSError('Path {} does not exists'.format(path.absolute()))
 
 
 def make_backup_project():
@@ -54,7 +68,7 @@ def git_push(ctx, text_commit):
     # execute pushing with Git
     ctx.run('git add -u')
     ctx.run('git add .')
-    logger.debug('Added files')
+    logger.debug('Added files to Git repository')
     ctx.run('git commit -m \"{0}\"'.format(text_commit))
     logger.debug('Made commit')
     ctx.run('git push -u origin master')
@@ -171,53 +185,224 @@ def recreate_db(ctx):
 
 
 @task
-def replace_text_pythonic(ctx, path, original_text, replaceable_text):
+def replace_text_in_python_files(ctx, path, original_text, replaceable_text):
+    """Replace text by pattern in pythonic files."""
 
-    path = pathlib.Path(path)
-    if not path.exists():
-        raise OSError('Path {} does not exists'.format(path.absolute()))
+    def prepare_line_to_display(line, text_for_wrap, escape_code):
+        """Auxilary function for wrap line to colored line by passed parameters."""
 
+        wrapped_text = '\x1b[{}m{}\x1b[0m'.format(escape_code, text_for_wrap)
+        return line.replace('\n', '').strip(' ').replace(text_for_wrap, wrapped_text)
+
+    # check if is real path passed
+    checkup_path(path)
+
+    # if user typed same values
     if original_text == replaceable_text:
         logger.warn('Original text is equal to replaceable text.')
         return
 
-    opened_files = dict()
+    # var for storage files where will be found needed text
+    needed_files = list()
 
-    for i in path.iterdir():
-        for j in i.rglob('*.py'):
-            if j.is_file():
-                f = j.open()
+    # find only python files
+    path = pathlib.Path(path)
+    for obj in path.rglob('*.py'):
 
-                lines_details = list()
-                max_len_num_line = 1
-                for line_num, original_line in enumerate(f.readlines(), 1):
-                    if original_text in original_line:
-                        replaceable_line = original_line.replace(original_text, replaceable_text)
-                    else:
-                        replaceable_line = original_line
-                    lines_details.append((line_num, original_line, replaceable_line))
+        # another one restrict for files
+        if not obj.is_file():
+            continue
 
-                    if len(str(line_num)) > max_len_num_line:
-                        max_len_num_line = line_num
+        # open file for read and write
+        f = obj.open('r+')
 
-                opened_files[f] = lines_details
+        # var for all details of lines this file
+        lines_details = dict()
 
-    terminal_size = shutil.get_terminal_size().columns
-    for f, details in opened_files.items():
+        # counter founed matches
+        count_found = 0
 
-        print(f.name)
-        print('-' * terminal_size)
-        for line_num, original_line, replaceable_line in details:
-            if original_line != replaceable_line:
+        for line_num, original_line in enumerate(f.readlines(), 1):
 
-                original_line_display = original_line.replace('\n', '')
-                replaceable_line_display = replaceable_line.replace('\n', '')
-                print('{line_num:>{max_len_num_line}} | {original_line:<{line_part_length}} {replaceable_line}'.format(
+            # if found match in a line
+            if original_text in original_line:
+
+                # highlight original text in original line
+                original_line_display = prepare_line_to_display(original_line, original_text, '3;30;41')
+
+                # highlight replaceable text in line with corresponding replace
+                replaceable_line = original_line.replace(original_text, replaceable_text)
+                replaceable_line_display = prepare_line_to_display(replaceable_line, replaceable_text, '3;30;43')
+
+                # updated counter by count founed matches in the line
+                count_found += original_line.count(original_text)
+
+            else:
+
+                # if nothind found - all details is none
+                replaceable_line = original_line_display = replaceable_line_display = None
+
+            lines_details[line_num] = dict(
+                original_line=original_line,
+                replaceable_line=replaceable_line,
+                original_line_display=original_line_display,
+                replaceable_line_display=replaceable_line_display,
+            )
+
+        # if file contains matches
+        if count_found > 0:
+
+            # print path to file and count founded matches
+            print('\x1b[1;33;44m {} (found {}) \x1b[0m'.format(f.name, count_found))
+            print('-' * TERMINAL_SIZE)
+
+            replaceable_content = str()
+            original_content = str()
+
+            for line_num, line_details in lines_details.items():
+
+                replaceable_line = line_details['replaceable_line']
+                original_line = line_details['original_line']
+
+                # restore original content of the file a line by line
+                original_content += original_line
+
+                # made content of the file with corresponding replications, if need
+                if replaceable_line is None:
+                    replaceable_content += original_line
+                    continue
+                else:
+                    replaceable_content += replaceable_line
+
+                # print corresponding details of line
+                print('{line_num:>10} | {original_line_display:<70} {replaceable_line_display}'.format(
                     line_num=line_num,
-                    max_len_num_line=max_len_num_line,
-                    line_part_length=terminal_size // 2,
-                    original_line=original_line_display,
-                    replaceable_line=replaceable_line_display,
+                    original_line_display=line_details['original_line_display'],
+                    replaceable_line_display=line_details['replaceable_line_display'],
                 ))
 
-        f.close()
+            # keep file as opened with an original and replacable content
+            needed_files.append((f, original_content, replaceable_content))
+
+        else:
+
+            # close a file, if it not contains matches at all
+            f.close()
+
+    # if no one file constins matches
+    if not needed_files:
+        logger.info('Nothing found for matching in all files')
+        return
+
+    # display promt to a user
+    user_promt = None
+    try:
+        while user_promt not in ['y', 'n']:
+            user_promt = input('Are you agree? (Yes(y)/No(n)) ')
+
+        if user_promt == 'n':
+            logger.info('Nothing changed.')
+            return
+        elif user_promt == 'y':
+
+            # if the user confimed changes
+            for f, original_content, replaceable_content in needed_files:
+                f.seek(0)
+                f.write(replaceable_content)
+
+    except Exception as e:
+
+        # if something went wrong recovery the contents of files to original state
+        for f, original_content, replaceable_content in needed_files:
+            f.seek(0)
+            f.truncate()
+            f.write(original_content)
+        logger.error('Changes discarted since raised error: {}'.format(e))
+    else:
+        if user_promt == 'y':
+            # if all good, print details about it
+            logger.info('Changed files: {} '.format(len(needed_files)))
+            for f, *other in needed_files:
+                print('\t{}'.format(f.name))
+    finally:
+        # close all opened files in any case
+        for f, *other in needed_files:
+            f.close()
+
+
+@task
+def rename_files(ctx, path, pattern, rename_to):
+
+    checkup_path(path)
+
+    details = list()
+    counter = 1
+    num_column_with = 5
+    origin_column_with = TERMINAL_SIZE // 2 - num_column_with
+    rename_column_with = origin_column_with
+
+    RenameFileDetail = collections.namedtuple(
+        'RenameFileDetail',
+        ('match_file', 'renamed_file', 'display_line')
+    )
+
+    for dirpath, dirnames, filenames in os.walk(path):
+
+        if not filenames:
+            continue
+
+        for file in fnmatch.filter(filenames, pattern):
+            match_file = '{}/{}'.format(dirpath, file)
+            renamed_file = '{}/{}'.format(dirpath, rename_to)
+            display_line = '{0:>{1}} | {2:<{3}} | {4:<{5}}'.format(
+                counter,
+                num_column_with,
+                match_file,
+                origin_column_with,
+                renamed_file,
+                rename_column_with,
+            )
+            counter += 1
+            details.append(
+                RenameFileDetail(
+                    match_file=match_file, renamed_file=renamed_file, display_line=display_line
+                )
+            )
+
+    if not details:
+        logger.info('Nothing found by pattern')
+
+    print('\x1b[1;37;44mFound files: {}\x1b[0m'.format(len(details)))
+    print('-' * TERMINAL_SIZE)
+    print('{0:>{1}} | {2:^{3}} | {4:^{5}}'.format(
+        '№',
+        num_column_with,
+        'Original name',
+        origin_column_with,
+        'Renamed name',
+        rename_column_with,
+    ))
+    print('-' * TERMINAL_SIZE)
+    for rename_file_detail in details:
+        print(rename_file_detail.display_line)
+
+    user_promt = None
+    while user_promt not in ['y', 'n']:
+
+        user_promt = input('Are you agree? (Yes(y)/No(n)) ')
+
+    if user_promt == 'n':
+        logger.info('Nothing changed')
+        return
+
+    raise NotImplementedError('Renaming files')
+
+
+@task
+def open_github_repository_page(ctx):
+    """Open in a default browser a web page of current Git repository."""
+
+    command_result = ctx.run('git config --get remote.origin.url')
+    github_repo = command_result.stdout
+    github_repo_url = github_repo.replace('git@github.com:', 'github.com/', 1).rstrip('.git')
+    webbrowser.open('https://' + github_repo_url)

@@ -18,7 +18,7 @@ from django.conf import settings
 from utils.python.utils import flatten
 from utils.django.models_utils import get_admin_url, upload_image
 from utils.django.models_fields import ConfiguredAutoSlugField, CountryField
-from utils.django.models import TimeStampedModel
+from utils.django.models import Timestampable, UUIDable, Creatable
 from utils.django.functions_db import Round
 from utils.django.validators import OnlyLettersValidator
 
@@ -39,7 +39,7 @@ logger.info('Idea: I read it and I read it now and I want read it')
 NOW_YEAR = timezone.now().year
 
 
-class Book(TagModelMixin, models.Model):
+class Book(TagModelMixin, UUIDable, Creatable):
     """
     Model for books
     """
@@ -51,7 +51,6 @@ class Book(TagModelMixin, models.Model):
     def upload_book_image(instance, filename):
         return upload_image(instance, filename)
 
-    id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
     name = models.CharField(
         _('name'), max_length=100,
         validators=[MinLengthValidator(settings.MIN_LENGTH_FOR_NAME_OR_TITLE_OBJECT)],
@@ -98,7 +97,6 @@ class Book(TagModelMixin, models.Model):
             ),
         ]
     )
-    created = models.DateTimeField(_('date added'), auto_now_add=True)
     tags = models.ManyToManyField(
         Tag, verbose_name=_('tags'), related_name='books',
     )
@@ -192,7 +190,7 @@ class Book(TagModelMixin, models.Model):
     get_most_common_words_from_replies.short_description = _('Most common words from replies')
 
 
-class Writer(models.Model):
+class Writer(UUIDable):
     """
     Model for writers of books
     """
@@ -201,7 +199,6 @@ class Writer(models.Model):
     MAX_BIRTH_YEAR = NOW_YEAR - 16
     MIN_DEATH_YEAR = 1916
 
-    id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
     name = models.CharField(
         _('Name'),
         max_length=200,
@@ -324,11 +321,10 @@ class Writer(models.Model):
     get_avg_mark_for_books.admin_order_field = 'avg_mark_for_books'
 
 
-class Publisher(models.Model):
+class Publisher(UUIDable):
 
     MIN_FOUNDED_YEAR = 1900
 
-    id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
     name = models.CharField(
         _('name'), max_length=50, unique=True,
         error_messages={'unique': _('Publisher with this name already exists.')}
@@ -375,7 +371,7 @@ class Publisher(models.Model):
     get_count_books.admin_order_field = 'count_books'
 
 
-class Reply(TimeStampedModel):
+class Reply(Timestampable):
     """
     Model for reply about other objects.
     """

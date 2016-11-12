@@ -1,6 +1,5 @@
 
 import itertools
-import uuid
 
 from django.template import Context, Template
 from django.utils.html import mark_safe, escape, format_html
@@ -18,13 +17,13 @@ import pygal
 from utils.django.models_utils import get_admin_url
 from utils.django.datetime_utils import convert_date_to_django_date_format
 from utils.django.models_fields import ConfiguredAutoSlugField
-from utils.django.models import TimeStampedModel
+from utils.django.models import Timestampable, UUIDable
 
 from .managers import PollManager, ChoiceManager, VoteManager
 from .querysets import PollQuerySet, ChoiceQuerySet
 
 
-class Poll(TimeStampedModel):
+class Poll(Timestampable, UUIDable):
     """
     Model for poll.
     """
@@ -179,14 +178,13 @@ class Poll(TimeStampedModel):
         return format_html('{}', svg)
 
 
-class Choice(models.Model):
+class Choice(UUIDable):
     """
     Model for choice of poll.
     """
 
     UNIQUE_ERROR_MESSAGE_FOR_TEXT_CHOICE_AND_POLL = _('Poll does not have more than one choice with this text')
 
-    id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
     poll = models.ForeignKey(
         'Poll', verbose_name=_('poll'),
         on_delete=models.CASCADE, related_name='choices',
@@ -232,12 +230,11 @@ class Choice(models.Model):
     get_truncated_text_choice.short_description = _('Text choice')
 
 
-class Vote(models.Model):
+class Vote(UUIDable):
     """
     Model of vote. This model is intermediate model for keep a choice of a user in a certain poll.
     """
 
-    id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
     poll = models.ForeignKey(
         'Poll', models.CASCADE,
         verbose_name=_('poll'), related_name='votes',

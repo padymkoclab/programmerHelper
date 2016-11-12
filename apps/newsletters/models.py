@@ -4,21 +4,22 @@ from django.core.validators import MinLengthValidator
 from django.utils.translation import ugettext_lazy as _
 from django.db import models
 
+from utils.django.models import Creatable
+
 from .managers import ManagerNewsletter
 
 
-class Newsletter(models.Model):
+class Newsletter(Creatable):
 
     content = models.CharField(
-        _('Content'),
+        _('content'),
         max_length=500,
         validators=[MinLengthValidator(25)]
     )
-    created = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        verbose_name = _("Newsletter")
-        verbose_name_plural = _("Newsletters")
+        verbose_name = _("newsletter")
+        verbose_name_plural = _("newsletters")
         get_latest_by = 'created'
         ordering = ['created']
 

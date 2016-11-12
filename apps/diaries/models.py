@@ -9,18 +9,17 @@ from django.utils.translation import ugettext_lazy as _
 from django.db import models
 from django.conf import settings
 
-from utils.django.models import TimeStampedModel
+from utils.django.models import Timestampable, UUIDable, Creatable
 from utils.django.models_utils import get_admin_url
 
 from .managers import DiaryManager, PartitionManager
 
 
-class Diary(models.Model):
+class Diary(UUIDable, Creatable):
     """ """
 
     MAX_COUNT_PARTITION = 50
 
-    id = models.UUIDField(default=uuid.uuid4, primary_key=True, editable=False)
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
         verbose_name=_('Owner'), related_name='diary'
@@ -81,7 +80,7 @@ class Diary(models.Model):
     get_total_size.admin_order_field = 'total_size'
 
 
-class Partition(TimeStampedModel):
+class Partition(Timestampable, UUIDable):
     """ """
 
     diary = models.ForeignKey(

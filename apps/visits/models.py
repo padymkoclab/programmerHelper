@@ -1,25 +1,22 @@
 
-import uuid
-
 from django.utils.translation import ugettext_lazy as _
 from django.db import models
 from django.conf import settings
 
 from utils.django.datetime_utils import convert_date_to_django_date_format
+from utils.django.models import UUIDable, Updateable, Viewable
 
 from .validators import validate_comma_separated_objects_list
 from .managers import VisitPageManager, AttendanceManager, VisitUserBrowserManager, VisitUserSystemManager
 
 
-class VisitPage(models.Model):
+class VisitPage(UUIDable, Viewable):
     """
     Model for working with visits users of pages.
     Have features keeping users and url visited them.
     """
 
-    id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
     url = models.CharField(_('URL'), validators=[], max_length=1000, unique=True)
-    count = models.IntegerField(_('count visits'), default=0)
 
     class Meta:
         verbose_name = _('visit page')
@@ -32,12 +29,11 @@ class VisitPage(models.Model):
         return '{0.url}'.format(self)
 
 
-class Attendance(models.Model):
+class Attendance(UUIDable):
     """
     Model for keep days of attendance of website whole
     """
 
-    id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
     users = models.ManyToManyField(
         settings.AUTH_USER_MODEL, related_name='attendances',
         verbose_name=_('user'), editable=False,
@@ -69,36 +65,33 @@ class Attendance(models.Model):
     get_count_visitors.admin_order_field = 'count_visitors'
 
 
-class Visit(models.Model):
+class Visit(UUIDable, Updateable):
     """
     Model for keep latest visit of the site
     """
 
-    id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL, related_name='last_seen',
         verbose_name=_('user'), editable=False, db_index=True
     )
-    date = models.DateTimeField(_('date'), editable=False, auto_now=True)
 
     objects = models.Manager()
 
     class Meta:
         verbose_name = _('visit')
         verbose_name_plural = _('visits')
-        get_latest_by = 'date'
-        ordering = ('-date', )
+        get_latest_by = 'updated'
+        ordering = ('-updated', )
 
     def __str__(self):
         return '{0.user}'.format(self)
 
 
-class VisitUserBrowser(models.Model):
+class VisitUserBrowser(UUIDable):
     """
     For only registered users
     """
 
-    id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
     name = models.CharField(_('name'), max_length=100, unique=True)
     user_pks = models.TextField(
         _('primary key of users'), validators=[validate_comma_separated_objects_list],
@@ -117,12 +110,11 @@ class VisitUserBrowser(models.Model):
         return '{0.name}'.format(self)
 
 
-class VisitUserSystem(models.Model):
+class VisitUserSystem(UUIDable):
     """
     For only registered users
     """
 
-    id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
     name = models.CharField(_('name'), max_length=50, unique=True)
     user_pks = models.TextField(
         _('primary key of users'), validators=[validate_comma_separated_objects_list],

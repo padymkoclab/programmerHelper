@@ -6,19 +6,17 @@ from django.utils.translation import ugettext_lazy as _
 from django.db import models
 from django.conf import settings
 
-from utils.django.models import TimeStampedModel
+from utils.django.models import Timestampable, UUIDable, Creatable
 from utils.django.models_utils import get_admin_url
 
 from .managers import BadgeManager, EarnedBadgeManager
 from .constants import Badges
 
 
-class Badge(TimeStampedModel):
+class Badge(Timestampable, UUIDable):
     """
 
     """
-
-    id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
 
     name = models.CharField(_('Name'), max_length=50, choices=Badges.CHOICES_NAME, db_index=True)
     description = models.CharField(_('Description'), max_length=50, choices=Badges.CHOICES_DESCRIPTION, db_index=True)
@@ -96,9 +94,7 @@ class Badge(TimeStampedModel):
     #     )
 
 
-class EarnedBadge(models.Model):
-
-    id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
+class EarnedBadge(UUIDable, Creatable):
 
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, verbose_name=_('User'),
@@ -110,7 +106,6 @@ class EarnedBadge(models.Model):
         on_delete=models.CASCADE, related_name='earned',
         db_index=True
     )
-    created = models.DateTimeField(_('Date getting'), auto_now_add=True, db_index=True)
 
     objects = EarnedBadgeManager()
 

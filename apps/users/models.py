@@ -2,7 +2,6 @@
 import logging
 import urllib
 import hashlib
-import uuid
 
 from django.contrib.postgres.fields import ArrayField
 from django import template
@@ -20,6 +19,7 @@ from django.core.cache import cache
 # from django.contrib.auth import password_validation
 
 from utils.django import models_fields as utils_models_fields
+from utils.django.models import Viewable, Updateable, UUIDable
 from utils.django.models_utils import get_admin_url
 
 from apps.badges.managers import BadgeManager
@@ -148,7 +148,7 @@ class Level(models.Model):
 class User(AbstractBaseUser, PermissionsMixin, UserCommentModelMixin, UserOpinionModelMixin, ArticleModelMixin,
     SnippetModelMixin, UserMarkModelMixin, QuestionModelMixin, AnswerModelMixin, UserReplyModelMixin,
     SolutionModelMixin, UserPollModelMixin, UserForumModelMixin, UserTagModelMixin, BadgeModelMixin,
-    UserNotificationModelMixin, UserVisitModelMixin):
+    UserNotificationModelMixin, UserVisitModelMixin, UUIDable):
     """
     Custom auth user model with additional fields and username fields as email
     """
@@ -156,7 +156,6 @@ class User(AbstractBaseUser, PermissionsMixin, UserCommentModelMixin, UserOpinio
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ('email', 'alias')
 
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     email = models.EmailField(
         _('email'), unique=True,
         error_messages={
@@ -310,7 +309,7 @@ class User(AbstractBaseUser, PermissionsMixin, UserCommentModelMixin, UserOpinio
         return
 
 
-class Profile(models.Model):
+class Profile(Viewable, Updateable, UUIDable):
     """
 
     """
@@ -325,8 +324,6 @@ class Profile(models.Model):
         (UNKNOWN, _('Unknown'))
     )
 
-    # main fields
-    id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
     user = utils_models_fields.AutoOneToOneField(
         'User', related_name='profile',
         verbose_name=_('User'), on_delete=models.CASCADE
@@ -357,19 +354,16 @@ class Profile(models.Model):
         verbose_name=_('Directions of development')
     )
 
-    # public noneditable info
-    views = models.IntegerField(_('Count views'), default=0, editable=False)
-
     # private info
     job = models.CharField(
-        _('Job'), max_length=100, default='', blank=True,
+        _('job'), max_length=100, default='', blank=True,
     )
     gender = models.CharField(
-        _('Gender'), max_length=10, choices=CHOICES_GENDER,
+        _('gender'), max_length=10, choices=CHOICES_GENDER,
         default=UNKNOWN,
     )
     date_birthday = models.DateField(
-        _('Date birthday'), null=True, blank=True,
+        _('date birthday'), null=True, blank=True,
         help_text=_('Only used for displaying age'))
     real_name = models.CharField(_('Real name'), max_length=200, default='', blank=True)
     phone = utils_models_fields.FixedCharField(
@@ -378,13 +372,12 @@ class Profile(models.Model):
     )
 
     # user preferences
-    show_location = models.BooleanField(_('Show location?'), default=False)
-    show_email = models.BooleanField(_('Show email'), default=True)
+    show_location = models.BooleanField(_('show location?'), default=False)
+    show_email = models.BooleanField(_('show email'), default=True)
 
     # non-editable and hidden information
-    latitude = models.FloatField(_('Latitude'), editable=False, null=True)
-    longitude = models.FloatField(_('Longitude'), editable=False, null=True)
-    updated = models.DateTimeField(_('Updated'), auto_now=True)
+    latitude = models.FloatField(_('latitude'), editable=False, null=True)
+    longitude = models.FloatField(_('longitude'), editable=False, null=True)
 
     class Meta:
         verbose_name = _('Profile')

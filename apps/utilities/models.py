@@ -6,7 +6,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.db import models
 from django.conf import settings
 
-from utils.django.models import TimeStampedModel
+from utils.django.models import Timestampable, UUIDable
 from utils.django.models_fields import ConfiguredAutoSlugField
 from utils.django.models_utils import get_admin_url
 
@@ -20,7 +20,7 @@ from apps.opinions.modelmixins import OpinionModelMixin
 from .managers import CategoryManager, UtilityManager
 
 
-class Category(TimeStampedModel):
+class Category(Timestampable, UUIDable):
     """
     Model of a category of utilities.
     """
@@ -103,7 +103,7 @@ class Category(TimeStampedModel):
     get_count_utilities.admin_order_field = 'count_utilities'
 
 
-class Utility(CommentModelMixin, OpinionModelMixin, TimeStampedModel):
+class Utility(CommentModelMixin, OpinionModelMixin, Timestampable, UUIDable):
     """
     Model of a utility
     """
