@@ -371,7 +371,7 @@ class Publisher(UUIDable):
     get_count_books.admin_order_field = 'count_books'
 
 
-class Reply(Timestampable):
+class Reply(Timestampable, UUIDable):
     """
     Model for reply about other objects.
     """

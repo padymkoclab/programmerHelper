@@ -1,14 +1,11 @@
 
-from django.utils.text import capfirst
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.utils.translation import ugettext_lazy as _
 from django.db import models
 from django.conf import settings
-from django.contrib.auth import get_user_model
 
 from utils.django.models import UUIDable
-from utils.python.utils import classproperty
 
 from .constants import Actions
 from .managers import (
@@ -88,26 +85,22 @@ class Notification(UUIDable):
     def __str__(self):
 
         if self.created is None:
-            return 'Unsaved object'
+            recipient = self.recipient if hasattr(self, 'recipient') else 'unknown user'
+            return 'for {}'.format(recipient)
 
-        action = self.get_action_display()
-        actor_display_text = self.get_actor_display_text()
+        action_display_pattern = self.get_action_display_pattern()
 
-        if self.has_target():
-
-            target_content_type_name, target_display_text = self.get_target_info()
-
-            return '{} "{}" {} {} "{}"'.format(
-                self.actor_verbose_name,
-                actor_display_text,
-                action,
-                target_content_type_name,
-                target_display_text,
-            )
-
-        return '{} "{}" {}'.format(
-            self.actor_verbose_name, actor_display_text, action
+        actor_type = 'ERRRROR' if self.actor is None else self.actor._meta.verbose_name
+        action_display_pattern = action_display_pattern % dict(
+            actor=self.get_actor_display_text(),
+            actor_type=actor_type,
+            target=self.target,
+            target_type=self.target_type_verbose_name,
+            action_target_type=self.action_target_type_verbose_name,
+            reputation_deviation=self.get_reputation_deviation(),
+            recipient=self.recipient,
         )
+        return 'for {}: {}'.format(self.recipient, action_display_pattern)
 
     def save(self, *args, **kwargs):
 
@@ -170,24 +163,14 @@ class Notification(UUIDable):
             return self.actor_display_text
         return self.actor.get_full_name()
 
-    @classproperty
-    def actor_verbose_name(self):
-
-        return capfirst(get_user_model()._meta.verbose_name)
-
-    def has_target(self):
-
-        return self.target is not None or self.target_content_type is not None
-
     @property
     def target_type_verbose_name(self):
 
-        if self.has_target():
+        if self.target_content_type is None:
+            return 'self.actor_verbose_name'
 
-            target_model = self.target_content_type.model_class()
-            return target_model._meta.verbose_name
-
-        return self.actor_verbose_name
+        target_model = self.target_content_type.model_class()
+        return target_model._meta.verbose_name
 
     @property
     def action_target_type_verbose_name(self):
@@ -199,14 +182,14 @@ class Notification(UUIDable):
 
         return self.target_type_verbose_name
 
-    def get_action_display(self):
+    def get_action_display_pattern(self):
 
-        return Actions.get_action_display(self.action)
-
-    def get_action_title(self):
-
-        return Actions.get_action_title(self.action)
+        return Actions.get_action_display_pattern(self.action)
 
     def display_anonimuos(self):
 
         return self.ANONIMUOS_DISPLAY_TEXT
+
+    def get_reputation_deviation(self):
+
+        return Actions.get_reputation_deviation(self.action)

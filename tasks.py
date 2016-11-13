@@ -4,7 +4,6 @@ import os
 import webbrowser
 import collections
 import logging
-import uuid
 import pathlib
 import shutil
 import random
@@ -33,29 +32,6 @@ def checkup_path(path):
     path = pathlib.Path(path)
     if not path.exists():
         raise OSError('Path {} does not exists'.format(path.absolute()))
-
-
-def make_backup_project():
-    dst = '/media/wlysenko/66ABF2AC3D03BAAA/Web/Projects/django/'
-    path_to_project = pathlib.Path(__file__).parent
-    project_name = path_to_project.name
-    path_to_backup = dst + project_name
-    try:
-        shutil.copytree(str(path_to_project), path_to_backup)
-    except FileExistsError:
-        temp_name_project = str(uuid.uuid1())
-        temp_path_to_backup = dst + temp_name_project
-        try:
-            shutil.copytree(str(path_to_project), temp_path_to_backup)
-        except:
-            raise RuntimeError('Не удалось сделать backup of project.')
-        else:
-            shutil.rmtree(path_to_backup)
-            shutil.os.rename(temp_path_to_backup, path_to_backup)
-    except:
-        raise RuntimeError('Не удалось сделать backup of project.')
-    else:
-        return True
 
 
 @task
@@ -336,10 +312,10 @@ def rename_files(ctx, path, pattern, rename_to):
     checkup_path(path)
 
     details = list()
-    counter = 1
+    counter = 0
     num_column_with = 5
     origin_column_with = TERMINAL_SIZE // 2 - num_column_with
-    rename_column_with = origin_column_with
+    rename_column_with = TERMINAL_SIZE - origin_column_with - num_column_with - 10
 
     RenameFileDetail = collections.namedtuple(
         'RenameFileDetail',
@@ -354,6 +330,7 @@ def rename_files(ctx, path, pattern, rename_to):
         for file in fnmatch.filter(filenames, pattern):
             match_file = '{}/{}'.format(dirpath, file)
             renamed_file = '{}/{}'.format(dirpath, rename_to)
+            counter += 1
             display_line = '{0:>{1}} | {2:<{3}} | {4:<{5}}'.format(
                 counter,
                 num_column_with,
@@ -362,17 +339,17 @@ def rename_files(ctx, path, pattern, rename_to):
                 renamed_file,
                 rename_column_with,
             )
-            counter += 1
             details.append(
                 RenameFileDetail(
                     match_file=match_file, renamed_file=renamed_file, display_line=display_line
                 )
             )
 
-    if not details:
+    if counter <= 1:
         logger.info('Nothing found by pattern')
+        return
 
-    print('\x1b[1;37;44mFound files: {}\x1b[0m'.format(len(details)))
+    print('\x1b[1;37;44mFound files: {}\x1b[0m'.format(counter))
     print('-' * TERMINAL_SIZE)
     print('{0:>{1}} | {2:^{3}} | {4:^{5}}'.format(
         '№',
@@ -395,7 +372,10 @@ def rename_files(ctx, path, pattern, rename_to):
         logger.info('Nothing changed')
         return
 
-    raise NotImplementedError('Renaming files')
+    for detail in details:
+        os.rename(detail.match_file, detail.renamed_file)
+
+    logger.info('Changed files: {}'.format(counter))
 
 
 @task

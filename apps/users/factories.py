@@ -30,9 +30,6 @@ class UserFactory(factory.DjangoModelFactory):
 
     password = factory.PostGenerationMethodCall('set_password', 'defaultpassword')
 
-    profile = factory.RelatedFactory('apps.users.factories.ProfileFactory', 'user')
-    diary = factory.RelatedFactory('apps.diaries.factories.DiaryFactory', 'user')
-
     @factory.lazy_attribute
     def is_active(self):
         random_float_number = random.random()
@@ -61,7 +58,7 @@ class ProfileFactory(factory.DjangoModelFactory):
         model = Profile
 
     user = factory.SubFactory(UserFactory, profile=None)
-    views = fuzzy.FuzzyInteger(0, 1000)
+    count_views = fuzzy.FuzzyInteger(0, 1000)
     gender = fuzzy.FuzzyChoice([val for val, label in Profile.CHOICES_GENDER])
     show_location = fuzzy.FuzzyChoice((True, False))
     show_email = fuzzy.FuzzyChoice((True, False))
@@ -80,6 +77,12 @@ class ProfileFactory(factory.DjangoModelFactory):
 
     @factory.lazy_attribute
     def on_github(self):
+        if random.random() > .5:
+            return slugify(factory.Faker('name').generate([]))
+        return ''
+
+    @factory.lazy_attribute
+    def on_bitbucket(self):
         if random.random() > .5:
             return slugify(factory.Faker('name').generate([]))
         return ''

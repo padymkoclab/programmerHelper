@@ -1,5 +1,4 @@
 
-import uuid
 
 from django.utils import timezone
 from django.core.exceptions import ValidationError
@@ -24,13 +23,14 @@ class Diary(UUIDable, Creatable):
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
         verbose_name=_('Owner'), related_name='diary'
     )
+    is_activated = models.BooleanField(_('is activated?'), default=False)
 
     objects = models.Manager()
     objects = DiaryManager()
 
     class Meta:
-        verbose_name = _('Diary')
-        verbose_name_plural = _('Diaries')
+        verbose_name = _('diary')
+        verbose_name_plural = _('diaries')
         ordering = ('user', )
 
     def __str__(self):

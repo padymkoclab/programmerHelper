@@ -222,6 +222,9 @@ class User(AbstractBaseUser, PermissionsMixin, UserCommentModelMixin, UserOpinio
 
         super(User, self).save(*args, **kwargs)
 
+        # autocreate profile
+        self.profile
+
     def delete(self, *args, **kwargs):
 
         # Protect a user from removal, if web application has this restriction
@@ -325,8 +328,7 @@ class Profile(Viewable, Updateable, UUIDable):
     )
 
     user = utils_models_fields.AutoOneToOneField(
-        'User', related_name='profile',
-        verbose_name=_('User'), on_delete=models.CASCADE
+        'User', on_delete=models.CASCADE, related_name='profile', verbose_name=_('User')
     )
 
     # public editable info
@@ -342,6 +344,11 @@ class Profile(Viewable, Updateable, UUIDable):
         default='', blank=True, max_length=200,
         startswith='https://github.com/',
     )
+    on_bitbucket = utils_models_fields.FixedCharField(
+        _('Presents on Bitbucket'),
+        default='', blank=True, max_length=200,
+        startswith='https://bitbucket.org/',
+    )
     on_stackoverflow = utils_models_fields.FixedCharField(
         _('Presents on stackoverflow.com'),
         default='', blank=True, max_length=200,
@@ -351,7 +358,7 @@ class Profile(Viewable, Updateable, UUIDable):
     crafts = ArrayField(
         models.CharField(max_length=100),
         size=10, blank=True, null=True,
-        verbose_name=_('Directions of development')
+        verbose_name=_('Directions of development (by level)')
     )
 
     # private info
@@ -380,8 +387,8 @@ class Profile(Viewable, Updateable, UUIDable):
     longitude = models.FloatField(_('longitude'), editable=False, null=True)
 
     class Meta:
-        verbose_name = _('Profile')
-        verbose_name_plural = _('Profiles')
+        verbose_name = _('profile')
+        verbose_name_plural = _('profiles')
 
     def __str__(self):
         return '{}'.format(self.user.get_short_name())
@@ -411,6 +418,7 @@ class Profile(Viewable, Updateable, UUIDable):
             'on_gmail',
             'on_github',
             'on_stackoverflow',
+            'on_bitbucket',
             'website',
             'job',
             'date_birthday',
@@ -431,3 +439,15 @@ class Profile(Viewable, Updateable, UUIDable):
         return result
     get_percentage_filling.short_description = _('Percentage filling')
     get_percentage_filling.admin_order_field = 'percentage_filling'
+
+    def latest_activity_from_github(self):
+        pass
+
+    def latest_activity_from_bitbucket(self):
+        pass
+
+    def latest_activity_from_gmail(self):
+        pass
+
+    def latest_activity_from_stackoverflow(self):
+        pass
