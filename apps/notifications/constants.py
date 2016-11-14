@@ -127,25 +127,25 @@ class Actions(enum.Enum):
         DELETED_MARK: _('%(actor)s deleted %(target_type)s "%(target)s"'),
 
         # solutions
-        ADDED_SOLUTION: _('added solution'),
-        UPDATED_SOLUTION: _('updated solution'),
-        DELETED_SOLUTION: _('deleted solution'),
+        ADDED_SOLUTION: _('%(actor)s  added %(target_type)s "%(target)s"'),
+        UPDATED_SOLUTION: _('%(actor)s updated %(target_type)s "%(target)s"'),
+        DELETED_SOLUTION: _('%(actor)s deleted %(target_type)s "%(target)s"'),
 
         # questions
-        ADDED_QUESTION: _('added question'),
-        UPDATED_QUESTION: _('updated question'),
-        DELETED_QUESTION: _('deleted question'),
-        ADDED_ANSWER: _('added answer'),
-        UPDATED_ANSWER: _('updated answer'),
-        DELETED_ANSWER: _('deleted answer'),
+        ADDED_QUESTION: _('%(actor)s  added %(target_type)s "%(target)s"'),
+        UPDATED_QUESTION: _('%(actor)s updated %(target_type)s "%(target)s"'),
+        DELETED_QUESTION: _('%(actor)s deleted %(target_type)s "%(target)s"'),
+        ADDED_ANSWER: _('%(actor)s  added %(target_type)s "%(target)s"'),
+        UPDATED_ANSWER: _('%(actor)s updated %(target_type)s "%(target)s"'),
+        DELETED_ANSWER: _('%(actor)s deleted %(target_type)s "%(target)s"'),
 
         # forums
-        ADDED_TOPIC: _('added topic'),
-        UPDATED_TOPIC: _('updated topic'),
-        DELETED_TOPIC: _('deleted topic'),
-        ADDED_POST: _('added post'),
-        UPDATED_POST: _('updated post'),
-        DELETED_POST: _('deleted post'),
+        ADDED_TOPIC: _('%(actor)s  added %(target_type)s "%(target)s"'),
+        UPDATED_TOPIC: _('%(actor)s updated %(target_type)s "%(target)s"'),
+        DELETED_TOPIC: _('%(actor)s deleted %(target_type)s "%(target)s"'),
+        ADDED_POST: _('%(actor)s  added %(target_type)s "%(target)s"'),
+        UPDATED_POST: _('%(actor)s updated %(target_type)s "%(target)s"'),
+        DELETED_POST: _('%(actor)s deleted %(target_type)s "%(target)s"'),
 
         # polls
         ADDED_VOTE: _('%(actor)s added %(action_target_type)s on %(target_type)s "%(target)s"'),
@@ -153,19 +153,19 @@ class Actions(enum.Enum):
         DELETED_VOTE: _('%(actor)s deleted %(action_target_type)s on %(target_type)s "%(target)s"'),
 
         # opinions
-        ADDED_OPINION: _('added opinion'),
-        UPDATED_OPINION: _('updated opinion'),
-        DELETED_OPINION: _('deleted opinion'),
+        ADDED_OPINION: _('%(actor)s added %(action_target_type)s on %(target_type)s "%(target)s'),
+        UPDATED_OPINION: _('%(actor)s updated %(action_target_type)s on %(target_type)s "%(target)s'),
+        DELETED_OPINION: _('%(actor)s deleted %(action_target_type)s on %(target_type)s "%(target)s'),
 
         # comments
-        ADDED_COMMENT: _('added comment'),
-        UPDATED_COMMENT: _('updated comment'),
-        DELETED_COMMENT: _('deleted comment'),
+        ADDED_COMMENT: _('%(actor)s added %(action_target_type)s on %(target_type)s "%(target)s'),
+        UPDATED_COMMENT: _('%(actor)s updated %(action_target_type)s on %(target_type)s "%(target)s'),
+        DELETED_COMMENT: _('%(actor)s deleted %(action_target_type)s on %(target_type)s "%(target)s'),
 
         # library
-        ADDED_REPLY: _('added reply'),
-        UPDATED_REPLY: _('updated reply'),
-        DELETED_REPLY: _('deleted reply'),
+        ADDED_REPLY: _('%(actor)s added %(action_target_type)s on %(target_type)s "%(target)s'),
+        UPDATED_REPLY: _('%(actor)s updated %(action_target_type)s on %(target_type)s "%(target)s'),
+        DELETED_REPLY: _('%(actor)s deleted %(action_target_type)s on %(target_type)s "%(target)s'),
 
         # badge
         EARNED_BADGE: _('%(actor)s earned %(target_type)s "%(target)s"'),
@@ -181,16 +181,16 @@ class Actions(enum.Enum):
         # user`s reputation
         REPUTATION_PARTICIPATE_IN_POLL: _('reputation of %(recipient)s was changed on %(reputation_deviation)s'),
         REPUTATION_UNDO_PARTICIPATE_IN_POLL: _('reputation of %(recipient)s was changed on %(reputation_deviation)s'),
-        REPUTATION_UPVOTE_OPINION: _('has upvote opinion'),
-        REPUTATION_CHANGED_TO_UPVOTE_OPINION: _('changed opinion to upvote'),
-        REPUTATION_DOWNVOTE_OPINION: _('has downvote'),
-        REPUTATION_CHANGED_TO_DOWNVOTE_OPINION: _('changed opinion to downvote'),
-        REPUTATION_LOSE_UPVOTE_OPINION: _('lose upvote opinion'),
-        REPUTATION_LOSE_DOWNVOTE_OPINION: _('lose downvote opinion'),
-        REPUTATION_PUT_ASSESSMENT: _('put_assessment'),
-        REPUTATION_CHANGED_ASSESSMENT_TO_UP: _('changed assessment to up'),
-        REPUTATION_CHANGED_ASSESSMENT_TO_DOWN: _('changed assessment to down'),
-        REPUTATION_UNDO_ASSESSMENT: _('undo_assessment'),
+        REPUTATION_UPVOTE_OPINION: _('reputation of %(recipient)s was changed on %(reputation_deviation)s'),
+        REPUTATION_CHANGED_TO_UPVOTE_OPINION: _('reputation of %(recipient)s was changed on %(reputation_deviation)s'),
+        REPUTATION_DOWNVOTE_OPINION: _('reputation of %(recipient)s was changed on %(reputation_deviation)s'),
+        REPUTATION_CHANGED_TO_DOWNVOTE_OPINION: _('reputation of %(recipient)s was changed on %(reputation_deviation)s'),
+        REPUTATION_LOSE_UPVOTE_OPINION: _('reputation of %(recipient)s was changed on %(reputation_deviation)s'),
+        REPUTATION_LOSE_DOWNVOTE_OPINION: _('reputation of %(recipient)s was changed on %(reputation_deviation)s'),
+        REPUTATION_PUT_ASSESSMENT: _('reputation of %(recipient)s was changed on %(reputation_deviation)s'),
+        REPUTATION_CHANGED_ASSESSMENT_TO_UP: _('reputation of %(recipient)s was changed on %(reputation_deviation)s'),
+        REPUTATION_CHANGED_ASSESSMENT_TO_DOWN: _('reputation of %(recipient)s was changed on %(reputation_deviation)s'),
+        REPUTATION_UNDO_ASSESSMENT: _('reputation of %(recipient)s was changed on %(reputation_deviation)s'),
     }
 
     @classmethod
@@ -205,21 +205,35 @@ class Actions(enum.Enum):
     @classmethod
     def get_reputation_deviation(cls, action_key):
 
-        reputation_charge = {
-            cls.REPUTATION_PARTICIPATE_IN_POLL: 1,
-            cls.REPUTATION_UNDO_PARTICIPATE_IN_POLL: -1,
-            cls.REPUTATION_UPVOTE_OPINION: 1,
-            cls.REPUTATION_CHANGED_TO_UPVOTE_OPINION: 1,
-            cls.REPUTATION_DOWNVOTE_OPINION: 1,
-            cls.REPUTATION_CHANGED_TO_DOWNVOTE_OPINION: 1,
-            cls.REPUTATION_LOSE_UPVOTE_OPINION: 1,
-            cls.REPUTATION_LOSE_DOWNVOTE_OPINION: 1,
-            cls.REPUTATION_PUT_ASSESSMENT: 1,
-            cls.REPUTATION_CHANGED_ASSESSMENT_TO_UP: 1,
-            cls.REPUTATION_CHANGED_ASSESSMENT_TO_DOWN: 1,
-            cls.REPUTATION_UNDO_ASSESSMENT: 1,
-        }
+        from apps.polls.models import Poll
+        from apps.questions.models import Question, Answer
+        from apps.articles.models import Article
+        from apps.solutions.models import Solution
+        from apps.snippets.models import Snippet
 
+        reputation_charge = {
+            Poll: 1,
+            Solution: 3,
+            Question: 2,
+            Answer: 3,
+            Snippet: 2,
+            Article: 'mark',
+        }
+        raise NotImplementedError('Need bind for type object and type action')
+        {
+            cls.REPUTATION_PARTICIPATE_IN_POLL: '+',
+            cls.REPUTATION_UNDO_PARTICIPATE_IN_POLL: '-',
+            cls.REPUTATION_UPVOTE_OPINION: '+',
+            cls.REPUTATION_CHANGED_TO_UPVOTE_OPINION: '+',
+            cls.REPUTATION_DOWNVOTE_OPINION: '-',
+            cls.REPUTATION_CHANGED_TO_DOWNVOTE_OPINION: '-',
+            cls.REPUTATION_LOSE_UPVOTE_OPINION: '-',
+            cls.REPUTATION_LOSE_DOWNVOTE_OPINION: '+',
+            cls.REPUTATION_PUT_ASSESSMENT: '+',
+            cls.REPUTATION_CHANGED_ASSESSMENT_TO_UP: '+',
+            cls.REPUTATION_CHANGED_ASSESSMENT_TO_DOWN: '-',
+            cls.REPUTATION_UNDO_ASSESSMENT: '-',
+        }
         try:
             const = cls(action_key)
         except ValueError:
