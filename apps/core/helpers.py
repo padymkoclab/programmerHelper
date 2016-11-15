@@ -23,12 +23,13 @@ from apps.notifications.signals import notify
 from apps.notifications.constants import Actions
 
 
-def determinate_recipient_while_deleting(users_for_deleting, GroupModerators, *users):
+def get_recipients_while_deleting(users_for_deleting, GroupModerators, *users):
 
     if users_for_deleting is None:
         a = list()
         a.append(GroupModerators)
-        return a.extend(users)
+        a.extend(users)
+        return a
 
     alive_recipients = GroupModerators.user_set.exclude(pk__in=[i.pk for i in users_for_deleting])
     alive_recipients = set(alive_recipients)
@@ -398,7 +399,7 @@ def update_badges_and_return_result(user, badge_const, users_lost_badges, users_
     return users_lost_badges, users_earned_badges
 
 
-def notify_activity(sender, instance, action, update_fields=None, users_for_deleting=None):
+def notify_activity(sender, instance, action, users_for_deleting=None):
 
     if sender in [
         User, Vote, Solution, Snippet, Question, Answer, Profile, Diary,
@@ -489,7 +490,7 @@ def notify_activity(sender, instance, action, update_fields=None, users_for_dele
                 level=Notification.SUCCESS,
             )
 
-        elif action == 'updated' and update_fields is not None:
+        elif action == 'updated':
 
             if sender in [Vote, Opinion, Comment, Mark, Answer, Reply, Post, Profile, Diary]:
 
@@ -552,6 +553,8 @@ def notify_activity(sender, instance, action, update_fields=None, users_for_dele
                 elif sender == Topic:
                     action = Actions.UPDATED_TOPIC.value
 
+                import ipdb; ipdb.set_trace()
+
             elif sender == User:
                 action = Actions.UPDATED_USER.value
                 action_target = None
@@ -578,59 +581,56 @@ def notify_activity(sender, instance, action, update_fields=None, users_for_dele
 
                 actor = instance if sender == User else instance.user
 
+                if users_for_deleting and actor in users_for_deleting:
+                    actor = actor.get_full_name()
+
                 if sender == Mark:
                     target = instance.article
                     action_target = instance
                     action = Actions.DELETED_MARK.value
-                    recipient = determinate_recipient_while_deleting(
+                    recipient = get_recipients_while_deleting(
                         users_for_deleting, GroupModerators, instance.article.user
                     )
                 elif sender == Answer:
                     target = instance.question
                     action_target = instance
                     action = Actions.DELETED_ANSWER.value
-                    recipient = determinate_recipient_while_deleting(
+                    recipient = get_recipients_while_deleting(
                         users_for_deleting, GroupModerators, instance.question.user
                     )
                 elif sender == Vote:
                     target = instance.poll
                     action_target = instance
                     action = Actions.DELETED_VOTE.value
-                    recipient = determinate_recipient_while_deleting(
-                        users_for_deleting, GroupModerators
-                    )
+                    recipient = get_recipients_while_deleting(users_for_deleting, GroupModerators)
                 elif sender == Reply:
                     target = instance.book
                     action_target = instance
                     action = Actions.DELETED_REPLY.value
-                    recipient = determinate_recipient_while_deleting(
-                        users_for_deleting, GroupModerators
-                    )
+                    recipient = get_recipients_while_deleting(users_for_deleting, GroupModerators)
                 elif sender == Post:
                     target = instance.topic
                     action_target = instance
                     action = Actions.DELETED_POST.value
-                    recipient = determinate_recipient_while_deleting(
-                        users_for_deleting, GroupModerators, instance.topic.user
-                    )
+                    recipient = get_recipients_while_deleting(users_for_deleting, GroupModerators, instance.topic.user)
                 elif sender == Opinion:
                     target = instance.content_object
                     action_target = instance
                     action = Actions.DELETED_OPINION.value
-                    recipient = determinate_recipient_while_deleting(
+                    recipient = get_recipients_while_deleting(
                         users_for_deleting, GroupModerators, instance.content_object.user
                     )
                 elif sender == Comment:
                     target = instance.content_object
                     action_target = instance
                     action = Actions.DELETED_COMMENT.value
-                    recipient = determinate_recipient_while_deleting(
+                    recipient = get_recipients_while_deleting(
                         users_for_deleting, GroupModerators, instance.content_object.user
                     )
                 elif sender in (Solution, Snippet, Question, Article, Topic):
                     target = instance
                     action_target = None
-                    recipient = determinate_recipient_while_deleting(users_for_deleting, GroupModerators, instance.user)
+                    recipient = get_recipients_while_deleting(users_for_deleting, GroupModerators, instance.user)
 
                     if sender == Solution:
                         action = Actions.DELETED_SOLUTION.value
@@ -647,9 +647,7 @@ def notify_activity(sender, instance, action, update_fields=None, users_for_dele
                     target = None
                     action_target = None
                     action = Actions.DELETED_USER.value
-                    recipient = determinate_recipient_while_deleting(
-                        users_for_deleting, GroupModerators
-                    )
+                    recipient = get_recipients_while_deleting(users_for_deleting, GroupModerators)
 
                 if recipient:
                     notify.send(
@@ -663,11 +661,11 @@ def notify_activity(sender, instance, action, update_fields=None, users_for_dele
                     )
 
 
-def notify_reputation(sender, instance, action, users_for_deleting):
+def notify_reputation(sender, instance, action, users_for_deleting, update_fields=None):
 
     if sender in (Vote, Opinion, Mark):
 
-        is_increase = None
+        is_changed = False
 
         if sender == Vote:
 
@@ -680,10 +678,10 @@ def notify_reputation(sender, instance, action, users_for_deleting):
 
             if action == 'created':
                 action = Actions.REPUTATION_PARTICIPATE_IN_POLL.value
-                is_increase = True
+                is_changed = True
             elif action == 'deleted':
                 action = Actions.REPUTATION_UNDO_PARTICIPATE_IN_POLL.value
-                is_increase = False
+                is_changed = True
 
         elif sender == Opinion:
 
@@ -698,28 +696,30 @@ def notify_reputation(sender, instance, action, users_for_deleting):
 
                 if instance.is_useful is True:
                     action = Actions.REPUTATION_UPVOTE_OPINION.value
-                    is_increase = True
+                    is_changed = True
                 elif instance.is_useful is False:
                     action = Actions.REPUTATION_DOWNVOTE_OPINION.value
-                    is_increase = False
+                    is_changed = True
 
             elif action == 'updated':
 
+                # import pdb; pdb.set_trace()
+
                 if instance.is_useful is True:
                     action = Actions.REPUTATION_CHANGED_TO_DOWNVOTE_OPINION.value
-                    is_increase = False
+                    is_changed = True
                 elif instance.is_useful is False:
                     action = Actions.REPUTATION_CHANGED_TO_UPVOTE_OPINION.value
-                    is_increase = True
+                    is_changed = True
 
             elif action == 'deleted':
 
                 if instance.is_useful is True:
                     action = Actions.REPUTATION_LOSE_UPVOTE_OPINION.value
-                    is_increase = False
+                    is_changed = True
                 elif instance.is_useful is False:
                     action = Actions.REPUTATION_LOSE_DOWNVOTE_OPINION.value
-                    is_increase = True
+                    is_changed = True
 
         elif sender == Mark:
 
@@ -737,12 +737,12 @@ def notify_reputation(sender, instance, action, users_for_deleting):
 
             target = instance.article
 
-        if is_increase is None:
+        if is_changed is False:
             return
 
-        value = get_value_changing_reputation(recipient, is_increase, target)
+        value = Actions.get_reputation_deviation(action, target)
 
-        recipient.reputation += value
+        recipient.reputation += int(value)
         recipient.full_clean()
         recipient.save()
 
@@ -755,17 +755,3 @@ def notify_reputation(sender, instance, action, users_for_deleting):
             level=Notification.SUCCESS,
             recipient=recipient,
         )
-
-
-def get_value_changing_reputation(recipient, is_increase, target):
-
-    cons = {
-        Poll: 1,
-        Question: 2,
-        Answer: 3,
-        Solution: 3,
-        Snippet: 2,
-    }
-
-    val = cons[type(target)]
-    return val if is_increase is True else -val

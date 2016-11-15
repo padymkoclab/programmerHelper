@@ -333,7 +333,7 @@ def check_badge_legendary_gold(user):
 def check_badge_yearling_bronze(user, visit_model):
     """More 1 year as registered."""
 
-    date_latest_visit = visit_model._default_manager.get(user=user).date
+    date_latest_visit = visit_model._default_manager.get(user=user).updated
     return date_latest_visit >= user.date_joined + relativedelta(years=1)
 
 

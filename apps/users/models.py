@@ -13,7 +13,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
-from django.db import models
+from django.db import models, router
 from django.conf import settings
 from django.core.cache import cache
 # from django.contrib.auth import password_validation
@@ -54,6 +54,7 @@ from apps.notifications.querysets import UserNotificationQuerySet
 
 from .managers import UserManager, LevelManager
 from .exceptions import ProtectDeleteUser
+from .utils import UserCollector
 from .validators import UsernameValidator
 
 
@@ -225,7 +226,7 @@ class User(AbstractBaseUser, PermissionsMixin, UserCommentModelMixin, UserOpinio
         # autocreate profile
         self.profile
 
-    def delete(self, *args, **kwargs):
+    def delete(self, using=None, keep_parents=False):
 
         # Protect a user from removal, if web application has this restriction
         #
@@ -239,7 +240,15 @@ class User(AbstractBaseUser, PermissionsMixin, UserCommentModelMixin, UserOpinio
                 )
             )
 
-        super(User, self).delete(*args, **kwargs)
+        using = using or router.db_for_write(self.__class__, instance=self)
+        assert self._get_pk_val() is not None, (
+            "%s object can't be deleted because its %s attribute is set to None." %
+            (self._meta.object_name, self._meta.pk.attname)
+        )
+
+        collector = UserCollector(using=using)
+        collector.collect([self], keep_parents=keep_parents)
+        return collector.delete()
 
     def get_absolute_url(self):
 

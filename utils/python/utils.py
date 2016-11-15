@@ -155,3 +155,32 @@ def get_filename_with_datetime(name, extension):
     datetime_ISO_format = now.strftime('%Y-%m-%d %H:%M:%S')
 
     return '{0} {1}.{2}'.format(name, datetime_ISO_format, extension)
+
+
+def generate_captcha(request):
+    raise NotImplementedError
+    color = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
+    img = Image.new('RGBA', (160, 80), color)
+    imgDrawer = ImageDraw.Draw(img)
+    textImg = Image.new('RGBA', (160, 80))
+    tmpDraw = ImageDraw.Draw(textImg)
+    font = ImageFont.truetype("resources/UbuntuMono-RI.ttf", 26)
+    i = 15
+    key = []
+    for x in xrange(1, 7):
+        r = str(random.randint(0, 9))
+        key.append(r)
+        tmpDraw.text((i, random.randint(20, 30)), r,
+                     font=font, fill=(0, 0, 0))
+        i += 22
+    request.session['captcha'] = ''.join(key)
+    for o in xrange((80 * 160) / 500):
+        imgDrawer.line((random.randint(0, 160), random.randint(0, 80), random.randint(0, 160), random.randint(0, 80)),
+                       fill=(random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)))
+    output = StringIO.StringIO()
+    textImg = textImg.rotate(random.randint(-20, 20))
+    mask = Image.new('RGBA', (160, 80), (0, 0, 0))
+    mask.paste(textImg, (0, 0))
+    img.paste(textImg, (0, 0), mask)
+    img.save(output, format='png')
+    return StreamingHttpResponse([output.getvalue()], content_type="image/png")

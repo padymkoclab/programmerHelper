@@ -19,11 +19,11 @@ from .helpers import notify_badges, notify_activity, notify_reputation
 
 
 @receiver(post_save, dispatch_uid=uuid.uuid4)
-def post_added_updated_object(sender, instance, created, raw, using, update_fields, **kwargs):
+def post_added_updated_object(sender, instance, created, **kwargs):
 
     action = 'created' if created is True else 'updated'
 
-    notify_activity(sender, instance, action, update_fields=update_fields)
+    notify_activity(sender, instance, action)
     notify_badges(sender, instance)
     notify_reputation(sender, instance, action, users_for_deleting=None)
 

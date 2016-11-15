@@ -1,6 +1,8 @@
 
+import collections
 import enum
 
+from django.contrib.contenttypes.models import ContentType
 from django.utils.translation import ugettext as _
 
 
@@ -203,7 +205,7 @@ class Actions(enum.Enum):
             raise ValueError('Action with key "{}" does not exists'.format(action_key))
 
     @classmethod
-    def get_reputation_deviation(cls, action_key):
+    def get_reputation_deviation(cls, action_key, target_content_type_or_target):
 
         from apps.polls.models import Poll
         from apps.questions.models import Question, Answer
@@ -211,31 +213,98 @@ class Actions(enum.Enum):
         from apps.solutions.models import Solution
         from apps.snippets.models import Snippet
 
+        ReputationCharge = collections.namedtuple('ReputationCharge', ('number', 'actions_up', 'actions_down'))
+
         reputation_charge = {
-            Poll: 1,
-            Solution: 3,
-            Question: 2,
-            Answer: 3,
-            Snippet: 2,
-            Article: 'mark',
+            Poll: ReputationCharge(
+                number=1,
+                actions_up=(
+                    cls.REPUTATION_PARTICIPATE_IN_POLL,
+                ),
+                actions_down=(
+                    cls.REPUTATION_UNDO_PARTICIPATE_IN_POLL,
+                ),
+            ),
+            Solution: ReputationCharge(
+                number=3,
+                actions_up=(
+                    cls.REPUTATION_UPVOTE_OPINION,
+                    cls.REPUTATION_CHANGED_TO_UPVOTE_OPINION,
+                    cls.REPUTATION_LOSE_DOWNVOTE_OPINION
+                ),
+                actions_down=(
+                    cls.REPUTATION_DOWNVOTE_OPINION,
+                    cls.REPUTATION_CHANGED_TO_DOWNVOTE_OPINION,
+                    cls.REPUTATION_LOSE_UPVOTE_OPINION
+                ),
+            ),
+            Snippet: ReputationCharge(
+                number=2,
+                actions_up=(
+                    cls.REPUTATION_UPVOTE_OPINION,
+                    cls.REPUTATION_CHANGED_TO_UPVOTE_OPINION,
+                    cls.REPUTATION_LOSE_DOWNVOTE_OPINION
+                ),
+                actions_down=(
+                    cls.REPUTATION_DOWNVOTE_OPINION,
+                    cls.REPUTATION_CHANGED_TO_DOWNVOTE_OPINION,
+                    cls.REPUTATION_LOSE_UPVOTE_OPINION
+                ),
+            ),
+            Question: ReputationCharge(
+                number=2,
+                actions_up=(
+                    cls.REPUTATION_UPVOTE_OPINION,
+                    cls.REPUTATION_CHANGED_TO_UPVOTE_OPINION,
+                    cls.REPUTATION_LOSE_DOWNVOTE_OPINION
+                ),
+                actions_down=(
+                    cls.REPUTATION_DOWNVOTE_OPINION,
+                    cls.REPUTATION_CHANGED_TO_DOWNVOTE_OPINION,
+                    cls.REPUTATION_LOSE_UPVOTE_OPINION
+                ),
+            ),
+            Answer: ReputationCharge(
+                number=3,
+                actions_up=(
+                    cls.REPUTATION_UPVOTE_OPINION,
+                    cls.REPUTATION_CHANGED_TO_UPVOTE_OPINION,
+                    cls.REPUTATION_LOSE_DOWNVOTE_OPINION
+                ),
+                actions_down=(
+                    cls.REPUTATION_DOWNVOTE_OPINION,
+                    cls.REPUTATION_CHANGED_TO_DOWNVOTE_OPINION,
+                    cls.REPUTATION_LOSE_UPVOTE_OPINION
+                ),
+            ),
+            Article: ReputationCharge(
+                number=None,
+                actions_up=(
+                    cls.REPUTATION_PUT_ASSESSMENT,
+                    cls.REPUTATION_CHANGED_ASSESSMENT_TO_UP
+                ),
+                actions_down=(
+                    cls.REPUTATION_CHANGED_ASSESSMENT_TO_DOWN,
+                    cls.REPUTATION_UNDO_ASSESSMENT
+                ),
+            ),
         }
-        raise NotImplementedError('Need bind for type object and type action')
-        {
-            cls.REPUTATION_PARTICIPATE_IN_POLL: '+',
-            cls.REPUTATION_UNDO_PARTICIPATE_IN_POLL: '-',
-            cls.REPUTATION_UPVOTE_OPINION: '+',
-            cls.REPUTATION_CHANGED_TO_UPVOTE_OPINION: '+',
-            cls.REPUTATION_DOWNVOTE_OPINION: '-',
-            cls.REPUTATION_CHANGED_TO_DOWNVOTE_OPINION: '-',
-            cls.REPUTATION_LOSE_UPVOTE_OPINION: '-',
-            cls.REPUTATION_LOSE_DOWNVOTE_OPINION: '+',
-            cls.REPUTATION_PUT_ASSESSMENT: '+',
-            cls.REPUTATION_CHANGED_ASSESSMENT_TO_UP: '+',
-            cls.REPUTATION_CHANGED_ASSESSMENT_TO_DOWN: '-',
-            cls.REPUTATION_UNDO_ASSESSMENT: '-',
-        }
-        try:
-            const = cls(action_key)
-        except ValueError:
+
+        action_const = cls(action_key)
+        if isinstance(target_content_type_or_target, ContentType):
+            model = target_content_type_or_target.model_class()
+        else:
+            model = type(target_content_type_or_target)
+
+        charge = reputation_charge.get(model, None)
+
+        if charge is None:
             return
-        return reputation_charge.get(const)
+
+        number = charge.number
+        if action_const in charge.actions_up:
+            number = '+{}'.format(number)
+        elif action_const in charge.actions_down:
+            number = '-{}'.format(number)
+
+        return number

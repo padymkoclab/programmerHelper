@@ -26,7 +26,7 @@ class VisitPageManager(models.Manager):
         except self.model.DoesNotExist:
             return 0
         else:
-            return obj.count
+            return obj.count_views
 
     def change_url_counter(self, request):
 
@@ -35,7 +35,7 @@ class VisitPageManager(models.Manager):
         obj, is_created = self.get_or_create(url=url_path)
 
         if not is_created:
-            obj.count += 1
+            obj.count_views += 1
             obj.save()
 
 

@@ -386,3 +386,27 @@ def open_github_repository_page(ctx):
     github_repo = command_result.stdout
     github_repo_url = github_repo.replace('git@github.com:', 'github.com/', 1).rstrip('.git')
     webbrowser.open('https://' + github_repo_url)
+
+
+def clean_pyc(ctx):
+    """Clean files with *.pyc extension"""
+
+    pass
+
+
+def install_requirements(ctx):
+    """"""
+
+    pass
+
+
+def migrate_db(ctx):
+    """"""
+
+    pass
+
+
+def flush_cache(ctx):
+    """"""
+
+    pass

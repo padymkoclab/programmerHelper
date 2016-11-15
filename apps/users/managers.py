@@ -81,7 +81,6 @@ class UserManager(BaseUserManager):
         return result
 
 
-
 class ActiveUserManager(models.Manager):
     """ """
 

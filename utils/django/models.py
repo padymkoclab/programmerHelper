@@ -174,3 +174,46 @@ class TimeFrameable(models.Model):
 
     start = models.DateTimeField(_('start'), null=True, blank=True)
     end = models.DateTimeField(_('end'), null=True, blank=True)
+
+
+class OverrrideUniqueTogetherErrorMessages(object):
+    """
+    Always must first inheriotanced meta-class:
+        class Opinion(OverrrideUniqueTogetherErrorMessages, GenericRelatable, Timestampable, UUIDable):
+    """
+
+    UNIQUE_TOGETHER_ERROR_MESSAGES = None
+
+    def __init__(self, *args, **kwargs):
+        super(OverrrideUniqueTogetherErrorMessages, self).__init__(*args, **kwargs)
+
+        if self.UNIQUE_TOGETHER_ERROR_MESSAGES is None:
+            raise ValueError('Override UNIQUE_TOGETHER_ERROR_MESSAGES')
+
+        count_restrictions = len(self._meta.unique_together)
+        if count_restrictions == 0:
+            raise AttributeError('Meta-attribute "unique_together" is empty')
+
+        if not isinstance(self.UNIQUE_TOGETHER_ERROR_MESSAGES, dict):
+            if isinstance(self._meta.unique_together[0], (list, tuple)):
+                if count_restrictions > 1:
+                    raise ValueError(
+                        "Overrided UNIQUE_TOGETHER_ERROR_MESSAGES for single restriction,"
+                        " but 'unique_together' contains several restrictions"
+                    )
+                first_restriction = self._meta.unique_together[0]
+            else:
+                first_restriction = self._meta.unique_together
+
+            self.UNIQUE_TOGETHER_ERROR_MESSAGES = {
+                first_restriction: self.UNIQUE_TOGETHER_ERROR_MESSAGES
+            }
+
+    class Meta:
+        abstract = True
+
+    def unique_error_message(self, model_class, unique_check):
+
+        if type(self) == model_class and unique_check:
+            return self.UNIQUE_TOGETHER_ERROR_MESSAGES[unique_check]
+        return super(OverrrideUniqueTogetherErrorMessages, self).unique_error_message(model_class, unique_check)

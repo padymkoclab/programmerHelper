@@ -28,7 +28,13 @@ def handle_notify(sender, **kwargs):
     action_target = kwargs.get('action_target')
     recipient = kwargs.get('recipient')
 
+    actor_display_text = ''
+    if type(actor) == str:
+        actor_display_text = actor
+        actor = None
+
     options = dict(
+        actor_display_text=actor_display_text,
         actor=actor,
         target=target,
         action=action,
@@ -63,8 +69,7 @@ def handle_notify(sender, **kwargs):
         options['recipient'] = recipient
 
         notification = Notification(**options)
-        if action == Actions.DELETED_USER.value:
-            notification.actor = None
+
         notification.full_clean()
-        # reqired additional variables
+        # required additional variables
         notification.save(actor=actor, target=target)

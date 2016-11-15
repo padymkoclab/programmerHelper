@@ -22,6 +22,7 @@ class Newsletter(Creatable):
         verbose_name_plural = _("newsletters")
         get_latest_by = 'created'
         ordering = ['created']
+        # may be need unique_together ((created, content))
 
     objects = models.Manager()
     objects = ManagerNewsletter()
@@ -35,3 +36,15 @@ class Newsletter(Creatable):
         return truncatechars(self.content, 80)
     truncated_content.short_description = content.verbose_name
     truncated_content.admin_order_field = 'content'
+
+    @classmethod
+    def from_db(cls, db, field_names, values):
+        raise ValueError
+        instance = super(Newsletter, cls).from_db(cls, db, field_names, values)
+        import ipdb; ipdb.set_trace()
+        return instance
+
+    def save(self, *args, **kwargs):
+        # import ipdb; ipdb.set_trace()
+        raise TypeError
+        super(Newsletter, self).save(*args, **kwargs)

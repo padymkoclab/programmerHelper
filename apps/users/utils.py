@@ -24,9 +24,10 @@ class UserCollector(Collector):
         deleted_counter = Counter()
 
         from .models import User
-        users_for_deleting = self.data[User]
+        users_for_deleting = self.data.get(User, ())
 
         with transaction.atomic(using=self.using, savepoint=False):
+
             # send pre_delete signals
             for model, obj in self.instances_with_model():
                 if not model._meta.auto_created:

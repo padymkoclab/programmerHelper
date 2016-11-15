@@ -23,3 +23,9 @@ class ManagerNewsletter(models.Manager):
         return get_chart_count_objects_for_the_past_year(
             self.get_statistics_count_newsletters_for_the_past_year()
         )
+
+    def create_newsletter(self, **kwargs):
+
+        obj = self.model(**kwargs)
+        obj.full_clean()
+        obj.save()

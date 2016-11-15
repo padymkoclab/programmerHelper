@@ -89,12 +89,13 @@ class Notification(UUIDable):
             return 'for {}'.format(recipient)
 
         action_display_pattern = self.get_action_display_pattern()
+        target = self.target_display_text if self.target is None else self.target
 
         actor_type = 'ERRRROR' if self.actor is None else self.actor._meta.verbose_name
         action_display_pattern = action_display_pattern % dict(
             actor=self.get_actor_display_text(),
             actor_type=actor_type,
-            target=self.target,
+            target=target,
             target_type=self.target_type_verbose_name,
             action_target_type=self.action_target_type_verbose_name,
             reputation_deviation=self.get_reputation_deviation(),
@@ -192,4 +193,4 @@ class Notification(UUIDable):
 
     def get_reputation_deviation(self):
 
-        return Actions.get_reputation_deviation(self.action)
+        return Actions.get_reputation_deviation(self.action, self.target_content_type)
