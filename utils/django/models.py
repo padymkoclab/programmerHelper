@@ -217,3 +217,28 @@ class OverrrideUniqueTogetherErrorMessages(object):
         if type(self) == model_class and unique_check:
             return self.UNIQUE_TOGETHER_ERROR_MESSAGES[unique_check]
         return super(OverrrideUniqueTogetherErrorMessages, self).unique_error_message(model_class, unique_check)
+
+
+class IsChangedInstanceModelMixin(models.Model):
+    """
+
+    """
+
+    class Meta:
+        abstract = True
+
+    @classmethod
+    def from_db(cls, db, field_names, values):
+        """ """
+
+        instance = super(IsChangedInstanceModelMixin, cls).from_db(db, field_names, values)
+        instance._original_values_fields = dict(zip(field_names, values))
+        return instance
+
+    def is_changed(self):
+        """ """
+
+        for fieldname, value in self._original_values_fields.items():
+            if getattr(self, fieldname) != value:
+                return True
+        return False

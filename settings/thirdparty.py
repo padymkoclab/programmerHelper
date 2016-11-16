@@ -6,7 +6,6 @@ from django.utils.text import slugify
 
 SHELL_PLUS = 'ipython'
 
-# additional autoload
 SHELL_PLUS_PRE_IMPORTS = (
     ('django.template', ('Template', 'Context')),
     ('django.contrib', 'admin'),
@@ -15,22 +14,16 @@ SHELL_PLUS_PRE_IMPORTS = (
     ('utils', 'django'),
 )
 
-# what needn`t rename in time autoload
-SHELL_PLUS_MODEL_ALIASES = {
-    # 'accounts': {'Account': 'AAAA'},
-}
+SHELL_PLUS_MODEL_ALIASES = {}
 
-# what needn`t autoload
-SHELL_PLUS_DONT_LOAD = [
-    # '',  # app name
-]
+SHELL_PLUS_DONT_LOAD = []
 
 SHELL_PLUS_PRINT_SQL = True
 
 IPYTHON_ARGUMENTS = [
-    # '--ext', '',
+    '--ext', 'autoreload',
     '--no-banner',
-    '--pdb',
+    # '--pdb',
     '--pprint',
 ]
 
