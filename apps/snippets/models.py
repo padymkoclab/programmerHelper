@@ -1,4 +1,5 @@
 
+import logging
 import collections
 
 from django.contrib.contenttypes.fields import GenericRelation
@@ -10,7 +11,7 @@ from django.conf import settings
 
 from utils.django.models_utils import get_admin_url
 from utils.django.models_fields import ConfiguredAutoSlugField
-from utils.django.models import Timestampable, UUIDable, Viewable, Commentable
+from utils.django.models import Timestampable, UUIDable, Viewable, Commentable, IsChangedInstanceModelMixin
 from utils.python.constants import CHOICES_LEXERS
 
 from apps.comments.models import Comment
@@ -23,13 +24,17 @@ from apps.tags.models import Tag
 from apps.tags.managers import TagManager
 from apps.tags.modelmixins import TagModelMixin
 
-# from apps.visits.models import Visit
-
 from .managers import SnippetManager
 from .querysets import SnippetQuerySet
 
 
-class Snippet(CommentModelMixin, OpinionModelMixin, TagModelMixin, Timestampable, UUIDable, Viewable, Commentable):
+logger = logging.getLogger('django.development')
+
+logger.info('Template for snippets design http://timonweb.com/snippets/ for snippets apps')
+
+
+class Snippet(CommentModelMixin, OpinionModelMixin, TagModelMixin, Timestampable, UUIDable,
+    Viewable, Commentable, IsChangedInstanceModelMixin):
     """
     Model for snippet.
     """

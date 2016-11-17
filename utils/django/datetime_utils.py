@@ -6,12 +6,7 @@ import random
 from django.utils import timezone
 from django.template import Template, Context
 
-import ephem
-
-"""[summary]
-
-[description]
-"""
+# import ephem
 
 
 def get_current_timezone_offset():

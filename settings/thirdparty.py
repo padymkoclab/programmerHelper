@@ -22,7 +22,7 @@ SHELL_PLUS_PRINT_SQL = True
 
 IPYTHON_ARGUMENTS = [
     '--ext', 'autoreload',
-    '--no-banner',
+    # '--no-banner',
     # '--pdb',
     '--pprint',
 ]

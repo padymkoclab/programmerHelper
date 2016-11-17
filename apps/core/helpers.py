@@ -490,7 +490,7 @@ def notify_activity(sender, instance, action, users_for_deleting=None):
                 level=Notification.SUCCESS,
             )
 
-        elif action == 'updated':
+        elif action == 'updated' and instance.is_changed() is True:
 
             if sender in [Vote, Opinion, Comment, Mark, Answer, Reply, Post, Profile, Diary]:
 
@@ -552,8 +552,6 @@ def notify_activity(sender, instance, action, users_for_deleting=None):
                     action = Actions.UPDATED_ARTICLE.value
                 elif sender == Topic:
                     action = Actions.UPDATED_TOPIC.value
-
-                import ipdb; ipdb.set_trace()
 
             elif sender == User:
                 action = Actions.UPDATED_USER.value
@@ -701,9 +699,7 @@ def notify_reputation(sender, instance, action, users_for_deleting, update_field
                     action = Actions.REPUTATION_DOWNVOTE_OPINION.value
                     is_changed = True
 
-            elif action == 'updated':
-
-                # import pdb; pdb.set_trace()
+            elif action == 'updated' and instance.is_changed() is True:
 
                 if instance.is_useful is True:
                     action = Actions.REPUTATION_CHANGED_TO_DOWNVOTE_OPINION.value

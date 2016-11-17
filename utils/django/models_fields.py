@@ -12,11 +12,10 @@ from django.utils.translation import ugettext as _
 from django.db import models
 from django.utils.encoding import smart_text
 
-import six
 from autoslug import AutoSlugField
-import markdown
-import textile
-from docutils.core import publish_parts
+# import markdown
+# import textile
+# from docutils.core import publish_parts
 
 from .forms_fields import CharFieldFixed
 from .widgets import ColorInput

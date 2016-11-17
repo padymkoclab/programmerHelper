@@ -1,4 +1,5 @@
 
+import collections
 import uuid
 
 # from django.utils import timezone
@@ -221,8 +222,12 @@ class OverrrideUniqueTogetherErrorMessages(object):
 
 class IsChangedInstanceModelMixin(models.Model):
     """
-
+    Mixin to a model for tracing changes from previous status on determined or all fields.
+    Ignore date/datetime fields with attribute auto_now=True, since it field will be changed in any case.
+    Does not support for M2M fields and fields to the ContentType`s model.
     """
+
+    FIELDS_FOR_TRACING = ()
 
     class Meta:
         abstract = True
@@ -231,14 +236,70 @@ class IsChangedInstanceModelMixin(models.Model):
     def from_db(cls, db, field_names, values):
         """ """
 
+        # check up a type of attribute
+        if not isinstance(cls.FIELDS_FOR_TRACING, (tuple, list)):
+            raise ValueError('Attribute "FIELDS_FOR_TRACING" must list or tuple')
+
+        # check up fieldnames passed to tracing
+        concrete_fieldnames = [field.name for field in cls._meta.concrete_fields]
+        non_exists_fieldnames = list()
+        for fieldname in cls.FIELDS_FOR_TRACING:
+            if fieldname not in concrete_fieldnames:
+                non_exists_fieldnames.append(fieldname)
+        if non_exists_fieldnames:
+            raise ValueError('Unknown fields for trace: {}'.format(','.join(non_exists_fieldnames)))
+
+        # get a instance from a db
         instance = super(IsChangedInstanceModelMixin, cls).from_db(db, field_names, values)
-        instance._original_values_fields = dict(zip(field_names, values))
+
+        # get values of fields of the instance
+        fields_values = dict(zip(field_names, values))
+
+        # drop unnecessary fields if need tracing for concrete fields
+        if cls.FIELDS_FOR_TRACING:
+            instance._original_values_fields = {
+                k: v for k, v in fields_values.items() if k in cls.FIELDS_FOR_TRACING
+            }
+        else:
+            instance._original_values_fields = fields_values
+
         return instance
 
-    def is_changed(self):
-        """ """
+    def is_changed(self) -> bool:
+        """Check up if values of fields for tracing was changed."""
 
         for fieldname, value in self._original_values_fields.items():
+
+            # ignore a field with auto_now=True
+            field = self._meta.get_field(fieldname)
+            if isinstance(field, (models.DateField, models.DateTimeField)):
+                if field.auto_now is True:
+                    continue
+
             if getattr(self, fieldname) != value:
                 return True
         return False
+
+    def get_changed_fields(self) -> dict:
+        """Get fields where was changes with an original value and current."""
+
+        changed_fields = dict()
+        for fieldname, original_value in self._original_values_fields.items():
+
+            # ignore a field with auto_now=True
+            field = self._meta.get_field(fieldname)
+            if isinstance(field, (models.DateField, models.DateTimeField)):
+                if field.auto_now is True:
+                    continue
+
+            current_value = getattr(self, fieldname)
+            if current_value != original_value:
+                changed_fields[fieldname] = (original_value, current_value)
+
+        return changed_fields
+
+    def save(self, *args, **kwargs):
+
+        i = super(IsChangedInstanceModelMixin, self).save(*args, **kwargs)
+        import ipdb; ipdb.set_trace()
+        self._original_values_fields = 1

@@ -7,7 +7,6 @@ import collections
 from django.contrib.postgres.fields import ArrayField
 from django.utils.html import format_html
 from django.core.exceptions import ValidationError
-from django.contrib.contenttypes.fields import GenericRelation
 from django.core.validators import MinLengthValidator, RegexValidator, MinValueValidator, MaxValueValidator
 from django.utils import timezone
 from django.core.urlresolvers import reverse
@@ -18,7 +17,7 @@ from django.conf import settings
 from utils.python.utils import flatten
 from utils.django.models_utils import get_admin_url, upload_image
 from utils.django.models_fields import ConfiguredAutoSlugField, CountryField
-from utils.django.models import Timestampable, UUIDable, Creatable
+from utils.django.models import Timestampable, UUIDable, Creatable, IsChangedInstanceModelMixin
 from utils.django.functions_db import Round
 from utils.django.validators import OnlyLettersValidator
 
@@ -371,7 +370,7 @@ class Publisher(UUIDable):
     get_count_books.admin_order_field = 'count_books'
 
 
-class Reply(Timestampable, UUIDable):
+class Reply(Timestampable, UUIDable, IsChangedInstanceModelMixin):
     """
     Model for reply about other objects.
     """
