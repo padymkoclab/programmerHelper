@@ -184,3 +184,16 @@ def generate_captcha(request):
     img.paste(textImg, (0, 0), mask)
     img.save(output, format='png')
     return StreamingHttpResponse([output.getvalue()], content_type="image/png")
+
+
+def partial(func, *oldargs, **oldkwargs):
+    """
+    def a(a, b, c, d):
+        return a + b + c + d
+    assert partial(a, 5, c=0)(8, d=2) == 15
+    """
+
+    def wrap(*newargs, **newkwargs):
+        newkwargs.update(oldkwargs)
+        return func(*(oldargs + newargs), **newkwargs)
+    return wrap

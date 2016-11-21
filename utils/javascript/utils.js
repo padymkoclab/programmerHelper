@@ -65,3 +65,51 @@ deffered.done(function(location_coordinates){
 }).fail(function(e){
     console.log('Could not determinate a location or it a feature is not avaible.');
 });
+
+
+/*
+
+*/
+var get_inner_text_all_tags_dom_without_children = function(){
+    var nodes = document.getElementsByTagName('*');
+    var result = new Array();
+    for (var i=0; i < nodes.length; i++){
+        var dom_element = nodes[i];
+        var innerText = '';
+        var child_nodes = dom_element.childNodes;
+        for (var j=0; j < child_nodes.length; ++j){
+
+            var node = child_nodes[j];
+            if (node.nodeType === Node.TEXT_NODE) {
+                innerText += node.wholeText;
+            }
+        }
+        var innerText = innerText.replace('\n', ' ').trim();
+        if (innerText){
+            result.push([dom_element, innerText]);
+        }
+    }
+    return result
+}
+
+
+/*
+
+*/
+var getElementsByTextContains = function(text){
+
+    if (!text){
+        throw new Error('Value "text" is empty');
+    }
+
+    var all_tags_with_innerText = get_inner_text_all_tags_dom_without_children();
+    var result = new Array();
+    // var text = text.toLowerCase();
+    for (var i=0; i < all_tags_with_innerText.length; ++i){
+        var [node, innerText] = all_tags_with_innerText[i];
+        if (innerText.indexOf(text) !== -1){
+            result.push(node);
+        }
+    }
+    return result
+}

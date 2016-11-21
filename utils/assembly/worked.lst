@@ -1,0 +1,29 @@
+     1                                  ; worked.asm       print a string using printf
+     2                                  ; Assemble:   nasm -f elf64 -l worked.lst  worked.asm
+     3                                  ; Link:       gcc -m64 -o worked  worked.o
+     4                                  ; Run:        ./worked
+     5                                  
+     6                                  ; Declare needed C  functions
+     7                                  extern  printf         ; the C function, to be called
+     8                                  
+     9                                  section .data          ; Data section, initialized variables
+    10 00000000 576F726B656400          msg:    db "Worked", 0 ; C string needs 0
+    11 00000007 25730A00                fmt:    db "%s", 10, 0 ; The printf format, "\n",'0'
+    12                                  
+    13                                  section .text          ; Code section.
+    14                                  
+    15                                  global main            ; the standard gcc entry point
+    16                                  main:                  ; the program label for the entry point
+    17 00000000 55                      push    rbp            ; set up stack frame, must be aligned
+    18                                  
+    19 00000001 48BF-                   mov rdi,fmt
+    20 00000003 [0700000000000000] 
+    21 0000000B 48BE-                   mov rsi,msg
+    22 0000000D [0000000000000000] 
+    23 00000015 B800000000              mov rax,0              ; or can be  xor  rax,rax
+    24 0000001A E8(00000000)            call    printf         ; Call C function
+    25                                  
+    26 0000001F 5D                      pop     rbp            ; restore stack
+    27                                  
+    28 00000020 B800000000              mov rax,0              ; normal, no error, return value
+    29 00000025 C3                      ret                    ; return
