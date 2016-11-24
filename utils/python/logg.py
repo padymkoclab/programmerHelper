@@ -1,22 +1,22 @@
 
-import logging
+import logging as pylogging
 
 
 def create_logger_by_filename(name):
     """Return a logger for with passed name."""
 
     # create log
-    logger = logging.getLogger(name)
-    logger.setLevel(logging.DEBUG)
+    logger = pylogging.getLogger(name)
+    logger.setLevel(pylogging.DEBUG)
 
     # create handler for terminal
-    terminalHandler = logging.StreamHandler()
+    terminalHandler = pylogging.StreamHandler()
 
     # set level messages for handler
-    terminalHandler.setLevel(logging.DEBUG)
+    terminalHandler.setLevel(pylogging.DEBUG)
 
     # create formatter for handler
-    fmt = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    fmt = pylogging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
     # add formatter for handler
     terminalHandler.setFormatter(fmt)
