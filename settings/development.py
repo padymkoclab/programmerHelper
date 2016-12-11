@@ -9,9 +9,9 @@ DEBUG = True
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': get_setting_from_file(filename='secrets.json', setting_name='DATABASE_NAME'),
-        'USER': get_setting_from_file(filename='secrets.json', setting_name='DATABASE_USER'),
-        'PASSWORD': get_setting_from_file(filename='secrets.json', setting_name='DATABASE_PASSWORD'),
+        'NAME': get_setting_from_file(BASE_DIR.child('secrets.json'), 'DATABASE_NAME'),
+        'USER': get_setting_from_file(BASE_DIR.child('secrets.json'), 'DATABASE_USER'),
+        'PASSWORD': get_setting_from_file(BASE_DIR.child('secrets.json'), 'DATABASE_PASSWORD'),
         'HOST': '127.0.0.1',
         'PORT': '',
         'TEST': {

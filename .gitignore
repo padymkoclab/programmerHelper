@@ -5,6 +5,7 @@
 *.ipynb
 .ipynb_checkpoints/
 .cache/
+.tox/
 project.sublime-workspace
 
 static/vendor/

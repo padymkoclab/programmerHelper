@@ -31,7 +31,7 @@ from django.contrib.auth import login, logout
 # from django.utils.text import capfirst
 from django.utils.encoding import force_text
 
-from utils.django.views_mixins import ContextTitleMixin
+from utils.django.viewmixins import ContextTitleMixin
 from utils.python.utils import get_filename_with_datetime
 
 from apps.notifications.models import Notification
@@ -42,7 +42,7 @@ from .forms_utils import BootstrapErrorList
 from .forms import LoginForm, AddChangeDisplayForm, ImportForm, InlinesFormsets
 from .utils import get_field_verbose_name_from_lookup
 # from .descriptors import SiteAdminStrictDescriptor, ModelAdminStrictDescriptor
-from .views_mixins import SiteAdminMixin, SiteModelAdminMixin, SiteAppAdminMixin
+from .viewmixins import SiteAdminMixin, SiteModelAdminMixin, SiteAppAdminMixin
 
 
 logger = logging.getLogger('django.development')

@@ -1,4 +1,7 @@
 
+import warnings
+import sys
+import inspect
 import fnmatch
 import os
 import webbrowser
@@ -11,6 +14,7 @@ import string
 
 from django.conf import settings
 
+import pip
 from invoke import task
 
 
@@ -36,6 +40,7 @@ def checkup_path(path):
 
 @task
 def git_push(ctx, text_commit):
+    """Prepare and commit changes to repository."""
 
     # made copy project to another disk
     # use difflib and replace only changed
@@ -308,6 +313,7 @@ def replace_text_in_python_files(ctx, path, original_text, replaceable_text):
 
 @task
 def rename_files(ctx, path, pattern, rename_to):
+    """Make renaming files be passed parameters."""
 
     checkup_path(path)
 
@@ -388,25 +394,150 @@ def open_github_repository_page(ctx):
     webbrowser.open('https://' + github_repo_url)
 
 
+@task
 def clean_pyc(ctx):
     """Clean files with *.pyc extension"""
 
     pass
 
 
+@task
 def install_requirements(ctx):
-    """"""
+    """Intall requirements from file"""
 
     pass
 
 
+@task
 def migrate_db(ctx):
-    """"""
+    """Make migration of database"""
 
     pass
 
 
+@task
 def flush_cache(ctx):
-    """"""
+    """Flush cache"""
 
     pass
+
+
+@task(help=dict(package_name='Package name'))
+def remove_package(ctx, package_name):
+    """Remove package with all dependencies."""
+
+    installed_distributions = {package.key: package for package in pip.get_installed_distributions()}
+
+    package_name = package_name.lower()
+    package = installed_distributions.get(package_name)
+
+    if package is None:
+        warnings.warn('Package {} is not found'.format(package_name), Warning)
+
+    packages_for_removing = set()
+
+    def determinate_packages_dependencies(package, level):
+
+        if level == 0:
+            prefix = ''
+        else:
+            prefix = '{}|--> '.format('  ' * level)
+        print('{}{}'.format(prefix, package.project_name))
+        packages_for_removing.add(package.key)
+        package = installed_distributions[package.key]
+        level += 1
+        for require in package.requires():
+            determinate_packages_dependencies(require, level)
+
+    determinate_packages_dependencies(package, level=0)
+
+    if len(packages_for_removing) == 1:
+        print('Package {} has not dependencies.'.format(package.project_name))
+    else:
+        packages_must_leave = set()
+        for installed_package in installed_distributions.values():
+            if installed_package.key not in packages_for_removing:
+                requires = {require.key for require in installed_package.requires()}
+                for package_must_leave in requires.intersection(packages_for_removing):
+                    packages_must_leave.add(package_must_leave)
+
+        packages_for_removing = packages_for_removing.difference(packages_must_leave)
+
+        if packages_must_leave:
+            print(
+                '\nNext packages has other dependencies, so it wouldn`t removed: {}'.format(
+                    ', '.join(packages_must_leave)
+                )
+            )
+
+        print('\nPackage {} has dependencies. Also will be removed:\n{}'.format(
+            package.project_name,
+            ', '.join(packages_for_removing)
+        ))
+
+    is_confirmed = None
+    while is_confirmed not in ('', 'y', 'n'):
+        is_confirmed = input('Are you agre Yes(y)/No(n): (y)')
+
+        if is_confirmed in ('', 'y'):
+            command = 'pip uninstall --yes {}'.format(' '.join(packages_for_removing))
+            ctx.run(command)
+
+
+@task
+def get_packages_dependencies(ctx, package_name=None):
+    """Display packages dependencies."""
+
+    installed_distributions = pip.get_installed_distributions()
+
+    packages_required_for = collections.defaultdict(list)
+    for package in installed_distributions:
+        for require in package.requires():
+            packages_required_for[require.key].append(package)
+
+    if package_name is None:
+        packages = installed_distributions
+
+    else:
+
+        package_name = package_name.lower()
+        package = [package for package in installed_distributions if package.key == package_name]
+
+        if not package:
+            warnings.warn('Package {} is not found'.format(package_name), Warning)
+            packages = ()
+        else:
+            packages = package
+
+    for package in packages:
+
+        package_required_for = packages_required_for[package.key]
+        count_package_required_for = len(package_required_for)
+
+        requires = package.requires()
+        count_requires = len(requires)
+
+        msg_required_for = 'package' if count_package_required_for == 1 else 'packages'
+        msg_dependencies = 'dependency' if count_requires == 1 else 'dependencies'
+
+        for required_for in package_required_for:
+            print('   |--> {}'.format(required_for))
+
+        if count_package_required_for:
+            print('   |')
+
+        print(
+            '\033[0;30;42m{}\033[00m - required for {} {} and has {} {}'.format(
+                package.project_name,
+                count_package_required_for,
+                msg_required_for,
+                count_requires,
+                msg_dependencies,
+            )
+        )
+
+        if count_requires:
+            print('   ^')
+
+        for require in requires:
+            print('   |-- {}'.format(require))

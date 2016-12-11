@@ -1,5 +1,5 @@
 
-from utils.django.views_mixins import ContextTitleMixin
+from utils.django.viewmixins import ContextTitleMixin
 
 from .descriptors import SiteAdminStrictDescriptor, ModelAdminStrictDescriptor, SiteAppAdminStrictDescriptor
 

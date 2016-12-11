@@ -1,28 +1,24 @@
 {
   "name": "programmerhelper",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "",
   "main": "index.js",
   "dependencies": {
-    "eslint-config-google": "^0.6.0",
-    "eslint-config-standard": "^5.3.5",
-    "eslint-plugin-react": "^5.2.2",
-    "eslint-plugin-standard": "^2.0.0"
   },
   "devDependencies": {},
   "scripts": {
-    "test": "grunt test --verbose"
+    "test": ""
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/setivolkylany/programmerHelper.git"
+    "url": "https://github.com/setivolkylany/programmerHelper.git"
   },
   "keywords": [
     "Python",
     "Django"
   ],
-  "author": "I",
-  "license": "ISC",
+  "author": "setivolkylany",
+  "license": "BSD",
   "bugs": {
     "url": "https://github.com/setivolkylany/programmerHelper/issues"
   },

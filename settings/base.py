@@ -13,7 +13,7 @@ BASE_DIR = Path(__file__).ancestor(2)
 
 SITE_ID = 1
 
-SECRET_KEY = get_setting_from_file(filename='secrets.json', setting_name='SECRET_KEY')
+SECRET_KEY = get_setting_from_file(BASE_DIR.child('secrets.json'), 'SECRET_KEY')
 
 # Application definition
 
